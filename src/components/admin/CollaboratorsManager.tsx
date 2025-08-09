@@ -185,12 +185,12 @@ export default function CollaboratorsManager() {
   const companies = [...new Set(collaborators.map(c => c.company))];
 
   const columns = [
-    { key: 'name', label: 'Nome' },
-    { key: 'role', label: 'Cargo' },
-    { key: 'company', label: 'Empresa' },
-    { key: 'contact', label: 'Contato' },
-    { key: 'isFeatured', label: 'Destaque' },
-    { key: 'createdAt', label: 'Data' }
+    { key: 'name', title: 'Nome' },
+    { key: 'role', title: 'Cargo' },
+    { key: 'company', title: 'Empresa' },
+    { key: 'contact', title: 'Contato' },
+    { key: 'isFeatured', title: 'Destaque' },
+    { key: 'createdAt', title: 'Data' }
   ];
 
   const formatDate = (dateString: string) => {

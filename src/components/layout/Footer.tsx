@@ -196,7 +196,7 @@ const Footer = () => {
               <div className="flex items-center space-x-3">
                 <Mail size={16} className="text-primary-400 flex-shrink-0" />
                 <a
-                  href="mailto:contato@associacaodeporcos.com.br"
+                  href="mailto:contato@associacaodeporcos.ao"
                   className="text-sm text-gray-300 hover:text-primary-400 transition-colors"
                 >
                   contato@associacaodeporcos.ao

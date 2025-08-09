@@ -153,12 +153,12 @@ export default function NewsManager() {
   const categories = [...new Set(news.map(n => n.category))];
 
   const columns = [
-    { key: 'title', label: 'Título' },
-    { key: 'category', label: 'Categoria' },
-    { key: 'author', label: 'Autor' },
-    { key: 'views', label: 'Visualizações' },
-    { key: 'isPublished', label: 'Status' },
-    { key: 'createdAt', label: 'Data' }
+    { key: 'title', title: 'Título' },
+    { key: 'category', title: 'Categoria' },
+    { key: 'author', title: 'Autor' },
+    { key: 'views', title: 'Visualizações' },
+    { key: 'isPublished', title: 'Status' },
+    { key: 'createdAt', title: 'Data' }
   ];
 
   const formatDate = (dateString: string) => {
@@ -399,7 +399,7 @@ export default function NewsManager() {
         message={`Tem certeza que deseja deletar a notícia "${newsToDelete?.title}"? Esta ação não pode ser desfeita.`}
         confirmText="Deletar"
         cancelText="Cancelar"
-        confirmColor="red"
+        type="danger"
       />
     </div>
   );

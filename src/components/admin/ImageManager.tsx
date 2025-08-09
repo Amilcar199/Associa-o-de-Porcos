@@ -227,7 +227,7 @@ export default function ImageManager() {
         message={`Tem certeza que deseja deletar a imagem "${imageToDelete?.filename}"? Esta ação não pode ser desfeita.`}
         confirmText="Deletar"
         cancelText="Cancelar"
-        confirmColor="red"
+        type="danger"
       />
     </div>
   );

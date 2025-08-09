@@ -199,7 +199,7 @@ const CallToAction = () => {
                     <Mail size={18} className="text-white" />
                   </div>
                   <div>
-                    <p className="text-white font-medium">contato@associacaodeporcos.com.br</p>
+                    <p className="text-white font-medium">contato@associacaodeporcos.ao</p>
                     <p className="text-primary-200 text-sm">Respondemos em até 24h</p>
                   </div>
                 </div>

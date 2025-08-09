@@ -302,7 +302,7 @@ export default function MembersArea() {
                       <p className="text-gray-600 text-sm mb-4">{item.description}</p>
                       <div className="flex items-center justify-between">
                         <span className="text-xs text-gray-500">
-                          {new Date(item.createdAt).toLocaleDateString('pt-BR')}
+                          {new Date(item.createdAt).toLocaleDateString('pt-AO')}
                         </span>
                         {item.url && (
                           <button className="inline-flex items-center text-sm text-green-600 hover:text-green-700">

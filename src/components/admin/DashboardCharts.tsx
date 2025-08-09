@@ -169,7 +169,7 @@ const DashboardCharts = () => {
                   {news.title}
                 </h4>
                 <p className="text-xs text-gray-500 mt-1">
-                  {new Date(news.publishedAt).toLocaleDateString('pt-BR')}
+                  {new Date(news.publishedAt).toLocaleDateString('pt-AO')}
                 </p>
               </div>
               <div className="ml-4 text-right">

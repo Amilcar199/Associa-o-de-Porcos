@@ -18,11 +18,12 @@ import {
   ChevronDown,
   ChevronRight
 } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 
 interface MenuItem {
   name: string
   href: string
-  icon: React.ComponentType<{ size?: number; className?: string }>
+  icon: LucideIcon
   badge?: number
   children?: MenuItem[]
 }

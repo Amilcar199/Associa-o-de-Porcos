@@ -174,9 +174,9 @@ ProductSchema.virtual('ageFormatted').get(function (this: IProduct) {
 // Virtual para preço formatado
 ProductSchema.virtual('priceFormatted').get(function (this: IProduct) {
   if (!this.price) return 'Preço sob consulta'
-  return new Intl.NumberFormat('pt-BR', {
+  return new Intl.NumberFormat('pt-AO', {
     style: 'currency',
-    currency: 'BRL'
+    currency: 'AOA'
   }).format(this.price)
 })
 

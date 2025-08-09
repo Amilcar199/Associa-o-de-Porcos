@@ -156,18 +156,18 @@ export default function ProductsManager() {
   const breeds = [...new Set(products.map(p => p.breed))];
 
   const columns = [
-    { key: 'name', label: 'Nome' },
-    { key: 'breed', label: 'Raça' },
-    { key: 'age', label: 'Idade (meses)' },
-    { key: 'weight', label: 'Peso (kg)' },
-    { key: 'price', label: 'Preço (R$)' },
-    { key: 'isAvailable', label: 'Disponível' }
+    { key: 'name', title: 'Nome' },
+    { key: 'breed', title: 'Raça' },
+    { key: 'age', title: 'Idade (meses)' },
+    { key: 'weight', title: 'Peso (kg)' },
+    { key: 'price', title: 'Preço (Kz)' },
+    { key: 'isAvailable', title: 'Disponível' }
   ];
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('pt-BR', {
+    return new Intl.NumberFormat('pt-AO', {
       style: 'currency',
-      currency: 'BRL'
+      currency: 'AOA'
     }).format(price);
   };
 
@@ -416,7 +416,7 @@ export default function ProductsManager() {
         message={`Tem certeza que deseja deletar o produto "${productToDelete?.name}"? Esta ação não pode ser desfeita.`}
         confirmText="Deletar"
         cancelText="Cancelar"
-        confirmColor="red"
+        type="danger"
       />
     </div>
   );

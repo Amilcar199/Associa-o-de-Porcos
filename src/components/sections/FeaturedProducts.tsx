@@ -115,9 +115,9 @@ const FeaturedProducts = () => {
   }, [])
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('pt-BR', {
+    return new Intl.NumberFormat('pt-AO', {
       style: 'currency',
-      currency: 'BRL'
+      currency: 'AOA'
     }).format(price)
   }
 
