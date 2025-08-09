@@ -1,0 +1,56 @@
+{
+  "name": "associacao-de-porcos",
+  "version": "1.0.0",
+  "description": "Site institucional da Associação de Porcos com área de membros e painel administrativo",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit",
+    "setup": "node scripts/setup.js"
+  },
+  "dependencies": {
+    "@auth/mongodb-adapter": "^3.10.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.5",
+    "@types/nodemailer": "^6.4.17",
+    "axios": "^1.6.0",
+    "bcryptjs": "^2.4.3",
+    "framer-motion": "^10.16.0",
+    "jsonwebtoken": "^9.0.2",
+    "lucide-react": "^0.294.0",
+    "mongoose": "^8.0.0",
+    "next": "^14.0.0",
+    "next-auth": "^4.24.0",
+    "nodemailer": "^6.10.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hook-form": "^7.47.0",
+    "react-hot-toast": "^2.4.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.7",
+    "@tailwindcss/typography": "^0.5.10",
+    "@types/node": "^20.9.0",
+    "@types/react": "^18.2.37",
+    "@types/react-dom": "^18.2.15",
+    "autoprefixer": "^10.4.16",
+    "eslint": "^8.53.0",
+    "eslint-config-next": "^14.0.0",
+    "postcss": "^8.4.31",
+    "tailwindcss": "^3.3.0",
+    "typescript": "^5.2.2"
+  },
+  "keywords": [
+    "associacao",
+    "porcos",
+    "agricultura",
+    "nextjs",
+    "mongodb",
+    "suinos"
+  ],
+  "author": "Associação de Porcos",
+  "license": "MIT"
+}
