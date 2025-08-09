@@ -96,13 +96,13 @@ const Header = () => {
               ) : (
                 <div className="flex items-center space-x-4">
                   <Link 
-                    href="/auth/login" 
+                    href="/login" 
                     className="text-primary-200 hover:text-white transition-colors"
                   >
                     Entrar
                   </Link>
                   <Link 
-                    href="/auth/register" 
+                    href="/registro" 
                     className="bg-primary-600 hover:bg-primary-700 px-3 py-1 rounded transition-colors"
                   >
                     Cadastre-se
@@ -240,13 +240,13 @@ const Header = () => {
               ) : (
                 <div className="flex items-center space-x-4">
                   <Link
-                    href="/auth/login"
+                    href="/login"
                     className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
                   >
                     Entrar
                   </Link>
                   <Link
-                    href="/auth/register"
+                    href="/registro"
                     className="btn-primary"
                   >
                     Faça Parte
@@ -345,13 +345,13 @@ const Header = () => {
                   ) : (
                     <div className="pt-4 border-t border-gray-200 space-y-4">
                       <Link
-                        href="/auth/login"
+                        href="/login"
                         className="block py-2 text-gray-700 hover:text-primary-600 font-medium transition-colors"
                       >
                         Entrar
                       </Link>
                       <Link
-                        href="/auth/register"
+                        href="/registro"
                         className="btn-primary inline-block"
                       >
                         Faça Parte

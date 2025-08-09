@@ -31,7 +31,7 @@ const Hero = () => {
       subtitle: 'Produtos certificados com os mais altos padrões de qualidade',
       description: 'Nossos suínos são criados seguindo rigorosos protocolos de bem-estar animal e sustentabilidade ambiental, garantindo produtos de excelência.',
       cta: 'Faça Parte da Associação',
-      ctaLink: '/auth/register',
+      ctaLink: '/registro',
       stats: [
         { label: 'Certificações', value: '15+' },
         { label: 'Raças Disponíveis', value: '12' },
