@@ -15,13 +15,13 @@ interface EmailTemplate {
 
 // Configurar transporter do Nodemailer
 const createTransporter = () => {
-  return nodemailer.createTransporter({
-    host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: parseInt(process.env.SMTP_PORT || '587'),
+  return nodemailer.createTransport({
+    host: process.env.EMAIL_SERVER_HOST || process.env.SMTP_HOST || 'smtp.gmail.com',
+    port: parseInt(process.env.EMAIL_SERVER_PORT || process.env.SMTP_PORT || '587', 10),
     secure: false, // true para 465, false para outras portas
     auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
+      user: process.env.EMAIL_SERVER_USER || process.env.SMTP_USER,
+      pass: process.env.EMAIL_SERVER_PASSWORD || process.env.SMTP_PASS,
     },
   });
 };
@@ -32,7 +32,7 @@ export const sendEmail = async (options: EmailOptions): Promise<boolean> => {
     const transporter = createTransporter();
     
     const mailOptions = {
-      from: `"Associação de Porcos" <${process.env.SMTP_USER}>`,
+      from: `"Associação de Porcos" <${process.env.EMAIL_FROM || process.env.EMAIL_SERVER_USER || process.env.SMTP_USER}>`,
       to: options.to,
       subject: options.subject,
       html: options.html,

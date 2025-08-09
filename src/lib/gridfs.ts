@@ -1,4 +1,5 @@
 import { GridFSBucket, ObjectId } from 'mongodb';
+import mongoose from 'mongoose';
 import { connectDB } from './mongodb';
 
 export interface UploadResult {
@@ -14,7 +15,8 @@ export async function uploadImage(
   filename: string,
   contentType: string
 ): Promise<UploadResult> {
-  const { db } = await connectDB();
+  await connectDB();
+  const db = mongoose.connection.db;
   const bucket = new GridFSBucket(db, { bucketName: 'images' });
 
   // Gerar nome único para o arquivo
@@ -31,14 +33,20 @@ export async function uploadImage(
 
   return new Promise((resolve, reject) => {
     uploadStream.on('error', reject);
-    uploadStream.on('finish', () => {
-      resolve({
-        fileId: uploadStream.id.toString(),
-        filename: uniqueFilename,
-        contentType,
-        size: uploadStream.length,
-        url: `/api/images/${uploadStream.id}`
-      });
+    uploadStream.on('finish', async () => {
+      try {
+        const fileId = uploadStream.id as ObjectId;
+        const fileDoc = await bucket.find({ _id: fileId }).next();
+        resolve({
+          fileId: fileId.toString(),
+          filename: uniqueFilename,
+          contentType: fileDoc?.metadata?.contentType || contentType,
+          size: fileDoc?.length || file.byteLength || 0,
+          url: `/api/images/${fileId.toString()}`
+        });
+      } catch (err) {
+        reject(err);
+      }
     });
 
     uploadStream.end(file);
@@ -47,14 +55,17 @@ export async function uploadImage(
 
 export async function getImage(fileId: string): Promise<{ stream: any; contentType: string } | null> {
   try {
-    const { db } = await connectDB();
+    await connectDB();
+    const db = mongoose.connection.db;
     const bucket = new GridFSBucket(db, { bucketName: 'images' });
     
-    const downloadStream = bucket.openDownloadStream(new ObjectId(fileId));
+    const objectId = new ObjectId(fileId);
+    const fileDoc = await bucket.find({ _id: objectId }).next();
+    const downloadStream = bucket.openDownloadStream(objectId);
     
     return {
       stream: downloadStream,
-      contentType: downloadStream.s.files.metadata?.contentType || 'image/jpeg'
+      contentType: fileDoc?.metadata?.contentType || 'image/jpeg'
     };
   } catch (error) {
     console.error('Erro ao buscar imagem:', error);
@@ -64,7 +75,8 @@ export async function getImage(fileId: string): Promise<{ stream: any; contentTy
 
 export async function deleteImage(fileId: string): Promise<boolean> {
   try {
-    const { db } = await connectDB();
+    await connectDB();
+    const db = mongoose.connection.db;
     const bucket = new GridFSBucket(db, { bucketName: 'images' });
     
     await bucket.delete(new ObjectId(fileId));
@@ -77,7 +89,8 @@ export async function deleteImage(fileId: string): Promise<boolean> {
 
 export async function listImages(): Promise<Array<{ fileId: string; filename: string; contentType: string; size: number; uploadedAt: Date }>> {
   try {
-    const { db } = await connectDB();
+    await connectDB();
+    const db = mongoose.connection.db;
     const bucket = new GridFSBucket(db, { bucketName: 'images' });
     
     const cursor = bucket.find({});
@@ -88,7 +101,7 @@ export async function listImages(): Promise<Array<{ fileId: string; filename: st
       filename: file.filename,
       contentType: file.metadata?.contentType || 'image/jpeg',
       size: file.length,
-      uploadedAt: file.metadata?.uploadedAt || file.uploadDate
+      uploadedAt: file.metadata?.uploadedAt || (file as any).uploadDate
     }));
   } catch (error) {
     console.error('Erro ao listar imagens:', error);

@@ -5,6 +5,7 @@ import { MongoClient } from 'mongodb'
 import connectDB from './mongodb'
 import User from '@/models/User'
 import { AuthUser } from '@/types'
+import GoogleProvider from 'next-auth/providers/google'
 
 if (!process.env.MONGODB_URI) {
   throw new Error('Por favor, adicione sua MONGODB_URI no arquivo .env.local')
@@ -72,7 +73,15 @@ export const authOptions: NextAuthOptions = {
           throw new Error(error instanceof Error ? error.message : 'Erro interno do servidor')
         }
       }
-    })
+    }),
+    ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+      ? [
+          GoogleProvider({
+            clientId: process.env.GOOGLE_CLIENT_ID!,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+          })
+        ]
+      : [])
   ],
   
   session: {
@@ -85,9 +94,9 @@ export const authOptions: NextAuthOptions = {
   },
   
   pages: {
-    signIn: '/auth/login',
-    signUp: '/auth/register',
-    error: '/auth/error',
+    signIn: '/login',
+    signUp: '/registro',
+    error: '/login',
   },
   
   callbacks: {

@@ -9,7 +9,7 @@ export default withAuth(
     // Proteger rotas do admin
     if (pathname.startsWith('/admin')) {
       if (!token || token.role !== 'admin') {
-        return NextResponse.redirect(new URL('/auth/login?error=insufficient_permissions', req.url))
+        return NextResponse.redirect(new URL('/login?error=insufficient_permissions', req.url))
       }
     }
 
@@ -53,7 +53,10 @@ export default withAuth(
           pathname.startsWith('/noticias') ||
           pathname.startsWith('/colaboradores') ||
           pathname.startsWith('/contato') ||
-          pathname.startsWith('/auth') ||
+          pathname.startsWith('/login') ||
+          pathname.startsWith('/registro') ||
+          pathname.startsWith('/esqueci-senha') ||
+          pathname.startsWith('/redefinir-senha') ||
           pathname.startsWith('/_next') ||
           pathname.startsWith('/favicon') ||
           pathname === '/api/contact'
