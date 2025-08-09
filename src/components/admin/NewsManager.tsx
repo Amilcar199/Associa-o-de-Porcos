@@ -33,7 +33,7 @@ interface NewsFormData {
 }
 
 export default function NewsManager() {
-  const [news, setNews] = useState<News[]>([]);
+  const [news, setNews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingNews, setEditingNews] = useState<News | null>(null);
@@ -150,7 +150,7 @@ export default function NewsManager() {
     return matchesSearch && matchesFilter;
   });
 
-  const categories = [...new Set(news.map(n => n.category))];
+  const categories = Array.from(new Map(news.map((n: any) => [n.category, n.category])).values());
 
   const columns = [
     { key: 'title', title: 'Título' },
@@ -162,7 +162,7 @@ export default function NewsManager() {
   ];
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('pt-BR', {
+    return new Date(dateString).toLocaleDateString('pt-AO', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric'
@@ -255,7 +255,6 @@ export default function NewsManager() {
         columns={columns}
         onEdit={(item) => handleEdit(item as News)}
         onDelete={(item) => setNewsToDelete(item as News)}
-        actions={['edit', 'delete']}
       />
 
       {/* Add/Edit Modal */}

@@ -182,7 +182,7 @@ export default function CollaboratorsManager() {
     return matchesSearch && matchesFilter;
   });
 
-  const companies = [...new Set(collaborators.map(c => c.company))];
+  const companies = Array.from(new Map(collaborators.map(c => [c.company, c.company])).values());
 
   const columns = [
     { key: 'name', title: 'Nome' },
@@ -297,7 +297,6 @@ export default function CollaboratorsManager() {
         columns={columns}
         onEdit={(item) => handleEdit(item as Collaborator)}
         onDelete={(item) => setCollaboratorToDelete(item as Collaborator)}
-        actions={['edit', 'delete']}
       />
 
       {/* Add/Edit Modal */}
@@ -512,7 +511,7 @@ export default function CollaboratorsManager() {
         message={`Tem certeza que deseja deletar o colaborador "${collaboratorToDelete?.name}"? Esta ação não pode ser desfeita.`}
         confirmText="Deletar"
         cancelText="Cancelar"
-        confirmColor="red"
+        type="danger"
       />
     </div>
   );

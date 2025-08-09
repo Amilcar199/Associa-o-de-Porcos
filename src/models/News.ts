@@ -124,7 +124,7 @@ NewsSchema.virtual('readTime').get(function (this: INews) {
 // Virtual para data formatada
 NewsSchema.virtual('publishedAtFormatted').get(function (this: INews) {
   if (!this.publishedAt) return null
-  return new Intl.DateTimeFormat('pt-BR', {
+  return new Intl.DateTimeFormat('pt-AO', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',

@@ -78,7 +78,7 @@ export default function ImageManager() {
   };
 
   const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString('pt-BR', {
+    return new Date(date).toLocaleDateString('pt-AO', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',

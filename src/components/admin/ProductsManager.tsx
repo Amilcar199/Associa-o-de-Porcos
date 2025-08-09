@@ -33,7 +33,7 @@ interface ProductFormData {
 }
 
 export default function ProductsManager() {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -153,7 +153,7 @@ export default function ProductsManager() {
     return matchesSearch && matchesFilter;
   });
 
-  const breeds = [...new Set(products.map(p => p.breed))];
+  const breeds = Array.from(new Map(products.map((p: any) => [p.breed, p.breed])).values());
 
   const columns = [
     { key: 'name', title: 'Nome' },
@@ -257,7 +257,6 @@ export default function ProductsManager() {
         columns={columns}
         onEdit={(item) => handleEdit(item as Product)}
         onDelete={(item) => setProductToDelete(item as Product)}
-        actions={['edit', 'delete']}
       />
 
       {/* Add/Edit Modal */}

@@ -153,8 +153,8 @@ export async function paginateResults<T>(
   pagination: PaginationParams,
   populate?: string | string[]
 ) {
-  const { page, limit, sort, order } = pagination
-  const skip = (page - 1) * limit!
+  const { page = 1, limit = 10, sort, order } = pagination
+  const skip = (page - 1) * limit
 
   // Construir query
   let mongoQuery = model.find(query)

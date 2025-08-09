@@ -131,11 +131,11 @@ userSchema.methods.incLoginAttempts = function() {
     });
   }
   
-  const updates = { $inc: { loginAttempts: 1 } };
+  const updates: any = { $inc: { loginAttempts: 1 } };
   
   // Se chegou ao limite de tentativas, bloquear conta
   if (this.loginAttempts + 1 >= 5 && !this.isLocked()) {
-    updates.$set = { lockUntil: Date.now() + 2 * 60 * 60 * 1000 }; // 2 horas
+    Object.assign(updates, { $set: { lockUntil: Date.now() + 2 * 60 * 60 * 1000 } }) // 2 horas
   }
   
   return this.updateOne(updates);

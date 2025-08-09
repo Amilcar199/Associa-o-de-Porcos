@@ -97,7 +97,7 @@ const RecentActivity = () => {
     const diffInDays = Math.floor(diffInHours / 24)
     if (diffInDays < 7) return `${diffInDays}d atrás`
     
-    return new Date(date).toLocaleDateString('pt-BR', {
+    return new Date(date).toLocaleDateString('pt-AO', {
       day: '2-digit',
       month: '2-digit'
     })

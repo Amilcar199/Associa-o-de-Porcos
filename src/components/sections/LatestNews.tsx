@@ -124,7 +124,7 @@ const LatestNews = () => {
   }
 
   const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat('pt-BR', {
+    return new Intl.DateTimeFormat('pt-AO', {
       day: 'numeric',
       month: 'long',
       year: 'numeric'

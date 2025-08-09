@@ -21,7 +21,7 @@ import { Contact } from '@/types'
 import toast from 'react-hot-toast'
 
 const ContactsManager = () => {
-  const [contacts, setContacts] = useState<Contact[]>([])
+  const [contacts, setContacts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [pagination, setPagination] = useState({
     page: 1,
@@ -174,7 +174,7 @@ const ContactsManager = () => {
     if (diffInMinutes < 1440) return `Há ${Math.floor(diffInMinutes / 60)} horas`
     if (diffInMinutes < 10080) return `Há ${Math.floor(diffInMinutes / 1440)} dias`
     
-    return new Date(date).toLocaleDateString('pt-BR', {
+    return new Date(date).toLocaleDateString('pt-AO', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric'
@@ -236,7 +236,7 @@ const ContactsManager = () => {
         <div className="text-sm text-gray-600">
           <div>{formatDate(value)}</div>
           <div className="text-xs text-gray-400">
-            {new Date(value).toLocaleDateString('pt-BR')}
+            {new Date(value).toLocaleDateString('pt-AO')}
           </div>
         </div>
       )
@@ -365,7 +365,7 @@ const ContactsManager = () => {
                 
                 {selectedContact.phone && (
                   <a
-                    href={`https://wa.me/55${selectedContact.phone.replace(/\D/g, '')}?text=Olá ${selectedContact.name}, vi sua mensagem sobre "${selectedContact.subject}"`}
+                    href={`https://wa.me/244${selectedContact.phone.replace(/\D/g, '')}?text=Olá ${selectedContact.name}, vi sua mensagem sobre \"${selectedContact.subject}\"`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"

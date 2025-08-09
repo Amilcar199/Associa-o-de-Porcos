@@ -68,7 +68,7 @@ ContactSchema.virtual('statusText').get(function (this: IContact) {
 
 // Virtual para data formatada
 ContactSchema.virtual('createdAtFormatted').get(function (this: IContact) {
-  return new Intl.DateTimeFormat('pt-BR', {
+  return new Intl.DateTimeFormat('pt-AO', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -84,22 +84,22 @@ ContactSchema.virtual('messagePreview').get(function (this: IContact) {
 })
 
 // Método estático para buscar contatos por status
-ContactSchema.statics.findByStatus = function (status: string) {
+ContactSchema.statics.findByStatus = function (this: any, status: string) {
   return this.find({ status }).sort({ createdAt: -1 })
 }
 
 // Método estático para buscar contatos novos
-ContactSchema.statics.findNew = function () {
+ContactSchema.statics.findNew = function (this: any) {
   return this.find({ status: 'new' }).sort({ createdAt: -1 })
 }
 
 // Método estático para buscar contatos não arquivados
-ContactSchema.statics.findActive = function () {
+ContactSchema.statics.findActive = function (this: any) {
   return this.find({ status: { $ne: 'archived' } }).sort({ createdAt: -1 })
 }
 
 // Método estático para contar contatos por status
-ContactSchema.statics.countByStatus = function () {
+ContactSchema.statics.countByStatus = function (this: any) {
   return this.aggregate([
     {
       $group: {
@@ -110,8 +110,11 @@ ContactSchema.statics.countByStatus = function () {
   ])
 }
 
+// Declaração para acalmar TS sobre métodos estáticos customizados
+// (remoção da reatribuição redundante)
+
 // Método estático para estatísticas de contato
-ContactSchema.statics.getStats = async function () {
+ContactSchema.statics.getStats = async function (this: any) {
   const now = new Date()
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
   const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()))
@@ -125,7 +128,7 @@ ContactSchema.statics.getStats = async function () {
     this.countByStatus()
   ])
 
-  const statusCounts = byStatus.reduce((acc: any, item: any) => {
+  const statusCounts = (byStatus as any[]).reduce((acc: any, item: any) => {
     acc[item._id] = item.count
     return acc
   }, {})

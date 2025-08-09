@@ -19,7 +19,7 @@ const client = new MongoClient(process.env.MONGODB_URI)
 const clientPromise = client.connect()
 
 export const authOptions: NextAuthOptions = {
-  adapter: MongoDBAdapter(clientPromise),
+  adapter: MongoDBAdapter(clientPromise) as any,
   providers: [
     CredentialsProvider({
       id: 'credentials',
@@ -95,7 +95,6 @@ export const authOptions: NextAuthOptions = {
   
   pages: {
     signIn: '/login',
-    signUp: '/registro',
     error: '/login',
   },
   
@@ -132,7 +131,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.sub!
-        session.user.role = token.role as string
+        session.user.role = (token.role as 'admin' | 'member' | 'visitor')
         session.user.avatar = token.avatar as string
       }
       return session

@@ -1,4 +1,4 @@
-import { GridFSBucket, ObjectId } from 'mongodb';
+import { GridFSBucket, ObjectId, Db } from 'mongodb';
 import mongoose from 'mongoose';
 import { connectDB } from './mongodb';
 
@@ -16,7 +16,10 @@ export async function uploadImage(
   contentType: string
 ): Promise<UploadResult> {
   await connectDB();
-  const db = mongoose.connection.db;
+  const db = (mongoose.connection as any).db as Db;
+  if (!db) {
+    throw new Error('Database connection not available')
+  }
   const bucket = new GridFSBucket(db, { bucketName: 'images' });
 
   // Gerar nome único para o arquivo
@@ -56,7 +59,8 @@ export async function uploadImage(
 export async function getImage(fileId: string): Promise<{ stream: any; contentType: string } | null> {
   try {
     await connectDB();
-    const db = mongoose.connection.db;
+    const db = (mongoose.connection as any).db as Db;
+    if (!db) return null
     const bucket = new GridFSBucket(db, { bucketName: 'images' });
     
     const objectId = new ObjectId(fileId);
@@ -76,7 +80,8 @@ export async function getImage(fileId: string): Promise<{ stream: any; contentTy
 export async function deleteImage(fileId: string): Promise<boolean> {
   try {
     await connectDB();
-    const db = mongoose.connection.db;
+    const db = (mongoose.connection as any).db as Db;
+    if (!db) return false
     const bucket = new GridFSBucket(db, { bucketName: 'images' });
     
     await bucket.delete(new ObjectId(fileId));
@@ -90,7 +95,8 @@ export async function deleteImage(fileId: string): Promise<boolean> {
 export async function listImages(): Promise<Array<{ fileId: string; filename: string; contentType: string; size: number; uploadedAt: Date }>> {
   try {
     await connectDB();
-    const db = mongoose.connection.db;
+    const db = (mongoose.connection as any).db as Db;
+    if (!db) return []
     const bucket = new GridFSBucket(db, { bucketName: 'images' });
     
     const cursor = bucket.find({});
