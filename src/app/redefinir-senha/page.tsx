@@ -1,102 +1,94 @@
-'use client';
+'use client'
 
-import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { Eye, EyeOff, Lock, AlertCircle, CheckCircle, ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
+export const dynamic = 'force-dynamic'
 
-export default function ResetPasswordPage() {
+import { Suspense, useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Eye, EyeOff, Lock, AlertCircle, CheckCircle, ArrowLeft } from 'lucide-react'
+import Link from 'next/link'
+
+function ResetPasswordContent() {
   const [formData, setFormData] = useState({
     password: '',
     confirmPassword: ''
-  });
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const [tokenValid, setTokenValid] = useState(false);
-  const [token, setToken] = useState('');
-  const router = useRouter();
-  const searchParams = useSearchParams();
+  })
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+  const [tokenValid, setTokenValid] = useState(false)
+  const [token, setToken] = useState('')
+  const router = useRouter()
+  const searchParams = useSearchParams()
 
   useEffect(() => {
-    const tokenParam = searchParams.get('token');
+    const tokenParam = searchParams.get('token')
     if (tokenParam) {
-      setToken(tokenParam);
-      validateToken(tokenParam);
+      setToken(tokenParam)
+      validateToken(tokenParam)
     } else {
-      setError('Token de recuperação inválido');
+      setError('Token de recuperação inválido')
     }
-  }, [searchParams]);
+  }, [searchParams])
 
   const validateToken = async (token: string) => {
     try {
       const response = await fetch('/api/auth/validate-reset-token', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token }),
-      });
+      })
 
       if (response.ok) {
-        setTokenValid(true);
+        setTokenValid(true)
       } else {
-        setError('Token inválido ou expirado');
+        setError('Token inválido ou expirado')
       }
     } catch (error) {
-      setError('Erro ao validar token');
+      setError('Erro ao validar token')
     }
-  };
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    setSuccess('');
+    e.preventDefault()
+    setLoading(true)
+    setError('')
+    setSuccess('')
 
-    // Validações
     if (formData.password !== formData.confirmPassword) {
-      setError('As senhas não coincidem');
-      setLoading(false);
-      return;
+      setError('As senhas não coincidem')
+      setLoading(false)
+      return
     }
 
     if (formData.password.length < 6) {
-      setError('A senha deve ter pelo menos 6 caracteres');
-      setLoading(false);
-      return;
+      setError('A senha deve ter pelo menos 6 caracteres')
+      setLoading(false)
+      return
     }
 
     try {
       const response = await fetch('/api/auth/reset-password', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          token,
-          password: formData.password
-        }),
-      });
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, password: formData.password }),
+      })
 
-      const data = await response.json();
+      const data = await response.json()
 
       if (!response.ok) {
-        setError(data.message || 'Erro ao redefinir senha');
+        setError(data.message || 'Erro ao redefinir senha')
       } else {
-        setSuccess('Senha redefinida com sucesso! Redirecionando...');
-        setTimeout(() => {
-          router.push('/login');
-        }, 2000);
+        setSuccess('Senha redefinida com sucesso! Redirecionando...')
+        setTimeout(() => { router.push('/login') }, 2000)
       }
     } catch (error) {
-      setError('Erro ao redefinir senha. Tente novamente.');
+      setError('Erro ao redefinir senha. Tente novamente.')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   if (!token) {
     return (
@@ -111,19 +103,15 @@ export default function ResetPasswordPage() {
           </Link>
         </div>
       </div>
-    );
+    )
   }
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900">
-            Redefinir Senha
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Digite sua nova senha
-          </p>
+          <h2 className="text-3xl font-bold text-gray-900">Redefinir Senha</h2>
+          <p className="mt-2 text-sm text-gray-600">Digite sua nova senha</p>
         </div>
       </div>
 
@@ -159,9 +147,7 @@ export default function ResetPasswordPage() {
               )}
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                  Nova Senha
-                </label>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700">Nova Senha</label>
                 <div className="mt-1 relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Lock className="h-5 w-5 text-gray-400" />
@@ -177,11 +163,7 @@ export default function ResetPasswordPage() {
                     className="appearance-none block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
                     placeholder="Mínimo 6 caracteres"
                   />
-                  <button
-                    type="button"
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
+                  <button type="button" className="absolute inset-y-0 right-0 pr-3 flex items-center" onClick={() => setShowPassword(!showPassword)}>
                     {showPassword ? (
                       <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
                     ) : (
@@ -192,9 +174,7 @@ export default function ResetPasswordPage() {
               </div>
 
               <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                  Confirmar Nova Senha
-                </label>
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">Confirmar Nova Senha</label>
                 <div className="mt-1 relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Lock className="h-5 w-5 text-gray-400" />
@@ -210,11 +190,7 @@ export default function ResetPasswordPage() {
                     className="appearance-none block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
                     placeholder="Confirme sua nova senha"
                   />
-                  <button
-                    type="button"
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  >
+                  <button type="button" className="absolute inset-y-0 right-0 pr-3 flex items-center" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
                     {showConfirmPassword ? (
                       <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
                     ) : (
@@ -237,17 +213,26 @@ export default function ResetPasswordPage() {
           )}
 
           <div className="mt-6 text-center">
-            <Link 
-              href="/login" 
-              className="inline-flex items-center text-sm text-green-600 hover:text-green-500"
-            >
-              <ArrowLeft className="w-4 h-4 mr-1" />
-              Voltar para o login
-            </Link>
+            <Link href="/login" className="text-sm text-green-600 hover:text-green-500">Voltar ao login</Link>
           </div>
         </div>
       </div>
     </div>
-  );
+  )
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
+          <p className="mt-2 text-sm text-gray-600">Carregando...</p>
+        </div>
+      </div>
+    }>
+      <ResetPasswordContent />
+    </Suspense>
+  )
 }
 

@@ -111,7 +111,6 @@ const userSchema = new mongoose.Schema({
 });
 
 // Índices para melhor performance
-userSchema.index({ email: 1 });
 userSchema.index({ role: 1 });
 userSchema.index({ isActive: 1 });
 userSchema.index({ createdAt: -1 });

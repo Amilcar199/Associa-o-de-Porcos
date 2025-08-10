@@ -1,12 +1,16 @@
 import type { Metadata } from 'next'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export const metadata: Metadata = {
   title: 'Notícias',
   description: 'Últimas notícias e eventos'
 }
 
 async function getNews() {
-  const res = await fetch(`/api/news`, { next: { revalidate: 60 } })
+  const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
+  const res = await fetch(`${baseUrl}/api/news`, { cache: 'no-store' })
   if (!res.ok) return []
   const json = await res.json()
   return json.data || []

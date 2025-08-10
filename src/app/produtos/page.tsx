@@ -1,12 +1,16 @@
 import type { Metadata } from 'next'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export const metadata: Metadata = {
   title: 'Produtos',
   description: 'Listagem de produtos disponíveis'
 }
 
 async function getProducts() {
-  const res = await fetch(`/api/products`, { next: { revalidate: 60 } })
+  const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
+  const res = await fetch(`${baseUrl}/api/products`, { cache: 'no-store' })
   if (!res.ok) return []
   const json = await res.json()
   return json.data || []
