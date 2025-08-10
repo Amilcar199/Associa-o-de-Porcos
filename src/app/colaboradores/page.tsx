@@ -5,8 +5,17 @@ export const metadata: Metadata = {
   description: 'Parceiros e colaboradores'
 }
 
+export const dynamic = 'force-dynamic'
+
+function getBaseUrl() {
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`
+  if (process.env.NEXTAUTH_URL) return process.env.NEXTAUTH_URL
+  return 'http://localhost:3000'
+}
+
 async function getCollaborators() {
-  const res = await fetch(`/api/collaborators`, { next: { revalidate: 60 } })
+  const baseUrl = getBaseUrl()
+  const res = await fetch(`${baseUrl}/api/collaborators`, { next: { revalidate: 60 } })
   if (!res.ok) return []
   const json = await res.json()
   return json.data || []

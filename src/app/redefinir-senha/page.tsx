@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Eye, EyeOff, Lock, AlertCircle, CheckCircle, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
-export default function ResetPasswordPage() {
+function ResetPasswordContent() {
   const [formData, setFormData] = useState({
     password: '',
     confirmPassword: ''
@@ -56,7 +56,6 @@ export default function ResetPasswordPage() {
     setError('');
     setSuccess('');
 
-    // Validações
     if (formData.password !== formData.confirmPassword) {
       setError('As senhas não coincidem');
       setLoading(false);
@@ -248,6 +247,14 @@ export default function ResetPasswordPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Carregando...</div>}>
+      <ResetPasswordContent />
+    </Suspense>
   );
 }
 
