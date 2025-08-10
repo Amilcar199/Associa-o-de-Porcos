@@ -52,7 +52,7 @@ const AdminHeader = ({ user }: AdminHeaderProps) => {
             <Link href="/admin" className="flex items-center space-x-3 ml-4 lg:ml-0">
               <div className="w-8 h-8 relative">
                 <Image
-                  src="/assets/logo/logo.png"
+                  src="/component/assets/logo.png"
                   alt="Associação de Porcos"
                   fill
                   className="object-contain"
