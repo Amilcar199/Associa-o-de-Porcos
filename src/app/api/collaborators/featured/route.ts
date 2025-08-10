@@ -3,6 +3,8 @@ import connectDB from '@/lib/mongodb'
 import Collaborator from '@/models/Collaborator'
 import { successResponse, errorResponse } from '@/lib/api-utils'
 
+export const dynamic = 'force-dynamic'
+
 // GET /api/collaborators/featured - Buscar colaboradores em destaque
 export async function GET(req: NextRequest) {
   try {

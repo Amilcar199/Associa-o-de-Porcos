@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { NextRequest, NextResponse } from 'next/server';
 import { uploadImage } from '@/lib/gridfs';
 import { authMiddleware } from '@/lib/api-utils';

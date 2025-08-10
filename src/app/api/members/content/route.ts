@@ -4,6 +4,8 @@ import { authOptions } from '@/lib/auth';
 import connectDB from '@/lib/mongodb';
 import { successResponse, errorResponse } from '@/lib/api-utils';
 
+export const dynamic = 'force-dynamic'
+
 // GET /api/members/content - Buscar conteúdo exclusivo para membros
 export async function GET(req: NextRequest) {
   try {

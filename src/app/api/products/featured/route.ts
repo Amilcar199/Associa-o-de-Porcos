@@ -3,6 +3,8 @@ import connectDB from '@/lib/mongodb'
 import Product from '@/models/Product'
 import { successResponse, errorResponse } from '@/lib/api-utils'
 
+export const dynamic = 'force-dynamic'
+
 // GET /api/products/featured - Buscar produtos em destaque
 export async function GET(req: NextRequest) {
   try {

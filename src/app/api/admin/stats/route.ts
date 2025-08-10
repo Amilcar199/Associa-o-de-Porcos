@@ -11,6 +11,8 @@ import {
   validateSession
 } from '@/lib/api-utils'
 
+export const dynamic = 'force-dynamic'
+
 // GET /api/admin/stats - Buscar estatísticas do dashboard (apenas admins)
 export async function GET(req: NextRequest) {
   try {

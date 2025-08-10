@@ -12,6 +12,8 @@ import {
   validateSession
 } from '@/lib/api-utils'
 
+export const dynamic = 'force-dynamic'
+
 // GET /api/admin/contacts - Listar contatos para admins
 export async function GET(req: NextRequest) {
   try {
