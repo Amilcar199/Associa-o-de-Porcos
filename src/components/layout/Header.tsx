@@ -126,7 +126,7 @@ const Header = () => {
             <Link href="/" className="flex items-center space-x-3">
               <div className="w-10 h-10 lg:w-12 lg:h-12 relative">
                 <Image
-                  src="/logo.png"
+                  src="/logo.svg"
                   alt="Associação de Porcos"
                   fill
                   className="object-contain"

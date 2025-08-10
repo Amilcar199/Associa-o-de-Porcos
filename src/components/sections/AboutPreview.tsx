@@ -16,32 +16,32 @@ const AboutPreview = () => {
   const features = [
     {
       icon: Users,
-      title: 'Comunidade Unida',
-      description: 'Mais de 500 criadores unidos pela paixão e qualidade na suinocultura'
+      title: 'Comunidade em expansão',
+      description: 'Mais de 100 criadores unidos para impulsionar a suinocultura recente'
     },
     {
       icon: Award,
-      title: 'Excelência Reconhecida',
-      description: 'Certificações nacionais e internacionais em qualidade e bem-estar animal'
+      title: 'Qualidade em construção',
+      description: 'Certificações e padrões sendo implantados com foco em bem-estar animal'
     },
     {
       icon: Leaf,
       title: 'Sustentabilidade',
-      description: 'Práticas sustentáveis que respeitam o meio ambiente e as futuras gerações'
+      description: 'Práticas sustentáveis implantadas desde o início das operações'
     },
     {
       icon: Heart,
       title: 'Bem-estar Animal',
-      description: 'Cuidado e respeito aos animais em todas as etapas do processo'
+      description: 'Cuidado e respeito presentes em todas as etapas do processo'
     }
   ]
 
   const achievements = [
-    '25 anos de tradição e experiência',
-    '500+ criadores associados ativos',
-    '15+ certificações de qualidade',
-    '98% de satisfação dos clientes',
-    '10.000+ suínos comercializados'
+    '2-3 anos de trajetória com base sólida',
+    '100+ criadores associados ativos',
+    '5+ certificações e padrões implantados',
+    '95% de satisfação dos associados',
+    '1.500+ suínos comercializados'
   ]
 
   return (
@@ -89,8 +89,8 @@ const AboutPreview = () => {
               className="absolute -bottom-6 -right-6 bg-white rounded-xl shadow-xl p-4 border border-gray-200"
             >
               <div className="text-center">
-                <div className="text-2xl font-bold text-primary-600">25+</div>
-                <div className="text-xs text-gray-600">Anos de Experiência</div>
+                <div className="text-2xl font-bold text-primary-600">2+</div>
+                <div className="text-xs text-gray-600">Anos de Atuação</div>
               </div>
             </motion.div>
 
@@ -102,7 +102,7 @@ const AboutPreview = () => {
               className="absolute -top-6 -left-6 bg-primary-600 text-white rounded-xl shadow-xl p-4"
             >
               <div className="text-center">
-                <div className="text-2xl font-bold">500+</div>
+                <div className="text-2xl font-bold">100+</div>
                 <div className="text-xs opacity-90">Criadores</div>
               </div>
             </motion.div>
@@ -120,14 +120,14 @@ const AboutPreview = () => {
                 Sobre Nós
               </span>
               <h2 className="text-3xl lg:text-4xl font-heading font-bold text-gray-900 mb-6">
-                Tradição e Inovação na 
+                Uma associação recente com 
                 <span className="text-gradient"> Suinocultura</span>
               </h2>
               <p className="text-lg text-gray-600 leading-relaxed mb-8">
-                Há mais de 25 anos, a Associação de Porcos tem sido pioneira na 
+                Fundada há pouco tempo, a Associação de Porcos vem estruturando a 
                 criação sustentável e responsável de suínos em Angola. Nossa missão 
-                é conectar criadores, promover a excelência e impulsionar o 
-                desenvolvimento do agronegócio suinícola.
+                é conectar criadores, apoiar o crescimento e impulsionar o 
+                desenvolvimento do setor desde os primeiros anos.
               </p>
             </div>
 
