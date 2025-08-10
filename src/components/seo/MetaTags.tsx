@@ -97,7 +97,7 @@ export default function MetaTags({
             "name": "Associação de Porcos",
             "description": description,
             "url": process.env.NEXTAUTH_URL,
-            "logo": `${process.env.NEXTAUTH_URL}/images/logo.png`,
+            "logo": `${process.env.NEXTAUTH_URL}/logo.svg`,
             "image": fullImage,
             "sameAs": [
               "https://www.facebook.com/associacaoporcos",

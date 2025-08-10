@@ -75,7 +75,7 @@ const Footer = () => {
             <Link href="/" className="flex items-center space-x-3 mb-4">
               <div className="w-10 h-10 relative">
                 <Image
-                  src="/logo.svg"
+                  src="/assets/logo/logo.svg"
                   alt="Associação de Porcos"
                   fill
                   className="object-contain"
