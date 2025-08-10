@@ -126,14 +126,14 @@ const Header = () => {
             <Link href="/" className="flex items-center space-x-3">
               <div className="w-10 h-10 lg:w-12 lg:h-12 relative">
                 <Image
-                  src="/assets/logo/logo.svg"
+                  src="/assets/logo/logo.png"
                   alt="Associação de Porcos"
                   fill
                   className="object-contain"
                   onError={(e) => {
                     // Fallback para quando a imagem não existir
                     const target = e.target as HTMLImageElement
-                    target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='40' fill='%2316a34a'/%3E%3Ctext x='50' y='55' text-anchor='middle' fill='white' font-size='30' font-weight='bold'%3EP%3C/text%3E%3C/svg%3E"
+                    target.src = '/assets/logo/logo.svg'
                   }}
                 />
               </div>
