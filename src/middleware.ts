@@ -6,7 +6,7 @@ export default withAuth(
     const { pathname } = req.nextUrl
     const token = req.nextauth.token
 
-    const TEMP_BYPASS_ADMIN_AUTH = true
+    const TEMP_BYPASS_ADMIN_AUTH = false
     if (TEMP_BYPASS_ADMIN_AUTH && (pathname.startsWith('/admin') || pathname.startsWith('/api/admin'))){
       return NextResponse.next()
     }
