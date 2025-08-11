@@ -13,43 +13,43 @@ const Hero = () => {
     {
       id: 1,
       image: '/hero/slide-1.jpg',
-      title: 'Criação Sustentável de Suínos',
-      subtitle: 'Conectando criadores e promovendo a excelência no agronegócio',
-      description: 'Somos uma associação dedicada ao desenvolvimento sustentável da suinocultura angolana, oferecendo suporte, conhecimento e parcerias estratégicas.',
+      title: 'Uma nova associação em crescimento',
+      subtitle: 'Conectando criadores e estruturando a suinocultura recente em Angola',
+      description: 'Somos uma associação jovem, com 2 a 3 anos de atuação, focada em apoiar criadores, organizar a cadeia e promover boas práticas desde o início.',
       cta: 'Conheça Nossos Produtos',
       ctaLink: '/produtos',
       stats: [
-        { label: 'Criadores Associados', value: '500+' },
-        { label: 'Suínos Comercializados', value: '10K+' },
-        { label: 'Anos de Experiência', value: '25+' }
+        { label: 'Criadores Associados', value: '100+' },
+        { label: 'Suínos Comercializados', value: '1K+' },
+        { label: 'Anos de Atuação', value: '2+' }
       ]
     },
     {
       id: 2,
       image: '/hero/slide-2.jpg',
-      title: 'Qualidade e Tradição',
-      subtitle: 'Produtos certificados com os mais altos padrões de qualidade',
-      description: 'Nossos suínos são criados seguindo rigorosos protocolos de bem-estar animal e sustentabilidade ambiental, garantindo produtos de excelência.',
+      title: 'Qualidade desde o primeiro dia',
+      subtitle: 'Padrões de bem-estar e sustentabilidade para um futuro sólido',
+      description: 'Mesmo recente, adotamos protocolos claros de bem-estar animal e sustentabilidade, construindo uma base confiável para nossos associados.',
       cta: 'Faça Parte da Associação',
       ctaLink: '/registro',
       stats: [
-        { label: 'Certificações', value: '15+' },
-        { label: 'Raças Disponíveis', value: '12' },
-        { label: 'Satisfação do Cliente', value: '98%' }
+        { label: 'Certificações', value: '5+' },
+        { label: 'Raças Disponíveis', value: '6' },
+        { label: 'Satisfação dos Associados', value: '95%' }
       ]
     },
     {
       id: 3,
       image: '/hero/slide-3.jpg',
-      title: 'Inovação e Tecnologia',
-      subtitle: 'Utilizando as mais modernas técnicas de criação e manejo',
-      description: 'Investimos continuamente em pesquisa, desenvolvimento e tecnologia para oferecer soluções inovadoras aos nossos associados.',
+      title: 'Começando com inovação',
+      subtitle: 'Tecnologia acessível e práticas modernas desde o início',
+      description: 'Estamos implementando gradualmente tecnologia e capacitação para elevar a produtividade e o bem-estar na cadeia suinícola.',
       cta: 'Saiba Mais',
       ctaLink: '/sobre',
       stats: [
-        { label: 'Projetos de Pesquisa', value: '8' },
-        { label: 'Parcerias Universitárias', value: '5' },
-        { label: 'Publicações Científicas', value: '50+' }
+        { label: 'Projetos Iniciados', value: '3' },
+        { label: 'Parcerias Ativas', value: '4' },
+        { label: 'Capacitações Realizadas', value: '20+' }
       ]
     }
   ]

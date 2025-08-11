@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
+import LogoPng from '@/components/assets/Logo.png'
 import { 
   Phone, 
   Mail, 
@@ -75,14 +76,10 @@ const Footer = () => {
             <Link href="/" className="flex items-center space-x-3 mb-4">
               <div className="w-10 h-10 relative">
                 <Image
-                  src="/logo.png"
+                  src={LogoPng}
                   alt="Associação de Porcos"
                   fill
                   className="object-contain"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement
-                    target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='40' fill='%2316a34a'/%3E%3Ctext x='50' y='55' text-anchor='middle' fill='white' font-size='30' font-weight='bold'%3EP%3C/text%3E%3C/svg%3E"
-                  }}
                 />
               </div>
               <div>
