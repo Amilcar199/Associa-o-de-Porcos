@@ -7,19 +7,17 @@ import User from '@/models/User'
 import { AuthUser } from '@/types'
 import GoogleProvider from 'next-auth/providers/google'
 
-if (!process.env.MONGODB_URI) {
-  throw new Error('Por favor, adicione sua MONGODB_URI no arquivo .env.local')
-}
+const hasMongoUri = !!process.env.MONGODB_URI
+const hasNextAuthSecret = !!process.env.NEXTAUTH_SECRET
 
-if (!process.env.NEXTAUTH_SECRET) {
-  throw new Error('Por favor, adicione sua NEXTAUTH_SECRET no arquivo .env.local')
-}
+// Nota: não falhar no build. Validar em runtime quando a rota de auth for usada.
 
-const client = new MongoClient(process.env.MONGODB_URI)
-const clientPromise = client.connect()
+// Só cria o client quando a variável existir
+const client = hasMongoUri ? new MongoClient(process.env.MONGODB_URI as string) : null
+const clientPromise = hasMongoUri ? client!.connect() : Promise.reject(new Error('MONGODB_URI não configurada'))
 
 export const authOptions: NextAuthOptions = {
-  adapter: MongoDBAdapter(clientPromise) as any,
+  adapter: hasMongoUri ? (MongoDBAdapter(clientPromise) as any) : undefined,
   providers: [
     CredentialsProvider({
       id: 'credentials',

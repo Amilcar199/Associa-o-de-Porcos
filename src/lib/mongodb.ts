@@ -1,10 +1,6 @@
 import mongoose from 'mongoose';
 
-const MONGODB_URI = process.env.MONGODB_URI!;
-
-if (!MONGODB_URI) {
-  throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
-}
+const MONGODB_URI = process.env.MONGODB_URI;
 
 // Tipagem e cache global de conexão
 const globalForMongoose = global as unknown as {
@@ -14,6 +10,10 @@ const globalForMongoose = global as unknown as {
 const cached = globalForMongoose.mongooseCache || (globalForMongoose.mongooseCache = { conn: null, promise: null });
 
 async function connectDB() {
+  if (!MONGODB_URI) {
+    throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
+  }
+
   if (cached.conn) {
     return cached.conn;
   }
