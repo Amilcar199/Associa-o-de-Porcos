@@ -1,8 +1,35 @@
 import { Metadata } from 'next'
+'use client'
+import { useEffect, useState } from 'react'
 
 export const metadata: Metadata = {
   title: 'Categorias de Produtos - Painel Administrativo',
   description: 'Gerenciar categorias de produtos'
+}
+
+function DynamicBreeds(){
+  const [breeds, setBreeds] = useState<string[]>([])
+  const [loading, setLoading] = useState(true)
+  useEffect(()=>{
+    const load=async()=>{
+      try{
+        const res = await fetch('/api/products?limit=1&sort=createdAt&order=desc')
+        // Pegar raças via agregação simples: vamos buscar várias páginas rapidamente
+        const res2 = await fetch('/api/products?limit=1000')
+        const list: any[] = res2.ok ? (await res2.json()).data || [] : []
+        const set = Array.from(new Set(list.map((p:any)=>p.breed).filter(Boolean)))
+        setBreeds(set)
+      } finally { setLoading(false) }
+    }
+    load()
+  },[])
+  if (loading) return <div>Carregando raças...</div>
+  if (breeds.length===0) return <div className="text-gray-500">Nenhuma raça encontrada.</div>
+  return (
+    <ul className="list-disc pl-6 text-gray-800 space-y-1">
+      {breeds.map(b=> <li key={b}>{b}</li>)}
+    </ul>
+  )
 }
 
 export default function AdminProductCategoriesPage() {
@@ -14,12 +41,8 @@ export default function AdminProductCategoriesPage() {
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <p className="text-gray-700 mb-3">Categorias de exemplo (raças) detectadas automaticamente a partir dos produtos:</p>
-        <ul className="list-disc pl-6 text-gray-800 space-y-1">
-          {['Landrace','Large White','Duroc','Hampshire','Pietrain','Yorkshire','Chester White','Spotted','Tamworth','Gloucester Old Spots','Mangalitsa','Ossabaw Island Hog','Mulefoot','Caipira','Piau','Moura','Canastra','Cruzado','Outro'].map(c => (
-            <li key={c}>{c}</li>
-          ))}
-        </ul>
+        <p className="text-gray-700 mb-3">Raças detectadas no banco de dados (dinâmico):</p>
+        <DynamicBreeds />
         <p className="text-sm text-gray-500 mt-4">Edição avançada de categorias em desenvolvimento.</p>
       </div>
     </div>

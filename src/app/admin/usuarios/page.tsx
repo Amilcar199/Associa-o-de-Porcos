@@ -26,11 +26,17 @@ export default function AdminUsersPage() {
     const load = async () => {
       try {
         setLoading(true)
-        // Caso não exista endpoint dedicado, podemos usar stats ou criar posteriormente /api/admin/users
-        const res = await fetch('/api/admin/stats')
+        const res = await fetch('/api/admin/users')
         if (res.ok) {
           const j = await res.json()
-          // Não há lista direta de usuários, usar placeholder inicial
+          const list = j.data || []
+          setUsers(list.map((u: any) => ({
+            id: u._id,
+            name: u.name,
+            email: u.email,
+            role: u.role,
+            active: u.isActive
+          })))
         }
       } finally {
         setLoading(false)
@@ -94,7 +100,11 @@ export default function AdminUsersPage() {
                   <div className="inline-flex items-center gap-2">
                     <button onClick={()=>alert('Funcionalidade de edição em desenvolvimento.')} className="text-primary-700 hover:text-primary-800">Editar</button>
                     <span className="text-gray-300">|</span>
-                    <button onClick={()=>alert('Funcionalidade de desativação em desenvolvimento.')} className="text-red-600 hover:text-red-700">Desativar</button>
+                    <button onClick={async()=>{
+                      const next = !u.active
+                      const res = await fetch(`/api/admin/users/${u.id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({isActive: next})})
+                      if (res.ok) setUsers(prev=>prev.map(x=>x.id===u.id?{...x,active:next}:x))
+                    }} className="text-red-600 hover:text-red-700">{u.active? 'Desativar':'Ativar'}</button>
                   </div>
                 </td>
               </tr>

@@ -146,25 +146,38 @@ export default function ImageManager() {
                   alt={image.filename}
                   className="w-full h-32 object-cover rounded-lg"
                 />
-                <div className="absolute top-2 right-2 flex space-x-1">
-                  <button
-                    onClick={() => {
-                      setSelectedImage(image);
-                      setShowPreviewModal(true);
-                    }}
-                    className="bg-blue-500 text-white p-1 rounded hover:bg-blue-600 transition-colors"
-                    title="Visualizar"
-                  >
-                    <Eye size={14} />
-                  </button>
-                  <button
-                    onClick={() => setImageToDelete(image)}
-                    className="bg-red-500 text-white p-1 rounded hover:bg-red-600 transition-colors"
-                    title="Deletar"
-                  >
-                    <Trash2 size={14} />
-                  </button>
-                </div>
+                                 <div className="absolute top-2 right-2 flex space-x-1">
+                   <button
+                     onClick={() => {
+                       setSelectedImage(image);
+                       setShowPreviewModal(true);
+                     }}
+                     className="bg-blue-500 text-white p-1 rounded hover:bg-blue-600 transition-colors"
+                     title="Visualizar"
+                   >
+                     <Eye size={14} />
+                   </button>
+                   <button
+                     onClick={async () => {
+                       // Definir como logo do site
+                       try {
+                         await fetch('/api/admin/config', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ logoUrl: `/api/images/${image.fileId}` }) })
+                         toast.success('Logo atualizado')
+                       } catch {}
+                     }}
+                     className="bg-green-600 text-white p-1 rounded hover:bg-green-700 transition-colors"
+                     title="Definir como logo"
+                   >
+                     <Upload size={14} />
+                   </button>
+                   <button
+                     onClick={() => setImageToDelete(image)}
+                     className="bg-red-500 text-white p-1 rounded hover:bg-red-600 transition-colors"
+                     title="Deletar"
+                   >
+                     <Trash2 size={14} />
+                   </button>
+                 </div>
               </div>
 
               <div className="space-y-2">
