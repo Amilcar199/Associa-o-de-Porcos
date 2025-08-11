@@ -96,7 +96,23 @@ export default function NewProductClient() {
             <label className="block text-sm text-gray-700 mb-1">Imagem (URL)</label>
             <div className="relative">
               <ImageIcon className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
-              <input value={form.images[0] || ''} onChange={(e)=>setForm(p=>({...p,images:[e.target.value]}))} className="w-full pl-9 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="https://..." required />
+              <input value={form.images[0] || ''} onChange={(e)=>setForm(p=>({...p,images:[e.target.value]}))} className="w-full pl-9 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="https://..." />
+            </div>
+            <div className="mt-2">
+              <label className="block text-sm text-gray-700 mb-1">ou Upload local</label>
+              <input type="file" accept="image/*" onChange={async (e)=>{
+                const file=e.target.files?.[0];
+                if(!file) return;
+                const fd=new FormData();
+                fd.append('file',file);
+                const res=await fetch('/api/images/upload',{method:'POST',body:fd});
+                if(res.ok){
+                  const json=await res.json();
+                  setForm(p=>({...p,images:[json.data.url]}));
+                } else {
+                  alert('Falha no upload da imagem');
+                }
+              }} className="w-full" />
             </div>
           </div>
           <div>

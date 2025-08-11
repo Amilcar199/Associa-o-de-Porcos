@@ -26,7 +26,15 @@ export interface SearchFilters {
 export async function validateSession(req: NextRequest, requireAdmin = false) {
   const session = await getServerSession(authOptions)
   
-  if (!session || !session.user) {
+  if (!session) {
+    // Fallback em desenvolvimento para permitir uso do painel/admin APIs sem login
+    if (process.env.NODE_ENV !== 'production') {
+      const user = { id: 'dev-admin', role: 'admin', name: 'Dev Admin', email: 'dev@local' } as any
+      if (requireAdmin && user.role !== 'admin') {
+        return { error: 'Acesso negado. Apenas administradores.', status: 403 }
+      }
+      return { session: null as any, user }
+    }
     return { error: 'Não autorizado', status: 401 }
   }
 

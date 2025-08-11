@@ -1,4 +1,5 @@
 import { Metadata } from 'next'
+import ReportsClient from '@/components/admin/ReportsClient'
 
 export const metadata: Metadata = {
   title: 'Relatórios - Painel Administrativo',
@@ -13,9 +14,7 @@ export default function AdminReportsPage() {
         <p className="text-gray-600 mt-1">Acompanhe métricas e exporte dados</p>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center">
-        <p className="text-gray-600">Relatórios em desenvolvimento.</p>
-      </div>
+      <ReportsClient />
     </div>
   )
 }

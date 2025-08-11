@@ -23,7 +23,7 @@ async function getNews() {
   const data = json.data || []
   const enriched = data.map((n: any, idx: number) => ({
     ...n,
-    imageUrl: n.imageUrl || placeholderImages[idx % placeholderImages.length]
+    imageUrl: n.featuredImage || n.imageUrl || placeholderImages[idx % placeholderImages.length]
   }))
   if (enriched.length === 0) {
     return [

@@ -2,6 +2,7 @@ import { Metadata } from 'next'
 import DashboardStats from '@/components/admin/DashboardStats'
 import DashboardCharts from '@/components/admin/DashboardCharts'
 import RecentActivity from '@/components/admin/RecentActivity'
+import AdminSearch from '@/components/admin/AdminSearch'
 
 export const metadata: Metadata = {
   title: 'Dashboard - Painel Administrativo',
@@ -20,6 +21,9 @@ export default function AdminDashboard() {
           Visão geral do sistema e atividades recentes
         </p>
       </div>
+
+      {/* Search Modal trigger via ?search= */}
+      <AdminSearch />
 
       {/* Stats Cards */}
       <DashboardStats />

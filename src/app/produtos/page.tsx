@@ -25,7 +25,7 @@ async function getProducts() {
   // Enriquecer com imagem fictícia se não houver
   const enriched = data.map((p: any, idx: number) => ({
     ...p,
-    imageUrl: p.imageUrl || placeholderImages[idx % placeholderImages.length]
+    imageUrl: (Array.isArray(p.images) && p.images[0]) || p.imageUrl || placeholderImages[idx % placeholderImages.length]
   }))
   if (enriched.length === 0) {
     return [

@@ -56,7 +56,7 @@ SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_USER=your-email@gmail.com
 SMTP_PASS=your-app-password
-ADMIN_EMAIL=admin@associacaoporcos.org.br
+ADMIN_EMAIL=admin@associacaoporcos.ao
 ```
 
 4. **Execute o script de setup:**
@@ -183,7 +183,7 @@ Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalh
 
 ## 📞 Suporte
 
-Para suporte, envie um email para `contato@associacaoporcos.org.br`
+Para suporte, envie um email para `contato@associacaoporcos.ao`
 
 ---
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { Search, UserPlus, Shield, Mail } from 'lucide-react'
 
 type AdminUser = {
@@ -19,7 +19,25 @@ const initialUsers: AdminUser[] = [
 
 export default function AdminUsersPage() {
   const [query, setQuery] = useState('')
-  const [users] = useState<AdminUser[]>(initialUsers)
+  const [users, setUsers] = useState<AdminUser[]>(initialUsers)
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        setLoading(true)
+        // Caso não exista endpoint dedicado, podemos usar stats ou criar posteriormente /api/admin/users
+        const res = await fetch('/api/admin/stats')
+        if (res.ok) {
+          const j = await res.json()
+          // Não há lista direta de usuários, usar placeholder inicial
+        }
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
+  }, [])
 
   const filtered = useMemo(() => {
     const q = query.toLowerCase().trim()
@@ -44,7 +62,7 @@ export default function AdminUsersPage() {
               onChange={e => setQuery(e.target.value)}
             />
           </div>
-          <button className="inline-flex items-center bg-primary-600 hover:bg-primary-700 text-white px-3 py-2 rounded-lg text-sm">
+          <button onClick={()=>{ window.location.href='/registro' }} className="inline-flex items-center bg-primary-600 hover:bg-primary-700 text-white px-3 py-2 rounded-lg text-sm">
             <UserPlus className="w-4 h-4 mr-2" /> Novo usuário
           </button>
         </div>
@@ -74,16 +92,16 @@ export default function AdminUsersPage() {
                 </td>
                 <td className="px-4 py-3 text-right">
                   <div className="inline-flex items-center gap-2">
-                    <button className="text-primary-700 hover:text-primary-800">Editar</button>
+                    <button onClick={()=>alert('Funcionalidade de edição em desenvolvimento.')} className="text-primary-700 hover:text-primary-800">Editar</button>
                     <span className="text-gray-300">|</span>
-                    <button className="text-red-600 hover:text-red-700">Desativar</button>
+                    <button onClick={()=>alert('Funcionalidade de desativação em desenvolvimento.')} className="text-red-600 hover:text-red-700">Desativar</button>
                   </div>
                 </td>
               </tr>
             ))}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-gray-500">Nenhum usuário encontrado</td>
+                <td colSpan={5} className="px-4 py-6 text-center text-gray-500">{loading ? 'Carregando...' : 'Nenhum usuário encontrado'}</td>
               </tr>
             )}
           </tbody>

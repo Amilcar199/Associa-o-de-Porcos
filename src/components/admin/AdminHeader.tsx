@@ -30,6 +30,18 @@ interface AdminHeaderProps {
 const AdminHeader = ({ user }: AdminHeaderProps) => {
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isNotifOpen, setIsNotifOpen] = useState(false)
+  const [notifs, setNotifs] = useState<any[]>([])
+
+  const loadNotifs = async () => {
+    try {
+      const res = await fetch('/api/admin/stats')
+      if (res.ok) {
+        const json = await res.json()
+        setNotifs(json.data?.recentActivity?.slice(0, 5) || [])
+      }
+    } catch {}
+  }
 
   const handleSignOut = async () => {
     await signOut({ callbackUrl: '/' })
@@ -80,17 +92,55 @@ const AdminHeader = ({ user }: AdminHeaderProps) => {
                 </div>
                 <input
                   type="text"
-                  placeholder="Buscar..."
+                  placeholder="Pesquisar em produtos, notícias e contatos..."
+                  onKeyDown={async (e) => {
+                    const target = e.target as HTMLInputElement
+                    if (e.key === 'Enter' && target.value.trim()) {
+                      const q = encodeURIComponent(target.value.trim())
+                      window.location.href = `/admin?search=${q}`
+                    }
+                  }}
                   className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
                 />
               </div>
             </div>
 
             {/* Notifications */}
-            <button className="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-full relative">
-              <Bell size={20} />
-              <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-400"></span>
-            </button>
+            <div className="relative">
+              <button
+                onClick={async ()=>{ if(!isNotifOpen) await loadNotifs(); setIsNotifOpen(!isNotifOpen) }}
+                className="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-full relative"
+              >
+                <Bell size={20} />
+                {notifs.length > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 block h-2 w-2 rounded-full bg-red-500"></span>
+                )}
+              </button>
+              <AnimatePresence>
+                {isNotifOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className="absolute right-0 mt-2 w-72 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50"
+                  >
+                    <div className="px-4 py-2 text-sm font-medium text-gray-700 border-b">Notificações</div>
+                    {notifs.length === 0 ? (
+                      <div className="px-4 py-4 text-sm text-gray-500">Sem novas notificações</div>
+                    ) : notifs.map((n, idx) => (
+                      <div key={idx} className="px-4 py-2 text-sm text-gray-700 border-b last:border-b-0">
+                        <div className="font-medium text-gray-900">{n.user || 'Sistema'}</div>
+                        <div className="text-gray-600">{n.action}</div>
+                        <div className="text-xs text-gray-400">{new Date(n.date).toLocaleString('pt-AO')}</div>
+                      </div>
+                    ))}
+                    <div className="px-4 py-2">
+                      <Link href="/admin" className="text-sm text-primary-600 hover:text-primary-700">Ver todas</Link>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
 
             {/* Back to Site */}
             <Link

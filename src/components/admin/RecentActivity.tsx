@@ -13,6 +13,7 @@ import {
   Trash,
   Eye
 } from 'lucide-react'
+import Modal from './ui/Modal'
 
 interface ActivityItem {
   type: 'user' | 'product' | 'news' | 'contact'
@@ -25,6 +26,11 @@ interface ActivityItem {
 const RecentActivity = () => {
   const [activities, setActivities] = useState<ActivityItem[]>([])
   const [loading, setLoading] = useState(true)
+  const [openAll, setOpenAll] = useState(false)
+  const [allActivities, setAllActivities] = useState<ActivityItem[]>([])
+  const [allLoading, setAllLoading] = useState(false)
+  const [page, setPage] = useState(1)
+  const pageSize = 20
 
   const fetchRecentActivity = async () => {
     try {
@@ -43,6 +49,22 @@ const RecentActivity = () => {
   useEffect(() => {
     fetchRecentActivity()
   }, [])
+
+  const fetchAll = async () => {
+    try {
+      setAllLoading(true)
+      const response = await fetch('/api/admin/stats')
+      if (response.ok) {
+        const data = await response.json()
+        setAllActivities(data.data.recentActivity || [])
+        setOpenAll(true)
+      }
+    } catch (error) {
+      console.error('Erro ao buscar todas atividades:', error)
+    } finally {
+      setAllLoading(false)
+    }
+  }
 
   const getActivityIcon = (type: string, action: string) => {
     if (action.includes('cadastrado') || action.includes('criado')) {
@@ -134,7 +156,7 @@ const RecentActivity = () => {
           <Clock className="w-5 h-5 mr-2 text-primary-600" />
           Atividade Recente
         </h3>
-        <button className="text-sm text-primary-600 hover:text-primary-700 font-medium">
+        <button className="text-sm text-primary-600 hover:text-primary-700 font-medium" onClick={fetchAll}>
           Ver tudo
         </button>
       </div>
@@ -186,6 +208,38 @@ const RecentActivity = () => {
             Nenhuma atividade recente
           </p>
         </div>
+      )}
+      {openAll && (
+        <Modal isOpen={openAll} onClose={() => setOpenAll(false)} title="Atividade Recente">
+          {allLoading ? (
+            <div>Carregando...</div>
+          ) : (
+            <div className="space-y-4">
+              {(allActivities.slice((page-1)*pageSize, page*pageSize)).map((activity, index) => (
+                <div key={index} className="flex space-x-3">
+                  <div className={`h-8 w-8 rounded-full border-2 flex items-center justify-center ${getActivityColor(activity.type)}`}>
+                    {getActivityIcon(activity.type, activity.action)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm">
+                      <span className="font-medium text-gray-900">{activity.user || 'Sistema'}</span>
+                      <span className="text-gray-500 ml-1">{activity.action.toLowerCase()}</span>
+                    </div>
+                    <p className="mt-0.5 text-sm text-gray-500 truncate">{activity.details}</p>
+                    <div className="mt-1 text-xs text-gray-400">{formatTimeAgo(activity.date)}</div>
+                  </div>
+                </div>
+              ))}
+              <div className="flex items-center justify-between pt-2 text-sm text-gray-600">
+                <button onClick={()=>setPage(Math.max(1,page-1))} disabled={page===1} className="px-2 py-1 border rounded disabled:opacity-50">Anterior</button>
+                <div>
+                  Página {page} de {Math.max(1, Math.ceil(allActivities.length/pageSize))}
+                </div>
+                <button onClick={()=>setPage(Math.min(Math.ceil(allActivities.length/pageSize),page+1))} disabled={page>=Math.ceil(allActivities.length/pageSize)} className="px-2 py-1 border rounded disabled:opacity-50">Próximo</button>
+              </div>
+            </div>
+          )}
+        </Modal>
       )}
     </motion.div>
   )

@@ -29,7 +29,6 @@ interface NewsFormData {
   excerpt: string;
   category: string;
   imageUrl?: string;
-  author: string;
   isPublished: boolean;
 }
 
@@ -48,7 +47,6 @@ export default function NewsManager() {
     excerpt: '',
     category: '',
     imageUrl: '',
-    author: '',
     isPublished: false
   });
 
@@ -77,12 +75,22 @@ export default function NewsManager() {
       const url = editingNews ? `/api/news/${editingNews._id}` : '/api/news';
       const method = editingNews ? 'PUT' : 'POST';
       
+      const payload: any = {
+        title: formData.title,
+        content: formData.content,
+        excerpt: formData.excerpt,
+        category: formData.category,
+        featuredImage: formData.imageUrl,
+        images: formData.imageUrl ? [formData.imageUrl] : [],
+        published: formData.isPublished
+      }
+      
       const response = await fetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       if (response.ok) {
@@ -107,9 +115,8 @@ export default function NewsManager() {
       content: newsItem.content,
       excerpt: newsItem.excerpt,
       category: newsItem.category,
-      imageUrl: newsItem.imageUrl || '',
-      author: newsItem.author,
-      isPublished: newsItem.isPublished
+      imageUrl: (newsItem as any).featuredImage || newsItem.imageUrl || '',
+      isPublished: (newsItem as any).published ?? newsItem.isPublished
     });
     setShowModal(true);
   };
@@ -143,7 +150,6 @@ export default function NewsManager() {
       excerpt: '',
       category: '',
       imageUrl: '',
-      author: '',
       isPublished: false
     });
   };
@@ -164,7 +170,6 @@ export default function NewsManager() {
   const columns = [
     { key: 'title', title: 'Título', sortable: true },
     { key: 'category', title: 'Categoria', sortable: true },
-    { key: 'author', title: 'Autor', sortable: true },
     { key: 'views', title: 'Visualizações', sortable: true },
     { key: 'isPublished', title: 'Status' },
     { key: 'createdAt', title: 'Data', sortable: true }
@@ -334,19 +339,6 @@ export default function NewsManager() {
             
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Autor
-              </label>
-              <input
-                type="text"
-                value={formData.author}
-                onChange={(e) => setFormData(prev => ({ ...prev, author: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                required
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Status
               </label>
               <select
@@ -389,7 +381,7 @@ export default function NewsManager() {
           {/* Image Upload */}
           <ImageUpload
             onImageUploaded={handleImageUploaded}
-            label="Imagem da Notícia"
+            label="Imagem de Destaque"
             className="mb-4"
           />
 

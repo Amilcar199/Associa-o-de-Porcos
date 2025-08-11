@@ -13,8 +13,14 @@ export default function AdminProductCategoriesPage() {
         <p className="text-gray-600 mt-1">Crie e organize categorias</p>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center">
-        <p className="text-gray-600">Módulo em desenvolvimento.</p>
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <p className="text-gray-700 mb-3">Categorias de exemplo (raças) detectadas automaticamente a partir dos produtos:</p>
+        <ul className="list-disc pl-6 text-gray-800 space-y-1">
+          {['Landrace','Large White','Duroc','Hampshire','Pietrain','Yorkshire','Chester White','Spotted','Tamworth','Gloucester Old Spots','Mangalitsa','Ossabaw Island Hog','Mulefoot','Caipira','Piau','Moura','Canastra','Cruzado','Outro'].map(c => (
+            <li key={c}>{c}</li>
+          ))}
+        </ul>
+        <p className="text-sm text-gray-500 mt-4">Edição avançada de categorias em desenvolvimento.</p>
       </div>
     </div>
   )

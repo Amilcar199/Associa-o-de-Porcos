@@ -46,12 +46,32 @@ export async function POST(req: NextRequest) {
     const sanitizedData = sanitizeInput(body)
 
     // Validar dados obrigatórios
-    if (!sanitizedData.name || !sanitizedData.breed || !sanitizedData.price) {
+    if (!sanitizedData.name || !sanitizedData.breed || sanitizedData.price === undefined) {
       return errorResponse('Nome, raça e preço são obrigatórios')
     }
 
+    // Mapear campos do formulário para o schema Product
+    const productData: any = {
+      name: sanitizedData.name,
+      description: sanitizedData.description,
+      breed: sanitizedData.breed,
+      age: sanitizedData.age,
+      weight: sanitizedData.weight,
+      price: sanitizedData.price,
+      images: Array.isArray(sanitizedData.images) && sanitizedData.images.length
+        ? sanitizedData.images
+        : (sanitizedData.imageUrl ? [sanitizedData.imageUrl] : []),
+      features: sanitizedData.features || [],
+      healthStatus: sanitizedData.healthStatus || 'good',
+      vaccinated: !!sanitizedData.vaccinated,
+      location: sanitizedData.location,
+      availability: sanitizedData.isAvailable === false ? 'reserved' : 'available',
+      seller: (authResult as any).user.id,
+      tags: sanitizedData.tags || []
+    }
+
     // Criar produto
-    const product = new Product(sanitizedData)
+    const product = new Product(productData)
     await product.save()
 
     return NextResponse.json(

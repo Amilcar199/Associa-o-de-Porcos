@@ -62,12 +62,37 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
     const sanitizedData = sanitizeInput(body)
 
     // Validar dados obrigatórios
-    if (!sanitizedData.name || !sanitizedData.breed || !sanitizedData.price) {
+    if (!sanitizedData.name || !sanitizedData.breed || sanitizedData.price === undefined) {
       return errorResponse('Nome, raça e preço são obrigatórios')
     }
 
+    // Mapear campos aceitos
+    const updateData: any = {
+      name: sanitizedData.name,
+      description: sanitizedData.description,
+      breed: sanitizedData.breed,
+      age: sanitizedData.age,
+      weight: sanitizedData.weight,
+      price: sanitizedData.price,
+      features: sanitizedData.features,
+      healthStatus: sanitizedData.healthStatus,
+      vaccinated: sanitizedData.vaccinated,
+      location: sanitizedData.location,
+      tags: sanitizedData.tags,
+    }
+    if (sanitizedData.images || sanitizedData.imageUrl) {
+      updateData.images = Array.isArray(sanitizedData.images) && sanitizedData.images.length
+        ? sanitizedData.images
+        : (sanitizedData.imageUrl ? [sanitizedData.imageUrl] : [])
+    }
+    if (typeof sanitizedData.isAvailable === 'boolean') {
+      updateData.availability = sanitizedData.isAvailable ? 'available' : 'reserved'
+    } else if (sanitizedData.availability) {
+      updateData.availability = sanitizedData.availability
+    }
+
     // Atualizar produto
-    Object.assign(product, sanitizedData)
+    Object.assign(product, updateData)
     await product.save()
 
     return NextResponse.json(

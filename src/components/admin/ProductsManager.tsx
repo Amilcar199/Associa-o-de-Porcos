@@ -17,7 +17,8 @@ interface Product {
   age: number;
   weight: number;
   imageUrl?: string;
-  isAvailable: boolean;
+  availability?: 'available' | 'sold' | 'reserved';
+  isAvailable?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -31,6 +32,7 @@ interface ProductFormData {
   weight: number;
   imageUrl?: string;
   isAvailable: boolean;
+  location?: string;
 }
 
 export default function ProductsManager() {
@@ -50,7 +52,8 @@ export default function ProductsManager() {
     age: 0,
     weight: 0,
     imageUrl: '',
-    isAvailable: true
+    isAvailable: true,
+    location: ''
   });
 
   useEffect(() => {
@@ -78,12 +81,24 @@ export default function ProductsManager() {
       const url = editingProduct ? `/api/products/${editingProduct._id}` : '/api/products';
       const method = editingProduct ? 'PUT' : 'POST';
       
+      const payload: any = {
+        name: formData.name,
+        description: formData.description,
+        price: formData.price,
+        breed: formData.breed,
+        age: formData.age,
+        weight: formData.weight,
+        imageUrl: formData.imageUrl,
+        isAvailable: formData.isAvailable,
+        location: formData.location
+      }
+      
       const response = await fetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       if (response.ok) {
@@ -110,8 +125,9 @@ export default function ProductsManager() {
       breed: product.breed,
       age: product.age,
       weight: product.weight,
-      imageUrl: product.imageUrl || '',
-      isAvailable: product.isAvailable
+      imageUrl: (product as any).imageUrl || '',
+      isAvailable: product.availability ? product.availability === 'available' : !!product.isAvailable,
+      location: (product as any).location || ''
     });
     setShowModal(true);
   };
@@ -147,7 +163,8 @@ export default function ProductsManager() {
       age: 0,
       weight: 0,
       imageUrl: '',
-      isAvailable: true
+      isAvailable: true,
+      location: ''
     });
   };
 
@@ -162,7 +179,7 @@ export default function ProductsManager() {
     return matchesSearch && matchesFilter;
   });
 
-  const breeds = Array.from(new Map(products.map((p: any) => [p.breed, p.breed])).values());
+  const breeds = Array.from(new Map(products.map((p: any) => [p.breed, p.breed])).values()).filter(Boolean);
 
   const columns = [
     { key: 'name', title: 'Nome', sortable: true },
@@ -170,7 +187,7 @@ export default function ProductsManager() {
     { key: 'age', title: 'Idade (meses)', sortable: true },
     { key: 'weight', title: 'Peso (kg)', sortable: true },
     { key: 'price', title: 'Preço (Kz)' },
-    { key: 'isAvailable', title: 'Disponível' }
+    { key: 'availability', title: 'Disponibilidade' }
   ];
 
   const formatPrice = (price: number) => {
@@ -180,14 +197,19 @@ export default function ProductsManager() {
     }).format(price);
   };
 
-  const formatAvailability = (isAvailable: boolean) => {
-    return isAvailable ? (
-      <span className="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">
-        Disponível
-      </span>
-    ) : (
-      <span className="bg-red-100 text-red-800 text-xs font-medium px-2 py-1 rounded-full">
-        Indisponível
+  const formatAvailability = (availability: string | boolean | undefined) => {
+    const status = typeof availability === 'boolean'
+      ? (availability ? 'available' : 'reserved')
+      : (availability || 'reserved')
+    const map: Record<string, { text: string; cls: string }> = {
+      available: { text: 'Disponível', cls: 'bg-green-100 text-green-800' },
+      reserved: { text: 'Reservado', cls: 'bg-yellow-100 text-yellow-800' },
+      sold: { text: 'Vendido', cls: 'bg-gray-100 text-gray-700' },
+    }
+    const conf = map[status] || map.reserved
+    return (
+      <span className={`${conf.cls} text-xs font-medium px-2 py-1 rounded-full`}>
+        {conf.text}
       </span>
     );
   };
@@ -211,7 +233,7 @@ export default function ProductsManager() {
   const tableData = sortedProducts.map(product => ({
     ...product,
     price: formatPrice(product.price),
-    isAvailable: formatAvailability(product.isAvailable)
+    availability: formatAvailability(product.availability ?? (product as any).isAvailable)
   }));
 
   // Paginação no cliente
@@ -363,7 +385,7 @@ export default function ProductsManager() {
             
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Preço (R$)
+                Preço (Kz)
               </label>
               <input
                 type="number"
@@ -403,12 +425,26 @@ export default function ProductsManager() {
             />
           </div>
 
-          {/* Image Upload */}
-          <ImageUpload
-            onImageUploaded={handleImageUploaded}
-            label="Imagem do Produto"
-            className="mb-4"
-          />
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Localização
+            </label>
+            <input
+              type="text"
+              value={formData.location}
+              onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              placeholder="Ex.: Luanda, Angola"
+              required
+            />
+          </div>
+
+                     {/* Image Upload */}
+           <ImageUpload
+             onImageUploaded={handleImageUploaded}
+             label="Imagem do Produto (upload local ou cole uma URL acima)"
+             className="mb-4"
+           />
 
           {formData.imageUrl && (
             <div className="bg-gray-50 rounded-lg p-4">
@@ -421,25 +457,25 @@ export default function ProductsManager() {
             </div>
           )}
 
-          <div className="flex justify-end space-x-3">
-            <button
-              type="button"
-              onClick={() => {
-                setShowModal(false);
-                setEditingProduct(null);
-                resetForm();
-              }}
-              className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-            >
-              {editingProduct ? 'Atualizar' : 'Adicionar'}
-            </button>
-          </div>
+                     <div className="flex justify-end space-x-3">
+             <button
+               type="button"
+               onClick={() => {
+                 setShowModal(false);
+                 setEditingProduct(null);
+                 resetForm();
+               }}
+               className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
+             >
+               Cancelar
+             </button>
+             <button
+               type="submit"
+               className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+             >
+               {editingProduct ? 'Atualizar' : 'Salvar'}
+             </button>
+           </div>
         </form>
       </Modal>
 

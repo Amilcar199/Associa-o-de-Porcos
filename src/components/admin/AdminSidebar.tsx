@@ -31,6 +31,19 @@ interface MenuItem {
 const AdminSidebar = () => {
   const pathname = usePathname()
   const [expandedItems, setExpandedItems] = useState<string[]>(['produtos', 'conteudo'])
+  const [contactBadge, setContactBadge] = useState<number | undefined>(undefined)
+
+  // Carregar badge de contatos (não bloqueante)
+  if (typeof window !== 'undefined' && contactBadge === undefined) {
+    fetch('/api/admin/stats').then(async (r)=>{
+      if(r.ok){
+        const j = await r.json()
+        const contacts = Array.isArray(j.data?.contacts) ? j.data.contacts : j.data?.contacts
+        const count = Array.isArray(contacts) ? contacts.reduce((acc: number, c: any)=> acc + (c.count||0), 0) : undefined
+        setContactBadge(count)
+      }
+    }).catch(()=>{})
+  }
 
   const menuItems: MenuItem[] = [
     {
@@ -68,7 +81,7 @@ const AdminSidebar = () => {
       name: 'Contatos',
       href: '/admin/contatos',
       icon: MessageSquare,
-      badge: 3
+      badge: contactBadge
     },
     {
       name: 'Mídia',
