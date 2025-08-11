@@ -1,35 +1,9 @@
 import { Metadata } from 'next'
-'use client'
-import { useEffect, useState } from 'react'
+import DynamicBreeds from '@/components/admin/DynamicBreeds'
 
 export const metadata: Metadata = {
   title: 'Categorias de Produtos - Painel Administrativo',
   description: 'Gerenciar categorias de produtos'
-}
-
-function DynamicBreeds(){
-  const [breeds, setBreeds] = useState<string[]>([])
-  const [loading, setLoading] = useState(true)
-  useEffect(()=>{
-    const load=async()=>{
-      try{
-        const res = await fetch('/api/products?limit=1&sort=createdAt&order=desc')
-        // Pegar raças via agregação simples: vamos buscar várias páginas rapidamente
-        const res2 = await fetch('/api/products?limit=1000')
-        const list: any[] = res2.ok ? (await res2.json()).data || [] : []
-        const set = Array.from(new Set(list.map((p:any)=>p.breed).filter(Boolean)))
-        setBreeds(set)
-      } finally { setLoading(false) }
-    }
-    load()
-  },[])
-  if (loading) return <div>Carregando raças...</div>
-  if (breeds.length===0) return <div className="text-gray-500">Nenhuma raça encontrada.</div>
-  return (
-    <ul className="list-disc pl-6 text-gray-800 space-y-1">
-      {breeds.map(b=> <li key={b}>{b}</li>)}
-    </ul>
-  )
 }
 
 export default function AdminProductCategoriesPage() {
