@@ -23,10 +23,24 @@ async function getProducts() {
   const json = await res.json()
   const data = json.data || []
   // Enriquecer com imagem fictícia se não houver
-  return data.map((p: any, idx: number) => ({
+  const enriched = data.map((p: any, idx: number) => ({
     ...p,
     imageUrl: p.imageUrl || placeholderImages[idx % placeholderImages.length]
   }))
+  if (enriched.length === 0) {
+    return [
+      {
+        name: 'Suíno Reprodutor Duroc',
+        breed: 'Duroc',
+        weight: 80,
+        age: 6,
+        priceFormatted: 'AOA 120.000',
+        code: 'DEMO-001',
+        imageUrl: placeholderImages[0]
+      }
+    ]
+  }
+  return enriched
 }
 
 export default async function ProdutosPage() {
