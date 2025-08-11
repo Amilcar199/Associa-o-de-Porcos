@@ -5,6 +5,7 @@ import { Trash2, Download, Eye, Upload } from 'lucide-react';
 import ImageUpload from './ui/ImageUpload';
 import ConfirmDialog from './ui/ConfirmDialog';
 import Modal from './ui/Modal';
+import { toast } from 'react-hot-toast';
 
 interface Image {
   fileId: string;
@@ -23,19 +24,32 @@ export default function ImageManager() {
   const [imageToDelete, setImageToDelete] = useState<Image | null>(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
 
+  // Paginação client-side
+  const [page, setPage] = useState(1)
+  const limit = 12
+  const total = images.length
+  const pages = Math.max(1, Math.ceil(total / limit))
+  const start = (page - 1) * limit
+  const end = start + limit
+  const paginatedImages = images.slice(start, end)
+
   useEffect(() => {
     fetchImages();
   }, []);
 
   const fetchImages = async () => {
     try {
+      setLoading(true)
       const response = await fetch('/api/images');
       if (response.ok) {
         const data = await response.json();
         setImages(data.data || []);
+      } else {
+        toast.error('Erro ao carregar imagens')
       }
     } catch (error) {
       console.error('Erro ao buscar imagens:', error);
+      toast.error('Erro ao carregar imagens')
     } finally {
       setLoading(false);
     }
@@ -43,12 +57,13 @@ export default function ImageManager() {
 
   const handleImageUploaded = (imageUrl: string) => {
     setUploadedImageUrl(imageUrl);
+    toast.success('Imagem enviada com sucesso')
     // Recarregar lista de imagens após upload
     setTimeout(() => {
       fetchImages();
       setShowUploadModal(false);
       setUploadedImageUrl(null);
-    }, 1000);
+    }, 800);
   };
 
   const handleDeleteImage = async () => {
@@ -61,9 +76,13 @@ export default function ImageManager() {
 
       if (response.ok) {
         setImages(images.filter(img => img.fileId !== imageToDelete.fileId));
+        toast.success('Imagem removida')
+      } else {
+        toast.error('Falha ao remover imagem')
       }
     } catch (error) {
       console.error('Erro ao deletar imagem:', error);
+      toast.error('Erro ao remover imagem')
     } finally {
       setImageToDelete(null);
     }
@@ -89,6 +108,7 @@ export default function ImageManager() {
 
   const copyImageUrl = (imageUrl: string) => {
     navigator.clipboard.writeText(`${window.location.origin}${imageUrl}`);
+    toast.success('URL copiada')
   };
 
   if (loading) {
@@ -115,7 +135,7 @@ export default function ImageManager() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {images.map((image) => (
+          {paginatedImages.map((image) => (
             <div
               key={image.fileId}
               className="bg-gray-50 rounded-lg p-4 border border-gray-200"
@@ -171,6 +191,19 @@ export default function ImageManager() {
             <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
             <p>Nenhuma imagem encontrada</p>
             <p className="text-sm">Faça upload da primeira imagem para começar</p>
+          </div>
+        )}
+
+        {/* Paginação */}
+        {pages > 1 && (
+          <div className="flex items-center justify-between mt-4 text-sm text-gray-600">
+            <div>
+              Mostrando {Math.min((page - 1) * limit + 1, total)} a {Math.min(page * limit, total)} de {total}
+            </div>
+            <div className="space-x-1">
+              <button onClick={() => setPage(Math.max(1, page - 1))} disabled={page === 1} className="px-2 py-1 border rounded disabled:opacity-50">Anterior</button>
+              <button onClick={() => setPage(Math.min(pages, page + 1))} disabled={page === pages} className="px-2 py-1 border rounded disabled:opacity-50">Próximo</button>
+            </div>
           </div>
         )}
       </div>
