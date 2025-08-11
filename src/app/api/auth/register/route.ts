@@ -45,6 +45,7 @@ export async function POST(req: NextRequest) {
       password: hashedPassword,
       phone: sanitizedData.phone || undefined,
       company: sanitizedData.company || undefined,
+      bio: sanitizedData.bio || undefined,
       role: 'member', // Usuários registrados são membros por padrão
       isActive: true,
       emailVerified: false,
