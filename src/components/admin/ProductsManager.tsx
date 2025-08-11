@@ -108,7 +108,7 @@ export default function ProductsManager() {
         resetForm();
         fetchProducts();
       } else {
-        toast.error('Falha ao salvar produto');
+        try { const err = await response.json(); toast.error(err?.error || 'Falha ao salvar produto') } catch { toast.error('Falha ao salvar produto') }
       }
     } catch (error) {
       console.error('Erro ao salvar produto:', error);

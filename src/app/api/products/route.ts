@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from 'next/server'
 import connectDB from '@/lib/mongodb'
 import Product from '@/models/Product'
+import User from '@/models/User'
 import { validateSession, errorResponse, successResponse, sanitizeInput, getPaginationParams, getSearchFilters, buildMongoQuery, buildMongoSort, paginateResults } from '@/lib/api-utils'
 
 // GET /api/products - Listar produtos
@@ -50,6 +51,27 @@ export async function POST(req: NextRequest) {
       return errorResponse('Nome, raça e preço são obrigatórios')
     }
 
+    // Garantir que exista um seller válido (admin ativo)
+    let seller = await User.findOne({ role: 'admin', isActive: true }).select('_id')
+    if (!seller && process.env.NODE_ENV !== 'production') {
+      try {
+        const demo = new User({
+          name: 'Admin Demo',
+          email: 'admin@demo.local',
+          password: 'admin123',
+          role: 'admin',
+          isActive: true
+        })
+        await demo.save()
+        seller = { _id: demo._id } as any
+      } catch (e) {
+        console.error('Não foi possível criar admin demo:', e)
+      }
+    }
+    if (!seller) {
+      return errorResponse('Nenhum administrador ativo encontrado para atribuir como vendedor. Crie um admin primeiro.')
+    }
+
     // Mapear campos do formulário para o schema Product
     const productData: any = {
       name: sanitizedData.name,
@@ -66,8 +88,15 @@ export async function POST(req: NextRequest) {
       vaccinated: !!sanitizedData.vaccinated,
       location: sanitizedData.location,
       availability: sanitizedData.isAvailable === false ? 'reserved' : 'available',
-      seller: (authResult as any).user.id,
+      seller: seller._id,
       tags: sanitizedData.tags || []
+    }
+
+    if (!productData.location) {
+      return errorResponse('Localização é obrigatória')
+    }
+    if (!productData.images || productData.images.length === 0) {
+      return errorResponse('Pelo menos uma imagem é obrigatória')
     }
 
     // Criar produto
