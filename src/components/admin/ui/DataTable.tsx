@@ -39,6 +39,7 @@ export interface DataTableProps {
   onView?: (row: any) => void
   searchPlaceholder?: string
   emptyMessage?: string
+  showHeader?: boolean
 }
 
 const DataTable = ({
@@ -53,7 +54,8 @@ const DataTable = ({
   onDelete,
   onView,
   searchPlaceholder = 'Buscar...',
-  emptyMessage = 'Nenhum registro encontrado'
+  emptyMessage = 'Nenhum registro encontrado',
+  showHeader = true
 }: DataTableProps) => {
   const [searchTerm, setSearchTerm] = useState('')
   const [sortKey, setSortKey] = useState<string>('')
@@ -143,26 +145,28 @@ const DataTable = ({
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
       {/* Header com busca */}
-      <div className="px-6 py-4 border-b border-gray-200">
-        <div className="flex items-center justify-between">
-          <div className="relative flex-1 max-w-lg">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
-            <input
-              type="text"
-              placeholder={searchPlaceholder}
-              value={searchTerm}
-              onChange={(e) => handleSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            />
-          </div>
-          <div className="flex items-center space-x-2 ml-4">
-            <button className="flex items-center space-x-2 px-3 py-2 text-gray-600 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50">
-              <Filter size={16} />
-              <span>Filtros</span>
-            </button>
+      {showHeader && (
+        <div className="px-6 py-4 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <div className="relative flex-1 max-w-lg">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+              <input
+                type="text"
+                placeholder={searchPlaceholder}
+                value={searchTerm}
+                onChange={(e) => handleSearch(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              />
+            </div>
+            <div className="flex items-center space-x-2 ml-4">
+              <button className="flex items-center space-x-2 px-3 py-2 text-gray-600 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50">
+                <Filter size={16} />
+                <span>Filtros</span>
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Tabela */}
       <div className="overflow-x-auto">
