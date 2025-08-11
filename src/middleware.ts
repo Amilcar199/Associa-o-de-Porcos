@@ -54,6 +54,12 @@ export default withAuth(
     callbacks: {
       authorized: ({ token, req }) => {
         const { pathname } = req.nextUrl
+        const TEMP_BYPASS_ADMIN_AUTH = true
+
+        // Respeitar bypass para /admin e /api/admin
+        if (TEMP_BYPASS_ADMIN_AUTH && (pathname.startsWith('/admin') || pathname.startsWith('/api/admin'))){
+          return true
+        }
         
         // Sempre permitir acesso às rotas públicas
         if (
