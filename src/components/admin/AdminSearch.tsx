@@ -29,9 +29,9 @@ export default function AdminSearch() {
           fetch(`/api/news?search=${encodeURIComponent(q)}&limit=5`),
           fetch(`/api/admin/contacts?search=${encodeURIComponent(q)}&limit=5`)
         ])
-        if (pr.ok) { const j = await pr.json(); setProducts(j.data || j.data?.data || j.data?.results || j.data ?? []) }
-        if (nr.ok) { const j = await nr.json(); setNews(j.data || j.data?.data || j.data?.results || j.data ?? []) }
-        if (cr.ok) { const j = await cr.json(); setContacts(j.data || j.data?.data || j.data?.results || j.data ?? []) }
+        if (pr.ok) { const j = await pr.json(); const dd:any = (j?.data ?? j?.results ?? j); setProducts(Array.isArray(dd)? dd : []) }
+        if (nr.ok) { const j = await nr.json(); const dd:any = (j?.data ?? j?.results ?? j); setNews(Array.isArray(dd)? dd : []) }
+        if (cr.ok) { const j = await cr.json(); const dd:any = (j?.data ?? j?.results ?? j); setContacts(Array.isArray(dd)? dd : []) }
       } finally { setLoading(false) }
     }
     load()
