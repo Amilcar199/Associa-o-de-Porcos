@@ -58,8 +58,7 @@ const AboutPreview = () => {
           >
             <div className="relative rounded-2xl overflow-hidden shadow-2xl">
               <Image
-                src="https://images.unsplash.com/photo-1525498128493-380d1990a112?q=80&w=1400&auto=format&fit=crop"
-                alt="Fazenda da Associação de Porcos"
+                src="https://images.unsplash.com/photo-1525498128493-380d1990a112?q=80&w=1400&auto=format&fit=crop"  alt="Fazenda da Associação de Porcos"
                 width={600}
                 height={400}
                 className="object-cover w-full h-[400px]"

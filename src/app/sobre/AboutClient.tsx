@@ -196,11 +196,9 @@ export default function AboutClient() {
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              'https://images.unsplash.com/photo-1556229061-3f99a5d6c2ba?q=80&w=1200&auto=format&fit=crop',
               'https://images.unsplash.com/photo-1525498128493-380d1990a112?q=80&w=1200&auto=format&fit=crop',
-              'https://images.unsplash.com/photo-1599327576016-7cc3f4f1bb4a?q=80&w=1200&auto=format&fit=crop',
-              'https://images.unsplash.com/photo-1568837668473-0640a2f2b86e?q=80&w=1200&auto=format&fit=crop',
-              'https://images.unsplash.com/photo-1585759071427-6f07e4f6e3f0?q=80&w=1200&auto=format&fit=crop'
+              'https://images.unsplash.com/photo-1556228720-195a672e8a03?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80',
+              'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80'
             ].map((src, idx) => (
               <motion.div
                 key={src}

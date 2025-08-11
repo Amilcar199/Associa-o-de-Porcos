@@ -84,7 +84,7 @@ const Footer = () => {
               </div>
               <div>
                 <h2 className="text-lg font-heading font-bold">
-                  Associação de Porcos
+                  Associação de suínos
                 </h2>
                 <p className="text-sm text-gray-400">
                   Criação Sustentável
@@ -224,7 +224,7 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row items-center justify-between">
             <div className="text-sm text-gray-400 mb-4 md:mb-0">
               <p>
-                © {currentYear} Associação de Porcos. Todos os direitos reservados.
+                © {currentYear} Associação de suínos. Todos os direitos reservados.
               </p>
             </div>
             

@@ -147,7 +147,7 @@ const Header = () => {
               </div>
               <div className="hidden sm:block">
                 <h1 className="text-2xl lg:text-3xl font-heading font-bold text-primary-800">
-                  Associação de Porcos
+                  Associação de suínos
                 </h1>
                 <p className="text-xs lg:text-sm text-gray-600">
                   Criação Sustentável

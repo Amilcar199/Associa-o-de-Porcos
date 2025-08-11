@@ -38,7 +38,7 @@ const CallToAction = () => {
 
   const stats = [
     { value: '500+', label: 'Membros Ativos' },
-    { value: '25+', label: 'Anos de Experiência' },
+    { value: '3+', label: 'Anos de Experiência' },
     { value: '98%', label: 'Satisfação dos Clientes' },
     { value: '15+', label: 'Certificações' }
   ]

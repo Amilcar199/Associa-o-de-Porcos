@@ -34,21 +34,21 @@ const Hero = () => {
       ctaLink: '/registro',
       stats: [
         { label: 'Certificações', value: '5+' },
-        { label: 'Raças Disponíveis', value: '6' },
+        { label: 'Raças Disponíveis', value: '6+' },
         { label: 'Satisfação dos Associados', value: '95%' }
       ]
     },
     {
       id: 3,
-      image: 'https://images.unsplash.com/photo-1599327576016-7cc3f4f1bb4a?q=80&w=1600&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1500595046743-cd271d694d30?q=80&w=1600&auto=format&fit=crop',
       title: 'Inovação que impulsiona resultados',
       subtitle: 'Tecnologia, gestão e conhecimento aplicados ao campo',
       description: 'Capacitação contínua, dados e tecnologia para elevar produtividade, bem-estar e sustentabilidade.',
       cta: 'Saiba Mais',
       ctaLink: '/sobre',
       stats: [
-        { label: 'Projetos Iniciados', value: '3' },
-        { label: 'Parcerias Ativas', value: '4' },
+        { label: 'Projetos Iniciados', value: '5+' },
+        { label: 'Parcerias Ativas', value: '4+' },
         { label: 'Capacitações Realizadas', value: '20+' }
       ]
     }
