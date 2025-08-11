@@ -198,7 +198,9 @@ export default function AboutClient() {
             {[
               'https://images.unsplash.com/photo-1556229061-3f99a5d6c2ba?q=80&w=1200&auto=format&fit=crop',
               'https://images.unsplash.com/photo-1525498128493-380d1990a112?q=80&w=1200&auto=format&fit=crop',
-              'https://images.unsplash.com/photo-1599327576016-7cc3f4f1bb4a?q=80&w=1200&auto=format&fit=crop'
+              'https://images.unsplash.com/photo-1599327576016-7cc3f4f1bb4a?q=80&w=1200&auto=format&fit=crop',
+              'https://images.unsplash.com/photo-1568837668473-0640a2f2b86e?q=80&w=1200&auto=format&fit=crop',
+              'https://images.unsplash.com/photo-1585759071427-6f07e4f6e3f0?q=80&w=1200&auto=format&fit=crop'
             ].map((src, idx) => (
               <motion.div
                 key={src}
