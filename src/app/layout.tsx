@@ -1,8 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter, Poppins } from 'next/font/google'
 import './globals.css'
-import Header from '@/components/layout/Header'
-import Footer from '@/components/layout/Footer'
+import SiteChrome from '@/components/layout/SiteChrome'
 import { Toaster } from 'react-hot-toast'
 import AuthProvider from '@/components/providers/AuthProvider'
 
@@ -80,13 +79,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen bg-gray-50 font-sans antialiased">
         <AuthProvider>
-          <div className="flex flex-col min-h-screen">
-            <Header />
-            <main className="flex-grow">
-              {children}
-            </main>
-            <Footer />
-          </div>
+          <SiteChrome>{children}</SiteChrome>
           <Toaster
             position="top-right"
             toastOptions={{
