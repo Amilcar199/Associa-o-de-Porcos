@@ -85,7 +85,7 @@ export default function ProductsManager() {
         name: formData.name,
         description: formData.description,
         price: formData.price,
-        breed: formData.breed,
+        breed: allowedBreeds.includes(formData.breed) ? formData.breed : 'Outro',
         age: formData.age,
         weight: formData.weight,
         imageUrl: formData.imageUrl,
@@ -180,6 +180,9 @@ export default function ProductsManager() {
   });
 
   const breeds = Array.from(new Map(products.map((p: any) => [p.breed, p.breed])).values()).filter(Boolean);
+  const allowedBreeds = [
+    'Landrace','Large White','Duroc','Hampshire','Pietrain','Yorkshire','Chester White','Spotted','Tamworth','Gloucester Old Spots','Mangalitsa','Ossabaw Island Hog','Mulefoot','Caipira','Piau','Moura','Canastra','Cruzado','Outro'
+  ]
 
   const columns = [
     { key: 'name', title: 'Nome', sortable: true },
@@ -347,13 +350,17 @@ export default function ProductsManager() {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Raça
               </label>
-              <input
-                type="text"
+              <select
                 value={formData.breed}
                 onChange={(e) => setFormData(prev => ({ ...prev, breed: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 required
-              />
+              >
+                <option value="">Selecione...</option>
+                {allowedBreeds.map(b => (
+                  <option key={b} value={b}>{b}</option>
+                ))}
+              </select>
             </div>
             
             <div>
