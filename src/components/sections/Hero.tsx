@@ -40,7 +40,7 @@ const Hero = () => {
     },
     {
       id: 3,
-      image: 'https://images.unsplash.com/photo-1500595046743-cd271d694d30?q=80&w=1600&auto=format&fit=crop',
+      image: 'https://images.unsplash.com/photo-1599327576016-7cc3f4f1bb4a?q=80&w=1600&auto=format&fit=crop',
       title: 'Inovação que impulsiona resultados',
       subtitle: 'Tecnologia, gestão e conhecimento aplicados ao campo',
       description: 'Capacitação contínua, dados e tecnologia para elevar produtividade, bem-estar e sustentabilidade.',

@@ -106,7 +106,7 @@ export default function MetaTags({
             ],
             "contactPoint": {
               "@type": "ContactPoint",
-              "telephone": "+244-222-123-456",
+              "telephone": "+244 928 476 427",
               "contactType": "customer service",
               "email": "contato@associacaoporcos.ao"
             },

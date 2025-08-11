@@ -51,7 +51,7 @@ export default function ContatoPage() {
         <p className="text-gray-600 mb-6">Fale connosco para parcerias, dúvidas e informações.</p>
         <div className="space-y-4 text-gray-700 bg-white rounded-xl shadow p-6">
           <div className="flex items-center space-x-3"><Mail size={18} className="text-primary-600" /><span>contato@associacaodeporcos.ao</span></div>
-          <div className="flex items-center space-x-3"><Phone size={18} className="text-primary-600" /><span>(+244) 222 123 456</span></div>
+          <div className="flex items-center space-x-3"><Phone size={18} className="text-primary-600" /><span>+244 928 476 427</span></div>
         </div>
       </div>
       <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow p-6 space-y-4">

@@ -189,7 +189,7 @@ const CallToAction = () => {
                     <Phone size={18} className="text-white" />
                   </div>
                   <div>
-                    <p className="text-white font-medium">(11) 99999-9999</p>
+                    <p className="text-white font-medium">+244 928 476 427</p>
                     <p className="text-primary-200 text-sm">WhatsApp e Ligações</p>
                   </div>
                 </div>
@@ -217,7 +217,7 @@ const CallToAction = () => {
                 </Link>
                 
                 <a
-                  href="https://wa.me/5511999999999"
+                  href="https://wa.me/244928476427"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 inline-flex items-center justify-center"
