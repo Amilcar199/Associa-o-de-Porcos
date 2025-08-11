@@ -12,7 +12,7 @@ export default withAuth(
     }
 
     // Permitir publicamente endpoints públicos de leitura
-    if (pathname.startsWith('/api/products')) {
+    if (pathname.startsWith('/api/products') || pathname.startsWith('/api/news')) {
       return NextResponse.next()
     }
 
@@ -70,7 +70,8 @@ export default withAuth(
           pathname.startsWith('/_next') ||
           pathname.startsWith('/favicon') ||
           pathname === '/api/contact' ||
-          pathname.startsWith('/api/products')
+          pathname.startsWith('/api/products') ||
+          pathname.startsWith('/api/news')
         ) {
           return true
         }
