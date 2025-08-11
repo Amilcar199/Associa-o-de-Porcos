@@ -61,8 +61,7 @@ export default function ProfilePage() {
   useEffect(() => {
     if (status === 'loading') return;
     
-    const TEMP_BYPASS_MEMBER_AUTH = true
-    if (!session && !TEMP_BYPASS_MEMBER_AUTH) {
+    if (!session) {
       router.push('/login');
       return;
     }

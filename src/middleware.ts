@@ -6,15 +6,6 @@ export default withAuth(
     const { pathname } = req.nextUrl
     const token = req.nextauth.token
 
-    const TEMP_BYPASS_ADMIN_AUTH = true
-    const TEMP_BYPASS_MEMBER_AUTH = true
-    if (
-      (TEMP_BYPASS_ADMIN_AUTH && (pathname.startsWith('/admin') || pathname.startsWith('/api/admin'))) ||
-      (TEMP_BYPASS_MEMBER_AUTH && (pathname.startsWith('/perfil') || pathname.startsWith('/api/user/profile')))
-    ){
-      return NextResponse.next()
-    }
-
     // Permitir publicamente endpoints públicos de leitura
     if (pathname.startsWith('/api/products') || pathname.startsWith('/api/news')) {
       return NextResponse.next()
@@ -58,17 +49,7 @@ export default withAuth(
     callbacks: {
       authorized: ({ token, req }) => {
         const { pathname } = req.nextUrl
-        const TEMP_BYPASS_ADMIN_AUTH = true
-        const TEMP_BYPASS_MEMBER_AUTH = true
 
-        // Respeitar bypass para /admin, /api/admin, /perfil e /api/user/profile
-        if (
-          (TEMP_BYPASS_ADMIN_AUTH && (pathname.startsWith('/admin') || pathname.startsWith('/api/admin'))) ||
-          (TEMP_BYPASS_MEMBER_AUTH && (pathname.startsWith('/perfil') || pathname.startsWith('/api/user/profile')))
-        ){
-          return true
-        }
-        
         // Sempre permitir acesso às rotas públicas
         if (
           pathname === '/' ||

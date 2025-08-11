@@ -12,110 +12,30 @@ import {
   Star
 } from 'lucide-react'
 
-// Mock data - será substituído pela API real
-const mockPartners = [
-  {
-    id: '1',
-    name: 'Dr. João Silva',
-    role: 'Veterinário Especialista',
-    company: 'Clínica Veterinária AgroSaúde',
-    avatar: '/collaborators/joao-silva.jpg',
-    description: 'Especialista em saúde suína com mais de 20 anos de experiência no setor.',
-    featured: true
-  },
-  {
-    id: '2',
-    name: 'Maria Santos',
-    role: 'Zootecnista',
-    company: 'Consultoria Técnica Rural',
-    avatar: '/collaborators/maria-santos.jpg',
-    description: 'Consultora em melhoramento genético e nutrição animal.',
-    featured: true
-  },
-  {
-    id: '3',
-    name: 'Carlos Oliveira',
-    role: 'Criador Parceiro',
-    company: 'Fazenda Esperança',
-    avatar: '/collaborators/carlos-oliveira.jpg',
-    description: 'Criador de suínos há 15 anos, especializado em reprodução.',
-    featured: true
-  },
-  {
-    id: '4',
-    name: 'Ana Costa',
-    role: 'Nutricionista Animal',
-    company: 'NutriSuínos Ltda',
-    avatar: '/collaborators/ana-costa.jpg',
-    description: 'Especialista em formulação de rações e suplementos.',
-    featured: true
-  },
-  {
-    id: '5',
-    name: 'Pedro Mendes',
-    role: 'Técnico Agropecuário',
-    company: 'TecnoRural',
-    avatar: '/collaborators/pedro-mendes.jpg',
-    description: 'Especialista em manejo e bem-estar animal.',
-    featured: false
-  },
-  {
-    id: '6',
-    name: 'Lucia Ferreira',
-    role: 'Médica Veterinária',
-    company: 'VetCare',
-    avatar: '/collaborators/lucia-ferreira.jpg',
-    description: 'Especialista em medicina preventiva e programas sanitários.',
-    featured: false
-  }
-]
-
-const organizationPartners = [
-  {
-    name: 'ACSA - Associação de Criadores de Suínos de Angola',
-    logo: '/partners/acsa-logo.png',
-    website: 'https://acsa.ao',
-    description: 'Entidade máxima da suinocultura angolana'
-  },
-  {
-    name: 'IIA - Instituto de Investigação Agronómica',
-    logo: '/partners/iia-logo.png',
-    website: 'https://www.iia.ao',
-    description: 'Centro de pesquisa e desenvolvimento'
-  },
-  {
-    name: 'UAN - Universidade Agostinho Neto',
-    logo: '/partners/uan-logo.png',
-    website: 'https://www.uan.ao',
-    description: 'Parceria em pesquisa e desenvolvimento'
-  },
-  {
-    name: 'Sindicato Rural',
-    logo: '/partners/sindicato-logo.png',
-    website: '#',
-    description: 'Representação dos produtores rurais'
-  }
-]
+interface PartnerItem {
+  _id: string
+  name: string
+  role: string
+  company?: string
+  avatar: string
+  description: string
+  featured: boolean
+}
 
 const PartnersSection = () => {
-  const [collaborators, setCollaborators] = useState(mockPartners)
+  const [collaborators, setCollaborators] = useState<PartnerItem[]>([])
   const [loading, setLoading] = useState(false)
 
-  // Função para buscar colaboradores (será implementada com API real)
   const fetchCollaborators = async () => {
     setLoading(true)
     try {
-      // const response = await fetch('/api/collaborators/featured')
-      // const data = await response.json()
-      // setCollaborators(data.collaborators)
-      
-      // Por enquanto, usar dados mock
-      setTimeout(() => {
-        setCollaborators(mockPartners.filter(p => p.featured))
-        setLoading(false)
-      }, 600)
+      const res = await fetch('/api/collaborators/featured?limit=6', { cache: 'no-store' })
+      if (!res.ok) throw new Error('Falha ao buscar colaboradores')
+      const json = await res.json()
+      setCollaborators(json.data || [])
     } catch (error) {
       console.error('Erro ao buscar colaboradores:', error)
+    } finally {
       setLoading(false)
     }
   }
@@ -125,25 +45,55 @@ const PartnersSection = () => {
   }, [])
 
   return (
-    // Seção temporariamente oculta
-    <section className="section-padding bg-white hidden">
+    <section className="section-padding bg-white">
       <div className="container-custom">
-        {/* Header */}
         <div className="text-center mb-12">
-          {/* Conteúdo oculto */}
+          <span className="inline-block bg-primary-100 text-primary-800 px-3 py-1 rounded-full text-sm font-medium mb-4">
+            Parceiros e Colaboradores
+          </span>
+          <h2 className="text-3xl lg:text-4xl font-heading font-bold text-gray-900 mb-6">
+            Nossa Rede de <span className="text-gradient">Especialistas</span>
+          </h2>
+          <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            Profissionais que apoiam nossa missão com conhecimento e experiência.
+          </p>
         </div>
 
-        {/* Stats Cards */}
-        {/* Conteúdo oculto */}
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[...Array(3)].map((_, idx) => (
+              <div key={idx} className="card animate-pulse">
+                <div className="h-40 bg-gray-200 rounded-t-lg" />
+                <div className="card-body space-y-3">
+                  <div className="h-4 bg-gray-200 rounded w-3/4" />
+                  <div className="h-3 bg-gray-200 rounded w-1/2" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            {collaborators.map((c) => (
+              <div key={c._id} className="card">
+                <div className="relative h-40">
+                  <Image src={c.avatar} alt={c.name} fill className="object-cover rounded-t-lg" />
+                </div>
+                <div className="card-body">
+                  <h3 className="font-bold text-lg text-gray-900">{c.name}</h3>
+                  <p className="text-sm text-gray-600">{c.role}{c.company ? ` · ${c.company}` : ''}</p>
+                  <p className="text-sm text-gray-600 mt-2 line-clamp-3">{c.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
-        {/* Featured Collaborators */}
-        {/* Conteúdo oculto */}
-
-        {/* Partners Carousel */}
-        {/* Conteúdo oculto */}
-
-        {/* CTA Partners */}
-        {/* Conteúdo oculto */}
+        <div className="text-center">
+          <Link href="/colaboradores" className="inline-flex items-center bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300">
+            Ver Todos os Colaboradores
+            <ArrowRight size={20} className="ml-2" />
+          </Link>
+        </div>
       </div>
     </section>
   )
