@@ -141,6 +141,18 @@ export default function NewProductClient() {
           </div>
         </div>
 
+        <div>
+          <label className="block text-sm text-gray-700 mb-1">Descrição</label>
+          <textarea
+            value={form.description}
+            onChange={(e)=>setForm(p=>({...p,description:e.target.value}))}
+            rows={4}
+            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+            placeholder="Descreva características, manejo, alimentação, etc."
+            required
+          />
+        </div>
+
         <div className="flex items-center gap-3">
           <button type="submit" disabled={loading} className="inline-flex items-center bg-primary-600 hover:bg-primary-700 text-white px-5 py-2.5 rounded-lg font-medium disabled:opacity-60">
             <Save className="w-4 h-4 mr-2" /> {loading ? 'Salvando...' : 'Salvar'}
