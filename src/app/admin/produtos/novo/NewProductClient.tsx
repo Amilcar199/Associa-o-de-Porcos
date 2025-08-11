@@ -20,19 +20,34 @@ export default function NewProductClient() {
     tags: [] as string[],
   })
 
+  const allowedBreeds = [
+    'Landrace','Large White','Duroc','Hampshire','Pietrain','Yorkshire','Chester White','Spotted','Tamworth','Gloucester Old Spots','Mangalitsa','Ossabaw Island Hog','Mulefoot','Caipira','Piau','Moura','Canastra','Cruzado','Outro'
+  ]
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
     try {
+      // validação simples de imagem
+      const imageList = (form.images || []).filter(Boolean)
+      if (imageList.length === 0) {
+        alert('Adicione pelo menos uma imagem (URL ou upload).')
+        return
+      }
+
       const res = await fetch('/api/products', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...form,
-          // seller será inferido no backend a partir da sessão ou validado
+          breed: allowedBreeds.includes(form.breed) ? form.breed : 'Outro',
+          images: imageList,
         }),
       })
-      if (!res.ok) throw new Error('Falha ao salvar')
+      if (!res.ok) {
+        try { const j = await res.json(); alert(j?.error || 'Falha ao salvar') } catch { alert('Falha ao salvar') }
+        return
+      }
       setForm({
         name: '', description: '', breed: '', age: 0, weight: 0, price: undefined,
         images: [''], features: [], healthStatus: 'good', vaccinated: false, location: '', tags: []
@@ -63,7 +78,12 @@ export default function NewProductClient() {
           </div>
           <div>
             <label className="block text-sm text-gray-700 mb-1">Raça</label>
-            <input value={form.breed} onChange={(e)=>setForm(p=>({...p,breed:e.target.value}))} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="Ex.: Duroc" required />
+            <select value={form.breed} onChange={(e)=>setForm(p=>({...p,breed:e.target.value}))} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" required>
+              <option value="">Selecione...</option>
+              {allowedBreeds.map(b => (
+                <option key={b} value={b}>{b}</option>
+              ))}
+            </select>
           </div>
         </div>
 
@@ -83,7 +103,7 @@ export default function NewProductClient() {
             </div>
           </div>
           <div>
-            <label className="block text-sm text-gray-700 mb-1">Preço (AOA)</label>
+            <label className="block text-sm text-gray-700 mb-1">Preço (Kz)</label>
             <div className="relative">
               <DollarSign className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
               <input type="number" value={form.price ?? ''} onChange={(e)=>setForm(p=>({...p,price:e.target.value===''?undefined:parseFloat(e.target.value)}))} className="w-full pl-9 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="120000" />
