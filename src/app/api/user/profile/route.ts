@@ -10,13 +10,38 @@ import { successResponse, errorResponse, sanitizeInput } from '@/lib/api-utils';
 // GET /api/user/profile - Buscar perfil do usuário logado
 export async function GET(req: NextRequest) {
   try {
-    await connectDB();
+    const TEMP_BYPASS_MEMBER_AUTH = true
 
     const session = await getServerSession(authOptions);
     
     if (!session || !session.user) {
+      if (TEMP_BYPASS_MEMBER_AUTH) {
+        const mockUser = {
+          _id: 'mock-user-id',
+          name: 'Membro Demo',
+          email: 'demo@usuario.local',
+          role: 'member',
+          avatar: undefined,
+          phone: '',
+          company: '',
+          bio: '',
+          location: '',
+          website: '',
+          socialMedia: {},
+          preferences: {
+            emailNotifications: true,
+            smsNotifications: false,
+            newsletter: true
+          },
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        }
+        return NextResponse.json(successResponse(mockUser))
+      }
       return errorResponse('Não autorizado', 401);
     }
+
+    await connectDB();
 
     const user = await User.findById(session.user.id).select('-password');
     
@@ -34,13 +59,37 @@ export async function GET(req: NextRequest) {
 // PUT /api/user/profile - Atualizar perfil do usuário logado
 export async function PUT(req: NextRequest) {
   try {
-    await connectDB();
+    const TEMP_BYPASS_MEMBER_AUTH = true
 
     const session = await getServerSession(authOptions);
     
     if (!session || !session.user) {
+      if (TEMP_BYPASS_MEMBER_AUTH) {
+        // Em modo bypass, aceitar atualização e retornar mock atualizado superficialmente
+        const body = await req.json();
+        const sanitizedData = sanitizeInput(body);
+        const updatedMock = {
+          _id: 'mock-user-id',
+          name: sanitizedData.name || 'Membro Demo',
+          email: 'demo@usuario.local',
+          role: 'member',
+          avatar: sanitizedData.avatar,
+          phone: sanitizedData.phone || '',
+          company: sanitizedData.company || '',
+          bio: sanitizedData.bio || '',
+          location: sanitizedData.location || '',
+          website: sanitizedData.website || '',
+          socialMedia: sanitizedData.socialMedia || {},
+          preferences: sanitizedData.preferences || { emailNotifications: true, smsNotifications: false, newsletter: true },
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        }
+        return NextResponse.json(successResponse(updatedMock, 'Perfil atualizado (bypass)'))
+      }
       return errorResponse('Não autorizado', 401);
     }
+
+    await connectDB();
 
     const body = await req.json();
     const sanitizedData = sanitizeInput(body);

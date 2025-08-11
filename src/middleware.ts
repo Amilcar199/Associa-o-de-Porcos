@@ -7,7 +7,11 @@ export default withAuth(
     const token = req.nextauth.token
 
     const TEMP_BYPASS_ADMIN_AUTH = true
-    if (TEMP_BYPASS_ADMIN_AUTH && (pathname.startsWith('/admin') || pathname.startsWith('/api/admin'))){
+    const TEMP_BYPASS_MEMBER_AUTH = true
+    if (
+      (TEMP_BYPASS_ADMIN_AUTH && (pathname.startsWith('/admin') || pathname.startsWith('/api/admin'))) ||
+      (TEMP_BYPASS_MEMBER_AUTH && (pathname.startsWith('/perfil') || pathname.startsWith('/api/user/profile')))
+    ){
       return NextResponse.next()
     }
 
@@ -55,9 +59,13 @@ export default withAuth(
       authorized: ({ token, req }) => {
         const { pathname } = req.nextUrl
         const TEMP_BYPASS_ADMIN_AUTH = true
+        const TEMP_BYPASS_MEMBER_AUTH = true
 
-        // Respeitar bypass para /admin e /api/admin
-        if (TEMP_BYPASS_ADMIN_AUTH && (pathname.startsWith('/admin') || pathname.startsWith('/api/admin'))){
+        // Respeitar bypass para /admin, /api/admin, /perfil e /api/user/profile
+        if (
+          (TEMP_BYPASS_ADMIN_AUTH && (pathname.startsWith('/admin') || pathname.startsWith('/api/admin'))) ||
+          (TEMP_BYPASS_MEMBER_AUTH && (pathname.startsWith('/perfil') || pathname.startsWith('/api/user/profile')))
+        ){
           return true
         }
         
