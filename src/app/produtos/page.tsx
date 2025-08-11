@@ -92,7 +92,10 @@ export default async function ProdutosPage() {
                   {/* Ações */}
                   <div className="mt-4 flex items-center justify-between">
                     <span className="text-sm text-gray-500">Código: {p.code || p._id?.slice?.(0, 6) || '—'}</span>
-                    <button className="text-primary-700 hover:text-primary-800 font-medium text-sm">Detalhes</button>
+                    <div className="flex items-center gap-3">
+                      <a href="/contato" className="text-primary-700 hover:text-primary-800 font-medium text-sm">Entre em Contato</a>
+                      <a href="tel:+244928476427" className="text-primary-700 hover:text-primary-800 font-medium text-sm">Ligue</a>
+                    </div>
                   </div>
                 </div>
               </div>
