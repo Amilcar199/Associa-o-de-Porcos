@@ -12,24 +12,24 @@ const Hero = () => {
   const slides = [
     {
       id: 1,
-      image: '/hero/slide-1.jpg',
-      title: 'Uma nova associação em crescimento',
-      subtitle: 'Conectando criadores e estruturando a suinocultura recente em Angola',
-      description: 'Somos uma associação jovem, com 2 a 3 anos de atuação, focada em apoiar criadores, organizar a cadeia e promover boas práticas desde o início.',
+      image: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?q=80&w=1600&auto=format&fit=crop',
+      title: 'Excelência na Suinocultura',
+      subtitle: 'Conectando criadores e impulsionando produtividade com qualidade',
+      description: 'Promovemos boas práticas, sustentabilidade e parcerias para resultados consistentes em toda a cadeia.',
       cta: 'Conheça Nossos Produtos',
       ctaLink: '/produtos',
       stats: [
         { label: 'Criadores Associados', value: '100+' },
         { label: 'Suínos Comercializados', value: '1K+' },
-        { label: 'Anos de Atuação', value: '2+' }
+        { label: 'Capacitações', value: '20+' }
       ]
     },
     {
       id: 2,
-      image: '/hero/slide-2.jpg',
-      title: 'Qualidade desde o primeiro dia',
-      subtitle: 'Padrões de bem-estar e sustentabilidade para um futuro sólido',
-      description: 'Mesmo recente, adotamos protocolos claros de bem-estar animal e sustentabilidade, construindo uma base confiável para nossos associados.',
+      image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?q=80&w=1600&auto=format&fit=crop',
+      title: 'Qualidade que inspira confiança',
+      subtitle: 'Bem-estar animal, rastreabilidade e eficiência',
+      description: 'Seguimos padrões rigorosos de qualidade para garantir desempenho, segurança e satisfação dos clientes e associados.',
       cta: 'Faça Parte da Associação',
       ctaLink: '/registro',
       stats: [
@@ -40,10 +40,10 @@ const Hero = () => {
     },
     {
       id: 3,
-      image: '/hero/slide-3.jpg',
-      title: 'Começando com inovação',
-      subtitle: 'Tecnologia acessível e práticas modernas desde o início',
-      description: 'Estamos implementando gradualmente tecnologia e capacitação para elevar a produtividade e o bem-estar na cadeia suinícola.',
+      image: 'https://images.unsplash.com/photo-1500595046743-cd271d694d30?q=80&w=1600&auto=format&fit=crop',
+      title: 'Inovação que impulsiona resultados',
+      subtitle: 'Tecnologia, gestão e conhecimento aplicados ao campo',
+      description: 'Capacitação contínua, dados e tecnologia para elevar produtividade, bem-estar e sustentabilidade.',
       cta: 'Saiba Mais',
       ctaLink: '/sobre',
       stats: [

@@ -45,7 +45,6 @@ const Header = () => {
     { name: 'Quem Somos', href: '/sobre' },
     { name: 'Produtos', href: '/produtos' },
     { name: 'Notícias', href: '/noticias' },
-    { name: 'Colaboradores', href: '/colaboradores' },
     { name: 'Contato', href: '/contato' },
   ]
 
@@ -125,7 +124,7 @@ const Header = () => {
           <div className="flex items-center justify-between h-16 lg:h-20">
             {/* Logo */}
             <Link href="/" className="flex items-center space-x-3">
-              <div className="w-10 h-10 lg:w-12 lg:h-12 relative">
+              <div className="w-12 h-12 lg:w-14 lg:h-14 relative">
                 <Image
                   src={LogoPng}
                   alt="Associação de Porcos"
@@ -135,7 +134,7 @@ const Header = () => {
                 />
               </div>
               <div className="hidden sm:block">
-                <h1 className="text-xl lg:text-2xl font-heading font-bold text-primary-800">
+                <h1 className="text-2xl lg:text-3xl font-heading font-bold text-primary-800">
                   Associação de Porcos
                 </h1>
                 <p className="text-xs lg:text-sm text-gray-600">

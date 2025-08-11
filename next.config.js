@@ -4,7 +4,7 @@ const nextConfig = {
     // appDir: true // Removido pois é padrão no Next.js 14
   },
   images: {
-    domains: ['localhost'],
+    domains: ['localhost', 'images.unsplash.com', 'source.unsplash.com', 'picsum.photos'],
   },
   env: {
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,

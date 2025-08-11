@@ -51,7 +51,7 @@ const AdminHeader = ({ user }: AdminHeaderProps) => {
 
             {/* Logo */}
             <Link href="/admin" className="flex items-center space-x-3 ml-4 lg:ml-0">
-              <div className="w-8 h-8 relative">
+              <div className="w-10 h-10 relative">
                 <Image
                   src={LogoPng}
                   alt="Associação de Porcos"

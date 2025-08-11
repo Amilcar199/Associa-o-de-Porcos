@@ -58,7 +58,7 @@ const AboutPreview = () => {
           >
             <div className="relative rounded-2xl overflow-hidden shadow-2xl">
               <Image
-                src="/about/main-image.jpg"
+                src="https://images.unsplash.com/photo-1525498128493-380d1990a112?q=80&w=1400&auto=format&fit=crop"
                 alt="Fazenda da Associação de Porcos"
                 width={600}
                 height={400}
@@ -89,8 +89,8 @@ const AboutPreview = () => {
               className="absolute -bottom-6 -right-6 bg-white rounded-xl shadow-xl p-4 border border-gray-200"
             >
               <div className="text-center">
-                <div className="text-2xl font-bold text-primary-600">2+</div>
-                <div className="text-xs text-gray-600">Anos de Atuação</div>
+                <div className="text-2xl font-bold text-primary-600">20+</div>
+                <div className="text-xs text-gray-600">Capacitações</div>
               </div>
             </motion.div>
 
@@ -120,14 +120,13 @@ const AboutPreview = () => {
                 Sobre Nós
               </span>
               <h2 className="text-3xl lg:text-4xl font-heading font-bold text-gray-900 mb-6">
-                Uma associação recente com 
+                Excelência e Inovação na
                 <span className="text-gradient"> Suinocultura</span>
               </h2>
               <p className="text-lg text-gray-600 leading-relaxed mb-8">
-                Fundada há pouco tempo, a Associação de Porcos vem estruturando a 
-                criação sustentável e responsável de suínos em Angola. Nossa missão 
-                é conectar criadores, apoiar o crescimento e impulsionar o 
-                desenvolvimento do setor desde os primeiros anos.
+                Promovemos a criação sustentável e responsável de suínos em Angola. 
+                Nossa missão é conectar criadores, apoiar o crescimento e impulsionar 
+                o desenvolvimento do setor com qualidade, tecnologia e parcerias sólidas.
               </p>
             </div>
 

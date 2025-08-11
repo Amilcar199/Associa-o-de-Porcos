@@ -8,10 +8,10 @@ import PartnersSection from '@/components/sections/PartnersSection'
 
 export const metadata: Metadata = {
   title: 'Home - Associação de Porcos',
-  description: 'Bem-vindo à Associação de Porcos. Uma associação recente (2-3 anos) focada em criação sustentável, organização da cadeia e parcerias no setor suinícola.',
+  description: 'Bem-vindo à Associação de Porcos. Sustentabilidade, qualidade e parcerias para impulsionar resultados na suinocultura.',
   openGraph: {
-    title: 'Associação de Porcos - Uma nova fase da suinocultura',
-    description: 'Associação jovem, focada em sustentabilidade, organização e parcerias para fortalecer a cadeia.',
+    title: 'Associação de Porcos - Sustentabilidade e Qualidade',
+    description: 'Boas práticas, inovação e parcerias para fortalecer toda a cadeia da suinocultura.',
     type: 'website',
   },
 }

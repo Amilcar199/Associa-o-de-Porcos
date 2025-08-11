@@ -22,7 +22,6 @@ const Footer = () => {
     { name: 'Quem Somos', href: '/sobre' },
     { name: 'Produtos', href: '/produtos' },
     { name: 'Notícias', href: '/noticias' },
-    { name: 'Colaboradores', href: '/colaboradores' },
     { name: 'Contato', href: '/contato' },
   ]
 
@@ -74,7 +73,7 @@ const Footer = () => {
           {/* Logo e Descrição */}
           <div className="lg:col-span-1">
             <Link href="/" className="flex items-center space-x-3 mb-4">
-              <div className="w-10 h-10 relative">
+              <div className="w-12 h-12 relative">
                 <Image
                   src={LogoPng}
                   alt="Associação de Porcos"
