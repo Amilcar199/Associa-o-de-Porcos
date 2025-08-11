@@ -79,6 +79,7 @@ const Footer = () => {
                   alt="Associação de Porcos"
                   fill
                   className="object-contain"
+                  sizes="48px"
                 />
               </div>
               <div>
@@ -136,6 +137,7 @@ const Footer = () => {
                 <li key={link.name}>
                   <Link
                     href={link.href}
+                    prefetch
                     className="text-gray-300 hover:text-primary-400 transition-colors text-sm"
                   >
                     {link.name}

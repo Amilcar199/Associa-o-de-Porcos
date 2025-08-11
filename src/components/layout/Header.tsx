@@ -5,7 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import LogoPng from '@/components/assets/Logo.png'
 import { useSession, signOut } from 'next-auth/react'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { 
   Menu, 
   X, 
@@ -24,6 +24,7 @@ const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false)
   const { data: session, status } = useSession()
   const pathname = usePathname()
+  const router = useRouter()
 
   // Detectar scroll para adicionar sombra ao header
   useEffect(() => {
@@ -33,6 +34,14 @@ const Header = () => {
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  // Prefetch programático das rotas mais acessadas
+  useEffect(() => {
+    const routesToPrefetch = ['/', '/sobre', '/produtos', '/noticias', '/contato', '/login', '/registro']
+    routesToPrefetch.forEach((route) => {
+      try { router.prefetch(route) } catch {}
+    })
+  }, [router])
 
   // Fechar menus ao mudar de rota
   useEffect(() => {
@@ -97,12 +106,14 @@ const Header = () => {
                 <div className="flex items-center space-x-4">
                   <Link 
                     href="/login" 
+                    prefetch
                     className="text-primary-200 hover:text-white transition-colors"
                   >
                     Entrar
                   </Link>
                   <Link 
                     href="/registro" 
+                    prefetch
                     className="bg-primary-600 hover:bg-primary-700 px-3 py-1 rounded transition-colors"
                   >
                     Cadastre-se
@@ -130,6 +141,7 @@ const Header = () => {
                   alt="Associação de Porcos"
                   fill
                   className="object-contain"
+                  sizes="(max-width: 1024px) 48px, 56px"
                   priority
                 />
               </div>
@@ -149,6 +161,7 @@ const Header = () => {
                 <Link
                   key={item.name}
                   href={item.href}
+                  prefetch
                   className={`font-medium transition-colors relative ${
                     isActiveLink(item.href)
                       ? 'text-primary-600'
