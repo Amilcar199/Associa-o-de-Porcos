@@ -11,6 +11,11 @@ export default withAuth(
       return NextResponse.next()
     }
 
+    // Permitir publicamente endpoints públicos de leitura
+    if (pathname.startsWith('/api/products')) {
+      return NextResponse.next()
+    }
+
     // Proteger rotas do admin
     if (pathname.startsWith('/admin')) {
       if (!token || token.role !== 'admin') {
@@ -64,7 +69,8 @@ export default withAuth(
           pathname.startsWith('/redefinir-senha') ||
           pathname.startsWith('/_next') ||
           pathname.startsWith('/favicon') ||
-          pathname === '/api/contact'
+          pathname === '/api/contact' ||
+          pathname.startsWith('/api/products')
         ) {
           return true
         }
