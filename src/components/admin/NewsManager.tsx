@@ -187,6 +187,15 @@ export default function NewsManager() {
     isPublished: formatStatus(newsItem.isPublished)
   }));
 
+  // Paginação no cliente
+  const [page, setPage] = useState(1)
+  const limit = 10
+  const total = tableData.length
+  const pages = Math.max(1, Math.ceil(total / limit))
+  const start = (page - 1) * limit
+  const end = start + limit
+  const paginatedData = tableData.slice(start, end)
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -225,7 +234,7 @@ export default function NewsManager() {
                 type="text"
                 placeholder="Buscar por título ou conteúdo..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => { setSearchTerm(e.target.value); setPage(1) }}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
               />
             </div>
@@ -237,7 +246,7 @@ export default function NewsManager() {
             </label>
             <select
               value={filterCategory}
-              onChange={(e) => setFilterCategory(e.target.value)}
+              onChange={(e) => { setFilterCategory(e.target.value); setPage(1) }}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
             >
               <option value="">Todas as categorias</option>
@@ -251,10 +260,12 @@ export default function NewsManager() {
 
       {/* Data Table */}
       <DataTable
-        data={tableData}
+        data={paginatedData}
         columns={columns}
         onEdit={(item) => handleEdit(item as News)}
         onDelete={(item) => setNewsToDelete(item as News)}
+        pagination={{ page, limit, total, pages }}
+        onPageChange={(p) => setPage(Math.min(Math.max(1, p), pages))}
       />
 
       {/* Add/Edit Modal */}
