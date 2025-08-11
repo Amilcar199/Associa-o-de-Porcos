@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Eye, Search, Filter } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 import DataTable from './ui/DataTable';
 import Modal from './ui/Modal';
 import ConfirmDialog from './ui/ConfirmDialog';
@@ -86,13 +87,17 @@ export default function ProductsManager() {
       });
 
       if (response.ok) {
+        toast.success(editingProduct ? 'Produto atualizado' : 'Produto criado');
         setShowModal(false);
         setEditingProduct(null);
         resetForm();
         fetchProducts();
+      } else {
+        toast.error('Falha ao salvar produto');
       }
     } catch (error) {
       console.error('Erro ao salvar produto:', error);
+      toast.error('Erro ao salvar produto');
     }
   };
 
@@ -121,9 +126,13 @@ export default function ProductsManager() {
 
       if (response.ok) {
         setProducts(products.filter(p => p._id !== productToDelete._id));
+        toast.success('Produto removido');
+      } else {
+        toast.error('Falha ao remover produto');
       }
     } catch (error) {
       console.error('Erro ao deletar produto:', error);
+      toast.error('Erro ao remover produto');
     } finally {
       setProductToDelete(null);
     }
@@ -156,10 +165,10 @@ export default function ProductsManager() {
   const breeds = Array.from(new Map(products.map((p: any) => [p.breed, p.breed])).values());
 
   const columns = [
-    { key: 'name', title: 'Nome' },
-    { key: 'breed', title: 'Raça' },
-    { key: 'age', title: 'Idade (meses)' },
-    { key: 'weight', title: 'Peso (kg)' },
+    { key: 'name', title: 'Nome', sortable: true },
+    { key: 'breed', title: 'Raça', sortable: true },
+    { key: 'age', title: 'Idade (meses)', sortable: true },
+    { key: 'weight', title: 'Peso (kg)', sortable: true },
     { key: 'price', title: 'Preço (Kz)' },
     { key: 'isAvailable', title: 'Disponível' }
   ];
@@ -183,7 +192,23 @@ export default function ProductsManager() {
     );
   };
 
-  const tableData = filteredProducts.map(product => ({
+  // Ordenação client-side
+  const [sortKey, setSortKey] = useState<string>('')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
+  const sortedProducts = [...filteredProducts].sort((a, b) => {
+    if (!sortKey) return 0
+    const av = a[sortKey as keyof typeof a]
+    const bv = b[sortKey as keyof typeof b]
+    if (av == null || bv == null) return 0
+    if (typeof av === 'number' && typeof bv === 'number') {
+      return sortOrder === 'asc' ? av - bv : bv - av
+    }
+    const as = String(av).toLowerCase()
+    const bs = String(bv).toLowerCase()
+    return sortOrder === 'asc' ? as.localeCompare(bs) : bs.localeCompare(as)
+  })
+
+  const tableData = sortedProducts.map(product => ({
     ...product,
     price: formatPrice(product.price),
     isAvailable: formatAvailability(product.isAvailable)
@@ -268,6 +293,7 @@ export default function ProductsManager() {
         onDelete={(item) => setProductToDelete(item as Product)}
         pagination={{ page, limit, total, pages }}
         onPageChange={(p) => setPage(Math.min(Math.max(1, p), pages))}
+        onSort={(key, order) => { setSortKey(key); setSortOrder(order) }}
       />
 
       {/* Add/Edit Modal */}

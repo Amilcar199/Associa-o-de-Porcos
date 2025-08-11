@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Eye, Search, Filter } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 import DataTable from './ui/DataTable';
 import Modal from './ui/Modal';
 import ConfirmDialog from './ui/ConfirmDialog';
@@ -85,13 +86,17 @@ export default function NewsManager() {
       });
 
       if (response.ok) {
+        toast.success(editingNews ? 'Notícia atualizada' : 'Notícia criada');
         setShowModal(false);
         setEditingNews(null);
         resetForm();
         fetchNews();
+      } else {
+        toast.error('Falha ao salvar notícia');
       }
     } catch (error) {
       console.error('Erro ao salvar notícia:', error);
+      toast.error('Erro ao salvar notícia');
     }
   };
 
@@ -119,9 +124,13 @@ export default function NewsManager() {
 
       if (response.ok) {
         setNews(news.filter(n => n._id !== newsToDelete._id));
+        toast.success('Notícia removida');
+      } else {
+        toast.error('Falha ao remover notícia');
       }
     } catch (error) {
       console.error('Erro ao deletar notícia:', error);
+      toast.error('Erro ao remover notícia');
     } finally {
       setNewsToDelete(null);
     }
@@ -153,12 +162,12 @@ export default function NewsManager() {
   const categories = Array.from(new Map(news.map((n: any) => [n.category, n.category])).values());
 
   const columns = [
-    { key: 'title', title: 'Título' },
-    { key: 'category', title: 'Categoria' },
-    { key: 'author', title: 'Autor' },
-    { key: 'views', title: 'Visualizações' },
+    { key: 'title', title: 'Título', sortable: true },
+    { key: 'category', title: 'Categoria', sortable: true },
+    { key: 'author', title: 'Autor', sortable: true },
+    { key: 'views', title: 'Visualizações', sortable: true },
     { key: 'isPublished', title: 'Status' },
-    { key: 'createdAt', title: 'Data' }
+    { key: 'createdAt', title: 'Data', sortable: true }
   ];
 
   const formatDate = (dateString: string) => {
@@ -181,7 +190,23 @@ export default function NewsManager() {
     );
   };
 
-  const tableData = filteredNews.map(newsItem => ({
+  // Ordenação client-side
+  const [sortKey, setSortKey] = useState<string>('')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
+  const sortedNews = [...filteredNews].sort((a, b) => {
+    if (!sortKey) return 0
+    const av = a[sortKey as keyof typeof a]
+    const bv = b[sortKey as keyof typeof b]
+    if (av == null || bv == null) return 0
+    if (typeof av === 'number' && typeof bv === 'number') {
+      return sortOrder === 'asc' ? av - bv : bv - av
+    }
+    const as = String(av).toLowerCase()
+    const bs = String(bv).toLowerCase()
+    return sortOrder === 'asc' ? as.localeCompare(bs) : bs.localeCompare(as)
+  })
+
+  const tableData = sortedNews.map(newsItem => ({
     ...newsItem,
     createdAt: formatDate(newsItem.createdAt),
     isPublished: formatStatus(newsItem.isPublished)
@@ -266,6 +291,7 @@ export default function NewsManager() {
         onDelete={(item) => setNewsToDelete(item as News)}
         pagination={{ page, limit, total, pages }}
         onPageChange={(p) => setPage(Math.min(Math.max(1, p), pages))}
+        onSort={(key, order) => { setSortKey(key); setSortOrder(order) }}
       />
 
       {/* Add/Edit Modal */}
