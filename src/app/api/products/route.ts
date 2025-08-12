@@ -51,6 +51,11 @@ export async function POST(req: NextRequest) {
       return errorResponse('Nome, raça e preço são obrigatórios')
     }
 
+    // Validar campos obrigatórios do modelo
+    if (!sanitizedData.healthStatus || sanitizedData.vaccinated === undefined) {
+      return errorResponse('Status de saúde e status de vacinação são obrigatórios')
+    }
+
     // Garantir que exista um seller válido (admin ativo)
     let seller = await User.findOne({ role: 'admin', isActive: true }).select('_id')
     if (!seller && process.env.NODE_ENV !== 'production') {
