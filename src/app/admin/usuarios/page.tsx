@@ -3,6 +3,7 @@
 import { useMemo, useState, useEffect } from 'react'
 import { Search, UserPlus, Shield, Mail, Edit, Power, PowerOff } from 'lucide-react'
 import UserEditModal from '@/components/UserEditModal'
+import UserCreateModal from '@/components/UserCreateModal'
 
 type AdminUser = {
   id: string
@@ -27,6 +28,7 @@ export default function AdminUsersPage() {
   const [users, setUsers] = useState<AdminUser[]>([])
   const [loading, setLoading] = useState(false)
   const [editModalOpen, setEditModalOpen] = useState(false)
+  const [createModalOpen, setCreateModalOpen] = useState(false)
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
 
   useEffect(() => {
@@ -76,6 +78,10 @@ export default function AdminUsersPage() {
 
   const handleUserUpdated = () => {
     loadUsers() // Recarrega a lista após atualização
+  }
+
+  const handleUserCreated = () => {
+    loadUsers() // Recarrega a lista após criação
   }
 
   const handleToggleUserStatus = async (userId: string, currentStatus: boolean) => {
@@ -130,7 +136,7 @@ export default function AdminUsersPage() {
             />
           </div>
           <button 
-            onClick={() => { window.location.href = '/registro' }} 
+            onClick={() => setCreateModalOpen(true)} 
             className="inline-flex items-center bg-primary-600 hover:bg-primary-700 text-white px-3 py-2 rounded-lg text-sm"
           >
             <UserPlus className="w-4 h-4 mr-2" /> Novo usuário
@@ -247,6 +253,13 @@ export default function AdminUsersPage() {
         }}
         userId={selectedUserId}
         onUserUpdated={handleUserUpdated}
+      />
+
+      {/* Modal de Criação */}
+      <UserCreateModal
+        isOpen={createModalOpen}
+        onClose={() => setCreateModalOpen(false)}
+        onUserCreated={handleUserCreated}
       />
     </div>
   )

@@ -67,12 +67,21 @@ export default function UserCreateModal({ isOpen, onClose, onUserCreated }: User
 
     try {
       setLoading(true)
-      const response = await fetch('/api/admin/users', {
+      const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          phone: formData.phone || undefined,
+          company: formData.company || undefined,
+          bio: formData.bio || undefined,
+          role: formData.role,
+          isActive: formData.isActive
+        })
       })
 
       if (response.ok) {
@@ -116,7 +125,7 @@ export default function UserCreateModal({ isOpen, onClose, onUserCreated }: User
       setFormData(prev => ({
         ...prev,
         [parent]: {
-          ...prev[parent as keyof typeof prev],
+          ...(prev[parent as keyof typeof prev] as any),
           [child]: value
         }
       }))

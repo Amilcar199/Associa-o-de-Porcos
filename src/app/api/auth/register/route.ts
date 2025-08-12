@@ -46,8 +46,8 @@ export async function POST(req: NextRequest) {
       phone: sanitizedData.phone || undefined,
       company: sanitizedData.company || undefined,
       bio: sanitizedData.bio || undefined,
-      role: 'member', // Usuários registrados são membros por padrão
-      isActive: true,
+      role: sanitizedData.role || 'member', // Aceita role personalizado ou usa 'member' como padrão
+      isActive: sanitizedData.isActive !== undefined ? sanitizedData.isActive : true,
       emailVerified: false,
       preferences: {
         newsletter: true,
