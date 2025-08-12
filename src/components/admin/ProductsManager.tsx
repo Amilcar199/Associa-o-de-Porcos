@@ -516,13 +516,24 @@ export default function ProductsManager() {
                   <button
                     type="button"
                     onClick={generateAutoCode}
-                    className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={!formData.breed}
+                    title={!formData.breed ? 'Selecione uma raça primeiro' : 'Gerar código automático'}
                   >
-                    Gerar
+                    <span className="flex items-center gap-2">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                      Gerar
+                    </span>
                   </button>
                 )}
               </div>
+              {formData.codeType === 'auto' && !formData.breed && (
+                <p className="text-sm text-amber-600 mt-1">
+                  ⚠️ Selecione uma raça para gerar o código automaticamente
+                </p>
+              )}
             </div>
           </div>
 

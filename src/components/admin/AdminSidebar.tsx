@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -32,6 +32,13 @@ interface MenuItem {
 const AdminSidebar = () => {
   const pathname = usePathname()
   const [expandedItems, setExpandedItems] = useState<string[]>(['produtos', 'conteudo'])
+  
+  // Garantir que 'conteudo' esteja sempre expandido inicialmente
+  useEffect(() => {
+    if (!expandedItems.includes('conteudo')) {
+      setExpandedItems(prev => [...prev, 'conteudo'])
+    }
+  }, [])
 
   const menuItems: MenuItem[] = [
     {
@@ -90,6 +97,7 @@ const AdminSidebar = () => {
   ]
 
   const toggleExpanded = (itemName: string) => {
+    console.log('Toggle expanded:', itemName, 'Current:', expandedItems)
     setExpandedItems(prev => 
       prev.includes(itemName) 
         ? prev.filter(item => item !== itemName)
