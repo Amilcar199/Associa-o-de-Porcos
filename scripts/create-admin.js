@@ -1,88 +1,85 @@
 // scripts/create-admin.js
-import dotenv from 'dotenv';
-import fs from 'fs';
-import path from 'path';
-import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs';
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+require('dotenv').config({ path: '.env.local' });
 
-// 1) Carrega .env.local OU .env (o que existir primeiro)
-const root = process.cwd();
-const candidates = [path.join(root, '.env.local'), path.join(root, '.env')];
-let loaded = false;
+async function createAdmin() {
+  try {
+    console.log('🔍 Criando usuário administrador...');
+    
+    if (!process.env.MONGODB_URI) {
+      console.error('❌ MONGODB_URI não está configurada');
+      return;
+    }
 
-for (const p of candidates) {
-  if (fs.existsSync(p)) {
-    dotenv.config({ path: p });
-    loaded = true;
-    console.log(`🌱 Carregado: ${path.basename(p)}`);
-    break;
+    console.log('🔌 Conectando...');
+    await mongoose.connect(process.env.MONGODB_URI);
+    console.log('✅ Conectado!');
+    
+    const db = mongoose.connection.db;
+    const usersCollection = db.collection('users');
+    
+    // Verificar se já existe admin
+    const existingAdmin = await usersCollection.findOne({ role: 'admin' });
+    
+    if (existingAdmin) {
+      console.log('👑 Admin já existe:', existingAdmin.email);
+      console.log('💡 Use as credenciais existentes');
+    } else {
+      console.log('👑 Criando admin...');
+      
+      // Hash da senha
+      const saltRounds = 12;
+      const hashedPassword = await bcrypt.hash('admin123', saltRounds);
+      
+      // Criar usuário admin
+      const adminUser = {
+        name: 'Administrador',
+        email: 'admin@associacao.ao',
+        password: hashedPassword,
+        role: 'admin',
+        isActive: true,
+        emailVerified: true,
+        company: 'Associação de Porcos',
+        bio: 'Usuário administrador padrão',
+        location: 'Luanda, Angola',
+        preferences: {
+          emailNotifications: true,
+          smsNotifications: false,
+          newsletter: true
+        },
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      
+      const result = await usersCollection.insertOne(adminUser);
+      
+      if (result.acknowledged) {
+        console.log('✅ Admin criado com sucesso!');
+        console.log('📧 Email: admin@associacao.ao');
+        console.log('🔑 Senha: admin123');
+        console.log('⚠️  IMPORTANTE: Altere a senha após o primeiro login!');
+      } else {
+        console.log('❌ Erro ao criar admin');
+      }
+    }
+    
+    // Listar todos os usuários
+    const allUsers = await usersCollection.find({}).toArray();
+    console.log('\n👥 Usuários no banco:');
+    allUsers.forEach(user => {
+      console.log(`  - ${user.name} (${user.email}) - ${user.role} - ${user.isActive ? 'Ativo' : 'Inativo'}`);
+    });
+    
+  } catch (error) {
+    console.error('❌ Erro:', error.message);
+  } finally {
+    if (mongoose.connection.readyState === 1) {
+      await mongoose.disconnect();
+      console.log('🔌 Conexão fechada');
+    }
+    process.exit(0);
   }
 }
-if (!loaded) {
-  dotenv.config(); // tenta padrão
-  console.log('🌱 Tentativa de carregar .env padrão');
-}
 
-// (Opcional) mostrar CWD só pra depurar
-console.log('📂 CWD:', root);
-
-// 2) Sobe tudo
-async function main() {
-  const mongoUri = process.env.MONGODB_URI;
-  if (!mongoUri) {
-    console.error('❌ MONGODB_URI não encontrado. Confira se está em .env ou .env.local na raiz do projeto.');
-    process.exit(1);
-  }
-
-  const name = process.env.SEED_ADMIN_NAME || 'Admin';
-  const email = process.env.SEED_ADMIN_EMAIL || 'admin@site.com';
-  const password = process.env.SEED_ADMIN_PASSWORD || 'TroqueEssaSenhaAgora!';
-
-  await mongoose.connect(mongoUri);
-
-  const userSchema = new mongoose.Schema(
-    {
-      name: { type: String, required: true },
-      email: { type: String, required: true, unique: true, index: true },
-      password: { type: String, required: true },
-      role: { type: String, enum: ['member', 'admin'], default: 'member' },
-      isActive: { type: Boolean, default: true },
-      emailVerified: { type: Boolean, default: false },
-      preferences: {
-        newsletter: { type: Boolean, default: true },
-        notifications: { type: Boolean, default: true },
-      },
-    },
-    { timestamps: true, collection: 'users' }
-  );
-
-  const User = mongoose.models.User || mongoose.model('User', userSchema);
-
-  const exists = await User.findOne({ email });
-  if (exists) {
-    console.log('⚠️ Já existe usuário com esse email:', email);
-    await mongoose.connection.close();
-    return;
-  }
-
-  const hashed = await bcrypt.hash(password, 12);
-
-  await User.create({
-    name,
-    email,
-    password: hashed,
-    role: 'admin',
-    isActive: true,
-    emailVerified: true,
-    preferences: { newsletter: false, notifications: true },
-  });
-
-  console.log('✅ Admin criado com sucesso:', email);
-  await mongoose.connection.close();
-}
-
-main().catch(async (err) => {
-  console.error('Erro ao criar admin:', err);
-  await mongoose.connection.close();
-  process.exit(1);
-});
+createAdmin();
