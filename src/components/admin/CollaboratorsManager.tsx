@@ -111,6 +111,8 @@ export default function CollaboratorsManager() {
         setEditingCollaborator(null);
         resetForm();
         fetchCollaborators();
+      } else {
+        try { const err = await response.json(); alert(err?.error || 'Falha ao salvar colaborador') } catch { alert('Falha ao salvar colaborador') }
       }
     } catch (error) {
       console.error('Erro ao salvar colaborador:', error);
@@ -201,11 +203,13 @@ export default function CollaboratorsManager() {
     });
   };
 
-  const formatContact = (contact: { email: string; phone: string }) => {
+  const formatContact = (contact: { email?: string; phone?: string } | undefined) => {
+    const email = contact?.email || '-'
+    const phone = contact?.phone || '-'
     return (
       <div className="text-sm">
-        <div>{contact.email}</div>
-        <div className="text-gray-500">{contact.phone}</div>
+        <div>{email}</div>
+        <div className="text-gray-500">{phone}</div>
       </div>
     );
   };
