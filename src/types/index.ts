@@ -253,3 +253,27 @@ export interface DashboardStats {
     user?: string
   }>
 }
+
+// Tipos para conteúdo de membros
+export interface MemberContent {
+  _id: string
+  title: string
+  description: string
+  type: 'document' | 'video' | 'article' | 'event'
+  category: string
+  url?: string
+  thumbnail?: string
+  content?: string
+  fileUrl?: string
+  videoUrl?: string
+  eventDate?: Date
+  eventLocation?: string
+  isFeatured: boolean
+  isActive: boolean
+  author: { name: string; email: string }
+  tags: string[]
+  views: number
+  downloads: number
+  createdAt: Date
+  updatedAt: Date
+}

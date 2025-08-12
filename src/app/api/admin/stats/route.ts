@@ -5,6 +5,7 @@ import Product from '@/models/Product'
 import News from '@/models/News'
 import Contact from '@/models/Contact'
 import Collaborator from '@/models/Collaborator'
+import MemberContent from '@/models/MemberContent'
 import {
   successResponse,
   errorResponse,
@@ -41,7 +42,9 @@ export async function GET(req: NextRequest) {
       newContactsThisMonth,
       usersThisMonth,
       productsThisMonth,
-      newsThisMonth
+      newsThisMonth,
+      totalMemberContent,
+      activeMemberContent
     ] = await Promise.all([
       User.countDocuments({ isActive: true }),
       Product.countDocuments({ isActive: true }),
@@ -53,7 +56,9 @@ export async function GET(req: NextRequest) {
       Contact.countDocuments({ createdAt: { $gte: startOfMonth } }),
       User.countDocuments({ createdAt: { $gte: startOfMonth }, isActive: true }),
       Product.countDocuments({ createdAt: { $gte: startOfMonth }, isActive: true }),
-      News.countDocuments({ createdAt: { $gte: startOfMonth } })
+      News.countDocuments({ createdAt: { $gte: startOfMonth } }),
+      MemberContent.countDocuments().catch(() => 0),
+      MemberContent.countDocuments({ isActive: true }).catch(() => 0)
     ])
 
     // Buscar estatísticas de contatos por status
@@ -63,7 +68,7 @@ export async function GET(req: NextRequest) {
     ])
 
     // Buscar atividade recente
-    const [recentUsers, recentProducts, recentNews, recentContacts] = await Promise.all([
+    const [recentUsers, recentProducts, recentNews, recentContacts, recentMemberContent] = await Promise.all([
       User.find({ isActive: true })
         .sort({ createdAt: -1 })
         .limit(5)
@@ -91,6 +96,13 @@ export async function GET(req: NextRequest) {
         .sort({ createdAt: -1 })
         .limit(5)
         .select('name email subject status createdAt')
+        .lean()
+        .catch(() => []),
+      
+      MemberContent.find({ isActive: true })
+        .sort({ createdAt: -1 })
+        .limit(5)
+        .select('title type category createdAt')
         .lean()
         .catch(() => [])
     ])
@@ -124,6 +136,13 @@ export async function GET(req: NextRequest) {
         date: contact.createdAt,
         user: contact.name,
         details: contact.subject
+      })),
+      ...(recentMemberContent || []).map(content => ({
+        type: 'member-content' as const,
+        action: 'Novo conteúdo de membros criado',
+        date: content.createdAt,
+        user: 'Admin',
+        details: `${content.title} (${content.type})`
       }))
     ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 10)
 
@@ -162,7 +181,9 @@ export async function GET(req: NextRequest) {
         newContactsThisMonth,
         usersThisMonth,
         productsThisMonth,
-        newsThisMonth
+        newsThisMonth,
+        totalMemberContent,
+        activeMemberContent
       },
       contacts: contactStats,
       charts: {
