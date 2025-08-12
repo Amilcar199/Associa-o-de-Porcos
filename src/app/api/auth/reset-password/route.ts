@@ -1,7 +1,6 @@
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import { successResponse, errorResponse, sanitizeInput } from '@/lib/api-utils';
@@ -32,12 +31,8 @@ export async function POST(req: NextRequest) {
       return errorResponse('Token inválido ou expirado');
     }
 
-    // Criptografar nova senha
-    const saltRounds = 12;
-    const hashedPassword = await bcrypt.hash(sanitizedData.password, saltRounds);
-
-    // Atualizar senha e limpar token
-    user.password = hashedPassword;
+    // Atualizar senha (hash será aplicado no pre-save do modelo)
+    user.password = sanitizedData.password;
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
     await user.save();

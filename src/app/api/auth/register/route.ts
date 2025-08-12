@@ -1,7 +1,6 @@
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import { successResponse, errorResponse, sanitizeInput, isValidEmail } from '@/lib/api-utils';
@@ -34,15 +33,12 @@ export async function POST(req: NextRequest) {
       return errorResponse('Email já está em uso');
     }
 
-    // Criptografar senha
-    const saltRounds = 12;
-    const hashedPassword = await bcrypt.hash(sanitizedData.password, saltRounds);
 
     // Criar usuário
     const userData = {
       name: sanitizedData.name,
       email: sanitizedData.email,
-      password: hashedPassword,
+      password: sanitizedData.password,
       phone: sanitizedData.phone || undefined,
       company: sanitizedData.company || undefined,
       bio: sanitizedData.bio || undefined,

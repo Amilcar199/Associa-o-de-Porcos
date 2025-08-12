@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
 require('dotenv').config({ path: '.env.local' });
 
 // Importar o modelo User
@@ -28,15 +27,11 @@ async function initializeDatabase() {
     } else {
       console.log('👑 Criando usuário administrador padrão...');
       
-      // Criar hash da senha
-      const saltRounds = 12;
-      const hashedPassword = await bcrypt.hash('admin123', saltRounds);
-      
       // Criar usuário admin
       const adminUser = new User({
         name: 'Administrador',
         email: 'admin@associacao.ao',
-        password: hashedPassword,
+        password: 'admin123',
         role: 'admin',
         isActive: true,
         emailVerified: true,
