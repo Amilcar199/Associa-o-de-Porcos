@@ -1,4 +1,5 @@
 import { Metadata } from 'next'
+import { Suspense } from 'react'
 import DashboardStats from '@/components/admin/DashboardStats'
 import DashboardCharts from '@/components/admin/DashboardCharts'
 import RecentActivity from '@/components/admin/RecentActivity'
@@ -23,21 +24,29 @@ export default function AdminDashboard() {
       </div>
 
       {/* Search Modal trigger via ?search= */}
-      <AdminSearch />
+      <Suspense fallback={<div>Carregando...</div>}>
+        <AdminSearch />
+      </Suspense>
 
       {/* Stats Cards */}
-      <DashboardStats />
+      <Suspense fallback={<div>Carregando estatísticas...</div>}>
+        <DashboardStats />
+      </Suspense>
 
       {/* Charts and Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Charts - 2/3 da largura */}
         <div className="lg:col-span-2">
-          <DashboardCharts />
+          <Suspense fallback={<div>Carregando gráficos...</div>}>
+            <DashboardCharts />
+          </Suspense>
         </div>
 
         {/* Recent Activity - 1/3 da largura */}
         <div className="lg:col-span-1">
-          <RecentActivity />
+          <Suspense fallback={<div>Carregando atividades...</div>}>
+            <RecentActivity />
+          </Suspense>
         </div>
       </div>
     </div>

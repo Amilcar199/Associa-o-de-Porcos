@@ -68,53 +68,57 @@ export async function GET(req: NextRequest) {
         .sort({ createdAt: -1 })
         .limit(5)
         .select('name email createdAt')
-        .lean(),
+        .lean()
+        .catch(() => []),
       
       Product.find({ isActive: true })
         .sort({ createdAt: -1 })
         .limit(5)
         .select('name breed seller createdAt')
         .populate('seller', 'name')
-        .lean(),
+        .lean()
+        .catch(() => []),
       
       News.find()
         .sort({ createdAt: -1 })
         .limit(5)
         .select('title published author createdAt')
         .populate('author', 'name')
-        .lean(),
+        .lean()
+        .catch(() => []),
       
       Contact.find()
         .sort({ createdAt: -1 })
         .limit(5)
         .select('name email subject status createdAt')
         .lean()
+        .catch(() => [])
     ])
 
     // Combinar atividade recente
     const recentActivity = [
-      ...recentUsers.map(user => ({
+      ...(recentUsers || []).map(user => ({
         type: 'user' as const,
         action: 'Novo usuário cadastrado',
         date: user.createdAt,
         user: user.name,
         details: user.email
       })),
-      ...recentProducts.map(product => ({
+      ...(recentProducts || []).map(product => ({
         type: 'product' as const,
         action: 'Novo produto cadastrado',
         date: product.createdAt,
         user: (product.seller as any)?.name,
         details: `${product.name} (${product.breed})`
       })),
-      ...recentNews.map(news => ({
+      ...(recentNews || []).map(news => ({
         type: 'news' as const,
         action: news.published ? 'Notícia publicada' : 'Rascunho criado',
         date: news.createdAt,
         user: (news.author as any)?.name,
         details: news.title
       })),
-      ...recentContacts.map(contact => ({
+      ...(recentContacts || []).map(contact => ({
         type: 'contact' as const,
         action: 'Nova mensagem de contato',
         date: contact.createdAt,
@@ -129,14 +133,14 @@ export async function GET(req: NextRequest) {
       { $group: { _id: '$breed', count: { $sum: 1 } } },
       { $sort: { count: -1 } },
       { $limit: 10 }
-    ])
+    ]).catch(() => [])
 
     // Estatísticas por categoria de notícias
     const newsByCategory = await News.aggregate([
       { $match: { published: true } },
       { $group: { _id: '$category', count: { $sum: 1 } } },
       { $sort: { count: -1 } }
-    ])
+    ]).catch(() => [])
 
     // Views das notícias mais populares
     const topNews = await News.find({ published: true })
@@ -144,6 +148,7 @@ export async function GET(req: NextRequest) {
       .limit(5)
       .select('title views publishedAt')
       .lean()
+      .catch(() => [])
 
     const stats = {
       overview: {

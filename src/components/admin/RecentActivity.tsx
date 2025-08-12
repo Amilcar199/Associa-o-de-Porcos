@@ -162,53 +162,53 @@ const RecentActivity = () => {
       </div>
 
       <div className="flow-root">
-        <ul className="-mb-8">
-          {activities.map((activity, index) => (
-            <li key={index}>
-              <div className="relative pb-8">
-                {index !== activities.length - 1 && (
-                  <span
-                    className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200"
-                    aria-hidden="true"
-                  />
-                )}
-                <div className="relative flex space-x-3">
-                  <div className={`h-8 w-8 rounded-full border-2 flex items-center justify-center ${getActivityColor(activity.type)}`}>
-                    {getActivityIcon(activity.type, activity.action)}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div>
-                      <div className="text-sm">
-                        <span className="font-medium text-gray-900">
-                          {activity.user || 'Sistema'}
-                        </span>
-                        <span className="text-gray-500 ml-1">
-                          {activity.action.toLowerCase()}
-                        </span>
-                      </div>
-                      <p className="mt-0.5 text-sm text-gray-500 truncate">
-                        {activity.details}
-                      </p>
+        {activities && activities.length > 0 ? (
+          <ul className="-mb-8">
+            {activities.map((activity, index) => (
+              <li key={index}>
+                <div className="relative pb-8">
+                  {index !== activities.length - 1 && (
+                    <span
+                      className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200"
+                      aria-hidden="true"
+                    />
+                  )}
+                  <div className="relative flex space-x-3">
+                    <div className={`h-8 w-8 rounded-full border-2 flex items-center justify-center ${getActivityColor(activity.type)}`}>
+                      {getActivityIcon(activity.type, activity.action)}
                     </div>
-                    <div className="mt-2 text-xs text-gray-400">
-                      {formatTimeAgo(activity.date)}
+                    <div className="flex-1 min-w-0">
+                      <div>
+                        <div className="text-sm">
+                          <span className="font-medium text-gray-900">
+                            {activity.user || 'Sistema'}
+                          </span>
+                          <span className="text-gray-500 ml-1">
+                            {activity.action.toLowerCase()}
+                          </span>
+                        </div>
+                        <p className="mt-0.5 text-sm text-gray-500 truncate">
+                          {activity.details}
+                        </p>
+                      </div>
+                      <div className="mt-2 text-xs text-gray-400">
+                        {formatTimeAgo(activity.date)}
+                      </div>
                     </div>
                   </div>
                 </div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="text-center py-8">
+            <Clock className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+            <p className="text-gray-500 text-sm">
+              Nenhuma atividade recente
+            </p>
+          </div>
+        )}
               </div>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {activities.length === 0 && (
-        <div className="text-center py-8">
-          <Clock className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-500 text-sm">
-            Nenhuma atividade recente
-          </p>
-        </div>
-      )}
       {openAll && (
         <Modal isOpen={openAll} onClose={() => setOpenAll(false)} title="Atividade Recente">
           {allLoading ? (

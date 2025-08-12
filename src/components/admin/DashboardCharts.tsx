@@ -88,31 +88,37 @@ const DashboardCharts = () => {
         </div>
 
         <div className="space-y-4">
-          {chartData?.productsByBreed.map((item, index) => {
-            const maxValue = Math.max(...(chartData?.productsByBreed.map(p => p.value) || [1]))
-            const percentage = (item.value / maxValue) * 100
+          {chartData?.productsByBreed && chartData.productsByBreed.length > 0 ? (
+            chartData.productsByBreed.map((item, index) => {
+              const maxValue = Math.max(...(chartData?.productsByBreed.map(p => p.value) || [1]))
+              const percentage = (item.value / maxValue) * 100
 
-            return (
-              <div key={item.name} className="flex items-center">
-                <div className="w-20 text-sm text-gray-600 flex-shrink-0">
-                  {item.name}
-                </div>
-                <div className="flex-1 mx-4">
-                  <div className="bg-gray-200 rounded-full h-3">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${percentage}%` }}
-                      transition={{ duration: 1, delay: index * 0.1 }}
-                      className={`h-3 rounded-full ${getBreedColor(index)}`}
-                    />
+              return (
+                <div key={item.name} className="flex items-center">
+                  <div className="w-20 text-sm text-gray-600 flex-shrink-0">
+                    {item.name}
+                  </div>
+                  <div className="flex-1 mx-4">
+                    <div className="bg-gray-200 rounded-full h-3">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${percentage}%` }}
+                        transition={{ duration: 1, delay: index * 0.1 }}
+                        className={`h-3 rounded-full ${getBreedColor(index)}`}
+                      />
+                    </div>
+                  </div>
+                  <div className="w-8 text-sm font-medium text-gray-900 text-right">
+                    {item.value}
                   </div>
                 </div>
-                <div className="w-8 text-sm font-medium text-gray-900 text-right">
-                  {item.value}
-                </div>
-              </div>
-            )
-          })}
+              )
+            })
+          ) : (
+            <div className="text-center py-8 text-gray-500 text-sm">
+              Nenhum produto encontrado para exibir estatísticas
+            </div>
+          )}
         </div>
       </motion.div>
 
@@ -131,19 +137,25 @@ const DashboardCharts = () => {
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          {chartData?.newsByCategory.map((item, index) => (
-            <div key={item.name} className="flex items-center space-x-3">
-              <div className={`w-4 h-4 rounded-full ${getCategoryColor(item.name)}`} />
-              <div className="flex-1">
-                <div className="text-sm font-medium text-gray-900">
-                  {item.name}
-                </div>
-                <div className="text-xs text-gray-500">
-                  {item.value} artigos
+          {chartData?.newsByCategory && chartData.newsByCategory.length > 0 ? (
+            chartData.newsByCategory.map((item, index) => (
+              <div key={item.name} className="flex items-center space-x-3">
+                <div className={`w-4 h-4 rounded-full ${getCategoryColor(item.name)}`} />
+                <div className="flex-1">
+                  <div className="text-sm font-medium text-gray-900">
+                    {item.name}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {item.value} artigos
+                  </div>
                 </div>
               </div>
+            ))
+          ) : (
+            <div className="col-span-2 text-center py-8 text-gray-500 text-sm">
+              Nenhuma notícia encontrada para exibir estatísticas
             </div>
-          ))}
+          )}
         </div>
       </motion.div>
 
@@ -162,26 +174,32 @@ const DashboardCharts = () => {
         </div>
 
         <div className="space-y-4">
-          {chartData?.topNews.map((news, index) => (
-            <div key={index} className="flex items-start justify-between">
-              <div className="flex-1">
-                <h4 className="text-sm font-medium text-gray-900 line-clamp-2">
-                  {news.title}
-                </h4>
-                <p className="text-xs text-gray-500 mt-1">
-                  {new Date(news.publishedAt).toLocaleDateString('pt-AO')}
-                </p>
-              </div>
-              <div className="ml-4 text-right">
-                <div className="text-sm font-semibold text-primary-600">
-                  {news.views.toLocaleString()}
+          {chartData?.topNews && chartData.topNews.length > 0 ? (
+            chartData.topNews.map((news, index) => (
+              <div key={index} className="flex items-start justify-between">
+                <div className="flex-1">
+                  <h4 className="text-sm font-medium text-gray-900 line-clamp-2">
+                    {news.title}
+                  </h4>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {new Date(news.publishedAt).toLocaleDateString('pt-AO')}
+                  </p>
                 </div>
-                <div className="text-xs text-gray-500">
-                  visualizações
+                <div className="ml-4 text-right">
+                  <div className="text-sm font-semibold text-primary-600">
+                    {news.views.toLocaleString()}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    visualizações
+                  </div>
                 </div>
               </div>
+            ))
+          ) : (
+            <div className="text-center py-8 text-gray-500 text-sm">
+              Nenhuma notícia encontrada para exibir estatísticas
             </div>
-          ))}
+          )}
         </div>
       </motion.div>
     </div>
