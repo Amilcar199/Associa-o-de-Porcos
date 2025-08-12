@@ -66,6 +66,11 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
       return errorResponse('Nome, raça e preço são obrigatórios')
     }
 
+    // Validar campos obrigatórios do modelo
+    if (!sanitizedData.healthStatus || !sanitizedData.vaccinated === undefined) {
+      return errorResponse('Status de saúde e status de vacinação são obrigatórios')
+    }
+
     // Mapear campos aceitos
     const updateData: any = {
       name: sanitizedData.name,

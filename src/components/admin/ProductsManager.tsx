@@ -33,6 +33,8 @@ interface ProductFormData {
   imageUrl?: string;
   isAvailable: boolean;
   location?: string;
+  healthStatus: 'excellent' | 'good' | 'fair';
+  vaccinated: boolean;
 }
 
 export default function ProductsManager() {
@@ -53,7 +55,9 @@ export default function ProductsManager() {
     weight: 0,
     imageUrl: '',
     isAvailable: true,
-    location: ''
+    location: '',
+    healthStatus: 'good',
+    vaccinated: false
   });
 
   useEffect(() => {
@@ -90,7 +94,9 @@ export default function ProductsManager() {
         weight: formData.weight,
         imageUrl: formData.imageUrl,
         isAvailable: formData.isAvailable,
-        location: formData.location
+        location: formData.location,
+        healthStatus: formData.healthStatus,
+        vaccinated: formData.vaccinated
       }
       
       const response = await fetch(url, {
@@ -127,7 +133,9 @@ export default function ProductsManager() {
       weight: product.weight,
       imageUrl: (product as any).imageUrl || '',
       isAvailable: product.availability ? product.availability === 'available' : !!product.isAvailable,
-      location: (product as any).location || ''
+      location: (product as any).location || '',
+      healthStatus: (product as any).healthStatus || 'good',
+      vaccinated: (product as any).vaccinated || false
     });
     setShowModal(true);
   };
@@ -164,7 +172,9 @@ export default function ProductsManager() {
       weight: 0,
       imageUrl: '',
       isAvailable: true,
-      location: ''
+      location: '',
+      healthStatus: 'good',
+      vaccinated: false
     });
   };
 
@@ -444,6 +454,39 @@ export default function ProductsManager() {
               placeholder="Ex.: Luanda, Angola"
               required
             />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Status de Saúde
+              </label>
+              <select
+                value={formData.healthStatus}
+                onChange={(e) => setFormData(prev => ({ ...prev, healthStatus: e.target.value as 'excellent' | 'good' | 'fair' }))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                required
+              >
+                <option value="excellent">Excelente</option>
+                <option value="good">Bom</option>
+                <option value="fair">Regular</option>
+              </select>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Status de Vacinação
+              </label>
+              <select
+                value={formData.vaccinated.toString()}
+                onChange={(e) => setFormData(prev => ({ ...prev, vaccinated: e.target.value === 'true' }))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                required
+              >
+                <option value="true">Vacinado</option>
+                <option value="false">Não Vacinado</option>
+              </select>
+            </div>
           </div>
 
                      {/* Image Upload */}
