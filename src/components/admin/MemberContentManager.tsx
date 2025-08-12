@@ -13,7 +13,10 @@ import {
   Video,
   BookOpen,
   Calendar,
-  Users
+  Users,
+  ExternalLink,
+  Download,
+  Play
 } from 'lucide-react'
 import Link from 'next/link'
 import { useToast } from '@/components/Toast'
@@ -50,6 +53,8 @@ export default function MemberContentManager() {
   })
   const [contentToDelete, setContentToDelete] = useState<MemberContent | null>(null)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [viewModalOpen, setViewModalOpen] = useState(false)
+  const [selectedContent, setSelectedContent] = useState<MemberContent | null>(null)
   const { showSuccess, showError } = useToast()
 
   useEffect(() => {
@@ -185,6 +190,16 @@ export default function MemberContentManager() {
       case 'event': return 'Evento'
       default: return type
     }
+  }
+
+  const openViewModal = (content: MemberContent) => {
+    setSelectedContent(content)
+    setViewModalOpen(true)
+  }
+
+  const closeViewModal = () => {
+    setViewModalOpen(false)
+    setSelectedContent(null)
   }
 
   return (
@@ -330,17 +345,21 @@ export default function MemberContentManager() {
                             </div>
                           )}
                         </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900 line-clamp-1">
-                            {item.title}
-                          </div>
-                          <div className="text-sm text-gray-500 line-clamp-2">
-                            {item.description}
-                          </div>
-                          <div className="text-xs text-gray-400 mt-1">
-                            Por {item.author.name} • {new Date(item.createdAt).toLocaleDateString('pt-AO')}
-                          </div>
-                        </div>
+                                                 <div className="ml-4">
+                           <div 
+                             className="text-sm font-medium text-gray-900 line-clamp-1 cursor-pointer hover:text-primary-600 transition-colors"
+                             onClick={() => openViewModal(item)}
+                             title="Clique para ver detalhes"
+                           >
+                             {item.title}
+                           </div>
+                           <div className="text-sm text-gray-500 line-clamp-2">
+                             {item.description}
+                           </div>
+                           <div className="text-xs text-gray-400 mt-1">
+                             Por {item.author.name} • {new Date(item.createdAt).toLocaleDateString('pt-AO')}
+                           </div>
+                         </div>
                       </div>
                     </td>
                     
@@ -503,6 +522,177 @@ export default function MemberContentManager() {
         cancelText="Cancelar"
         variant="danger"
       />
+
+      {/* Modal de Visualização de Conteúdo */}
+      {viewModalOpen && selectedContent && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <div className="flex items-center gap-3">
+                {getTypeIcon(selectedContent.type)}
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-900">{selectedContent.title}</h3>
+                  <p className="text-sm text-gray-500">{getTypeText(selectedContent.type)} • {selectedContent.category}</p>
+                </div>
+              </div>
+              <button
+                onClick={closeViewModal}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="p-6 space-y-6">
+              {/* Thumbnail */}
+              {selectedContent.thumbnail && (
+                <div className="text-center">
+                  <img
+                    src={selectedContent.thumbnail}
+                    alt={selectedContent.title}
+                    className="max-w-full h-64 object-cover rounded-lg mx-auto"
+                  />
+                </div>
+              )}
+
+              {/* Description */}
+              <div>
+                <h4 className="text-lg font-medium text-gray-900 mb-2">Descrição</h4>
+                <p className="text-gray-700">{selectedContent.description}</p>
+              </div>
+
+              {/* Main Content */}
+              {selectedContent.content && (
+                <div>
+                  <h4 className="text-lg font-medium text-gray-900 mb-2">Conteúdo</h4>
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <p className="text-gray-700 whitespace-pre-wrap">{selectedContent.content}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* URLs and Actions */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {selectedContent.type === 'document' && selectedContent.fileUrl && (
+                  <div className="bg-blue-50 rounded-lg p-4">
+                    <h4 className="text-sm font-medium text-blue-900 mb-2">Documento</h4>
+                    <a
+                      href={selectedContent.fileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium"
+                    >
+                      <Download className="w-4 h-4" />
+                      Baixar Documento
+                    </a>
+                  </div>
+                )}
+
+                {selectedContent.type === 'video' && selectedContent.videoUrl && (
+                  <div className="bg-purple-50 rounded-lg p-4">
+                    <h4 className="text-sm font-medium text-purple-900 mb-2">Vídeo</h4>
+                    <a
+                      href={selectedContent.videoUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-purple-600 hover:text-purple-700 font-medium"
+                    >
+                      <Play className="w-4 h-4" />
+                      Assistir Vídeo
+                    </a>
+                  </div>
+                )}
+
+                {selectedContent.url && (
+                  <div className="bg-green-50 rounded-lg p-4">
+                    <h4 className="text-sm font-medium text-green-900 mb-2">Link Externo</h4>
+                    <a
+                      href={selectedContent.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-green-600 hover:text-green-700 font-medium"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      Abrir Link
+                    </a>
+                  </div>
+                )}
+
+                {selectedContent.type === 'event' && selectedContent.eventDate && (
+                  <div className="bg-orange-50 rounded-lg p-4">
+                    <h4 className="text-sm font-medium text-orange-900 mb-2">Data do Evento</h4>
+                    <p className="text-orange-700">
+                      {new Date(selectedContent.eventDate).toLocaleDateString('pt-AO', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </p>
+                    {selectedContent.eventLocation && (
+                      <p className="text-orange-600 text-sm mt-1">{selectedContent.eventLocation}</p>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Tags */}
+              {selectedContent.tags && selectedContent.tags.length > 0 && (
+                <div>
+                  <h4 className="text-lg font-medium text-gray-900 mb-2">Tags</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedContent.tags.map(tag => (
+                      <span
+                        key={tag}
+                        className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Stats */}
+              <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200">
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-gray-900">{selectedContent.views}</p>
+                  <p className="text-sm text-gray-500">Visualizações</p>
+                </div>
+                {selectedContent.type === 'document' && (
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-gray-900">{selectedContent.downloads}</p>
+                    <p className="text-sm text-gray-500">Downloads</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-between p-6 border-t border-gray-200 bg-gray-50">
+              <div className="text-sm text-gray-500">
+                Criado por {selectedContent.author.name} • {new Date(selectedContent.createdAt).toLocaleDateString('pt-AO')}
+              </div>
+              <div className="flex items-center gap-2">
+                {selectedContent.isFeatured && (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">
+                    <Star className="w-3 h-3" />
+                    Destacado
+                  </span>
+                )}
+                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                  selectedContent.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                }`}>
+                  {selectedContent.isActive ? 'Ativo' : 'Inativo'}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
