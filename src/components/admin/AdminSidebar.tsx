@@ -73,8 +73,7 @@ const AdminSidebar = () => {
       children: [
         { name: 'Notícias', href: '/admin/noticias', icon: Newspaper },
         { name: 'Nova Notícia', href: '/admin/noticias/nova', icon: Newspaper },
-        { name: 'Colaboradores', href: '/admin/colaboradores', icon: UsersRound },
-        { name: 'Novo Colaborador', href: '/admin/colaboradores/novo', icon: UsersRound }
+        { name: 'Colaboradores', href: '/admin/colaboradores', icon: UsersRound }
       ]
     },
     {
