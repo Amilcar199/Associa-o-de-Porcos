@@ -37,6 +37,7 @@ export interface Product extends Document {
   healthStatus: 'excellent' | 'good' | 'fair'
   vaccinated: boolean
   location: string
+  code: string
   availability: 'available' | 'sold' | 'reserved'
   seller: User | string
   tags: string[]

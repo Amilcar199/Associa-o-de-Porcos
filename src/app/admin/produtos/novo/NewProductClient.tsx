@@ -18,11 +18,34 @@ export default function NewProductClient() {
     vaccinated: false,
     location: '',
     tags: [] as string[],
+    code: '',
+    codeType: 'auto' as 'auto' | 'manual',
   })
 
   const allowedBreeds = [
     'Landrace','Large White','Duroc','Hampshire','Pietrain','Yorkshire','Chester White','Spotted','Tamworth','Gloucester Old Spots','Mangalitsa','Ossabaw Island Hog','Mulefoot','Caipira','Piau','Moura','Canastra','Cruzado','Outro'
   ]
+
+  const generateAutoCode = async () => {
+    if (form.breed) {
+      try {
+        const response = await fetch('/api/products/generate-code', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ breed: form.breed }),
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          setForm(prev => ({ ...prev, code: data.code }));
+        }
+      } catch (error) {
+        console.error('Erro ao gerar código:', error);
+      }
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -42,6 +65,7 @@ export default function NewProductClient() {
           ...form,
           breed: allowedBreeds.includes(form.breed) ? form.breed : 'Outro',
           images: imageList,
+          code: form.code,
         }),
       })
       if (!res.ok) {
@@ -50,7 +74,8 @@ export default function NewProductClient() {
       }
       setForm({
         name: '', description: '', breed: '', age: 0, weight: 0, price: undefined,
-        images: [''], features: [], healthStatus: 'good', vaccinated: false, location: '', tags: []
+        images: [''], features: [], healthStatus: 'good', vaccinated: false, location: '', tags: [],
+        code: '', codeType: 'auto'
       })
       alert('Produto criado com sucesso')
     } catch (err) {
@@ -138,6 +163,56 @@ export default function NewProductClient() {
           <div>
             <label className="block text-sm text-gray-700 mb-1">Localização</label>
             <input value={form.location} onChange={(e)=>setForm(p=>({...p,location:e.target.value}))} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="Ex.: Luanda, Angola" required />
+          </div>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm text-gray-700 mb-1">Tipo de Código</label>
+            <select
+              value={form.codeType}
+              onChange={(e) => {
+                const newType = e.target.value as 'auto' | 'manual';
+                setForm(prev => ({ 
+                  ...prev, 
+                  codeType: newType,
+                  code: newType === 'auto' ? '' : prev.code
+                }));
+                if (newType === 'auto') {
+                  generateAutoCode();
+                }
+              }}
+              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              required
+            >
+              <option value="auto">Gerar Automaticamente</option>
+              <option value="manual">Código Personalizado</option>
+            </select>
+          </div>
+          
+          <div>
+            <label className="block text-sm text-gray-700 mb-1">Código do Produto</label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={form.code}
+                onChange={(e) => setForm(prev => ({ ...prev, code: e.target.value }))}
+                className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                placeholder={form.codeType === 'auto' ? 'Código será gerado automaticamente' : 'Ex.: DUROC-2024-001'}
+                required
+                disabled={form.codeType === 'auto'}
+              />
+              {form.codeType === 'auto' && (
+                <button
+                  type="button"
+                  onClick={generateAutoCode}
+                  className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  disabled={!form.breed}
+                >
+                  Gerar
+                </button>
+              )}
+            </div>
           </div>
         </div>
 

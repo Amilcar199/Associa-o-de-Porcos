@@ -235,6 +235,16 @@ const Header = () => {
                           <span>Meu Perfil</span>
                         </Link>
                         
+                        {(session.user?.role === 'member' || session.user?.role === 'admin') && (
+                          <Link
+                            href="/membros"
+                            className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
+                          >
+                            <Users size={16} />
+                            <span>Área de Membros</span>
+                          </Link>
+                        )}
+                        
                         {session.user?.role === 'admin' && (
                           <Link
                             href="/admin"

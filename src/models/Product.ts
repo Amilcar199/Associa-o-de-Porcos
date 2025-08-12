@@ -98,6 +98,13 @@ const ProductSchema = new Schema<IProduct>({
     trim: true,
     maxlength: [100, 'Localização não pode ter mais que 100 caracteres'],
   },
+  code: {
+    type: String,
+    unique: true,
+    required: [true, 'Código do produto é obrigatório'],
+    trim: true,
+    maxlength: [20, 'Código não pode ter mais que 20 caracteres'],
+  },
   availability: {
     type: String,
     enum: ['available', 'sold', 'reserved'],
@@ -220,6 +227,22 @@ ProductSchema.statics.findFeatured = function (limit = 6) {
   .populate('seller', 'name email phone company')
   .sort({ createdAt: -1 })
   .limit(limit)
+}
+
+// Método estático para gerar código automático
+ProductSchema.statics.generateCode = async function (breed: string) {
+  const year = new Date().getFullYear()
+  const lastProduct = await this.findOne({ 
+    code: { $regex: `^${breed.toUpperCase()}-${year}-` } 
+  }).sort({ code: -1 })
+  
+  let sequence = 1
+  if (lastProduct && lastProduct.code) {
+    const lastSequence = parseInt(lastProduct.code.split('-')[2])
+    sequence = lastSequence + 1
+  }
+  
+  return `${breed.toUpperCase()}-${year}-${sequence.toString().padStart(3, '0')}`
 }
 
 // Middleware para validar seller antes de salvar

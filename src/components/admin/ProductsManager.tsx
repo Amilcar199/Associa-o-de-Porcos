@@ -35,6 +35,8 @@ interface ProductFormData {
   location?: string;
   healthStatus: 'excellent' | 'good' | 'fair';
   vaccinated: boolean;
+  code: string;
+  codeType: 'auto' | 'manual';
 }
 
 export default function ProductsManager() {
@@ -57,7 +59,9 @@ export default function ProductsManager() {
     isAvailable: true,
     location: '',
     healthStatus: 'good',
-    vaccinated: false
+    vaccinated: false,
+    code: '',
+    codeType: 'auto'
   });
 
   useEffect(() => {
@@ -96,7 +100,8 @@ export default function ProductsManager() {
         isAvailable: formData.isAvailable,
         location: formData.location,
         healthStatus: formData.healthStatus,
-        vaccinated: formData.vaccinated
+        vaccinated: formData.vaccinated,
+        code: formData.code
       }
       
       const response = await fetch(url, {
@@ -135,9 +140,32 @@ export default function ProductsManager() {
       isAvailable: product.availability ? product.availability === 'available' : !!product.isAvailable,
       location: (product as any).location || '',
       healthStatus: (product as any).healthStatus || 'good',
-      vaccinated: (product as any).vaccinated || false
+      vaccinated: (product as any).vaccinated || false,
+      code: (product as any).code || '',
+      codeType: (product as any).code ? 'manual' : 'auto'
     });
     setShowModal(true);
+  };
+
+  const generateAutoCode = async () => {
+    if (formData.breed) {
+      try {
+        const response = await fetch('/api/products/generate-code', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ breed: formData.breed }),
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          setFormData(prev => ({ ...prev, code: data.code }));
+        }
+      } catch (error) {
+        console.error('Erro ao gerar código:', error);
+      }
+    }
   };
 
   const handleDelete = async () => {
@@ -174,7 +202,9 @@ export default function ProductsManager() {
       isAvailable: true,
       location: '',
       healthStatus: 'good',
-      vaccinated: false
+      vaccinated: false,
+      code: '',
+      codeType: 'auto'
     });
   };
 
@@ -440,6 +470,60 @@ export default function ProductsManager() {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
               required
             />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Tipo de Código
+              </label>
+              <select
+                value={formData.codeType}
+                onChange={(e) => {
+                  const newType = e.target.value as 'auto' | 'manual';
+                  setFormData(prev => ({ 
+                    ...prev, 
+                    codeType: newType,
+                    code: newType === 'auto' ? '' : prev.code
+                  }));
+                  if (newType === 'auto') {
+                    generateAutoCode();
+                  }
+                }}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                required
+              >
+                <option value="auto">Gerar Automaticamente</option>
+                <option value="manual">Código Personalizado</option>
+              </select>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Código do Produto
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={formData.code}
+                  onChange={(e) => setFormData(prev => ({ ...prev, code: e.target.value }))}
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  placeholder={formData.codeType === 'auto' ? 'Código será gerado automaticamente' : 'Ex.: DUROC-2024-001'}
+                  required
+                  disabled={formData.codeType === 'auto'}
+                />
+                {formData.codeType === 'auto' && (
+                  <button
+                    type="button"
+                    onClick={generateAutoCode}
+                    className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    disabled={!formData.breed}
+                  >
+                    Gerar
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
 
           <div>
