@@ -36,7 +36,7 @@ async function main() {
 
   const name = process.env.SEED_ADMIN_NAME || 'Admin';
   const email = process.env.SEED_ADMIN_EMAIL || 'admin@site.com';
-  const password = process.env.SEED_ADMIN_PASSWORD || 'TroqueEssaSenhaAgora!';
+  const password = process.env.SEED_ADMIN_PASSWORD || 'Admin@010292546';
 
   await mongoose.connect(mongoUri);
 
