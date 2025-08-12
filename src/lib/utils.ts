@@ -73,3 +73,31 @@ export function formatCurrency(amount: number): string {
 export function formatNumber(num: number): string {
   return new Intl.NumberFormat('pt-AO').format(num)
 }
+
+/**
+ * Formata um preço para exibição (alias para formatCurrency)
+ */
+export function formatPrice(price: number): string {
+  return formatCurrency(price)
+}
+
+/**
+ * Formata a idade de um animal
+ */
+export function formatAge(age: number): string {
+  if (age === 1) return '1 mês'
+  if (age < 12) return `${age} meses`
+  const years = Math.floor(age / 12)
+  const months = age % 12
+  if (months === 0) return years === 1 ? '1 ano' : `${years} anos`
+  return `${years} ano${years > 1 ? 's' : ''} e ${months} mês${months > 1 ? 'es' : ''}`
+}
+
+/**
+ * Calcula o tempo de leitura de um texto
+ */
+export function calculateReadTime(text: string): string {
+  const words = (text || '').split(' ').length
+  const minutes = Math.ceil(words / 200)
+  return `${minutes} min`
+}

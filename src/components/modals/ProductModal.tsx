@@ -136,7 +136,7 @@ export default function ProductModal({
           {/* Preço */}
           <div className="absolute bottom-4 right-4">
             <span className="bg-primary-600 text-white px-4 py-2 text-lg font-bold rounded-full shadow-lg">
-              {formatPrice(product.price)}
+              {product.price ? formatPrice(product.price) : 'Preço sob consulta'}
             </span>
           </div>
 
@@ -186,7 +186,7 @@ export default function ProductModal({
                     <Calendar size={20} className="text-primary-600" />
                     <div>
                       <p className="text-sm text-gray-500">Idade</p>
-                      <p className="font-semibold text-gray-900">{formatAge(product.age)}</p>
+                      <p className="font-semibold text-gray-900">{product.age ? formatAge(product.age) : 'Não informado'}</p>
                     </div>
                   </div>
                   

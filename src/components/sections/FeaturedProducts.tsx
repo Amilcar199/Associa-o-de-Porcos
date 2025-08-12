@@ -13,6 +13,7 @@ import {
   Weight
 } from 'lucide-react'
 import ProductModal from '@/components/modals/ProductModal'
+import { formatPrice, formatAge } from '@/lib/utils'
 
 interface FeaturedProduct {
   _id: string
@@ -54,19 +55,7 @@ const FeaturedProducts = () => {
     fetchFeaturedProducts()
   }, [])
 
-  const formatPrice = (price?: number) => {
-    if (price == null) return 'Preço sob consulta'
-    return new Intl.NumberFormat('pt-AO', { style: 'currency', currency: 'AOA' }).format(price)
-  }
 
-  const formatAge = (age: number) => {
-    if (age === 1) return '1 mês'
-    if (age < 12) return `${age} meses`
-    const years = Math.floor(age / 12)
-    const months = age % 12
-    if (months === 0) return years === 1 ? '1 ano' : `${years} anos`
-    return `${years} ano${years > 1 ? 's' : ''} e ${months} mês${months > 1 ? 'es' : ''}`
-  }
 
   const getHealthStatusColor = (status?: string) => {
     switch (status) {
