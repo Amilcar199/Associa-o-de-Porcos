@@ -57,6 +57,11 @@ export default function MemberContentManager() {
   const [selectedContent, setSelectedContent] = useState<MemberContent | null>(null)
   const { showSuccess, showError } = useToast()
 
+  // Debug: verificar estado do modal
+  useEffect(() => {
+    console.log('Estado do modal:', { viewModalOpen, selectedContent: selectedContent?.title })
+  }, [viewModalOpen, selectedContent])
+
   useEffect(() => {
     fetchContent()
   }, [pagination.page, searchTerm, filterType, filterCategory, filterStatus])
@@ -193,6 +198,7 @@ export default function MemberContentManager() {
   }
 
   const openViewModal = (content: MemberContent) => {
+    console.log('Abrindo modal para:', content.title)
     setSelectedContent(content)
     setViewModalOpen(true)
   }
@@ -345,11 +351,13 @@ export default function MemberContentManager() {
                             </div>
                           )}
                         </div>
-                                                 <div className="ml-4">
+                                                 <div className="ml-4 flex-1">
                            <div 
-                             className="text-sm font-medium text-gray-900 line-clamp-1 cursor-pointer hover:text-primary-600 transition-colors"
+                             className="text-sm font-medium text-gray-900 line-clamp-1 cursor-pointer hover:text-primary-600 transition-colors p-1 rounded hover:bg-primary-50"
                              onClick={() => openViewModal(item)}
                              title="Clique para ver detalhes"
+                             onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f0f9ff'}
+                             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                            >
                              {item.title}
                            </div>
@@ -430,6 +438,14 @@ export default function MemberContentManager() {
                           ) : (
                             <div className="w-4 h-4 bg-green-600 rounded-full" />
                           )}
+                        </button>
+                        
+                        <button
+                          onClick={() => openViewModal(item)}
+                          className="p-1 text-green-600 hover:text-green-700 hover:bg-green-50 rounded transition-colors"
+                          title="Ver Detalhes"
+                        >
+                          <Eye className="w-4 h-4" />
                         </button>
                         
                         <Link
@@ -525,7 +541,14 @@ export default function MemberContentManager() {
 
       {/* Modal de Visualização de Conteúdo */}
       {viewModalOpen && selectedContent && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              closeViewModal()
+            }
+          }}
+        >
           <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
