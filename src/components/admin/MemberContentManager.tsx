@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { 
   Plus, 
   Search, 
@@ -39,6 +40,7 @@ interface MemberContent {
 }
 
 export default function MemberContentManager() {
+  const router = useRouter()
   const [content, setContent] = useState<MemberContent[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
@@ -206,6 +208,17 @@ export default function MemberContentManager() {
   const closeViewModal = () => {
     setViewModalOpen(false)
     setSelectedContent(null)
+  }
+
+  const handleEdit = (contentId: string) => {
+    console.log('Navegando para editar:', contentId)
+    try {
+      router.push(`/admin/conteudo-membros/editar/${contentId}`)
+    } catch (error) {
+      console.error('Erro na navegação:', error)
+      // Fallback: tentar navegação manual
+      window.location.href = `/admin/conteudo-membros/editar/${contentId}`
+    }
   }
 
   return (
@@ -448,13 +461,16 @@ export default function MemberContentManager() {
                           <Eye className="w-4 h-4" />
                         </button>
                         
-                        <Link
-                          href={`/admin/conteudo-membros/editar/${item._id}`}
+                        <button
+                          onClick={() => {
+                            console.log('Botão editar clicado para:', item._id, item.title)
+                            handleEdit(item._id)
+                          }}
                           className="p-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded transition-colors"
                           title="Editar"
                         >
                           <Edit className="w-4 h-4" />
-                        </Link>
+                        </button>
                         
                         <button
                           onClick={() => {
