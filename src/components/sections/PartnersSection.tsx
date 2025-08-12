@@ -29,7 +29,7 @@ const PartnersSection = () => {
   const fetchCollaborators = async () => {
     setLoading(true)
     try {
-      const res = await fetch('/api/collaborators/featured?limit=6', { cache: 'no-store' })
+      const res = await fetch('/api/collaborators?limit=6', { cache: 'no-store' })
       if (!res.ok) throw new Error('Falha ao buscar colaboradores')
       const json = await res.json()
       setCollaborators(json.data || [])
@@ -71,7 +71,7 @@ const PartnersSection = () => {
               </div>
             ))}
           </div>
-        ) : (
+        ) : collaborators.length === 0 ? null : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
             {collaborators.map((c) => (
               <div key={c._id} className="card">
@@ -88,12 +88,14 @@ const PartnersSection = () => {
           </div>
         )}
 
+        {collaborators.length > 0 && (
         <div className="text-center">
           <Link href="/colaboradores" className="inline-flex items-center bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300">
             Ver Todos os Colaboradores
             <ArrowRight size={20} className="ml-2" />
           </Link>
         </div>
+        )}
       </div>
     </section>
   )
