@@ -63,7 +63,7 @@ export default function NewsManager() {
 
   const fetchNews = async () => {
     try {
-      const response = await fetch('/api/news');
+      const response = await fetch('/api/admin/news');
       if (response.ok) {
         const data = await response.json();
         setNews(data.data || []);
