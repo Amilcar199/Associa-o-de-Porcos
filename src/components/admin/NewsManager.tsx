@@ -221,7 +221,7 @@ export default function NewsManager() {
   const tableData = sortedNews.map(newsItem => ({
     ...newsItem,
     createdAt: formatDate(newsItem.createdAt),
-    isPublished: formatStatus(newsItem.isPublished)
+    isPublished: formatStatus((newsItem as any).published ?? newsItem.isPublished)
   }));
 
   // Paginação no cliente
