@@ -4,6 +4,8 @@ import { useMemo, useState, useEffect } from 'react'
 import { Search, UserPlus, Shield, Mail, Edit, Power, PowerOff, Trash2 } from 'lucide-react'
 import UserEditModal from '@/components/UserEditModal'
 import UserCreateModal from '@/components/UserCreateModal'
+import ConfirmModal from '@/components/ConfirmModal'
+import { useToast } from '@/components/Toast'
 
 type AdminUser = {
   id: string
@@ -30,6 +32,9 @@ export default function AdminUsersPage() {
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [createModalOpen, setCreateModalOpen] = useState(false)
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [userToDelete, setUserToDelete] = useState<{ id: string; name: string } | null>(null)
+  const { showSuccess, showError } = useToast()
 
   useEffect(() => {
     loadUsers()
@@ -99,34 +104,37 @@ export default function AdminUsersPage() {
         ))
       } else {
         const error = await res.json()
-        alert(`Erro ao ${newStatus ? 'ativar' : 'desativar'} usuário: ${error.message || 'Erro desconhecido'}`)
+        showError(`Erro ao ${newStatus ? 'ativar' : 'desativar'} usuário: ${error.error || 'Erro desconhecido'}`)
       }
     } catch (error) {
       console.error('Erro ao alterar status do usuário:', error)
-      alert('Erro ao alterar status do usuário')
+      showError('Erro ao alterar status do usuário')
     }
   }
 
-  const handleDeleteUser = async (userId: string, userName: string) => {
-    if (!confirm(`Tem certeza que deseja excluir o usuário "${userName}"? Esta ação não pode ser desfeita.`)) {
-      return
-    }
+  const handleDeleteUser = (userId: string, userName: string) => {
+    setUserToDelete({ id: userId, name: userName })
+    setDeleteModalOpen(true)
+  }
+
+  const confirmDeleteUser = async () => {
+    if (!userToDelete) return
 
     try {
-      const res = await fetch(`/api/admin/users/${userId}`, {
+      const res = await fetch(`/api/admin/users/${userToDelete.id}`, {
         method: 'DELETE'
       })
       
       if (res.ok) {
-        setUsers(prev => prev.filter(u => u.id !== userId))
-        alert('Usuário excluído com sucesso')
+        setUsers(prev => prev.filter(u => u.id !== userToDelete.id))
+        showSuccess('Usuário excluído com sucesso')
       } else {
         const error = await res.json()
-        alert(`Erro ao excluir usuário: ${error.error || 'Erro desconhecido'}`)
+        showError(`Erro ao excluir usuário: ${error.error || 'Erro desconhecido'}`)
       }
     } catch (error) {
       console.error('Erro ao excluir usuário:', error)
-      alert('Erro ao excluir usuário')
+      showError('Erro ao excluir usuário')
     }
   }
 
@@ -291,6 +299,21 @@ export default function AdminUsersPage() {
         isOpen={createModalOpen}
         onClose={() => setCreateModalOpen(false)}
         onUserCreated={handleUserCreated}
+      />
+
+      {/* Modal de Confirmação de Exclusão */}
+      <ConfirmModal
+        isOpen={deleteModalOpen}
+        onClose={() => {
+          setDeleteModalOpen(false)
+          setUserToDelete(null)
+        }}
+        onConfirm={confirmDeleteUser}
+        title="Confirmar Exclusão"
+        message={`Tem certeza que deseja excluir o usuário "${userToDelete?.name}"? Esta ação não pode ser desfeita.`}
+        confirmText="Excluir"
+        cancelText="Cancelar"
+        variant="danger"
       />
     </div>
   )
