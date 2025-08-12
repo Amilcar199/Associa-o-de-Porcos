@@ -44,6 +44,10 @@ const PartnersSection = () => {
     fetchCollaborators()
   }, [])
 
+  if (!loading && collaborators.length === 0) {
+    return null
+  }
+
   return (
     <section className="section-padding bg-white">
       <div className="container-custom">
