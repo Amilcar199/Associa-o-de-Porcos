@@ -19,31 +19,19 @@ import {
   ChevronRight
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
+import ContactBadge from './ContactBadge'
 
 interface MenuItem {
   name: string
   href: string
   icon: LucideIcon
-  badge?: number
+  badge?: number | 'custom'
   children?: MenuItem[]
 }
 
 const AdminSidebar = () => {
   const pathname = usePathname()
   const [expandedItems, setExpandedItems] = useState<string[]>(['produtos', 'conteudo'])
-  const [contactBadge, setContactBadge] = useState<number | undefined>(undefined)
-
-  // Carregar badge de contatos (não bloqueante)
-  if (typeof window !== 'undefined' && contactBadge === undefined) {
-    fetch('/api/admin/stats').then(async (r)=>{
-      if(r.ok){
-        const j = await r.json()
-        const contacts = Array.isArray(j.data?.contacts) ? j.data.contacts : j.data?.contacts
-        const count = Array.isArray(contacts) ? contacts.reduce((acc: number, c: any)=> acc + (c.count||0), 0) : undefined
-        setContactBadge(count)
-      }
-    }).catch(()=>{})
-  }
 
   const menuItems: MenuItem[] = [
     {
@@ -80,7 +68,7 @@ const AdminSidebar = () => {
       name: 'Contatos',
       href: '/admin/contatos',
       icon: MessageSquare,
-      badge: contactBadge
+      badge: 'custom'
     },
     {
       name: 'Mídia',
@@ -140,11 +128,13 @@ const AdminSidebar = () => {
                 className={active ? 'text-primary-600' : 'text-gray-500'} 
               />
               <span>{item.name}</span>
-              {item.badge && (
+              {item.badge === 'custom' ? (
+                <ContactBadge />
+              ) : item.badge ? (
                 <span className="bg-red-100 text-red-800 text-xs font-medium px-2 py-1 rounded-full">
                   {item.badge}
                 </span>
-              )}
+              ) : null}
             </div>
             {isExpanded ? (
               <ChevronDown size={16} className="text-gray-400" />
@@ -173,7 +163,7 @@ const AdminSidebar = () => {
       <Link
         key={item.name}
         href={item.href}
-        className={`flex items-center justify-between px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
+        className={`flex items-center justify-between px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 group ${
           level > 0 ? 'ml-4' : ''
         } ${
           active
@@ -188,11 +178,13 @@ const AdminSidebar = () => {
           />
           <span>{item.name}</span>
         </div>
-        {item.badge && (
+        {item.badge === 'custom' ? (
+          <ContactBadge />
+        ) : item.badge ? (
           <span className="bg-red-100 text-red-800 text-xs font-medium px-2 py-1 rounded-full">
             {item.badge}
           </span>
-        )}
+        ) : null}
       </Link>
     )
   }
