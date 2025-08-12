@@ -4,7 +4,7 @@ import FeaturedProducts from '@/components/sections/FeaturedProducts'
 import AboutPreview from '@/components/sections/AboutPreview'
 import LatestNews from '@/components/sections/LatestNews'
 import CallToAction from '@/components/sections/CallToAction'
-// import PartnersSection from '@/components/sections/PartnersSection'
+import PartnersSection from '@/components/sections/PartnersSection'
 
 export const metadata: Metadata = {
   title: 'Home - Associação de Porcos',
@@ -31,8 +31,8 @@ export default function HomePage() {
       {/* Latest News */}
       <LatestNews />
       
-      {/* Partners Section ocultada temporariamente */}
-      {/* <PartnersSection /> */}
+      {/* Partners Section */}
+      <PartnersSection />
       
       {/* Call to Action */}
       <CallToAction />
