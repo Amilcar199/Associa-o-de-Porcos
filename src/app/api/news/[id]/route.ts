@@ -30,8 +30,7 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
 
     // Incrementar visualizações se for uma requisição pública
     if (!req.headers.get('authorization')) {
-      news.views = (news.views || 0) + 1
-      await news.save()
+      await news.incrementViews()
     }
 
     return NextResponse.json(successResponse(news))
