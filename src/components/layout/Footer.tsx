@@ -13,9 +13,18 @@ import {
   Heart,
   ArrowRight
 } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 const Footer = () => {
   const currentYear = new Date().getFullYear()
+  const [siteConfig, setSiteConfig] = useState<any>(null)
+
+  useEffect(()=>{
+    const load = async () => {
+      try { const res = await fetch('/api/admin/config', { cache: 'no-store' }); if (res.ok){ const j = await res.json(); setSiteConfig(j?.data || null) } } catch {}
+    }
+    load()
+  }, [])
 
   const quickLinks = [
     { name: 'Início', href: '/' },
@@ -74,13 +83,17 @@ const Footer = () => {
           <div className="lg:col-span-1">
             <Link href="/" className="flex items-center space-x-3 mb-4">
               <div className="w-12 h-12 relative">
-                <Image
-                  src={LogoPng}
-                  alt="Associação de Porcos"
-                  fill
-                  className="object-contain"
-                  sizes="48px"
-                />
+                {siteConfig?.logoUrl ? (
+                  <img src={siteConfig.logoUrl} alt="Logo" className="w-full h-full object-contain" />
+                ) : (
+                  <Image
+                    src={LogoPng}
+                    alt="Associação de Porcos"
+                    fill
+                    className="object-contain"
+                    sizes="48px"
+                  />
+                )}
               </div>
               <div>
                 <h2 className="text-lg font-heading font-bold">
@@ -194,10 +207,10 @@ const Footer = () => {
               <div className="flex items-center space-x-3">
                 <Mail size={16} className="text-primary-400 flex-shrink-0" />
                 <a
-                  href="mailto:contato@associacaodeporcos.ao"
+                  href={`mailto:${siteConfig?.contactEmail || 'contato@associacaodeporcos.ao'}`}
                   className="text-sm text-gray-300 hover:text-primary-400 transition-colors"
                 >
-                  contato@associacaodeporcos.ao
+                  {siteConfig?.contactEmail || 'contato@associacaodeporcos.ao'}
                 </a>
               </div>
             </div>
@@ -245,7 +258,7 @@ const Footer = () => {
                 ))}
               </div>
               
-              <div className="flex items-center text-sm text-gray-400">
+              <div className="flex items-center text-sm text_gray-400">
                 <span>Feito com</span>
                 <Heart size={14} className="text-red-500 mx-1" />
                 <span>para o agronegócio</span>

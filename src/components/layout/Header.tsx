@@ -22,6 +22,7 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
+  const [siteConfig, setSiteConfig] = useState<any>(null)
   const { data: session, status } = useSession()
   const pathname = usePathname()
   const router = useRouter()
@@ -34,6 +35,13 @@ const Header = () => {
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  useEffect(()=>{
+    const load = async () => {
+      try { const res = await fetch('/api/admin/config', { cache: 'no-store' }); if (res.ok){ const j = await res.json(); setSiteConfig(j?.data || null) } } catch {}
+    }
+    load()
+  },[])
 
   // Prefetch programático das rotas mais acessadas
   useEffect(() => {
@@ -136,14 +144,18 @@ const Header = () => {
             {/* Logo */}
             <Link href="/" className="flex items-center space-x-3">
               <div className="w-12 h-12 lg:w-14 lg:h-14 relative">
-                <Image
-                  src={LogoPng}
-                  alt="Associação de Porcos"
-                  fill
-                  className="object-contain"
-                  sizes="(max-width: 1024px) 48px, 56px"
-                  priority
-                />
+                {siteConfig?.logoUrl ? (
+                  <img src={siteConfig.logoUrl} alt="Logo" className="w-full h-full object-contain" />
+                ) : (
+                  <Image
+                    src={LogoPng}
+                    alt="Associação de Porcos"
+                    fill
+                    className="object-contain"
+                    sizes="(max-width: 1024px) 48px, 56px"
+                    priority
+                  />
+                )}
               </div>
               <div className="hidden sm:block">
                 <h1 className="text-2xl lg:text-3xl font-heading font-bold text-primary-800">
