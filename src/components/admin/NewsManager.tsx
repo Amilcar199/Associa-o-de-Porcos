@@ -100,7 +100,7 @@ export default function NewsManager() {
         resetForm();
         fetchNews();
       } else {
-        toast.error('Falha ao salvar notícia');
+        try { const err = await response.json(); toast.error(err?.error || 'Falha ao salvar notícia') } catch { toast.error('Falha ao salvar notícia') }
       }
     } catch (error) {
       console.error('Erro ao salvar notícia:', error);

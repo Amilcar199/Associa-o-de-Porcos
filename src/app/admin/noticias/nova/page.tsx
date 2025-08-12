@@ -1,4 +1,5 @@
 import { Metadata } from 'next'
+import NewNewsClient from './NewNewsClient'
 
 export const metadata: Metadata = {
   title: 'Nova Notícia - Painel Administrativo',
@@ -13,9 +14,7 @@ export default function AdminNewNewsPage() {
         <p className="text-gray-600 mt-1">Redija e publique uma notícia</p>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center">
-        <p className="text-gray-600">Editor em desenvolvimento.</p>
-      </div>
+      <NewNewsClient />
     </div>
   )
 }
