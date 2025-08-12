@@ -55,3 +55,60 @@ export async function GET(req: NextRequest) {
     return errorResponse('Erro interno do servidor', 500)
   }
 }
+
+export async function POST(req: NextRequest) {
+  try {
+    await connectDB()
+
+    // Apenas admins podem criar usuários
+    const auth = await validateSession(req, true)
+    if ('error' in auth) {
+      return errorResponse(auth.error || 'Não autorizado', auth.status)
+    }
+
+    const body = await req.json()
+    
+    // Validação dos campos obrigatórios
+    if (!body.name || !body.email || !body.password || !body.role) {
+      return errorResponse('Nome, email, senha e papel são obrigatórios')
+    }
+
+    // Verificar se o email já existe
+    const existingUser = await User.findOne({ email: body.email.toLowerCase() })
+    if (existingUser) {
+      return errorResponse('Email já está em uso')
+    }
+
+    // Criar novo usuário
+    const userData = {
+      name: body.name.trim(),
+      email: body.email.toLowerCase().trim(),
+      password: body.password,
+      role: body.role,
+      company: body.company?.trim() || null,
+      bio: body.bio?.trim() || null,
+      location: body.location?.trim() || null,
+      phone: body.phone?.trim() || null,
+      website: body.website?.trim() || null,
+      socialMedia: {
+        linkedin: body.socialMedia?.linkedin?.trim() || null,
+        twitter: body.socialMedia?.twitter?.trim() || null,
+        facebook: body.socialMedia?.facebook?.trim() || null
+      },
+      isActive: body.isActive !== undefined ? body.isActive : true
+    }
+
+    const newUser = new User(userData)
+    await newUser.save()
+
+    // Retornar usuário criado (sem senha)
+    const createdUser = await User.findById(newUser._id)
+      .select('name email role isActive createdAt company bio location phone website socialMedia avatar')
+      .lean()
+
+    return NextResponse.json(successResponse(createdUser, 'Usuário criado com sucesso'), { status: 201 })
+  } catch (error) {
+    console.error('Erro ao criar usuário:', error)
+    return errorResponse('Erro interno do servidor', 500)
+  }
+}
