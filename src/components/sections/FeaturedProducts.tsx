@@ -12,6 +12,7 @@ import {
   Clock,
   Weight
 } from 'lucide-react'
+import ProductModal from '@/components/modals/ProductModal'
 
 interface FeaturedProduct {
   _id: string
@@ -31,6 +32,8 @@ interface FeaturedProduct {
 const FeaturedProducts = () => {
   const [products, setProducts] = useState<FeaturedProduct[]>([])
   const [loading, setLoading] = useState(false)
+  const [selectedProduct, setSelectedProduct] = useState<FeaturedProduct | null>(null)
+  const [modalOpen, setModalOpen] = useState(false)
 
   const fetchFeaturedProducts = async () => {
     setLoading(true)
@@ -83,6 +86,32 @@ const FeaturedProducts = () => {
     }
   }
 
+  const openProductModal = (product: FeaturedProduct) => {
+    setSelectedProduct(product)
+    setModalOpen(true)
+  }
+
+  const closeProductModal = () => {
+    setModalOpen(false)
+    setSelectedProduct(null)
+  }
+
+  const goToPreviousProduct = () => {
+    if (!selectedProduct) return
+    const currentIndex = products.findIndex(p => p._id === selectedProduct._id)
+    if (currentIndex > 0) {
+      setSelectedProduct(products[currentIndex - 1])
+    }
+  }
+
+  const goToNextProduct = () => {
+    if (!selectedProduct) return
+    const currentIndex = products.findIndex(p => p._id === selectedProduct._id)
+    if (currentIndex < products.length - 1) {
+      setSelectedProduct(products[currentIndex + 1])
+    }
+  }
+
   return (
     <section className="section-padding bg-white">
       <div className="container-custom">
@@ -128,7 +157,8 @@ const FeaturedProducts = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="card group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
+                onClick={() => openProductModal(product)}
+                className="card group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer"
               >
                 <div className="relative h-48 overflow-hidden rounded-t-lg">
                   <Image
@@ -181,9 +211,15 @@ const FeaturedProducts = () => {
                   </div>
 
                   <div className="flex gap-2">
-                    <Link href={`/produtos`} className="flex-1 btn-primary text-center text-sm py-2">
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        openProductModal(product)
+                      }}
+                      className="flex-1 btn-primary text-center text-sm py-2"
+                    >
                       Ver Detalhes
-                    </Link>
+                    </button>
                     <button className="w-10 h-10 bg-gray-100 hover:bg-primary-100 rounded-lg flex items-center justify-center transition-colors">
                       <ShoppingCart size={16} className="text-gray-600 hover:text-primary-600" />
                     </button>
@@ -213,6 +249,17 @@ const FeaturedProducts = () => {
           </Link>
         </motion.div>
       </div>
+
+      {/* Modal de Produto */}
+      <ProductModal
+        isOpen={modalOpen}
+        onClose={closeProductModal}
+        product={selectedProduct}
+        onPrevious={goToPreviousProduct}
+        onNext={goToNextProduct}
+        hasPrevious={selectedProduct ? products.findIndex(p => p._id === selectedProduct._id) > 0 : false}
+        hasNext={selectedProduct ? products.findIndex(p => p._id === selectedProduct._id) < products.length - 1 : false}
+      />
     </section>
   )
 }

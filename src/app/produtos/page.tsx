@@ -1,8 +1,6 @@
 export const dynamic = 'force-dynamic'
 
 import type { Metadata } from 'next'
-import Image from 'next/image'
-import { Tag, Weight, Calendar } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Produtos',
@@ -60,47 +58,7 @@ export default async function ProdutosPage() {
         {products.length === 0 ? (
           <div className="bg-white rounded-xl shadow p-8 text-center text-gray-600">Nenhum produto disponível no momento.</div>
         ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {products.map((p: any, idx: number) => (
-              <div key={p._id || idx} className="group bg-white rounded-xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition">
-                {/* Imagem */}
-                <div className="relative h-48">
-                  <Image
-                    src={p.imageUrl}
-                    alt={p.name || 'Produto'}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width:768px) 100vw, 33vw"
-                  />
-                  {/* Badge de preço */}
-                  {p.priceFormatted && (
-                    <div className="absolute top-3 right-3 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-primary-700 text-sm font-semibold shadow">
-                      {p.priceFormatted}
-                    </div>
-                  )}
-                </div>
-
-                {/* Conteúdo */}
-                <div className="p-4">
-                  <h3 className="font-semibold text-gray-900 text-lg line-clamp-1">{p.name}</h3>
-                  <div className="mt-2 grid grid-cols-3 gap-2 text-xs text-gray-600">
-                    <div className="flex items-center gap-1"><Tag size={14} className="text-primary-600" />{p.breed || '—'}</div>
-                    <div className="flex items-center gap-1"><Weight size={14} className="text-primary-600" />{p.weight ? `${p.weight} kg` : '—'}</div>
-                    <div className="flex items-center gap-1"><Calendar size={14} className="text-primary-600" />{p.age ? `${p.age} meses` : '—'}</div>
-                  </div>
-
-                  {/* Ações */}
-                  <div className="mt-4 flex items-center justify-between">
-                    <span className="text-sm text-gray-500">Código: {p.code || p._id?.slice?.(0, 6) || '—'}</span>
-                    <div className="flex items-center gap-3">
-                      <a href="/contato" className="text-primary-700 hover:text-primary-800 font-medium text-sm">Entre em Contato</a>
-                      <a href="tel:+244928476427" className="text-primary-700 hover:text-primary-800 font-medium text-sm">Ligue</a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          <ProductsClient products={products} />
         )}
       </div>
     </section>

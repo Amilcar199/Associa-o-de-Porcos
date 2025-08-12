@@ -10,6 +10,7 @@ import {
   Eye,
   Clock
 } from 'lucide-react'
+import NewsModal from '@/components/modals/NewsModal'
 
 interface LatestNewsItem {
   _id: string
@@ -27,6 +28,8 @@ interface LatestNewsItem {
 const LatestNews = () => {
   const [news, setNews] = useState<LatestNewsItem[]>([])
   const [loading, setLoading] = useState(false)
+  const [selectedNews, setSelectedNews] = useState<LatestNewsItem | null>(null)
+  const [modalOpen, setModalOpen] = useState(false)
 
   const fetchLatestNews = async () => {
     setLoading(true)
@@ -74,6 +77,32 @@ const LatestNews = () => {
     const words = (excerpt || '').split(' ').length
     const minutes = Math.ceil(words / 200)
     return `${minutes} min de leitura`
+  }
+
+  const openNewsModal = (newsItem: LatestNewsItem) => {
+    setSelectedNews(newsItem)
+    setModalOpen(true)
+  }
+
+  const closeNewsModal = () => {
+    setModalOpen(false)
+    setSelectedNews(null)
+  }
+
+  const goToPreviousNews = () => {
+    if (!selectedNews) return
+    const currentIndex = news.findIndex(n => n._id === selectedNews._id)
+    if (currentIndex > 0) {
+      setSelectedNews(news[currentIndex - 1])
+    }
+  }
+
+  const goToNextNews = () => {
+    if (!selectedNews) return
+    const currentIndex = news.findIndex(n => n._id === selectedNews._id)
+    if (currentIndex < news.length - 1) {
+      setSelectedNews(news[currentIndex + 1])
+    }
   }
 
   return (
@@ -126,7 +155,10 @@ const LatestNews = () => {
                 viewport={{ once: true }}
                 className="lg:row-span-2"
               >
-                <Link href={`/noticias/${news[0]?.slug}`} className="group block">
+                <div 
+                  onClick={() => openNewsModal(news[0])}
+                  className="group block cursor-pointer"
+                >
                   <div className="card overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 h-full">
                     <div className="relative h-64 lg:h-80 overflow-hidden">
                       <Image
@@ -173,7 +205,7 @@ const LatestNews = () => {
                       </div>
                     </div>
                   </div>
-                </Link>
+                </div>
               </motion.div>
             )}
 
@@ -186,7 +218,10 @@ const LatestNews = () => {
                   transition={{ duration: 0.6, delay: index * 0.1 }}
                   viewport={{ once: true }}
                 >
-                  <Link href={`/noticias/${article.slug}`} className="group block">
+                  <div 
+                    onClick={() => openNewsModal(article)}
+                    className="group block cursor-pointer"
+                  >
                     <div className="card overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
                       <div className="flex">
                         <div className="relative w-32 h-24 lg:w-40 lg:h-28 flex-shrink-0 overflow-hidden">
@@ -220,9 +255,9 @@ const LatestNews = () => {
                             </div>
                           </div>
                         </div>
+                                              </div>
                       </div>
                     </div>
-                  </Link>
                 </motion.div>
               ))}
             </div>
@@ -248,6 +283,17 @@ const LatestNews = () => {
           </Link>
         </motion.div>
       </div>
+
+      {/* Modal de Notícia */}
+      <NewsModal
+        isOpen={modalOpen}
+        onClose={closeNewsModal}
+        news={selectedNews}
+        onPrevious={goToPreviousNews}
+        onNext={goToNextNews}
+        hasPrevious={selectedNews ? news.findIndex(n => n._id === selectedNews._id) > 0 : false}
+        hasNext={selectedNews ? news.findIndex(n => n._id === selectedNews._id) < news.length - 1 : false}
+      />
     </section>
   )
 }
