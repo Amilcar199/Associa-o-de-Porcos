@@ -65,3 +65,34 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     return errorResponse('Erro interno do servidor', 500)
   }
 }
+
+export async function DELETE(req: NextRequest, { params }: RouteParams) {
+  try {
+    await connectDB()
+
+    const auth = await validateSession(req, true)
+    if ('error' in auth) return errorResponse(auth.error || 'Não autorizado', auth.status)
+
+    const { id } = params
+    if (!isValidObjectId(id)) return errorResponse('ID inválido')
+
+    // Verificar se o usuário não é o último admin
+    const userToDelete = await User.findById(id)
+    if (!userToDelete) return errorResponse('Usuário não encontrado', 404)
+
+    if (userToDelete.role === 'admin') {
+      const adminCount = await User.countDocuments({ role: 'admin', isActive: true })
+      if (adminCount <= 1) {
+        return errorResponse('Não é possível excluir o último administrador ativo', 400)
+      }
+    }
+
+    // Excluir o usuário
+    await User.findByIdAndDelete(id)
+
+    return NextResponse.json(successResponse({}, 'Usuário excluído com sucesso'))
+  } catch (error) {
+    console.error('Erro ao excluir usuário:', error)
+    return errorResponse('Erro interno do servidor', 500)
+  }
+}

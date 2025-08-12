@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useState, useEffect } from 'react'
-import { Search, UserPlus, Shield, Mail, Edit, Power, PowerOff } from 'lucide-react'
+import { Search, UserPlus, Shield, Mail, Edit, Power, PowerOff, Trash2 } from 'lucide-react'
 import UserEditModal from '@/components/UserEditModal'
 import UserCreateModal from '@/components/UserCreateModal'
 
@@ -104,6 +104,29 @@ export default function AdminUsersPage() {
     } catch (error) {
       console.error('Erro ao alterar status do usuário:', error)
       alert('Erro ao alterar status do usuário')
+    }
+  }
+
+  const handleDeleteUser = async (userId: string, userName: string) => {
+    if (!confirm(`Tem certeza que deseja excluir o usuário "${userName}"? Esta ação não pode ser desfeita.`)) {
+      return
+    }
+
+    try {
+      const res = await fetch(`/api/admin/users/${userId}`, {
+        method: 'DELETE'
+      })
+      
+      if (res.ok) {
+        setUsers(prev => prev.filter(u => u.id !== userId))
+        alert('Usuário excluído com sucesso')
+      } else {
+        const error = await res.json()
+        alert(`Erro ao excluir usuário: ${error.error || 'Erro desconhecido'}`)
+      }
+    } catch (error) {
+      console.error('Erro ao excluir usuário:', error)
+      alert('Erro ao excluir usuário')
     }
   }
 
@@ -227,6 +250,14 @@ export default function AdminUsersPage() {
                             Ativar
                           </>
                         )}
+                      </button>
+                      <span className="text-gray-300">|</span>
+                      <button 
+                        onClick={() => handleDeleteUser(u.id, u.name)}
+                        className="inline-flex items-center gap-1 text-red-600 hover:text-red-700 hover:bg-red-50 px-2 py-1 rounded transition-colors"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                        Excluir
                       </button>
                     </div>
                   </td>
