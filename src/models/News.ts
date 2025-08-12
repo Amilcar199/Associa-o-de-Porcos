@@ -93,7 +93,6 @@ const NewsSchema = new Schema<INews>({
 
 // Índices para performance e busca
 NewsSchema.index({ title: 'text', content: 'text', excerpt: 'text' })
-NewsSchema.index({ slug: 1 }, { unique: true })
 NewsSchema.index({ category: 1, published: 1 })
 NewsSchema.index({ author: 1, published: 1 })
 NewsSchema.index({ published: 1, featured: 1, publishedAt: -1 })
