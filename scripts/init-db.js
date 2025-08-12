@@ -78,6 +78,10 @@ async function initializeDatabase() {
       console.log('   - Crie um cluster gratuito');
       console.log('   - Obtenha a string de conexão');
       console.log('   - Atualize MONGODB_URI no .env.local');
+    } else if (error.message.includes('Cannot find module')) {
+      console.log('\n💡 SOLUÇÃO:');
+      console.log('   - Execute o script do diretório raiz do projeto');
+      console.log('   - Verifique se o caminho ../src/models/User está correto');
     }
     
   } finally {

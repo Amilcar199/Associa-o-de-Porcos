@@ -46,6 +46,8 @@ async function testConnection() {
       console.log('💡 Dica: Verifique usuário e senha do MongoDB');
     } else if (error.message.includes('ENOTFOUND')) {
       console.log('💡 Dica: Verifique se a URL do cluster está correta');
+    } else if (error.message.includes('Cannot find module')) {
+      console.log('💡 Dica: Erro de caminho do modelo - verifique se está executando do diretório raiz');
     }
     
   } finally {
