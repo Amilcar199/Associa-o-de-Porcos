@@ -49,6 +49,13 @@ export default function NewsManager() {
     imageUrl: '',
     isPublished: false
   });
+ 
+  const allowedCategories = [
+    { value: 'news', label: 'Notícias' },
+    { value: 'events', label: 'Eventos' },
+    { value: 'tips', label: 'Dicas' },
+    { value: 'market', label: 'Mercado' }
+  ]
 
   useEffect(() => {
     fetchNews();
@@ -79,7 +86,7 @@ export default function NewsManager() {
         title: formData.title,
         content: formData.content,
         excerpt: formData.excerpt,
-        category: formData.category,
+        category: allowedCategories.map(c=>c.value).includes(formData.category as any) ? formData.category : 'news',
         featuredImage: formData.imageUrl,
         images: formData.imageUrl ? [formData.imageUrl] : [],
         published: formData.isPublished
@@ -328,13 +335,17 @@ export default function NewsManager() {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Categoria
               </label>
-              <input
-                type="text"
+              <select
                 value={formData.category}
                 onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 required
-              />
+              >
+                <option value="">Selecione...</option>
+                {allowedCategories.map(c => (
+                  <option key={c.value} value={c.value}>{c.label}</option>
+                ))}
+              </select>
             </div>
             
             <div>
