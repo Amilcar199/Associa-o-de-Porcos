@@ -1,6 +1,10 @@
 'use client'
 
 import Image from 'next/image'
+import Slide1 from '@/components/assets/Foto Slider1.jpg'
+import Slide2 from '@/components/assets/Foto slider2.jpg'
+import Slide3 from '@/components/assets/Foto slider 3.jpg'
+import Suino from '@/components/assets/Foto Suino.webp'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Award, Leaf, Users, Target, ShieldCheck, Sparkles, ArrowRight, Recycle, LineChart } from 'lucide-react'
@@ -16,7 +20,7 @@ export default function AboutClient() {
       {/* Hero Section */}
       <div className="relative min-h-[40vh] lg:min-h-[55vh] overflow-hidden">
         <Image
-          src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?q=80&w=2000&auto=format&fit=crop"
+          src={Suino}
           alt="Suinocultura sustentável"
           fill
           priority
@@ -195,13 +199,9 @@ export default function AboutClient() {
             <p className="text-gray-600 mt-2">Momentos que representam nosso compromisso com qualidade e bem‑estar.</p>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
-            {[
-              'https://images.unsplash.com/photo-1525498128493-380d1990a112?q=80&w=1200&auto=format&fit=crop',
-              'https://images.unsplash.com/photo-1556228720-195a672e8a03?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80',
-              'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80'
-            ].map((src, idx) => (
+            {[Slide1, Slide2, Slide3].map((src, idx) => (
               <motion.div
-                key={src}
+                key={idx}
                 initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: idx * 0.05 }}

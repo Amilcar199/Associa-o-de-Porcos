@@ -5,6 +5,9 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { ChevronRight, Play, Users, Award, Leaf } from 'lucide-react'
+import Slide1 from '@/components/assets/Foto Slider1.jpg'
+import Slide2 from '@/components/assets/Foto slider2.jpg'
+import Slide3 from '@/components/assets/Foto slider 3.jpg'
 
 const Hero = () => {
   const [currentSlide, setCurrentSlide] = useState(0)
@@ -12,7 +15,7 @@ const Hero = () => {
   const slides = [
     {
       id: 1,
-      image: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?q=80&w=1600&auto=format&fit=crop',
+      image: Slide1 as unknown as string,
       title: 'Excelência na Suinocultura',
       subtitle: 'Conectando criadores e impulsionando produtividade com qualidade',
       description: 'Promovemos boas práticas, sustentabilidade e parcerias para resultados consistentes em toda a cadeia.',
@@ -26,7 +29,7 @@ const Hero = () => {
     },
     {
       id: 2,
-      image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?q=80&w=1600&auto=format&fit=crop',
+      image: Slide2 as unknown as string,
       title: 'Qualidade que inspira confiança',
       subtitle: 'Bem-estar animal, rastreabilidade e eficiência',
       description: 'Seguimos padrões rigorosos de qualidade para garantir desempenho, segurança e satisfação dos clientes e associados.',
@@ -40,7 +43,7 @@ const Hero = () => {
     },
     {
       id: 3,
-        image: 'https://images.unsplash.com/photo-1500595046743-cd271d694d30?q=80&w=1600&auto=format&fit=crop',
+        image: Slide3 as unknown as string,
       title: 'Inovação que impulsiona resultados',
       subtitle: 'Tecnologia, gestão e conhecimento aplicados ao campo',
       description: 'Capacitação contínua, dados e tecnologia para elevar produtividade, bem-estar e sustentabilidade.',
@@ -82,7 +85,7 @@ const Hero = () => {
             className="absolute inset-0"
           >
             <Image
-              src={slide.image}
+              src={slide.image as any}
               alt={slide.title}
               fill
               className="object-cover"
