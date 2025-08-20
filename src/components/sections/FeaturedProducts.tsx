@@ -171,7 +171,7 @@ const FeaturedProducts = () => {
                   </button>
                   <div className="absolute bottom-3 left-3">
                     <span className="bg-primary-600 text-white px-3 py-1 text-sm font-bold rounded-full">
-                      {formatPrice(product.price)}
+                      {product.price !== undefined ? formatPrice(product.price) : 'Preço sob consulta'}
                     </span>
                   </div>
                 </div>

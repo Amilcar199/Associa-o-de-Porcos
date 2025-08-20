@@ -1,6 +1,7 @@
 /**
  * Utilitários gerais da aplicação
  */
+import mongoose from 'mongoose'
 
 /**
  * Formata uma data para o formato português de Angola
@@ -100,4 +101,11 @@ export function calculateReadTime(text: string): string {
   const words = (text || '').split(' ').length
   const minutes = Math.ceil(words / 200)
   return `${minutes} min`
+}
+
+/**
+ * Valida se um ID é um ObjectId do MongoDB válido
+ */
+export function isValidObjectId(id: string): boolean {
+  return mongoose.Types.ObjectId.isValid(id)
 }

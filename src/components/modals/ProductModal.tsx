@@ -8,7 +8,22 @@ import { formatPrice, formatAge } from '@/lib/utils'
 interface ProductModalProps {
   isOpen: boolean
   onClose: () => void
-  product: any
+  product: {
+    _id?: string
+    name: string
+    description?: string
+    breed: string
+    age?: number
+    weight: number
+    price?: number
+    images?: string[]
+    imageUrl?: string
+    healthStatus?: 'excellent' | 'good' | 'fair'
+    vaccinated?: boolean
+    location?: string
+    features?: string[]
+    code?: string
+  } | null
   onPrevious?: () => void
   onNext?: () => void
   hasPrevious?: boolean
@@ -44,7 +59,7 @@ export default function ProductModal({
     if (e.key === 'ArrowRight' && hasNext) onNext?.()
   }
 
-  const getHealthStatusColor = (status: string) => {
+  const getHealthStatusColor = (status?: string) => {
     switch (status) {
       case 'excellent': return 'bg-green-100 text-green-800'
       case 'good': return 'bg-blue-100 text-blue-800'
@@ -53,7 +68,7 @@ export default function ProductModal({
     }
   }
 
-  const getHealthStatusText = (status: string) => {
+  const getHealthStatusText = (status?: string) => {
     switch (status) {
       case 'excellent': return 'Excelente'
       case 'good': return 'Bom'
@@ -78,8 +93,8 @@ export default function ProductModal({
         {/* Header com imagem */}
         <div className="relative h-80 lg:h-96 overflow-hidden">
           <Image
-            src={images[currentImageIndex] || '/products/placeholder.jpg'}
-            alt={product.name}
+            src={((images[currentImageIndex] as string) ?? '/products/placeholder.jpg')}
+            alt={(product.name ?? '') as string}
             fill
             className="object-cover"
             priority
@@ -211,8 +226,8 @@ export default function ProductModal({
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <h3 className="font-semibold text-gray-900 mb-2">Status de Saúde</h3>
                     <div className="flex items-center gap-2">
-                      <span className={`px-3 py-1 text-sm font-medium rounded-full ${getHealthStatusColor(product.healthStatus)}`}>
-                        {getHealthStatusText(product.healthStatus)}
+                      <span className={`px-3 py-1 text-sm font-medium rounded-full ${getHealthStatusColor(product.healthStatus ?? undefined)}`}>
+                        {getHealthStatusText(product.healthStatus ?? undefined)}
                       </span>
                     </div>
                   </div>

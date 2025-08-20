@@ -17,7 +17,8 @@ import {
   Users,
   ExternalLink,
   Download,
-  Play
+  Play,
+  X
 } from 'lucide-react'
 import Link from 'next/link'
 import { useToast } from '@/components/Toast'
@@ -31,12 +32,18 @@ interface MemberContent {
   category: string
   url?: string
   thumbnail?: string
+  content?: string
+  fileUrl?: string
+  videoUrl?: string
+  eventDate?: string | Date
+  eventLocation?: string
   isFeatured: boolean
   isActive: boolean
   views: number
   downloads: number
   author: { name: string; email: string }
   createdAt: string
+  tags?: string[]
 }
 
 export default function MemberContentManager() {

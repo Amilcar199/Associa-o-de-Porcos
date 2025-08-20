@@ -1,4 +1,4 @@
-import mongoose, { Schema, model, models } from 'mongoose'
+import mongoose, { Schema, model, models, Model } from 'mongoose'
 import { Product as IProduct } from '@/types'
 
 const ProductSchema = new Schema<IProduct>({
@@ -260,6 +260,12 @@ ProductSchema.pre('save', async function (next) {
   next()
 })
 
-const Product = models.Product || model<IProduct>('Product', ProductSchema)
+interface ProductModel extends Model<IProduct> {
+  findWithFilters(filters: any): Promise<IProduct[]>
+  findFeatured(limit?: number): Promise<IProduct[]>
+  generateCode(breed: string): Promise<string>
+}
+
+const Product = (models.Product as unknown as ProductModel) || model<IProduct, ProductModel>('Product', ProductSchema)
 
 export default Product

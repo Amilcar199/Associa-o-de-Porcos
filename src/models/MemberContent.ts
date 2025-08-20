@@ -1,4 +1,4 @@
-import mongoose, { Schema, model, models } from 'mongoose'
+import mongoose, { Schema, model, models, Model } from 'mongoose'
 
 export interface IMemberContent {
   title: string
@@ -20,6 +20,13 @@ export interface IMemberContent {
   downloads: number
   createdAt: Date
   updatedAt: Date
+}
+
+interface MemberContentModel extends Model<IMemberContent> {
+  findActive(): Promise<IMemberContent[]>
+  findFeatured(): Promise<IMemberContent[]>
+  findByType(type: string): Promise<IMemberContent[]>
+  findByCategory(category: string): Promise<IMemberContent[]>
 }
 
 const MemberContentSchema = new Schema<IMemberContent>({
@@ -209,6 +216,6 @@ MemberContentSchema.methods.incrementDownloads = function() {
   return this.save()
 }
 
-const MemberContent = models.MemberContent || model<IMemberContent>('MemberContent', MemberContentSchema)
+const MemberContent = (models.MemberContent as MemberContentModel) || model<IMemberContent, MemberContentModel>('MemberContent', MemberContentSchema)
 
 export default MemberContent
