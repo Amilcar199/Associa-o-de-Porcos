@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
+import AboutImage from '@/components/assets/oksuinos.webp'
 import { motion } from 'framer-motion'
 import { 
   Users, 
@@ -58,14 +59,11 @@ const AboutPreview = () => {
           >
             <div className="relative rounded-2xl overflow-hidden shadow-2xl">
               <Image
-                src="https://images.unsplash.com/photo-1525498128493-380d1990a112?q=80&w=1400&auto=format&fit=crop"  alt="Fazenda da Associação de Porcos"
+                src={AboutImage}
+                alt="Fazenda da Associação de Porcos"
                 width={600}
                 height={400}
                 className="object-cover w-full h-[400px]"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement
-                  target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 400'%3E%3Crect width='600' height='400' fill='%2316a34a'/%3E%3Ctext x='300' y='200' text-anchor='middle' fill='white' font-size='24'%3EFazenda Sustentável%3C/text%3E%3C/svg%3E"
-                }}
               />
               
               {/* Overlay com informações */}
