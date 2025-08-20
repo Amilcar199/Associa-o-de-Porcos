@@ -59,7 +59,7 @@ const Header = () => {
   }, [pathname])
 
   const navItems = [
-    { name: 'Home', href: '/' },
+    { name: 'Inicio', href: '/' },
     { name: 'Quem Somos', href: '/sobre' },
     { name: 'Produtos', href: '/produtos' },
     { name: 'Notícias', href: '/noticias' },
@@ -141,10 +141,10 @@ const Header = () => {
         }`}
       >
         <div className="container-custom">
-          <div className="flex items-center justify-between h-16 lg:h-20">
+          <div className="flex items-center justify-between h-32 lg:h-32">
             {/* Logo */}
             <Link href="/" className="flex items-center space-x-3">
-              <div className="w-12 h-12 lg:w-14 lg:h-14 relative">
+              <div className="w-16 h-16 lg:w-24 lg:h-24 relative border-spacing-x-1">
                 {siteConfig?.logoUrl ? (
                   <img src={siteConfig.logoUrl} alt="Logo" className="w-full h-full object-contain" />
                 ) : (
@@ -158,10 +158,11 @@ const Header = () => {
                   />
                 )}
               </div>
-              <div className="hidden sm:block">
-                <h1 className="text-2xl lg:text-3xl font-heading font-bold text-primary-800">
-                  Associação de suínos
+              <div className="hidden sm:block mt-6">
+                <h1 className="text-xl lg:text-3xl font-heading font-bold text-primary-800 bg-primary">
+                  Associação de Suinocultores
                 </h1>
+                <h1 className="text-xl lg:text-xl font-heading font-bold text-primary-800" > do Norte</h1>
                 <p className="text-xs lg:text-sm text-gray-600">
                   Criação Sustentável
                 </p>

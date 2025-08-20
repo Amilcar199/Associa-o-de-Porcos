@@ -62,7 +62,7 @@ const CallToAction = () => {
           className="text-center mb-16"
         >
           <h2 className="text-3xl lg:text-5xl font-heading font-bold text-white mb-6 leading-tight">
-            Pronto para Fazer Parte da
+            Pronto Para Fazer Parte da
             <br />
             <span className="text-primary-200">Melhor Associação?</span>
           </h2>

@@ -119,7 +119,7 @@ const LatestNews = () => {
             Últimas Notícias
           </span>
           <h2 className="text-3xl lg:text-4xl font-heading font-bold text-gray-900 mb-6">
-            Fique por Dentro das
+            Fique Por Dentro das
             <span className="text-gradient"> Novidades</span>
           </h2>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
