@@ -78,7 +78,7 @@ const Header = () => {
   return (
     <>
       {/* Top Bar com informações de contato */}
-      <div className="bg-primary-800 text-white py-2 hidden md:block">
+      <div className="bg-primary-800 text-white py-1 hidden md:block">
         <div className="container-custom">
           <div className="flex justify-between items-center text-sm">
             <div className="flex items-center space-x-6">
@@ -141,10 +141,10 @@ const Header = () => {
         }`}
       >
         <div className="container-custom">
-          <div className="flex items-center justify-between h-32 lg:h-32">
+          <div className="flex items-center justify-between h-20 lg:h-24">
             {/* Logo */}
             <Link href="/" className="flex items-center space-x-3">
-              <div className="w-16 h-16 lg:w-24 lg:h-24 relative border-spacing-x-1">
+              <div className="w-12 h-12 lg:w-16 lg:h-16 relative">
                 {siteConfig?.logoUrl ? (
                   <img src={siteConfig.logoUrl} alt="Logo" className="w-full h-full object-contain" />
                 ) : (
@@ -153,24 +153,22 @@ const Header = () => {
                     alt="Associação de Porcos"
                     fill
                     className="object-contain"
-                    sizes="(max-width: 1024px) 48px, 56px"
+                    sizes="(max-width: 1024px) 48px, 64px"
                     priority
                   />
                 )}
               </div>
-              <div className="hidden sm:block mt-6">
-                <h1 className="text-xl lg:text-3xl font-heading font-bold text-primary-800 bg-primary">
+              <div className="hidden sm:block">
+                <h1 className="text-lg lg:text-2xl font-heading font-bold text-primary-800 leading-tight">
                   Associação de Suinocultores
+                  <span className="block">do Norte</span>
                 </h1>
-                <h1 className="text-xl lg:text-xl font-heading font-bold text-primary-800" > do Norte</h1>
-                <p className="text-xs lg:text-sm text-gray-600">
-                  Criação Sustentável
-                </p>
+                <p className="text-xs lg:text-sm text-gray-600">Criação Sustentável</p>
               </div>
             </Link>
 
             {/* Navegação Desktop */}
-            <nav className="hidden lg:flex items-center space-x-8">
+            <nav className="hidden lg:flex items-center gap-8">
               {navItems.map((item) => (
                 <Link
                   key={item.name}
@@ -196,7 +194,7 @@ const Header = () => {
             </nav>
 
             {/* User Menu Desktop */}
-            <div className="hidden lg:flex items-center space-x-4">
+            <div className="hidden lg:flex items-center gap-4">
               {session ? (
                 <div className="relative">
                   <button
