@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Buscar conteúdo ativo do banco de dados
-    const memberContent = await MemberContent.findActive()
+    const memberContent = await (MemberContent as any).findActive()
       .populate('author', 'name')
       .lean();
 

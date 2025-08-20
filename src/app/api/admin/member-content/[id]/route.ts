@@ -72,8 +72,8 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     ]
 
     allowedFields.forEach(field => {
-      if (sanitizedData[field] !== undefined) {
-        existingContent[field] = sanitizedData[field]
+      if ((sanitizedData as any)[field] !== undefined) {
+        ;(existingContent as any)[field] = (sanitizedData as any)[field]
       }
     })
 
