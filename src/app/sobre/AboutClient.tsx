@@ -7,7 +7,7 @@ import Slide3 from '@/components/assets/Foto slider 3.jpg'
 import Suino from '@/components/assets/Foto Suino.webp'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { Award, Leaf, Users, Target, ShieldCheck, Sparkles, ArrowRight, Recycle, LineChart } from 'lucide-react'
+import { Award, Leaf, Users, Target, ShieldCheck, Sparkles, ArrowRight, Recycle, LineChart, Flag, Milestone, TrendingUp } from 'lucide-react'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -165,13 +165,13 @@ export default function AboutClient() {
           <p className="text-gray-600 mt-2 max-w-2xl mx-auto">Evoluímos continuamente com foco em qualidade, conhecimento e sustentabilidade.</p>
         </div>
         <div className="relative">
-          <div className="absolute left-1/2 top-0 -translate-x-1/2 h-full w-px bg-gray-200 hidden md:block" />
-          <div className="space-y-8">
+          <div className="absolute left-1/2 top-0 -translate-x-1/2 h-full w-px bg-gradient-to-b from-primary-200 via-gray-200 to-primary-200 hidden md:block" />
+          <div className="space-y-10">
             {[
-              { title: 'Estruturação de Programas', desc: 'Iniciativas de capacitação e apoio técnico a produtores.' },
-              { title: 'Padrões de Qualidade', desc: 'Implantação de processos e rastreabilidade para elevar a confiança.' },
-              { title: 'Projetos e Parcerias', desc: 'Ações com instituições e empresas para inovação e mercado.' },
-              { title: 'Expansão e Resultados', desc: 'Maior alcance, produtividade e bem-estar animal aprimorado.' }
+              { title: 'Estruturação de Programas', desc: 'Iniciativas de capacitação e apoio técnico a produtores.', icon: Flag },
+              { title: 'Padrões de Qualidade', desc: 'Implantação de processos e rastreabilidade para elevar a confiança.', icon: Milestone },
+              { title: 'Projetos e Parcerias', desc: 'Ações com instituições e empresas para inovação e mercado.', icon: Users },
+              { title: 'Expansão e Resultados', desc: 'Maior alcance, produtividade e bem-estar animal aprimorado.', icon: TrendingUp }
             ].map((step, idx) => (
               <motion.div
                 key={step.title}
@@ -179,11 +179,18 @@ export default function AboutClient() {
                 whileInView={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.6 }}
                 viewport={{ once: true, amount: 0.3 }}
-                className={`md:w-1/2 ${idx % 2 === 0 ? 'md:pr-8 md:ml-auto' : 'md:pl-8'}`}
+                className={`relative md:w-1/2 ${idx % 2 === 0 ? 'md:pr-10 md:ml-auto' : 'md:pl-10'}`}
               >
-                <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6">
-                  <h4 className="text-lg font-semibold text-gray-900">{step.title}</h4>
-                  <p className="text-gray-700 mt-2 text-sm leading-relaxed">{step.desc}</p>
+                {/* Marker */}
+                <div className={`hidden md:flex absolute top-7 ${idx % 2 === 0 ? '-left-4' : '-right-4'} items-center justify-center w-8 h-8 rounded-full bg-white ring-2 ring-primary-200 shadow-sm`}>
+                  <div className="w-2.5 h-2.5 rounded-full bg-primary-600" />
+                </div>
+                <div className="bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition p-6">
+                  <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-primary-50 text-primary-700">
+                    <step.icon size={18} />
+                  </div>
+                  <h4 className="mt-3 text-lg font-semibold text-gray-900">{step.title}</h4>
+                  <p className="text-gray-700 mt-1.5 text-sm leading-relaxed">{step.desc}</p>
                 </div>
               </motion.div>
             ))}
