@@ -8,11 +8,19 @@ export const metadata: Metadata = {
 }
 
 async function getCollaborators() {
-  const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
-  const res = await fetch(`${baseUrl}/api/collaborators`, { next: { revalidate: 60 } })
-  if (!res.ok) return []
-  const json = await res.json()
-  return json.data || []
+  try {
+    const res = await fetch(`/api/collaborators`, {
+      next: { revalidate: 60 },
+      headers: { Accept: 'application/json' }
+    })
+    if (!res.ok) return []
+    const contentType = res.headers.get('content-type') || ''
+    if (!contentType.includes('application/json')) return []
+    const json = await res.json()
+    return json.data || []
+  } catch {
+    return []
+  }
 }
 
 export default async function ColaboradoresPage() {
