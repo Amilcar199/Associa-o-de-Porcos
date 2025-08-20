@@ -46,7 +46,7 @@ const Header = () => {
 
   // Prefetch programático das rotas mais acessadas
   useEffect(() => {
-    const routesToPrefetch = ['/', '/sobre', '/produtos', '/noticias', '/contato', '/login', '/registro']
+    const routesToPrefetch = ['/', '/sobre', '/servicos', '/produtos', '/noticias', '/contato', '/login', '/registro']
     routesToPrefetch.forEach((route) => {
       try { router.prefetch(route) } catch {}
     })
@@ -61,6 +61,7 @@ const Header = () => {
   const navItems = [
     { name: 'Inicio', href: '/' },
     { name: 'Quem Somos', href: '/sobre' },
+    { name: 'Serviços', href: '/servicos' },
     { name: 'Produtos', href: '/produtos' },
     { name: 'Notícias', href: '/noticias' },
     { name: 'Contato', href: '/contato' },
