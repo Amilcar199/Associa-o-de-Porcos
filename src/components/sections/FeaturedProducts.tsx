@@ -13,6 +13,7 @@ import {
   Weight
 } from 'lucide-react'
 import ProductModal from '@/components/modals/ProductModal'
+import Placeholder from '@/components/assets/Foto Suino.webp'
 import { formatPrice, formatAge } from '@/lib/utils'
 
 interface FeaturedProduct {
@@ -151,7 +152,7 @@ const FeaturedProducts = () => {
               >
                 <div className="relative h-48 overflow-hidden rounded-t-lg">
                   <Image
-                    src={product.images?.[0] || '/products/placeholder.jpg'}
+                    src={(product.images?.[0] as any) || (Placeholder as any)}
                     alt={product.name}
                     fill
                     className="object-cover group-hover:scale-110 transition-transform duration-300"

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { X, Calendar, Weight, MapPin, Heart, ShoppingCart, Phone, Mail, ArrowLeft, ArrowRight } from 'lucide-react'
 import Image from 'next/image'
+import Placeholder from '@/components/assets/Foto Suino.webp'
 import { formatPrice, formatAge } from '@/lib/utils'
 
 interface ProductModalProps {
@@ -77,7 +78,9 @@ export default function ProductModal({
     }
   }
 
-  const images = product.images || [product.imageUrl] || ['/products/placeholder.jpg']
+  const images = product.images && product.images.length > 0
+    ? product.images
+    : (product.imageUrl ? [product.imageUrl] : [Placeholder as unknown as string])
 
   return (
     <div 
@@ -93,7 +96,7 @@ export default function ProductModal({
         {/* Header com imagem */}
         <div className="relative h-80 lg:h-96 overflow-hidden">
           <Image
-            src={((images[currentImageIndex] as string) ?? '/products/placeholder.jpg')}
+            src={(images[currentImageIndex] as any) || (Placeholder as any)}
             alt={(product.name ?? '') as string}
             fill
             className="object-cover"

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { X, Calendar, User, Eye, Tag, ArrowLeft, ArrowRight } from 'lucide-react'
 import Image from 'next/image'
+import Placeholder from '@/components/assets/Foto Suino.webp'
 import { formatDate, calculateReadTime } from '@/lib/utils'
 
 interface NewsModalProps {
@@ -56,7 +57,7 @@ export default function NewsModal({
         {/* Header */}
         <div className="relative h-80 lg:h-96 overflow-hidden">
           <Image
-            src={news.featuredImage || '/news/placeholder.jpg'}
+            src={(news.featuredImage as any) || (Placeholder as any)}
             alt={news.title}
             fill
             className="object-cover"
