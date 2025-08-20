@@ -22,6 +22,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
+  const [isAboutMenuOpen, setIsAboutMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const [siteConfig, setSiteConfig] = useState<any>(null)
   const { data: session, status } = useSession()
@@ -46,7 +47,7 @@ const Header = () => {
 
   // Prefetch programático das rotas mais acessadas
   useEffect(() => {
-    const routesToPrefetch = ['/', '/sobre', '/servicos', '/produtos', '/noticias', '/contato', '/login', '/registro']
+    const routesToPrefetch = ['/', '/sobre', '/colaboradores', '/servicos', '/produtos', '/noticias', '/contato', '/login', '/registro']
     routesToPrefetch.forEach((route) => {
       try { router.prefetch(route) } catch {}
     })
@@ -60,6 +61,7 @@ const Header = () => {
 
   const navItems = [
     { name: 'Inicio', href: '/' },
+    // Quem Somos terá dropdown customizado
     { name: 'Quem Somos', href: '/sobre' },
     { name: 'Serviços', href: '/servicos' },
     { name: 'Produtos', href: '/produtos' },
@@ -170,28 +172,85 @@ const Header = () => {
 
             {/* Navegação Desktop */}
             <nav className="hidden lg:flex items-center gap-8">
-              {navItems.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  prefetch
-                  className={`font-medium transition-colors relative ${
-                    isActiveLink(item.href)
-                      ? 'text-primary-600'
-                      : 'text-gray-700 hover:text-primary-600'
-                  }`}
-                >
-                  {item.name}
-                  {isActiveLink(item.href) && (
-                    <motion.div
-                      layoutId="activeLink"
-                      className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary-600"
-                      initial={false}
-                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                    />
-                  )}
-                </Link>
-              ))}
+              {navItems.map((item) => {
+                if (item.name === 'Quem Somos') {
+                  return (
+                    <div
+                      key={item.name}
+                      className="relative"
+                      onMouseEnter={() => setIsAboutMenuOpen(true)}
+                      onMouseLeave={() => setIsAboutMenuOpen(false)}
+                    >
+                      <button
+                        className={`font-medium transition-colors relative flex items-center gap-1 ${
+                          isActiveLink(item.href)
+                            ? 'text-primary-600'
+                            : 'text-gray-700 hover:text-primary-600'
+                        }`}
+                        onClick={() => setIsAboutMenuOpen((v) => !v)}
+                        aria-haspopup="menu"
+                        aria-expanded={isAboutMenuOpen}
+                      >
+                        {item.name}
+                        <span className={`transition-transform ${isAboutMenuOpen ? 'rotate-180' : ''}`}>▾</span>
+                        {isActiveLink(item.href) && (
+                          <motion.div
+                            layoutId="activeLink"
+                            className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary-600"
+                            initial={false}
+                            transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                          />
+                        )}
+                      </button>
+                      <AnimatePresence>
+                        {isAboutMenuOpen && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 10 }}
+                            className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2"
+                          >
+                            <Link
+                              href="/sobre"
+                              className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                            >
+                              Sobre a Associação
+                            </Link>
+                            <Link
+                              href="/colaboradores"
+                              className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                            >
+                              Colaboradores
+                            </Link>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  )
+                }
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    prefetch
+                    className={`font-medium transition-colors relative ${
+                      isActiveLink(item.href)
+                        ? 'text-primary-600'
+                        : 'text-gray-700 hover:text-primary-600'
+                    }`}
+                  >
+                    {item.name}
+                    {isActiveLink(item.href) && (
+                      <motion.div
+                        layoutId="activeLink"
+                        className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary-600"
+                        initial={false}
+                        transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                      />
+                    )}
+                  </Link>
+                )
+              })}
             </nav>
 
             {/* User Menu Desktop */}
@@ -309,17 +368,24 @@ const Header = () => {
               <div className="container-custom py-4">
                 <nav className="space-y-4">
                   {navItems.map((item) => (
-                    <Link
-                      key={item.name}
-                      href={item.href}
-                      className={`block py-2 font-medium transition-colors ${
-                        isActiveLink(item.href)
-                          ? 'text-primary-600'
-                          : 'text-gray-700 hover:text-primary-600'
-                      }`}
-                    >
-                      {item.name}
-                    </Link>
+                    <div key={item.name}>
+                      <Link
+                        href={item.href}
+                        className={`block py-2 font-medium transition-colors ${
+                          isActiveLink(item.href)
+                            ? 'text-primary-600'
+                            : 'text-gray-700 hover:text-primary-600'
+                        }`}
+                      >
+                        {item.name}
+                      </Link>
+                      {item.name === 'Quem Somos' && (
+                        <div className="ml-4 border-l border-gray-200 pl-4 space-y-1">
+                          <Link href="/sobre" className="block py-1 text-sm text-gray-600 hover:text-primary-600">Sobre a Associação</Link>
+                          <Link href="/colaboradores" className="block py-1 text-sm text-gray-600 hover:text-primary-600">Colaboradores</Link>
+                        </div>
+                      )}
+                    </div>
                   ))}
                   
                   {session ? (
