@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     siteName: 'Associação de Porcos',
     images: [
       {
-        url: '/og-image.jpg',
+        url: '/og',
         width: 1200,
         height: 630,
         alt: 'Associação de Porcos'
@@ -47,7 +47,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Associação de Porcos - Criação Sustentável',
     description: 'Promovendo parcerias e criação sustentável de suínos.',
-    images: ['/og-image.jpg']
+    images: ['/og']
   },
   robots: {
     index: true,

@@ -12,7 +12,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1,
     },
     {
-      url: `${baseUrl}/quem-somos`,
+      url: `${baseUrl}/sobre`,
       lastModified: new Date(),
       changeFrequency: 'monthly' as const,
       priority: 0.8,
@@ -22,6 +22,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date(),
       changeFrequency: 'monthly' as const,
       priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/privacidade`,
+      lastModified: new Date(),
+      changeFrequency: 'yearly' as const,
+      priority: 0.4,
+    },
+    {
+      url: `${baseUrl}/termos`,
+      lastModified: new Date(),
+      changeFrequency: 'yearly' as const,
+      priority: 0.4,
+    },
+    {
+      url: `${baseUrl}/cookies`,
+      lastModified: new Date(),
+      changeFrequency: 'yearly' as const,
+      priority: 0.3,
     },
     {
       url: `${baseUrl}/login`,

@@ -15,17 +15,11 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode
 }) {
-  const TEMP_BYPASS_ADMIN_AUTH = true
-  let user: any
-  if (TEMP_BYPASS_ADMIN_AUTH) {
-    user = { id: 'temp-admin', name: 'Admin Demo', email: 'admin@demo.local', avatar: null, role: 'admin' }
-  } else {
-    const session = await getServerSession(authOptions)
-    if (!session || session.user.role !== 'admin') {
-      redirect('/login?error=insufficient_permissions')
-    }
-    user = session.user
+  const session = await getServerSession(authOptions)
+  if (!session || session.user.role !== 'admin') {
+    redirect('/login?error=insufficient_permissions')
   }
+  const user = session.user
 
   return (
     <AdminWrapper>
