@@ -21,6 +21,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useLanguage } from '@/components/providers/LanguageProvider'
 import pt from '@/lib/i18n/dictionaries/pt'
 import en from '@/lib/i18n/dictionaries/en'
+import HeaderLanguageMenu from '@/components/i18n/HeaderLanguageMenu'
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -260,6 +261,7 @@ const Header = () => {
 
             {/* User Menu Desktop */}
             <div className="hidden lg:flex items-center gap-4">
+              <HeaderLanguageMenu />
               {session ? (
                 <div className="relative">
                   <button
@@ -393,6 +395,10 @@ const Header = () => {
                     </div>
                   ))}
                   
+                  {/* Language menu on mobile */}
+                  <div className="pt-4 border-t border-gray-200">
+                    <HeaderLanguageMenu />
+                  </div>
                   {session ? (
                     <div className="pt-4 border-t border-gray-200 space-y-4">
                       <div className="flex items-center space-x-3">
