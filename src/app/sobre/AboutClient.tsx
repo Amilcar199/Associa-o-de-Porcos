@@ -223,24 +223,6 @@ export default function AboutClient() {
         </div>
       </div>
 
-      {/* CTA Final */}
-      <div className="container-custom py-12 lg:py-16">
-        <div className="bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl p-8 lg:p-10 text-white flex flex-col md:flex-row items-center justify-between gap-6">
-          <div>
-            <h4 className="text-2xl font-heading font-bold mb-1">Vamos construir resultados juntos</h4>
-            <p className="text-primary-100">Fale connosco para parcerias, capacitações e soluções personalizadas.</p>
-          </div>
-          <div className="flex gap-3">
-            <Link href="/contato" className="inline-flex items-center bg-white text-primary-700 hover:bg-primary-50 font-semibold py-3 px-6 rounded-lg transition-all">
-              Entrar em Contato <ArrowRight size={18} className="ml-2" />
-            </Link>
-            <Link href="/registro" className="inline-flex items-center border-2 border-white text-white hover:bg-white/10 font-semibold py-3 px-6 rounded-lg transition-all">
-              Tornar-se Membro
-            </Link>
-          </div>
-        </div>
-      </div>
-
       {/* Localização - Fundo da Página */}
       <div className="bg-gray-50 py-12 lg:py-16">
         <div className="container-custom">
@@ -273,6 +255,24 @@ export default function AboutClient() {
                 <li className="text-3xl font-heading font-extrabold text-primary-700">Luanda</li>
               </ul>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* CTA Final */}
+      <div className="container-custom py-12 lg:py-16">
+        <div className="bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl p-8 lg:p-10 text-white flex flex-col md:flex-row items-center justify-between gap-6">
+          <div>
+            <h4 className="text-2xl font-heading font-bold mb-1">Vamos construir resultados juntos</h4>
+            <p className="text-primary-100">Fale connosco para parcerias, capacitações e soluções personalizadas.</p>
+          </div>
+          <div className="flex gap-3">
+            <Link href="/contato" className="inline-flex items-center bg-white text-primary-700 hover:bg-primary-50 font-semibold py-3 px-6 rounded-lg transition-all">
+              Entrar em Contato <ArrowRight size={18} className="ml-2" />
+            </Link>
+            <Link href="/registro" className="inline-flex items-center border-2 border-white text-white hover:bg-white/10 font-semibold py-3 px-6 rounded-lg transition-all">
+              Tornar-se Membro
+            </Link>
           </div>
         </div>
       </div>
