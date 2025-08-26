@@ -344,7 +344,7 @@ const Header = () => {
                   </Link>
                   <Link
                     href="/registro"
-                    className="btn-primary rounded-full px-5 py-2.5 whitespace-nowrap"
+                    className="btn-primary"
                   >
                     {dict.user.signup}
                   </Link>
