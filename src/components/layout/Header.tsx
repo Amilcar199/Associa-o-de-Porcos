@@ -18,6 +18,9 @@ import {
   MapPin
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useLanguage } from '@/components/providers/LanguageProvider'
+import pt from '@/lib/i18n/dictionaries/pt'
+import en from '@/lib/i18n/dictionaries/en'
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -28,6 +31,8 @@ const Header = () => {
   const { data: session, status } = useSession()
   const pathname = usePathname()
   const router = useRouter()
+  const { locale } = useLanguage()
+  const dict = locale.startsWith('en') ? en : pt
 
   // Detectar scroll para adicionar sombra ao header
   useEffect(() => {
@@ -60,13 +65,13 @@ const Header = () => {
   }, [pathname])
 
   const navItems = [
-    { name: 'Inicio', href: '/' },
+    { name: dict.nav.home, href: '/' },
     // Quem Somos terá dropdown customizado
-    { name: 'Quem Somos', href: '/sobre' },
-    { name: 'Serviços', href: '/servicos' },
-    { name: 'Produtos', href: '/produtos' },
-    { name: 'Notícias', href: '/noticias' },
-    { name: 'Contato', href: '/contato' },
+    { name: dict.nav.about, href: '/sobre' },
+    { name: dict.nav.services, href: '/servicos' },
+    { name: dict.nav.products, href: '/produtos' },
+    { name: dict.nav.news, href: '/noticias' },
+    { name: dict.nav.contact, href: '/contato' },
   ]
 
   const isActiveLink = (href: string) => {
@@ -101,7 +106,7 @@ const Header = () => {
             
             <div className="flex items-center space-x-4">
               {status === 'loading' ? (
-                <div className="animate-pulse">Carregando...</div>
+                <div className="animate-pulse">{dict.user.loading}</div>
               ) : session ? (
                 <div className="flex items-center space-x-2">
                   <span>Olá, {session.user?.name}</span>
@@ -121,14 +126,14 @@ const Header = () => {
                     prefetch
                     className="text-primary-200 hover:text-white transition-colors"
                   >
-                    Entrar
+                    {dict.user.login}
                   </Link>
                   <Link 
                     href="/registro" 
                     prefetch
                     className="bg-primary-600 hover:bg-primary-700 px-3 py-1 rounded transition-colors"
                   >
-                    Cadastre-se
+                    {dict.user.signup}
                   </Link>
                 </div>
               )}
@@ -334,13 +339,13 @@ const Header = () => {
                     href="/login"
                     className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
                   >
-                    Entrar
+                    {dict.user.login}
                   </Link>
                   <Link
                     href="/registro"
                     className="btn-primary"
                   >
-                    Faça Parte
+                    {dict.user.signup}
                   </Link>
                 </div>
               )}
@@ -446,13 +451,13 @@ const Header = () => {
                         href="/login"
                         className="block py-2 text-gray-700 hover:text-primary-600 font-medium transition-colors"
                       >
-                        Entrar
+                        {dict.user.login}
                       </Link>
                       <Link
                         href="/registro"
                         className="btn-primary inline-block"
                       >
-                        Faça Parte
+                        {dict.user.signup}
                       </Link>
                     </div>
                   )}

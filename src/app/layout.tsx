@@ -4,6 +4,7 @@ import './globals.css'
 import SiteChrome from '@/components/layout/SiteChrome'
 import { Toaster } from 'react-hot-toast'
 import AuthProvider from '@/components/providers/AuthProvider'
+import { LanguageProvider } from '@/components/providers/LanguageProvider'
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -79,7 +80,9 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen bg-gray-50 font-sans antialiased">
         <AuthProvider>
-          <SiteChrome>{children}</SiteChrome>
+          <LanguageProvider>
+            <SiteChrome>{children}</SiteChrome>
+          </LanguageProvider>
           <Toaster
             position="top-right"
             toastOptions={{

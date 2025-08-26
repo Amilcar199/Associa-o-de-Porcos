@@ -14,10 +14,17 @@ import {
   ArrowRight
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { useCookieConsent } from '@/components/cookies/CookieConsentProvider'
+import { useLanguage } from '@/components/providers/LanguageProvider'
+import pt from '@/lib/i18n/dictionaries/pt'
+import en from '@/lib/i18n/dictionaries/en'
 
 const Footer = () => {
   const currentYear = new Date().getFullYear()
   const [siteConfig, setSiteConfig] = useState<any>(null)
+  const { openPreferences } = useCookieConsent()
+  const { locale } = useLanguage()
+  const dict = locale.startsWith('en') ? en : pt
 
   useEffect(()=>{
     const load = async () => {
@@ -27,17 +34,17 @@ const Footer = () => {
   }, [])
 
   const quickLinks = [
-    { name: 'Início', href: '/' },
-    { name: 'Quem Somos', href: '/sobre' },
-    { name: 'Produtos', href: '/produtos' },
-    { name: 'Notícias', href: '/noticias' },
-    { name: 'Contato', href: '/contato' },
+    { name: dict.nav.home, href: '/' },
+    { name: dict.nav.about, href: '/sobre' },
+    { name: dict.nav.products, href: '/produtos' },
+    { name: dict.nav.news, href: '/noticias' },
+    { name: dict.nav.contact, href: '/contato' },
   ]
 
   const legalLinks = [
-    { name: 'Política de Privacidade', href: '/privacidade' },
-    { name: 'Termos de Uso', href: '/termos' },
-    { name: 'Cookies', href: '/cookies' },
+    { name: dict.footer.privacy, href: '/privacidade' },
+    { name: dict.footer.terms, href: '/termos' },
+    { name: dict.footer.cookies, href: '/cookies' },
   ]
 
   const productCategories = [
@@ -55,17 +62,17 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row items-center justify-between">
             <div className="mb-4 md:mb-0">
               <h3 className="text-xl font-heading font-semibold mb-2">
-                Fique por dentro das novidades
+                {dict.footer.newsletterTitle}
               </h3>
               <p className="text-primary-100">
-                Receba as últimas notícias e atualizações do setor suinícola
+                {dict.footer.newsletterDesc}
               </p>
             </div>
             
             <div className="flex w-full max-w-md">
               <input
                 type="email"
-                placeholder="Seu melhor e-mail"
+                placeholder={dict.footer.emailPlaceholder}
                 className="flex-1 px-4 py-3 rounded-l-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-400"
               />
               <button className="bg-primary-800 hover:bg-primary-900 px-6 py-3 rounded-r-lg transition-colors flex items-center">
@@ -224,7 +231,7 @@ const Footer = () => {
                 className="inline-flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
               >
                 <Phone size={16} />
-                <span>WhatsApp</span>
+                <span>{dict.footer.whatsapp}</span>
               </a>
             </div>
           </div>
@@ -256,6 +263,12 @@ const Footer = () => {
                     )}
                   </span>
                 ))}
+                <button
+                  onClick={openPreferences}
+                  className="text-gray-400 hover:text-primary-400 transition-colors"
+                >
+                  {dict.footer.cookiePreferences}
+                </button>
               </div>
               
               <div className="flex items-center text-sm text_gray-400">
