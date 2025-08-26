@@ -132,7 +132,7 @@ const Header = () => {
                   <Link 
                     href="/registro" 
                     prefetch
-                    className="bg-primary-600 hover:bg-primary-700 px-3 py-1 rounded transition-colors"
+                    className="btn-primary rounded-full px-5 py-2.5 whitespace-nowrap"
                   >
                     {dict.user.signup}
                   </Link>
@@ -457,7 +457,7 @@ const Header = () => {
                       </Link>
                       <Link
                         href="/registro"
-                        className="btn-primary inline-block"
+                        className="btn-primary rounded-full px-5 py-2.5 inline-block"
                       >
                         {dict.user.signup}
                       </Link>
