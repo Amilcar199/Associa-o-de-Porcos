@@ -243,7 +243,7 @@ export default function AboutClient() {
             {/* Texto à Direita */}
             <div>
               <span className="inline-block bg-primary-100 text-primary-800 px-3 py-1 rounded-full text-sm font-medium mb-3">Nossa Presença</span>
-              <h3 className="text-3xl font-heading font-bold mb-3">É onde estamos localizados</h3>
+              <h3 className="text-3xl font-heading font-bold mb-3">Nossa presença em Angola</h3>
               <p className="text-gray-700 mb-3">Estamos presentes em território nacional com parcerias locais e atuação próxima ao produtor. Levamos conhecimento, assistência técnica e padrões de qualidade para impulsionar resultados de forma consistente.</p>
               <p className="text-gray-600 mb-6">Abaixo, algumas das províncias onde mantemos operações e apoio contínuo:</p>
               <ul className="space-y-2">
