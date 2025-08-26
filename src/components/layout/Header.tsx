@@ -153,7 +153,7 @@ const Header = () => {
           <div className="flex items-center justify-between h-20 lg:h-24">
             {/* Logo */}
             <Link href="/" className="flex items-center space-x-3">
-              <div className="w-12 h-12 lg:w-16 lg:h-16 relative">
+              <div className="w-12 h-12 lg:w-32 lg:h-32 relative">
                 {siteConfig?.logoUrl ? (
                   <img src={siteConfig.logoUrl} alt="Logo" className="w-full h-full object-contain" />
                 ) : (

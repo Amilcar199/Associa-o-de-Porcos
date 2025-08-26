@@ -247,13 +247,14 @@ export default function AboutClient() {
               <p className="text-gray-700 mb-3">Estamos presentes em território nacional com parcerias locais e atuação próxima ao produtor. Levamos conhecimento, assistência técnica e padrões de qualidade para impulsionar resultados de forma consistente.</p>
               <p className="text-gray-600 mb-6">Abaixo, algumas das províncias onde mantemos operações e apoio contínuo:</p>
               <ul className="space-y-2">
+                <li className="text-3xl font-heading font-extrabold text-primary-700">Luanda</li>
                 <li className="text-xl text-gray-800">Benguela</li>
                 <li className="text-xl text-gray-800">Bengo</li>
                 <li className="text-xl text-gray-800">Icole Bengo</li>
                 <li className="text-xl text-gray-800">Malanje</li>
                 <li className="text-xl text-gray-800">Huambo</li>
                 <li className="text-xl text-gray-800">Kuanza Norte</li>
-                <li className="text-3xl font-heading font-extrabold text-primary-700">Luanda</li>
+                
               </ul>
             </div>
           </div>
