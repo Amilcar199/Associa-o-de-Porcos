@@ -229,12 +229,12 @@ export default function AboutClient() {
           <div className="grid md:grid-cols-2 gap-8 lg:gap-12 items-center">
             {/* Imagem à Esquerda */}
             <div>
-              <div className="relative w-full h-80 lg:h-96 rounded-2xl overflow-hidden shadow border border-gray-100 bg-white">
+              <div className="relative w-full h-96 lg:h-[34rem] rounded-2xl overflow-hidden shadow">
                 <Image
                   src={MapaAngola}
                   alt="Mapa de Angola"
                   fill
-                  className="object-contain p-4"
+                  className="object-contain"
                   sizes="(max-width:768px) 100vw, 50vw"
                 />
               </div>
