@@ -348,9 +348,9 @@ const Header = () => {
                   >
                     {dict.user.signup}
                   </Link>
+                  <HeaderLanguageMenu />
                 </div>
               )}
-              <HeaderLanguageMenu />
             </div>
 
             {/* Botão Menu Mobile */}
@@ -461,12 +461,11 @@ const Header = () => {
                       >
                         {dict.user.signup}
                       </Link>
+                      <div>
+                        <HeaderLanguageMenu />
+                      </div>
                     </div>
                   )}
-                  {/* Language menu after auth buttons on mobile */}
-                  <div className="pt-4 border-t border-gray-200">
-                    <HeaderLanguageMenu />
-                  </div>
                 </nav>
               </div>
             </motion.div>
