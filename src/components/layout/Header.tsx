@@ -150,10 +150,10 @@ const Header = () => {
         }`}
       >
         <div className="container-custom">
-          <div className="flex items-center justify-between h-20 lg:h-24">
+          <div className="flex items-center justify-between h-20 lg:h-36">
             {/* Logo */}
-            <Link href="/" className="flex items-center space-x-3">
-              <div className="w-12 h-12 lg:w-32 lg:h-32 relative">
+            <Link href="/" className="flex items-center space-x-3 lg:space-x-5">
+              <div className="w-12 h-12 lg:w-36 lg:h-36 relative">
                 {siteConfig?.logoUrl ? (
                   <img src={siteConfig.logoUrl} alt="Logo" className="w-full h-full object-contain" />
                 ) : (
@@ -162,22 +162,22 @@ const Header = () => {
                     alt="Associação de Porcos"
                     fill
                     className="object-contain"
-                    sizes="(max-width: 1024px) 48px, 64px"
+                    sizes="(max-width: 1024px) 48px, 144px"
                     priority
                   />
                 )}
               </div>
               <div className="hidden sm:block">
-                <h1 className="text-lg lg:text-2xl font-heading font-bold text-white leading-tight">
+                <h1 className="text-lg lg:text-3xl font-heading font-bold text-white leading-tight">
                   Associação de Suinocultores
                   <span className="block">do Norte</span>
                 </h1>
-                <p className="text-xs lg:text-sm text-primary-100">Criação Sustentável</p>
+                <p className="text-xs lg:text-base text-primary-100">Criação Sustentável</p>
               </div>
             </Link>
 
             {/* Navegação Desktop */}
-            <nav className="hidden lg:flex items-center gap-8">
+            <nav className="hidden lg:flex items-center gap-10 xl:gap-12">
               {navItems.map((item) => {
                 if (item.name === 'Quem Somos') {
                   return (
@@ -188,7 +188,7 @@ const Header = () => {
                       onMouseLeave={() => setIsAboutMenuOpen(false)}
                     >
                       <button
-                        className={`font-medium transition-colors relative flex items-center gap-1 ${
+                        className={`font-medium lg:text-lg transition-colors relative flex items-center gap-1 ${
                           isActiveLink(item.href)
                             ? 'text-white'
                             : 'text-white/80 hover:text-white'
@@ -239,7 +239,7 @@ const Header = () => {
                     key={item.name}
                     href={item.href}
                     prefetch
-                    className={`font-medium transition-colors relative ${
+                    className={`font-medium lg:text-lg transition-colors relative ${
                       isActiveLink(item.href)
                         ? 'text-white'
                         : 'text-white/80 hover:text-white'
