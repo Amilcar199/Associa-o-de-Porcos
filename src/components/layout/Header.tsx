@@ -132,7 +132,7 @@ const Header = () => {
                   <Link 
                     href="/registro" 
                     prefetch
-                    className="btn-primary rounded-none"
+                    className="btn-primary"
                   >
                     {dict.user.signup}
                   </Link>
@@ -344,7 +344,7 @@ const Header = () => {
                   </Link>
                   <Link
                     href="/registro"
-                    className="btn-primary rounded-none"
+                    className="btn-primary"
                   >
                     {dict.user.signup}
                   </Link>
@@ -457,7 +457,7 @@ const Header = () => {
                       </Link>
                       <Link
                         href="/registro"
-                        className="btn-primary rounded-none"
+                        className="btn-primary"
                       >
                         {dict.user.signup}
                       </Link>
