@@ -260,7 +260,7 @@ const Header = () => {
             </nav>
 
             {/* User Menu Desktop */}
-            <div className="hidden lg:flex items-center gap-4 text-white">
+            <div className="hidden lg:flex items-center gap-5 lg:ml-8 xl:ml-10 text-white">
               {session ? (
                 <div className="relative">
                   <button
@@ -335,7 +335,7 @@ const Header = () => {
                   </AnimatePresence>
                 </div>
               ) : (
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-5">
                   <Link
                     href="/login"
                     className="text-white/90 hover:text-white font-medium transition-colors"
@@ -344,7 +344,7 @@ const Header = () => {
                   </Link>
                   <Link
                     href="/registro"
-                    className="btn-primary"
+                    className="btn-primary rounded-full px-5 py-2.5 whitespace-nowrap"
                   >
                     {dict.user.signup}
                   </Link>

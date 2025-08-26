@@ -36,6 +36,9 @@ export default function HeaderLanguageMenu() {
         title={current.label}
       >
         <span className="text-lg leading-none">{getFlag(locale)}</span>
+        <span className="text-xs font-semibold text-gray-700 leading-none">
+          {locale === 'pt-AO' ? 'AO' : locale === 'pt-BR' ? 'BR' : locale === 'pt-PT' ? 'PT' : 'EN'}
+        </span>
       </button>
       {open && (
         <div className="absolute right-0 mt-2 w-48 rounded-md border border-gray-200 bg-white shadow-lg z-50">
