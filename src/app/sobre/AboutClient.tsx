@@ -8,6 +8,7 @@ import Suino from '@/components/assets/Foto Suino.webp'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Award, Leaf, Users, Target, ShieldCheck, Sparkles, ArrowRight, Recycle, LineChart, Flag, Milestone, TrendingUp } from 'lucide-react'
+import MapaAngola from '@/components/assets/Mapa de Angola.png'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -236,6 +237,42 @@ export default function AboutClient() {
             <Link href="/registro" className="inline-flex items-center border-2 border-white text-white hover:bg-white/10 font-semibold py-3 px-6 rounded-lg transition-all">
               Tornar-se Membro
             </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Localização - Fundo da Página */}
+      <div className="bg-gray-50 py-12 lg:py-16">
+        <div className="container-custom">
+          <div className="grid md:grid-cols-2 gap-8 lg:gap-12 items-center">
+            {/* Imagem à Esquerda */}
+            <div>
+              <div className="relative w-full h-80 lg:h-96 rounded-2xl overflow-hidden shadow border border-gray-100 bg-white">
+                <Image
+                  src={MapaAngola}
+                  alt="Mapa de Angola"
+                  fill
+                  className="object-contain p-4"
+                  sizes="(max-width:768px) 100vw, 50vw"
+                />
+              </div>
+            </div>
+
+            {/* Texto à Direita */}
+            <div>
+              <span className="inline-block bg-primary-100 text-primary-800 px-3 py-1 rounded-full text-sm font-medium mb-3">Nossa Presença</span>
+              <h3 className="text-3xl font-heading font-bold mb-3">É onde estamos localizados</h3>
+              <p className="text-gray-600 mb-6">Atuamos nas principais regiões para apoiar produtores e fortalecer a cadeia suinícola.</p>
+              <ul className="space-y-2">
+                <li className="text-xl text-gray-800">Benguela</li>
+                <li className="text-xl text-gray-800">Bengo</li>
+                <li className="text-xl text-gray-800">Icole Bengo</li>
+                <li className="text-xl text-gray-800">Malanje</li>
+                <li className="text-xl text-gray-800">Huambo</li>
+                <li className="text-xl text-gray-800">Kuanza Norte</li>
+                <li className="text-3xl font-heading font-extrabold text-primary-700">Luanda</li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
