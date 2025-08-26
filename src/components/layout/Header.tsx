@@ -145,7 +145,7 @@ const Header = () => {
 
       {/* Header Principal */}
       <header 
-        className={`sticky top-0 z-50 bg-white transition-all duration-300 ${
+        className={`sticky top-0 z-50 bg-primary-800 transition-all duration-300 ${
           isScrolled ? 'shadow-md' : 'shadow-sm'
         }`}
       >
@@ -168,11 +168,11 @@ const Header = () => {
                 )}
               </div>
               <div className="hidden sm:block">
-                <h1 className="text-lg lg:text-2xl font-heading font-bold text-primary-800 leading-tight">
+                <h1 className="text-lg lg:text-2xl font-heading font-bold text-white leading-tight">
                   Associação de Suinocultores
                   <span className="block">do Norte</span>
                 </h1>
-                <p className="text-xs lg:text-sm text-gray-600">Criação Sustentável</p>
+                <p className="text-xs lg:text-sm text-primary-100">Criação Sustentável</p>
               </div>
             </Link>
 
@@ -190,8 +190,8 @@ const Header = () => {
                       <button
                         className={`font-medium transition-colors relative flex items-center gap-1 ${
                           isActiveLink(item.href)
-                            ? 'text-primary-600'
-                            : 'text-gray-700 hover:text-primary-600'
+                            ? 'text-white'
+                            : 'text-white/80 hover:text-white'
                         }`}
                         onClick={() => setIsAboutMenuOpen((v) => !v)}
                         aria-haspopup="menu"
@@ -202,7 +202,7 @@ const Header = () => {
                         {isActiveLink(item.href) && (
                           <motion.div
                             layoutId="activeLink"
-                            className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary-600"
+                            className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary-300"
                             initial={false}
                             transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                           />
@@ -241,15 +241,15 @@ const Header = () => {
                     prefetch
                     className={`font-medium transition-colors relative ${
                       isActiveLink(item.href)
-                        ? 'text-primary-600'
-                        : 'text-gray-700 hover:text-primary-600'
+                        ? 'text-white'
+                        : 'text-white/80 hover:text-white'
                     }`}
                   >
                     {item.name}
                     {isActiveLink(item.href) && (
                       <motion.div
                         layoutId="activeLink"
-                        className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary-600"
+                        className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary-300"
                         initial={false}
                         transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                       />
@@ -260,12 +260,12 @@ const Header = () => {
             </nav>
 
             {/* User Menu Desktop */}
-            <div className="hidden lg:flex items-center gap-4">
+            <div className="hidden lg:flex items-center gap-4 text-white">
               {session ? (
                 <div className="relative">
                   <button
                     onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                    className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                    className="flex items-center space-x-2 p-2 rounded-lg hover:bg-white/10 transition-colors"
                   >
                     <div className="w-8 h-8 rounded-full bg-primary-600 flex items-center justify-center text-white font-medium">
                       {session.user?.avatar ? (
@@ -280,7 +280,7 @@ const Header = () => {
                         session.user?.name?.charAt(0).toUpperCase()
                       )}
                     </div>
-                    <span className="font-medium text-gray-700">
+                    <span className="font-medium">
                       {session.user?.name}
                     </span>
                   </button>
@@ -338,7 +338,7 @@ const Header = () => {
                 <div className="flex items-center space-x-4">
                   <Link
                     href="/login"
-                    className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
+                    className="text-white/90 hover:text-white font-medium transition-colors"
                   >
                     {dict.user.login}
                   </Link>
@@ -356,7 +356,7 @@ const Header = () => {
             {/* Botão Menu Mobile */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              className="lg:hidden p-2 rounded-lg text-white hover:bg-white/10 transition-colors"
             >
               {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
