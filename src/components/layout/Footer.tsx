@@ -89,7 +89,7 @@ const Footer = () => {
           {/* Logo e Descrição */}
           <div className="lg:col-span-1">
             <Link href="/" className="flex items-center space-x-3 mb-4">
-              <div className="w-12 h-12 relative">
+              <div className="w-16 h-16 relative">
                 {siteConfig?.logoUrl ? (
                   <img src={siteConfig.logoUrl} alt="Logo" className="w-full h-full object-contain" />
                 ) : (
@@ -98,15 +98,15 @@ const Footer = () => {
                     alt="Associação de Porcos"
                     fill
                     className="object-contain"
-                    sizes="48px"
+                    sizes="64px"
                   />
                 )}
               </div>
               <div>
-                <h2 className="text-lg font-heading font-bold">
+                <h2 className="text-xl font-heading font-bold">
                   Associação de suínos
                 </h2>
-                <p className="text-sm text-gray-400">
+                <p className="text-base text-gray-400">
                   Criação Sustentável
                 </p>
               </div>
