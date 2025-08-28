@@ -148,9 +148,27 @@ Sistema de upload usando MongoDB GridFS:
 
 ### Vercel (Recomendado)
 
-1. Conecte seu repositório ao Vercel
-2. Configure as variáveis de ambiente
-3. Deploy automático
+**⚠️ IMPORTANTE: Configuração Correta do Projeto**
+
+Para garantir que suas alterações sejam enviadas para o domínio correto:
+`associacao-de-porcos-itl5rahgc-amilcar-lembe-s-projects.vercel.app`
+
+**Passos para Configuração:**
+
+1. **Conecte seu repositório ao Vercel**
+   - Use o nome do projeto: `associacao-de-porcos`
+   - Não use: `associacao-suinos`
+
+2. **Configure as variáveis de ambiente**
+   - Copie o arquivo `.env.example` para `.env.local`
+   - Configure `NEXTAUTH_URL` com o domínio correto
+   - Configure `MONGODB_URI` e outras variáveis necessárias
+
+3. **Verifique o arquivo `vercel.json`**
+   - O arquivo já está configurado com o nome correto do projeto
+
+4. **Deploy automático**
+   - Após o push para o repositório, o Vercel fará deploy automático
 
 ### Outras Plataformas
 
