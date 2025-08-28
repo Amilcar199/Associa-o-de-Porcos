@@ -153,7 +153,7 @@ const Header = () => {
           <div className="flex items-center justify-between h-20 lg:h-36">
             {/* Logo */}
             <Link href="/" className="flex items-center space-x-3 lg:space-x-5">
-              <div className="w-12 h-12 lg:w-36 lg:h-36 relative">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-36 lg:h-36 relative">
                 {siteConfig?.logoUrl ? (
                   <img src={siteConfig.logoUrl} alt="Logo" className="w-full h-full object-contain" />
                 ) : (
@@ -162,7 +162,7 @@ const Header = () => {
                     alt="Associação de Porcos"
                     fill
                     className="object-contain"
-                    sizes="(max-width: 1024px) 48px, 144px"
+                    sizes="(max-width: 640px) 56px, (max-width: 768px) 64px, (max-width: 1024px) 80px, 144px"
                     priority
                   />
                 )}

@@ -78,7 +78,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <meta name="theme-color" content="#16a34a" />
       </head>
-      <body className="min-h-screen bg-gray-50 font-sans antialiased">
+      <body className="min-h-screen bg-gray-50 font-sans antialiased overflow-x-hidden">
         <AuthProvider>
           <LanguageProvider>
             <SiteChrome>{children}</SiteChrome>

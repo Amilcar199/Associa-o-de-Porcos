@@ -83,7 +83,7 @@ const AboutPreview = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
               viewport={{ once: true }}
-              className="absolute -bottom-6 -right-6 bg-white rounded-xl shadow-xl p-4 border border-gray-200"
+              className="absolute bottom-2 right-2 md:-bottom-6 md:-right-6 bg-white rounded-xl shadow-xl p-4 border border-gray-200 pointer-events-none select-none"
             >
               <div className="text-center">
                 <div className="text-2xl font-bold text-primary-600">20+</div>
@@ -96,7 +96,7 @@ const AboutPreview = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.5 }}
               viewport={{ once: true }}
-              className="absolute -top-6 -left-6 bg-primary-600 text-white rounded-xl shadow-xl p-4"
+              className="absolute top-2 left-2 md:-top-6 md:-left-6 bg-primary-600 text-white rounded-xl shadow-xl p-4 pointer-events-none select-none"
             >
               <div className="text-center">
                 <div className="text-2xl font-bold">100+</div>
