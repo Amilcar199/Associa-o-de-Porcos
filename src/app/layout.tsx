@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'pt_AO',
     url: 'https://associacaodeporcos.ao',
-    title: 'Associação de Porcos - Criação Sustentável e Parceria',
+    title: 'Associação de Suinocultores do norte - Criação Sustentável e Parceria',
     description: 'Associação dedicada à criação sustentável de suínos, promovendo parcerias entre criadores.',
     siteName: 'Associação de Porcos',
     images: [
