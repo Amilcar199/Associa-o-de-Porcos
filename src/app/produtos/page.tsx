@@ -26,18 +26,32 @@ async function getProducts() {
     const res = await fetch(`/api/products`, { cache: 'no-store' })
     if (!res.ok) return []
     const json = await res.json()
-    const data = json.data || []
+    let data = json.data || []
 
     const currencyFormatter = new Intl.NumberFormat('pt-AO', {
       style: 'currency',
       currency: 'AOA'
     })
 
-    const enriched = data.map((p: any, idx: number) => ({
+    let enriched = data.map((p: any, idx: number) => ({
       ...p,
       imageUrl: (p.images && p.images[0]) || p.imageUrl || placeholderImages[idx % placeholderImages.length],
       priceFormatted: p.priceFormatted || (typeof p.price === 'number' ? currencyFormatter.format(p.price) : undefined)
     }))
+
+    // Fallback: se a lista geral vier vazia, tentar os "featured" (como na home)
+    if (enriched.length === 0) {
+      const resFeatured = await fetch(`/api/products/featured?limit=12`, { cache: 'no-store' })
+      if (resFeatured.ok) {
+        const jsonFeatured = await resFeatured.json()
+        const dataFeatured = jsonFeatured.data || []
+        enriched = dataFeatured.map((p: any, idx: number) => ({
+          ...p,
+          imageUrl: (p.images && p.images[0]) || p.imageUrl || placeholderImages[idx % placeholderImages.length],
+          priceFormatted: p.priceFormatted || (typeof p.price === 'number' ? currencyFormatter.format(p.price) : undefined)
+        }))
+      }
+    }
 
     if (enriched.length === 0) {
       return [
