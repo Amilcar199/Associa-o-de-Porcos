@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { User, Settings, History, Shield, LogOut } from 'lucide-react';
 import { useLanguage } from '@/components/providers/LanguageProvider';
@@ -76,7 +76,7 @@ export default function ProfilePage() {
 
   const fetchProfile = async () => {
     try {
-      const response = await fetch('/api/user/profile');
+      const response = await fetch('/api/user/profile', { credentials: 'include', cache: 'no-store' });
       if (response.ok) {
         const data = await response.json();
         setProfile(data.data);
@@ -116,6 +116,7 @@ export default function ProfilePage() {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify(formData),
       });
 
@@ -139,6 +140,7 @@ export default function ProfilePage() {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({ avatar: imageUrl }),
       });
 
@@ -493,7 +495,27 @@ export default function ProfilePage() {
                   <div className="border border-gray-200 rounded-lg p-4">
                     <h4 className="text-sm font-medium text-gray-900 mb-2">{dict.profile.changePasswordTitle}</h4>
                     <p className="text-sm text-gray-500 mb-4">{dict.profile.changePasswordDesc}</p>
-                    <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    <button
+                      onClick={async () => {
+                        const currentPassword = window.prompt('Digite a sua senha atual:') || '';
+                        if (!currentPassword) return;
+                        const newPassword = window.prompt('Digite a nova senha (mín. 6 caracteres):') || '';
+                        if (!newPassword) return;
+                        try {
+                          const res = await fetch('/api/user/security/change-password', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            credentials: 'include',
+                            body: JSON.stringify({ currentPassword, newPassword })
+                          });
+                          const j = await res.json();
+                          if (res.ok) alert('Senha alterada com sucesso!'); else alert(j.error || 'Erro ao alterar senha');
+                        } catch (e) {
+                          alert('Erro ao alterar senha');
+                        }
+                      }}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    >
                       {dict.profile.changePasswordBtn}
                     </button>
                   </div>
@@ -501,7 +523,21 @@ export default function ProfilePage() {
                   <div className="border border-gray-200 rounded-lg p-4">
                     <h4 className="text-sm font-medium text-gray-900 mb-2">{dict.profile.sessionsTitle}</h4>
                     <p className="text-sm text-gray-500 mb-4">{dict.profile.sessionsDesc}</p>
-                    <button className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
+                    <button
+                      onClick={async () => {
+                        try {
+                          const res = await fetch('/api/user/security/sessions', {
+                            method: 'POST',
+                            credentials: 'include'
+                          });
+                          const j = await res.json();
+                          if (res.ok) alert('Sessões encerradas em outros dispositivos.'); else alert(j.error || 'Erro ao encerrar sessões');
+                        } catch (e) {
+                          alert('Erro ao encerrar sessões');
+                        }
+                      }}
+                      className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+                    >
                       {dict.profile.sessionsBtn}
                     </button>
                   </div>
@@ -509,7 +545,28 @@ export default function ProfilePage() {
                   <div className="border border-red-200 rounded-lg p-4">
                     <h4 className="text-sm font-medium text-red-900 mb-2">{dict.profile.dangerZoneTitle}</h4>
                     <p className="text-sm text-red-700 mb-4">{dict.profile.dangerZoneDesc}</p>
-                    <button className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                    <button
+                      onClick={async () => {
+                        const confirmDelete = window.confirm('Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita.');
+                        if (!confirmDelete) return;
+                        try {
+                          const res = await fetch('/api/user/security/delete', {
+                            method: 'DELETE',
+                            credentials: 'include'
+                          });
+                          const j = await res.json();
+                          if (res.ok) {
+                            alert('Conta excluída com sucesso.');
+                            await signOut({ callbackUrl: '/' });
+                          } else {
+                            alert(j.error || 'Erro ao excluir conta');
+                          }
+                        } catch (e) {
+                          alert('Erro ao excluir conta');
+                        }
+                      }}
+                      className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                    >
                       {dict.profile.deleteAccountBtn}
                     </button>
                   </div>
