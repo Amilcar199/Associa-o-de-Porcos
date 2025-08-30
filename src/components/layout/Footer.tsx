@@ -25,6 +25,7 @@ const Footer = () => {
   const { openPreferences } = useCookieConsent()
   const { locale } = useLanguage()
   const dict = locale.startsWith('en') ? en : pt
+  const isEn = locale.startsWith('en')
 
   useEffect(()=>{
     const load = async () => {
@@ -113,35 +114,18 @@ const Footer = () => {
             </Link>
             
             <p className="text-gray-300 text-sm mb-6 leading-relaxed">
-              Promovendo a criação sustentável e responsável de suínos, 
-              conectando criadores e oferecendo produtos de alta qualidade 
-              para o agronegócio angolano.
+              {isEn ? 'Promoting sustainable and responsible pig farming, connecting farmers and offering high-quality products for Angola’s agribusiness.' : 'Promovendo a criação sustentável e responsável de suínos, conectando criadores e oferecendo produtos de alta qualidade para o agronegócio angolano.'}
             </p>
             
             {/* Redes Sociais */}
             <div className="flex space-x-4">
-              <a
-                href="https://facebook.com/associacaodeporcos"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-10 h-10 bg-gray-800 hover:bg-primary-600 rounded-full flex items-center justify-center transition-colors"
-              >
+              <a href="https://facebook.com/associacaodeporcos" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-800 hover:bg-primary-600 rounded-full flex items-center justify-center transition-colors">
                 <Facebook size={20} />
               </a>
-              <a
-                href="https://instagram.com/associacaodeporcos"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-10 h-10 bg-gray-800 hover:bg-primary-600 rounded-full flex items-center justify-center transition-colors"
-              >
+              <a href="https://instagram.com/associacaodeporcos" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-800 hover:bg-primary-600 rounded-full flex items-center justify-center transition-colors">
                 <Instagram size={20} />
               </a>
-              <a
-                href="https://linkedin.com/company/associacaodeporcos"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-10 h-10 bg-gray-800 hover:bg-primary-600 rounded-full flex items-center justify-center transition-colors"
-              >
+              <a href="https://linkedin.com/company/associacaodeporcos" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-800 hover:bg-primary-600 rounded-full flex items-center justify-center transition-colors">
                 <Linkedin size={20} />
               </a>
             </div>
@@ -155,11 +139,7 @@ const Footer = () => {
             <ul className="space-y-3">
               {quickLinks.map((link) => (
                 <li key={link.name}>
-                  <Link
-                    href={link.href}
-                    prefetch
-                    className="text-gray-300 hover:text-primary-400 transition-colors text-sm"
-                  >
+                  <Link href={link.href} prefetch className="text-gray-300 hover:text-primary-400 transition-colors text-sm">
                     {link.name}
                   </Link>
                 </li>
@@ -175,10 +155,7 @@ const Footer = () => {
             <ul className="space-y-3">
               {productCategories.map((category) => (
                 <li key={category.name}>
-                  <Link
-                    href={category.href}
-                    className="text-gray-300 hover:text-primary-400 transition-colors text-sm"
-                  >
+                  <Link href={category.href} className="text-gray-300 hover:text-primary-400 transition-colors text-sm">
                     {category.name}
                   </Link>
                 </li>
@@ -203,20 +180,14 @@ const Footer = () => {
               
               <div className="flex items-center space-x-3">
                 <Phone size={16} className="text-primary-400 flex-shrink-0" />
-                <a
-                  href="tel:+244928476427"
-                  className="text-sm text-gray-300 hover:text-primary-400 transition-colors"
-                >
+                <a href="tel:+244928476427" className="text-sm text-gray-300 hover:text-primary-400 transition-colors">
                   +244 928 476 427
                 </a>
               </div>
               
               <div className="flex items-center space-x-3">
                 <Mail size={16} className="text-primary-400 flex-shrink-0" />
-                <a
-                  href={`mailto:${siteConfig?.contactEmail || 'contato@associacaodeporcos.ao'}`}
-                  className="text-sm text-gray-300 hover:text-primary-400 transition-colors"
-                >
+                <a href={`mailto:${siteConfig?.contactEmail || 'contato@associacaodeporcos.ao'}`} className="text-sm text-gray-300 hover:text-primary-400 transition-colors">
                   {siteConfig?.contactEmail || 'contato@associacaodeporcos.ao'}
                 </a>
               </div>
@@ -224,12 +195,7 @@ const Footer = () => {
 
             {/* WhatsApp CTA */}
             <div className="mt-6">
-              <a
-                href="https://wa.me/244928476427"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-              >
+              <a href="https://wa.me/244928476427" target="_blank" rel="noopener noreferrer" className="inline-flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
                 <Phone size={16} />
                 <span>{dict.footer.whatsapp}</span>
               </a>
@@ -244,7 +210,7 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row items-center justify-between">
             <div className="text-sm text-gray-400 mb-4 md:mb-0">
               <p>
-                © {currentYear} Associação de suínos. Todos os direitos reservados.
+                {isEn ? `© ${currentYear} Pig Farmers Association. All rights reserved.` : `© ${currentYear} Associação de suínos. Todos os direitos reservados.`}
               </p>
             </div>
             
@@ -252,10 +218,7 @@ const Footer = () => {
               <div className="flex items-center space-x-4 text-sm">
                 {legalLinks.map((link, index) => (
                   <span key={link.name} className="flex items-center">
-                    <Link
-                      href={link.href}
-                      className="text-gray-400 hover:text-primary-400 transition-colors"
-                    >
+                    <Link href={link.href} className="text-gray-400 hover:text-primary-400 transition-colors">
                       {link.name}
                     </Link>
                     {index < legalLinks.length - 1 && (
@@ -263,10 +226,7 @@ const Footer = () => {
                     )}
                   </span>
                 ))}
-                <button
-                  onClick={openPreferences}
-                  className="text-gray-400 hover:text-primary-400 transition-colors"
-                >
+                <button onClick={openPreferences} className="text-gray-400 hover:text-primary-400 transition-colors">
                   {dict.footer.cookiePreferences}
                 </button>
               </div>

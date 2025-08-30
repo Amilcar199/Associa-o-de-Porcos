@@ -11,32 +11,30 @@ import {
   Phone,
   Mail
 } from 'lucide-react'
+import { useLanguage } from '@/components/providers/LanguageProvider'
 
 const CallToAction = () => {
-  const benefits = [
-    {
-      icon: Users,
-      title: 'Comunidade Ativa',
-      description: 'Conecte-se com mais de 500 criadores experientes'
-    },
-    {
-      icon: Star,
-      title: 'Qualidade Garantida',
-      description: 'Produtos certificados com os melhores padrões'
-    },
-    {
-      icon: Shield,
-      title: 'Suporte Técnico',
-      description: 'Assistência especializada sempre disponível'
-    },
-    {
-      icon: Heart,
-      title: 'Bem-estar Animal',
-      description: 'Práticas sustentáveis e éticas comprovadas'
-    }
+  const { locale } = useLanguage()
+  const isEn = locale.startsWith('en')
+
+  const benefits = isEn ? [
+    { icon: Users, title: 'Active Community', description: 'Connect with over 500 experienced farmers' },
+    { icon: Star, title: 'Guaranteed Quality', description: 'Certified products with top standards' },
+    { icon: Shield, title: 'Technical Support', description: 'Specialized assistance always available' },
+    { icon: Heart, title: 'Animal Welfare', description: 'Proven sustainable and ethical practices' }
+  ] : [
+    { icon: Users, title: 'Comunidade Ativa', description: 'Conecte-se com mais de 500 criadores experientes' },
+    { icon: Star, title: 'Qualidade Garantida', description: 'Produtos certificados com os melhores padrões' },
+    { icon: Shield, title: 'Suporte Técnico', description: 'Assistência especializada sempre disponível' },
+    { icon: Heart, title: 'Bem-estar Animal', description: 'Práticas sustentáveis e éticas comprovadas' }
   ]
 
-  const stats = [
+  const stats = isEn ? [
+    { value: '500+', label: 'Active Members' },
+    { value: '3+', label: 'Years of Experience' },
+    { value: '98%', label: 'Customer Satisfaction' },
+    { value: '15+', label: 'Certifications' }
+  ] : [
     { value: '500+', label: 'Membros Ativos' },
     { value: '3+', label: 'Anos de Experiência' },
     { value: '98%', label: 'Satisfação dos Clientes' },
@@ -62,14 +60,12 @@ const CallToAction = () => {
           className="text-center mb-16"
         >
           <h2 className="text-3xl lg:text-5xl font-heading font-bold text-white mb-6 leading-tight">
-            Pronto Para Fazer Parte da
+            {isEn ? 'Ready to be part of the' : 'Pronto Para Fazer Parte da'}
             <br />
-            <span className="text-primary-200">Melhor Associação?</span>
+            <span className="text-primary-200">{isEn ? 'Best Association?' : 'Melhor Associação?'}</span>
           </h2>
           <p className="text-xl text-primary-100 max-w-3xl mx-auto leading-relaxed mb-8">
-            Junte-se à comunidade de criadores mais respeitada de Angola. 
-            Tenha acesso a produtos premium, suporte técnico especializado 
-            e uma rede de contatos valiosa.
+            {isEn ? 'Join Angola’s most respected community of farmers. Access premium products, specialized technical support and a valuable network.' : 'Junte-se à comunidade de criadores mais respeitada de Angola. Tenha acesso a produtos premium, suporte técnico especializado e uma rede de contatos valiosa.'}
           </p>
 
           {/* CTA Buttons */}
@@ -78,7 +74,7 @@ const CallToAction = () => {
               href="/auth/register"
               className="inline-flex items-center bg-white text-primary-700 hover:bg-primary-50 font-bold py-4 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg"
             >
-              Cadastre-se Gratuitamente
+              {isEn ? 'Sign up for free' : 'Cadastre-se Gratuitamente'}
               <ArrowRight size={20} className="ml-2" />
             </Link>
             
@@ -86,7 +82,7 @@ const CallToAction = () => {
               href="/produtos"
               className="inline-flex items-center border-2 border-white text-white hover:bg-white hover:text-primary-700 font-semibold py-4 px-8 rounded-lg transition-all duration-300"
             >
-              Explore Nossos Produtos
+              {isEn ? 'Explore Our Products' : 'Explore Nossos Produtos'}
             </Link>
           </div>
 
@@ -94,15 +90,15 @@ const CallToAction = () => {
           <div className="flex flex-wrap justify-center items-center gap-8 text-primary-200">
             <div className="flex items-center space-x-2">
               <Shield size={20} />
-              <span className="text-sm font-medium">100% Seguro</span>
+              <span className="text-sm font-medium">{isEn ? '100% Secure' : '100% Seguro'}</span>
             </div>
             <div className="flex items-center space-x-2">
               <Heart size={20} />
-              <span className="text-sm font-medium">Bem-estar Garantido</span>
+              <span className="text-sm font-medium">{isEn ? 'Welfare Assured' : 'Bem-estar Garantido'}</span>
             </div>
             <div className="flex items-center space-x-2">
               <Star size={20} />
-              <span className="text-sm font-medium">Qualidade Premium</span>
+              <span className="text-sm font-medium">{isEn ? 'Premium Quality' : 'Qualidade Premium'}</span>
             </div>
           </div>
         </motion.div>
@@ -176,11 +172,10 @@ const CallToAction = () => {
             {/* Left Content */}
             <div>
               <h3 className="text-2xl font-heading font-bold text-white mb-4">
-                Ainda tem Dúvidas?
+                {isEn ? 'Still have questions?' : 'Ainda tem Dúvidas?'}
               </h3>
               <p className="text-primary-100 mb-6 leading-relaxed">
-                Nossa equipe está pronta para esclarecer todas as suas questões 
-                e ajudá-lo a encontrar a melhor solução para seu negócio.
+                {isEn ? 'Our team is ready to clarify your questions and help you find the best solution for your business.' : 'Nossa equipe está pronta para esclarecer todas as suas questões e ajudá-lo a encontrar a melhor solução para seu negócio.'}
               </p>
               
               <div className="space-y-4">
@@ -190,7 +185,7 @@ const CallToAction = () => {
                   </div>
                   <div>
                     <p className="text-white font-medium">+244 928 476 427</p>
-                    <p className="text-primary-200 text-sm">WhatsApp e Ligações</p>
+                    <p className="text-primary-200 text-sm">{isEn ? 'WhatsApp and Calls' : 'WhatsApp e Ligações'}</p>
                   </div>
                 </div>
                 
@@ -200,7 +195,7 @@ const CallToAction = () => {
                   </div>
                   <div>
                     <p className="text-white font-medium">contato@associacaodeporcos.ao</p>
-                    <p className="text-primary-200 text-sm">Respondemos em até 24h</p>
+                    <p className="text-primary-200 text-sm">{isEn ? 'We reply within 24h' : 'Respondemos em até 24h'}</p>
                   </div>
                 </div>
               </div>
@@ -213,7 +208,7 @@ const CallToAction = () => {
                   href="/contato"
                   className="bg-white text-primary-700 hover:bg-primary-50 font-bold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105"
                 >
-                  Entre em Contato
+                  {isEn ? 'Get in Touch' : 'Entre em Contato'}
                 </Link>
                 
                 <a
@@ -239,7 +234,7 @@ const CallToAction = () => {
           className="text-center mt-12"
         >
           <p className="text-primary-200 text-lg">
-            ✨ Transforme seu negócio hoje mesmo. Junte-se a nós! ✨
+            {isEn ? '✨ Transform your business today. Join us! ✨' : '✨ Transforme seu negócio hoje mesmo. Junte-se a nós! ✨'}
           </p>
         </motion.div>
       </div>
