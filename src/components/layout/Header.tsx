@@ -22,7 +22,7 @@ import { useLanguage } from '@/components/providers/LanguageProvider'
 import pt from '@/lib/i18n/dictionaries/pt'
 import en from '@/lib/i18n/dictionaries/en'
 import HeaderLanguageMenu from '@/components/i18n/HeaderLanguageMenu'
-import { BRAND_NAME } from '@/lib/brand'
+import { BRAND_NAME, BRAND_TITLE_LINE1, BRAND_TITLE_LINE2 } from '@/lib/brand'
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -170,7 +170,8 @@ const Header = () => {
               </div>
               <div className="hidden sm:block">
                 <h1 className="text-lg lg:text-3xl font-heading font-bold text-white leading-tight">
-                  {BRAND_NAME}
+                  {BRAND_TITLE_LINE1}
+                  <span className="block">{BRAND_TITLE_LINE2}</span>
                 </h1>
                 <p className="text-xs lg:text-base text-primary-100">{dict.site?.tagline || 'Criação Sustentável'}</p>
               </div>
