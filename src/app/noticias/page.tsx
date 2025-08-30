@@ -21,26 +21,36 @@ const placeholderImages = [
 ]
 
 async function getNews() {
-  const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
-  const res = await fetch(`${baseUrl}/api/news`, { next: { revalidate: 60 } })
-  if (!res.ok) return []
-  const json = await res.json()
-  const data = json.data || []
-  const enriched = data.map((n: any, idx: number) => ({
-    ...n,
-    imageUrl: n.featuredImage || n.imageUrl || placeholderImages[idx % placeholderImages.length]
-  }))
-  if (enriched.length === 0) {
-    return [
-      {
-        title: 'Programa de Boas Práticas na Suinocultura',
-        excerpt: 'Iniciativa reforça capacitações e padrões de qualidade para elevar produtividade e bem‑estar animal.',
-        publishedAtFormatted: new Date().toLocaleDateString('pt-AO', { day: '2-digit', month: 'short', year: 'numeric' }),
-        imageUrl: placeholderImages[0]
-      }
-    ]
+  try {
+    const res = await fetch(`/api/news`, { cache: 'no-store' })
+    if (!res.ok) return []
+    const json = await res.json()
+    const data = json.data || []
+
+    const enriched = data.map((n: any, idx: number) => ({
+      ...n,
+      imageUrl: n.featuredImage || n.imageUrl || placeholderImages[idx % placeholderImages.length],
+      publishedAtFormatted:
+        n.publishedAtFormatted || (n.publishedAt
+          ? new Intl.DateTimeFormat('pt-AO', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(n.publishedAt))
+          : undefined)
+    }))
+
+    if (enriched.length === 0) {
+      return [
+        {
+          title: 'Programa de Boas Práticas na Suinocultura',
+          excerpt: 'Iniciativa reforça capacitações e padrões de qualidade para elevar produtividade e bem‑estar animal.',
+          publishedAtFormatted: new Date().toLocaleDateString('pt-AO', { day: '2-digit', month: 'short', year: 'numeric' }),
+          imageUrl: placeholderImages[0]
+        }
+      ]
+    }
+    return enriched
+  } catch (e) {
+    console.error('Falha ao carregar notícias:', e)
+    return []
   }
-  return enriched
 }
 
 export default async function NoticiasPage() {
