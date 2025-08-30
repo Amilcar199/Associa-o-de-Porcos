@@ -24,6 +24,9 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [pendingEmail, setPendingEmail] = useState('');
+  const [verifyCode, setVerifyCode] = useState('');
+  const [verifying, setVerifying] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const router = useRouter();
@@ -68,20 +71,8 @@ export default function RegisterPage() {
       if (!response.ok) {
         setError(data.message || dict.auth.errorRegister);
       } else {
-        setSuccess(dict.auth.successRegister);
-        setTimeout(async () => {
-          const result = await signIn('credentials', {
-            email: formData.email,
-            password: formData.password,
-            redirect: false
-          });
-
-          if (result?.error) {
-            router.push('/login');
-          } else {
-            router.push('/membros');
-          }
-        }, 2000);
+        setSuccess('Conta criada! Verifique seu email com o código recebido.');
+        setPendingEmail(formData.email);
       }
     } catch (error) {
       setError(dict.auth.errorRegister + '.');
@@ -105,6 +96,7 @@ export default function RegisterPage() {
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+          {!pendingEmail ? (
           <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
               <div className="bg-red-50 border border-red-200 rounded-md p-4">
@@ -306,6 +298,51 @@ export default function RegisterPage() {
               </button>
             </div>
           </form>
+          ) : (
+            <div className="space-y-4">
+              <p className="text-sm text-gray-700">Enviamos um código para {pendingEmail}. Digite abaixo para verificar seu email.</p>
+              <input
+                value={verifyCode}
+                onChange={(e)=>setVerifyCode(e.target.value)}
+                className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                placeholder="Código de 6 dígitos"
+              />
+              <div className="flex gap-2">
+                <button
+                  disabled={verifying}
+                  onClick={async ()=>{
+                    setVerifying(true)
+                    setError(''); setSuccess('')
+                    try{
+                      const res = await fetch('/api/auth/verify-email',{method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email: pendingEmail, code: verifyCode })})
+                      const j = await res.json()
+                      if(res.ok){
+                        setSuccess('Email verificado! Você já pode fazer login.')
+                        await signIn('credentials', { email: formData.email || pendingEmail, password: formData.password, redirect: false })
+                        router.push('/membros')
+                      } else {
+                        setError(j.error || 'Código inválido')
+                      }
+                    } finally { setVerifying(false) }
+                  }}
+                  className="inline-flex justify-center px-4 py-2 rounded-md bg-green-600 text-white hover:bg-green-700 disabled:opacity-50"
+                >
+                  {verifying ? 'Verificando...' : 'Verificar'}
+                </button>
+                <button
+                  disabled={verifying}
+                  onClick={async ()=>{
+                    setError(''); setSuccess('')
+                    await fetch('/api/auth/resend-code',{method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email: pendingEmail })})
+                    setSuccess('Código reenviado.')
+                  }}
+                  className="inline-flex justify-center px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50"
+                >
+                  Reenviar código
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Seção de registro social removida */}
 

@@ -4,7 +4,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import { successResponse, errorResponse, sanitizeInput, isValidEmail } from '@/lib/api-utils';
-import { sendWelcomeEmail } from '@/lib/email';
+import { sendWelcomeEmail, getVerificationCodeTemplate, sendEmail } from '@/lib/email';
+import crypto from 'crypto'
 
 // POST /api/auth/register - Registrar novo usuário
 export async function POST(req: NextRequest) {
@@ -52,21 +53,25 @@ export async function POST(req: NextRequest) {
     };
 
     const user = new User(userData);
+    // Gerar código 6 dígitos
+    const code = (Math.floor(100000 + Math.random() * 900000)).toString()
+    user.emailVerificationCode = code
+    user.emailVerificationExpires = new Date(Date.now() + 15 * 60 * 1000)
     await user.save();
 
-    // Enviar email de boas-vindas (opcional)
+    // Enviar email com código de verificação
     try {
-      await sendWelcomeEmail(sanitizedData.email, sanitizedData.name);
+      const tpl = getVerificationCodeTemplate(sanitizedData.name, code)
+      await sendEmail({ to: sanitizedData.email, subject: tpl.subject, html: tpl.html, text: tpl.text })
     } catch (error) {
-      console.error('Erro ao enviar email de boas-vindas:', error);
-      // Não falhar se o email não for enviado
+      console.error('Erro ao enviar código de verificação:', error);
     }
 
     // Retornar usuário sem senha
     const userResponse = user.toPublicJSON();
 
     return NextResponse.json(
-      successResponse(userResponse, 'Conta criada com sucesso!'),
+      successResponse(userResponse, 'Conta criada com sucesso! Verifique seu email para ativar a conta.'),
       { status: 201 }
     );
   } catch (error: any) {
