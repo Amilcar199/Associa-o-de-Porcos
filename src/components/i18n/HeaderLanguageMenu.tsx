@@ -6,8 +6,6 @@ import { useLanguage } from '@/components/providers/LanguageProvider'
 
 const OPTIONS: { label: string; value: Locale }[] = [
   { label: 'Português (AO)', value: 'pt-AO' },
-  { label: 'Português (BR)', value: 'pt-BR' },
-  { label: 'Português (PT)', value: 'pt-PT' },
   { label: 'English (US)', value: 'en-US' },
 ]
 
