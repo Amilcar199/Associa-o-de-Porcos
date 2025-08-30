@@ -169,8 +169,8 @@ const Header = () => {
               </div>
               <div className="hidden sm:block">
                 <h1 className="text-lg lg:text-3xl font-heading font-bold text-white leading-tight">
-                  {dict.site?.titleLine1 || 'Associação de Suinocultores'}
-                  <span className="block">{dict.site?.titleLine2 || 'do Norte'}</span>
+                  Associação de Suinocultores
+                  <span className="block">do Norte</span>
                 </h1>
                 <p className="text-xs lg:text-base text-primary-100">{dict.site?.tagline || 'Criação Sustentável'}</p>
               </div>
