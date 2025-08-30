@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { Tag, Weight, Calendar, Eye } from 'lucide-react'
 import ProductModal from '@/components/modals/ProductModal'
+import { useLanguage } from '@/components/providers/LanguageProvider'
 
 interface Product {
   _id: string
@@ -27,6 +28,8 @@ interface ProductsClientProps {
 }
 
 export default function ProductsClient({ products }: ProductsClientProps) {
+  const { locale } = useLanguage()
+  const isEn = locale.startsWith('en')
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
 
@@ -69,7 +72,7 @@ export default function ProductsClient({ products }: ProductsClientProps) {
             <div className="relative h-48">
               <Image
                 src={product.imageUrl}
-                alt={product.name || 'Produto'}
+                alt={product.name || (isEn ? 'Product' : 'Produto')}
                 fill
                 className="object-cover group-hover:scale-110 transition-transform duration-300"
                 sizes="(max-width:768px) 100vw, 33vw"
@@ -86,7 +89,7 @@ export default function ProductsClient({ products }: ProductsClientProps) {
               <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <div className="bg-white/90 backdrop-blur px-4 py-2 rounded-full flex items-center gap-2">
                   <Eye size={16} className="text-primary-600" />
-                  <span className="text-primary-700 font-medium text-sm">Ver Detalhes</span>
+                  <span className="text-primary-700 font-medium text-sm">{isEn ? 'See details' : 'Ver Detalhes'}</span>
                 </div>
               </div>
             </div>
@@ -107,14 +110,14 @@ export default function ProductsClient({ products }: ProductsClientProps) {
                 </div>
                 <div className="flex items-center gap-1">
                   <Calendar size={14} className="text-primary-600" />
-                  {product.age ? `${product.age} meses` : '—'}
+                  {product.age ? `${product.age} ${isEn ? 'months' : 'meses'}` : '—'}
                 </div>
               </div>
 
               {/* Ações */}
               <div className="mt-4 flex items-center justify-between">
                 <span className="text-sm text-gray-500">
-                  Código: {product.code || product._id?.slice?.(0, 6) || '—'}
+                  {isEn ? 'Code' : 'Código'}: {product.code || product._id?.slice?.(0, 6) || '—'}
                 </span>
                 <div className="flex items-center gap-3">
                   <button 
@@ -124,7 +127,7 @@ export default function ProductsClient({ products }: ProductsClientProps) {
                     }}
                     className="text-primary-700 hover:text-primary-800 font-medium text-sm hover:underline"
                   >
-                    Ver Detalhes
+                    {isEn ? 'See details' : 'Ver Detalhes'}
                   </button>
                 </div>
               </div>
