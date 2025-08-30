@@ -5,19 +5,20 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { ChevronRight, Play, Users, Award, Leaf } from 'lucide-react'
-import { useLanguage } from '@/components/providers/LanguageProvider'
-import pt from '@/lib/i18n/dictionaries/pt'
-import en from '@/lib/i18n/dictionaries/en'
 import Slide1 from '@/components/assets/Foto Slider1.jpg'
 import Slide2 from '@/components/assets/Foto slider2.jpg'
 import Slide3 from '@/components/assets/Foto slider 3.jpg'
+import { useLanguage } from '@/components/providers/LanguageProvider'
+import pt from '@/lib/i18n/dictionaries/pt'
+import en from '@/lib/i18n/dictionaries/en'
 
 const Hero = () => {
   const [currentSlide, setCurrentSlide] = useState(0)
   const { locale } = useLanguage()
   const dict = locale.startsWith('en') ? en : pt
+  const isEn = locale.startsWith('en')
 
-  const slides = locale.startsWith('en')
+  const slides = isEn
     ? [
         {
           id: 1,
@@ -147,7 +148,6 @@ const Hero = () => {
               className="object-cover"
               priority={index === 0}
               onError={(e) => {
-                // Fallback para gradiente quando imagem não existir
                 const target = e.target as HTMLElement
                 target.style.background = 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)'
               }}
@@ -251,30 +251,30 @@ const Hero = () => {
                 <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-6">
                   <Users className="text-primary-300 mb-4" size={40} />
                   <h3 className="text-xl font-semibold text-white mb-2">
-                    Comunidade Forte
+                    {isEn ? 'Strong Community' : 'Comunidade Forte'}
                   </h3>
                   <p className="text-gray-200 text-sm">
-                    Mais de 500 criadores associados compartilhando conhecimento e experiências.
+                    {isEn ? 'Over 500 associated farmers sharing knowledge and experiences.' : 'Mais de 500 criadores associados compartilhando conhecimento e experiências.'}
                   </p>
                 </div>
                 
                 <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-6">
                   <Award className="text-primary-300 mb-4" size={40} />
                   <h3 className="text-xl font-semibold text-white mb-2">
-                    Qualidade Certificada
+                    {isEn ? 'Certified Quality' : 'Qualidade Certificada'}
                   </h3>
                   <p className="text-gray-200 text-sm">
-                    Produtos com certificação de qualidade e bem-estar animal.
+                    {isEn ? 'Products certified with high quality and animal welfare.' : 'Produtos com certificação de qualidade e bem-estar animal.'}
                   </p>
                 </div>
                 
                 <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-6">
                   <Leaf className="text-primary-300 mb-4" size={40} />
                   <h3 className="text-xl font-semibold text-white mb-2">
-                    Sustentabilidade
+                    {isEn ? 'Sustainability' : 'Sustentabilidade'}
                   </h3>
                   <p className="text-gray-200 text-sm">
-                    Práticas sustentáveis e responsabilidade ambiental em primeiro lugar.
+                    {isEn ? 'Sustainable practices and environmental responsibility first.' : 'Práticas sustentáveis e responsabilidade ambiental em primeiro lugar.'}
                   </p>
                 </div>
               </div>
