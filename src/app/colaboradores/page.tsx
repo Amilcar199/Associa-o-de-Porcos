@@ -1,10 +1,15 @@
 export const dynamic = 'force-dynamic'
 
 import type { Metadata } from 'next'
+import { cookies } from 'next/headers'
 
-export const metadata: Metadata = {
-  title: 'Colaboradores',
-  description: 'Parceiros e colaboradores'
+export function generateMetadata(): Metadata {
+  const locale = cookies().get('locale')?.value || 'pt-AO'
+  const isEn = String(locale).startsWith('en')
+  return {
+    title: isEn ? 'Team' : 'Colaboradores',
+    description: isEn ? 'Partners and collaborators' : 'Parceiros e colaboradores'
+  }
 }
 
 async function getCollaborators() {
@@ -25,17 +30,19 @@ async function getCollaborators() {
 
 export default async function ColaboradoresPage() {
   const collaborators = await getCollaborators()
+  const locale = cookies().get('locale')?.value || 'pt-AO'
+  const isEn = String(locale).startsWith('en')
 
   return (
     <section className="container-custom py-12">
       <div className="flex items-end justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-heading font-bold text-primary-800">Colaboradores</h1>
-          <p className="text-gray-600 mt-1">Parceiros que fortalecem a nossa associação.</p>
+          <h1 className="text-3xl font-heading font-bold text-primary-800">{isEn ? 'Team' : 'Colaboradores'}</h1>
+          <p className="text-gray-600 mt-1">{isEn ? 'Partners that strengthen our association.' : 'Parceiros que fortalecem a nossa associação.'}</p>
         </div>
       </div>
       {collaborators.length === 0 ? (
-        <div className="bg-white rounded-xl shadow p-8 text-center text-gray-600">Nenhum colaborador cadastrado ainda.</div>
+        <div className="bg-white rounded-xl shadow p-8 text-center text-gray-600">{isEn ? 'No collaborators registered yet.' : 'Nenhum colaborador cadastrado ainda.'}</div>
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {collaborators.map((c: any) => (
