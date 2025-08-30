@@ -44,6 +44,8 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('profile');
+  const [activity, setActivity] = useState<any[]>([]);
+  const [activityLoading, setActivityLoading] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showSessionsModal, setShowSessionsModal] = useState(false);
   const [pwForm, setPwForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
@@ -159,6 +161,21 @@ export default function ProfilePage() {
     }
   };
 
+  useEffect(() => {
+    const loadActivity = async () => {
+      setActivityLoading(true)
+      try {
+        const res = await fetch('/api/user/activity', { credentials: 'include', cache: 'no-store' })
+        if (res.ok) {
+          const j = await res.json()
+          setActivity(j.data || [])
+        }
+      } catch {}
+      setActivityLoading(false)
+    }
+    if (session) loadActivity()
+  }, [session])
+
   const submitPasswordChange = async () => {
     setPwError('');
     if (!pwForm.currentPassword || !pwForm.newPassword || !pwForm.confirmPassword) {
@@ -253,6 +270,17 @@ export default function ProfilePage() {
               >
                 <Shield className="inline-block w-4 h-4 mr-2" />
                 {dict.profile.tabs.security}
+              </button>
+              <button
+                onClick={() => setActiveTab('activity')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'activity'
+                    ? 'border-green-500 text-green-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                <History className="inline-block w-4 h-4 mr-2" />
+                Atividades
               </button>
             </nav>
           </div>
@@ -586,6 +614,39 @@ export default function ProfilePage() {
                     </button>
                   </div>
                 </div>
+              </div>
+            )}
+            {activeTab === 'activity' && (
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium text-gray-900">Atividade da conta</h3>
+                {activityLoading ? (
+                  <div className="text-sm text-gray-500">Carregando...</div>
+                ) : activity.length === 0 ? (
+                  <div className="text-sm text-gray-500">Sem registros.</div>
+                ) : (
+                  <div className="overflow-hidden rounded-lg border border-gray-200">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IP</th>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User-Agent</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {activity.map((log, idx) => (
+                          <tr key={log._id || idx}>
+                            <td className="px-4 py-2 text-sm text-gray-700">{new Date(log.createdAt).toLocaleString()}</td>
+                            <td className="px-4 py-2 text-sm text-gray-700">{log.type}</td>
+                            <td className="px-4 py-2 text-sm text-gray-700">{log.ip || '-'}</td>
+                            <td className="px-4 py-2 text-sm text-gray-700 truncate max-w-xs" title={log.userAgent}>{log.userAgent || '-'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
             )}
           </div>

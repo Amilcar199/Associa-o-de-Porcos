@@ -5,6 +5,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import connectDB from '@/lib/mongodb'
 import User from '@/models/User'
+import ActivityLog from '@/models/ActivityLog'
 import { errorResponse, successResponse, sanitizeInput } from '@/lib/api-utils'
 
 export async function POST(req: NextRequest) {
@@ -27,6 +28,15 @@ export async function POST(req: NextRequest) {
 
     user.password = newPassword
     await user.save()
+
+    try {
+      await ActivityLog.create({
+        user: user._id,
+        type: 'password_change',
+        ip: req.headers.get('x-forwarded-for') || undefined,
+        userAgent: req.headers.get('user-agent') || undefined,
+      })
+    } catch {}
 
     return Response.json(successResponse({}, 'Senha alterada com sucesso'))
   } catch (e) {

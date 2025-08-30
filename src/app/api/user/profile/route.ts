@@ -6,6 +6,7 @@ import { authOptions } from '@/lib/auth';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import { successResponse, errorResponse, sanitizeInput } from '@/lib/api-utils';
+import ActivityLog from '@/models/ActivityLog';
 
 // GET /api/user/profile - Buscar perfil do usuário logado
 export async function GET(req: NextRequest) {
@@ -60,6 +61,16 @@ export async function PUT(req: NextRequest) {
     if (!updatedUser) {
       return errorResponse('Usuário não encontrado', 404);
     }
+
+    try {
+      await ActivityLog.create({
+        user: session.user.id,
+        type: 'profile_update',
+        ip: req.headers.get('x-forwarded-for') || undefined,
+        userAgent: req.headers.get('user-agent') || undefined,
+        metadata: Object.keys(sanitizedData)
+      })
+    } catch {}
 
     return NextResponse.json(
       successResponse(updatedUser, 'Perfil atualizado com sucesso')
