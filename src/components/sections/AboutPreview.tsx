@@ -102,9 +102,9 @@ const AboutPreview = () => {
               {/* Overlay com informações */}
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
                 <div className="text-white">
-                  <h3 className="font-bold text-xl mb-2">Nossa Fazenda</h3>
+                  <h3 className="font-bold text-xl mb-2">{locale.startsWith('en') ? 'Our Farm' : 'Nossa Fazenda'}</h3>
                   <p className="text-sm opacity-90">
-                    Tecnologia e tradição trabalhando juntas
+                    {locale.startsWith('en') ? 'Technology and tradition working together' : 'Tecnologia e tradição trabalhando juntas'}
                   </p>
                 </div>
               </div>
