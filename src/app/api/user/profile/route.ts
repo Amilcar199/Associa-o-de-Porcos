@@ -46,6 +46,15 @@ export async function PUT(req: NextRequest) {
     const body = await req.json();
     const sanitizedData = sanitizeInput(body);
 
+    // Impedir alterações de perfil se email não verificado
+    const currentUser = await User.findById(session.user.id).select('-password');
+    if (!currentUser) {
+      return errorResponse('Usuário não encontrado', 404);
+    }
+    if (!currentUser.emailVerified) {
+      return errorResponse('Email não verificado. Verifique seu email antes de alterar o perfil.', 400);
+    }
+
     // Remover campos que não devem ser alterados pelo usuário
     delete sanitizedData.email;
     delete sanitizedData.role;

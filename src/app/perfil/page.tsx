@@ -235,6 +235,20 @@ export default function ProfilePage() {
         </div>
 
         <div className="bg-white rounded-lg shadow">
+          {/* Banner de verificação */}
+          {!((session.user as any)?.emailVerified) && (
+            <div className="px-6 py-3 bg-yellow-50 border-b border-yellow-200 text-sm text-yellow-800 flex items-center justify-between">
+              <div>
+                Seu email ainda não foi verificado. Verifique seu email para liberar todas as funcionalidades.
+              </div>
+              <button
+                onClick={async ()=>{ await fetch('/api/auth/resend-code',{ method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email: session.user?.email }) }) }}
+                className="text-yellow-900 underline font-medium"
+              >
+                Reenviar código
+              </button>
+            </div>
+          )}
           {/* Tabs */}
           <div className="border-b border-gray-200">
             <nav className="-mb-px flex space-x-8 px-6">
@@ -456,7 +470,7 @@ export default function ProfilePage() {
                 <div className="flex justify-end">
                   <button
                     type="submit"
-                    disabled={saving}
+                    disabled={saving || !((session.user as any)?.emailVerified)}
                     className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {saving ? dict.profile.saving : dict.profile.saveChanges}
