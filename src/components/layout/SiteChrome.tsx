@@ -18,6 +18,7 @@ export default function SiteChrome({ children }: { children: React.ReactNode }) 
     <CookieConsentProvider>
       <div className="flex flex-col min-h-screen">
         <Header />
+        <LanguageSelector />
         <main className="flex-grow">{children}</main>
         <Footer />
       </div>

@@ -103,19 +103,19 @@ export default function CookieConsentProvider({ children }: { children: React.Re
 						<div className="mt-4 space-y-4">
 							<label className="flex items-start gap-3">
 								<input type="checkbox" checked disabled className="mt-1" />
-								<span className="text-sm text-gray-700">Necessários (sempre ativos)</span>
+								<span className="text-sm text-gray-700">{dict.cookies.necessaryLabel}</span>
 							</label>
 							<label className="flex items-start gap-3">
 								<input type="checkbox" checked={consent.analytics} onChange={(e) => setConsent({ ...consent, analytics: e.target.checked })} className="mt-1" />
-								<span className="text-sm text-gray-700">Analíticos</span>
+								<span className="text-sm text-gray-700">{dict.cookies.analyticsLabel}</span>
 							</label>
 							<label className="flex items-start gap-3">
 								<input type="checkbox" checked={consent.marketing} onChange={(e) => setConsent({ ...consent, marketing: e.target.checked })} className="mt-1" />
-								<span className="text-sm text-gray-700">Marketing</span>
+								<span className="text-sm text-gray-700">{dict.cookies.marketingLabel}</span>
 							</label>
 						</div>
 						<div className="mt-6 flex justify-end gap-2">
-							<button onClick={() => setIsModalOpen(false)} className="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 text-sm">Cancelar</button>
+							<button onClick={() => setIsModalOpen(false)} className="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 text-sm">{dict.cookies.cancel}</button>
 							<button onClick={() => { Cookies.set(CONSENT_COOKIE_KEY, JSON.stringify(consent), { expires: 365, sameSite: 'lax' }); setIsModalOpen(false); setShowBanner(false) }} className="px-4 py-2 rounded-md bg-primary-600 text-white hover:bg-primary-700 text-sm">{dict.cookies.save}</button>
 						</div>
 					</div>

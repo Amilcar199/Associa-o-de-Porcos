@@ -48,10 +48,10 @@ const Footer = () => {
   ]
 
   const productCategories = [
-    { name: 'Suínos Reprodutores', href: '/produtos?categoria=reprodutores' },
-    { name: 'Leitões', href: '/produtos?categoria=leitoes' },
-    { name: 'Suínos de Engorda', href: '/produtos?categoria=engorda' },
-    { name: 'Matrizes', href: '/produtos?categoria=matrizes' },
+    { name: dict.categories?.breeders || 'Suínos Reprodutores', href: '/produtos?categoria=reprodutores' },
+    { name: dict.categories?.piglets || 'Leitões', href: '/produtos?categoria=leitoes' },
+    { name: dict.categories?.fattening || 'Suínos de Engorda', href: '/produtos?categoria=engorda' },
+    { name: dict.categories?.sows || 'Matrizes', href: '/produtos?categoria=matrizes' },
   ]
 
   return (
@@ -104,10 +104,10 @@ const Footer = () => {
               </div>
               <div>
                 <h2 className="text-lg font-heading font-bold">
-                  Associação de suínos
+                  {dict.site?.titleLine1 || 'Associação de suínos'}
                 </h2>
                 <p className="text-sm text-gray-400">
-                  Criação Sustentável
+                  {dict.site?.tagline || 'Criação Sustentável'}
                 </p>
               </div>
             </Link>
@@ -150,7 +150,7 @@ const Footer = () => {
           {/* Links Rápidos */}
           <div>
             <h3 className="text-lg font-heading font-semibold mb-4">
-              Links Rápidos
+              {dict.footer.quickLinksTitle}
             </h3>
             <ul className="space-y-3">
               {quickLinks.map((link) => (
@@ -170,7 +170,7 @@ const Footer = () => {
           {/* Produtos */}
           <div>
             <h3 className="text-lg font-heading font-semibold mb-4">
-              Nossos Produtos
+              {dict.footer.ourProductsTitle}
             </h3>
             <ul className="space-y-3">
               {productCategories.map((category) => (
@@ -189,7 +189,7 @@ const Footer = () => {
           {/* Contato */}
           <div>
             <h3 className="text-lg font-heading font-semibold mb-4">
-              Entre em Contato
+              {dict.footer.contactTitle}
             </h3>
             <div className="space-y-4">
               <div className="flex items-start space-x-3">
@@ -272,9 +272,9 @@ const Footer = () => {
               </div>
               
               <div className="flex items-center text-sm text_gray-400">
-                <span>Feito com</span>
+                <span>{dict.footer.madeWith}</span>
                 <Heart size={14} className="text-red-500 mx-1" />
-                <span>para o agronegócio</span>
+                <span>{dict.footer.forAgribusiness}</span>
               </div>
             </div>
           </div>
