@@ -9,6 +9,7 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Award, Leaf, Users, Target, ShieldCheck, Sparkles, ArrowRight, Recycle, LineChart, Flag, Milestone, TrendingUp } from 'lucide-react'
 import MapaAngola from '@/components/assets/Mapa de Angola.png'
+import { useLanguage } from '@/components/providers/LanguageProvider'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -16,13 +17,15 @@ const fadeUp = {
 }
 
 export default function AboutClient() {
+  const { locale } = useLanguage()
+  const isEn = locale.startsWith('en')
   return (
     <section className="space-y-0">
       {/* Hero Section */}
       <div className="relative min-h-[40vh] lg:min-h-[55vh] overflow-hidden">
         <Image
           src={Suino}
-          alt="Suinocultura sustentável"
+          alt={isEn ? 'Sustainable pig farming' : 'Suinocultura sustentável'}
           fill
           priority
           className="object-cover"
@@ -37,9 +40,9 @@ export default function AboutClient() {
             transition={{ duration: 0.7 }}
             className="text-white max-w-3xl"
           >
-            <span className="inline-block bg-white/15 backdrop-blur px-3 py-1 rounded-full text-sm mb-4">Quem Somos</span>
-            <h1 className="text-4xl lg:text-5xl font-heading font-bold leading-tight">Excelência e Inovação na Suinocultura</h1>
-            <p className="mt-4 text-primary-100 text-lg">Promovemos a criação sustentável, a qualidade e o desenvolvimento do setor, conectando produtores, conhecimento e mercado.</p>
+            <span className="inline-block bg-white/15 backdrop-blur px-3 py-1 rounded-full text-sm mb-4">{isEn ? 'About Us' : 'Quem Somos'}</span>
+            <h1 className="text-4xl lg:text-5xl font-heading font-bold leading-tight">{isEn ? 'Excellence and Innovation in Pig Farming' : 'Excelência e Inovação na Suinocultura'}</h1>
+            <p className="mt-4 text-primary-100 text-lg">{isEn ? 'We promote sustainability, quality and sector development by connecting producers, knowledge and the market.' : 'Promovemos a criação sustentável, a qualidade e o desenvolvimento do setor, conectando produtores, conhecimento e mercado.'}</p>
           </motion.div>
         </div>
       </div>
@@ -48,10 +51,10 @@ export default function AboutClient() {
       <div className="container-custom -mt-10 lg:-mt-14 relative z-20">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
-            { label: 'Produtores Apoiados', value: '100+', icon: Users },
-            { label: 'Capacitações', value: '20+', icon: Award },
-            { label: 'Projetos Ativos', value: '8', icon: LineChart },
-            { label: 'Boas Práticas', value: '100%', icon: ShieldCheck }
+            { label: isEn ? 'Supported Producers' : 'Produtores Apoiados', value: '100+', icon: Users },
+            { label: isEn ? 'Trainings' : 'Capacitações', value: '20+', icon: Award },
+            { label: isEn ? 'Active Projects' : 'Projetos Ativos', value: '8', icon: LineChart },
+            { label: isEn ? 'Best Practices' : 'Boas Práticas', value: '100%', icon: ShieldCheck }
           ].map((item, idx) => (
             <motion.div
               key={item.label}
@@ -78,18 +81,18 @@ export default function AboutClient() {
         <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
           {[
             {
-              title: 'Missão',
-              desc: 'Impulsionar o desenvolvimento do setor suíno com capacitação, qualidade e apoio ao produtor.',
+              title: isEn ? 'Mission' : 'Missão',
+              desc: isEn ? 'Drive the pig sector through training, quality and producer support.' : 'Impulsionar o desenvolvimento do setor suíno com capacitação, qualidade e apoio ao produtor.',
               icon: Target
             },
             {
-              title: 'Visão',
-              desc: 'Ser referência em suinocultura sustentável, com alto padrão de produtividade e bem-estar.',
+              title: isEn ? 'Vision' : 'Visão',
+              desc: isEn ? 'Be a reference in sustainable pig farming with high productivity and animal welfare.' : 'Ser referência em suinocultura sustentável, com alto padrão de produtividade e bem-estar.',
               icon: Sparkles
             },
             {
-              title: 'Valores',
-              desc: 'Sustentabilidade, transparência, inovação, qualidade e respeito ao bem-estar animal.',
+              title: isEn ? 'Values' : 'Valores',
+              desc: isEn ? 'Sustainability, transparency, innovation, quality and animal welfare.' : 'Sustentabilidade, transparência, inovação, qualidade e respeito ao bem-estar animal.',
               icon: Leaf
             }
           ].map((card, idx) => (
@@ -116,26 +119,26 @@ export default function AboutClient() {
       <div className="bg-gray-50 py-12 lg:py-16">
         <div className="container-custom">
           <div className="text-center mb-10">
-            <span className="inline-block bg-primary-100 text-primary-800 px-3 py-1 rounded-full text-sm font-medium mb-3">Como Trabalhamos</span>
-            <h3 className="text-3xl font-heading font-bold">Nossos Pilares</h3>
-            <p className="text-gray-600 mt-2 max-w-2xl mx-auto">Unimos conhecimento, sustentabilidade e mercado para gerar resultados consistentes para toda a cadeia.</p>
+            <span className="inline-block bg-primary-100 text-primary-800 px-3 py-1 rounded-full text-sm font-medium mb-3">{isEn ? 'How We Work' : 'Como Trabalhamos'}</span>
+            <h3 className="text-3xl font-heading font-bold">{isEn ? 'Our Pillars' : 'Nossos Pilares'}</h3>
+            <p className="text-gray-600 mt-2 max-w-2xl mx-auto">{isEn ? 'We combine knowledge, sustainability and market to deliver consistent results across the chain.' : 'Unimos conhecimento, sustentabilidade e mercado para gerar resultados consistentes para toda a cadeia.'}</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
             {[
               {
-                title: 'Apoio ao Produtor',
-                desc: 'Capacitação, assistência técnica e partilha de boas práticas para elevar produtividade e rentabilidade.',
+                title: isEn ? 'Producer Support' : 'Apoio ao Produtor',
+                desc: isEn ? 'Training, technical assistance and sharing best practices to raise productivity and profitability.' : 'Capacitação, assistência técnica e partilha de boas práticas para elevar produtividade e rentabilidade.',
                 icon: Users
               },
               {
-                title: 'Sustentabilidade',
-                desc: 'Gestão responsável, bem-estar animal e práticas que preservam o meio ambiente e a eficiência do sistema.',
+                title: isEn ? 'Sustainability' : 'Sustentabilidade',
+                desc: isEn ? 'Responsible management, animal welfare and practices that preserve the environment and system efficiency.' : 'Gestão responsável, bem-estar animal e práticas que preservam o meio ambiente e a eficiência do sistema.',
                 icon: Recycle
               },
               {
-                title: 'Mercado e Qualidade',
-                desc: 'Padrões, rastreabilidade e ligações com o mercado para fortalecer a confiança e a competitividade.',
+                title: isEn ? 'Market and Quality' : 'Mercado e Qualidade',
+                desc: isEn ? 'Standards, traceability and market links to strengthen confidence and competitiveness.' : 'Padrões, rastreabilidade e ligações com o mercado para fortalecer a confiança e a competitividade.',
                 icon: Award
               }
             ].map((item, idx) => (
@@ -161,18 +164,18 @@ export default function AboutClient() {
       {/* Linha do Tempo */}
       <div className="container-custom py-12 lg:py-16">
         <div className="text-center mb-10">
-          <span className="inline-block bg-primary-100 text-primary-800 px-3 py-1 rounded-full text-sm font-medium mb-3">Nossa Trajetória</span>
-          <h3 className="text-3xl font-heading font-bold">Marcos que nos moldaram</h3>
-          <p className="text-gray-600 mt-2 max-w-2xl mx-auto">Evoluímos continuamente com foco em qualidade, conhecimento e sustentabilidade.</p>
+          <span className="inline-block bg-primary-100 text-primary-800 px-3 py-1 rounded-full text-sm font-medium mb-3">{isEn ? 'Our Journey' : 'Nossa Trajetória'}</span>
+          <h3 className="text-3xl font-heading font-bold">{isEn ? 'Milestones that shaped us' : 'Marcos que nos moldaram'}</h3>
+          <p className="text-gray-600 mt-2 max-w-2xl mx-auto">{isEn ? 'We continually evolve with a focus on quality, knowledge and sustainability.' : 'Evoluímos continuamente com foco em qualidade, conhecimento e sustentabilidade.'}</p>
         </div>
         <div className="relative">
           <div className="absolute left-1/2 top-0 -translate-x-1/2 h-full w-px bg-gradient-to-b from-primary-200 via-gray-200 to-primary-200 hidden md:block" />
           <div className="space-y-10">
             {[
-              { title: 'Estruturação de Programas', desc: 'Iniciativas de capacitação e apoio técnico a produtores.', icon: Flag },
-              { title: 'Padrões de Qualidade', desc: 'Implantação de processos e rastreabilidade para elevar a confiança.', icon: Milestone },
-              { title: 'Projetos e Parcerias', desc: 'Ações com instituições e empresas para inovação e mercado.', icon: Users },
-              { title: 'Expansão e Resultados', desc: 'Maior alcance, produtividade e bem-estar animal aprimorado.', icon: TrendingUp }
+              { title: isEn ? 'Program Structuring' : 'Estruturação de Programas', desc: isEn ? 'Training initiatives and technical support for producers.' : 'Iniciativas de capacitação e apoio técnico a produtores.', icon: Flag },
+              { title: isEn ? 'Quality Standards' : 'Padrões de Qualidade', desc: isEn ? 'Implementation of processes and traceability to raise confidence.' : 'Implantação de processos e rastreabilidade para elevar a confiança.', icon: Milestone },
+              { title: isEn ? 'Projects and Partnerships' : 'Projetos e Parcerias', desc: isEn ? 'Actions with institutions and companies for innovation and market.' : 'Ações com instituições e empresas para inovação e mercado.', icon: Users },
+              { title: isEn ? 'Expansion and Results' : 'Expansão e Resultados', desc: isEn ? 'Greater reach, productivity and improved animal welfare.' : 'Maior alcance, produtividade e bem-estar animal aprimorado.', icon: TrendingUp }
             ].map((step, idx) => (
               <motion.div
                 key={step.title}
@@ -203,8 +206,8 @@ export default function AboutClient() {
       <div className="bg-gray-50 py-12 lg:py-16">
         <div className="container-custom">
           <div className="text-center mb-8">
-            <h3 className="text-2xl font-heading font-bold">Da Fazenda ao Mercado</h3>
-            <p className="text-gray-600 mt-2">Momentos que representam nosso compromisso com qualidade e bem‑estar.</p>
+            <h3 className="text-2xl font-heading font-bold">{isEn ? 'From Farm to Market' : 'Da Fazenda ao Mercado'}</h3>
+            <p className="text-gray-600 mt-2">{isEn ? 'Moments representing our commitment to quality and welfare.' : 'Momentos que representam nosso compromisso com qualidade e bem‑estar.'}</p>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             {[Slide1, Slide2, Slide3].map((src, idx) => (
@@ -216,7 +219,7 @@ export default function AboutClient() {
                 viewport={{ once: true }}
                 className="relative h-56 rounded-2xl overflow-hidden shadow"
               >
-                <Image src={src} alt="Galeria da associação" fill className="object-cover" sizes="(max-width:768px) 100vw, 33vw" />
+                <Image src={src} alt={isEn ? 'Association gallery' : 'Galeria da associação'} fill className="object-cover" sizes="(max-width:768px) 100vw, 33vw" />
               </motion.div>
             ))}
           </div>
@@ -232,7 +235,7 @@ export default function AboutClient() {
               <div className="relative w-full h-96 lg:h-[34rem] rounded-2xl overflow-hidden shadow">
                 <Image
                   src={MapaAngola}
-                  alt="Mapa de Angola"
+                  alt={isEn ? 'Map of Angola' : 'Mapa de Angola'}
                   fill
                   className="object-contain"
                   sizes="(max-width:768px) 100vw, 50vw"
@@ -242,10 +245,10 @@ export default function AboutClient() {
 
             {/* Texto à Direita */}
             <div>
-              <span className="inline-block bg-primary-100 text-primary-800 px-3 py-1 rounded-full text-sm font-medium mb-3">Nossa Presença</span>
-              <h3 className="text-3xl font-heading font-bold mb-3">Nossa presença em Angola</h3>
-              <p className="text-gray-700 mb-3">Estamos presentes em território nacional com parcerias locais e atuação próxima ao produtor. Levamos conhecimento, assistência técnica e padrões de qualidade para impulsionar resultados de forma consistente.</p>
-              <p className="text-gray-600 mb-6">Abaixo, algumas das províncias onde mantemos operações e apoio contínuo:</p>
+              <span className="inline-block bg-primary-100 text-primary-800 px-3 py-1 rounded-full text-sm font-medium mb-3">{isEn ? 'Our Presence' : 'Nossa Presença'}</span>
+              <h3 className="text-3xl font-heading font-bold mb-3">{isEn ? 'Our presence in Angola' : 'Nossa presença em Angola'}</h3>
+              <p className="text-gray-700 mb-3">{isEn ? 'We operate nationally with local partnerships and close support to producers. We deliver knowledge, technical assistance and quality standards to consistently drive results.' : 'Estamos presentes em território nacional com parcerias locais e atuação próxima ao produtor. Levamos conhecimento, assistência técnica e padrões de qualidade para impulsionar resultados de forma consistente.'}</p>
+              <p className="text-gray-600 mb-6">{isEn ? 'Below are some provinces where we maintain operations and continuous support:' : 'Abaixo, algumas das províncias onde mantemos operações e apoio contínuo:'}</p>
               <ul className="space-y-2">
                 <li className="text-3xl font-heading font-extrabold text-primary-700">Luanda</li>
                 <li className="text-xl text-gray-800">Benguela</li>
@@ -265,15 +268,15 @@ export default function AboutClient() {
       <div className="container-custom py-12 lg:py-16">
         <div className="bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl p-8 lg:p-10 text-white flex flex-col md:flex-row items-center justify-between gap-6">
           <div>
-            <h4 className="text-2xl font-heading font-bold mb-1">Vamos construir resultados juntos</h4>
-            <p className="text-primary-100">Fale connosco para parcerias, capacitações e soluções personalizadas.</p>
+            <h4 className="text-2xl font-heading font-bold mb-1">{isEn ? 'Let’s build results together' : 'Vamos construir resultados juntos'}</h4>
+            <p className="text-primary-100">{isEn ? 'Contact us for partnerships, training and tailored solutions.' : 'Fale connosco para parcerias, capacitações e soluções personalizadas.'}</p>
           </div>
           <div className="flex gap-3">
             <Link href="/contato" className="inline-flex items-center bg-white text-primary-700 hover:bg-primary-50 font-semibold py-3 px-6 rounded-lg transition-all">
-              Entrar em Contato <ArrowRight size={18} className="ml-2" />
+              {isEn ? 'Get in Touch' : 'Entrar em Contato'} <ArrowRight size={18} className="ml-2" />
             </Link>
             <Link href="/registro" className="inline-flex items-center border-2 border-white text-white hover:bg-white/10 font-semibold py-3 px-6 rounded-lg transition-all">
-              Tornar-se Membro
+              {isEn ? 'Become a Member' : 'Tornar-se Membro'}
             </Link>
           </div>
         </div>

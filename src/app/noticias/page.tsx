@@ -3,10 +3,15 @@ export const dynamic = 'force-dynamic'
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import { Calendar } from 'lucide-react'
+import { cookies } from 'next/headers'
 
-export const metadata: Metadata = {
-  title: 'Notícias',
-  description: 'Últimas notícias e eventos'
+export function generateMetadata(): Metadata {
+  const locale = cookies().get('locale')?.value || 'pt-AO'
+  const isEn = String(locale).startsWith('en')
+  return {
+    title: isEn ? 'News' : 'Notícias',
+    description: isEn ? 'Latest news and events' : 'Últimas notícias e eventos'
+  }
 }
 
 const placeholderImages = [
@@ -40,20 +45,22 @@ async function getNews() {
 
 export default async function NoticiasPage() {
   const news = await getNews()
+  const locale = cookies().get('locale')?.value || 'pt-AO'
+  const isEn = String(locale).startsWith('en')
 
   return (
     <section className="">
       {/* Hero */}
       <div className="bg-gradient-to-r from-primary-50 to-white border-b border-gray-100">
         <div className="container-custom py-10">
-          <h1 className="text-3xl font-heading font-bold text-primary-800">Notícias</h1>
-          <p className="text-gray-600 mt-2 max-w-2xl">Acompanhe novidades do setor e da associação. Imagens ilustrativas.</p>
+          <h1 className="text-3xl font-heading font-bold text-primary-800">{isEn ? 'News' : 'Notícias'}</h1>
+          <p className="text-gray-600 mt-2 max-w-2xl">{isEn ? 'Follow news from the sector and the association. Illustrative images.' : 'Acompanhe novidades do setor e da associação. Imagens ilustrativas.'}</p>
         </div>
       </div>
 
       <div className="container-custom py-10">
         {news.length === 0 ? (
-          <div className="bg-white rounded-xl shadow p-8 text-center text-gray-600">Nenhuma notícia publicada no momento.</div>
+          <div className="bg-white rounded-xl shadow p-8 text-center text-gray-600">{isEn ? 'No news published at the moment.' : 'Nenhuma notícia publicada no momento.'}</div>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {news.map((n: any, idx: number) => (
@@ -61,7 +68,7 @@ export default async function NoticiasPage() {
                 <div className="relative h-44">
                   <Image
                     src={n.imageUrl}
-                    alt={n.title || 'Notícia'}
+                    alt={n.title || (isEn ? 'News' : 'Notícia')}
                     fill
                     className="object-cover"
                     sizes="(max-width:768px) 100vw, 33vw"

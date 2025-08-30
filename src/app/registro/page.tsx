@@ -4,9 +4,14 @@ import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Mail, Lock, User, Phone, Building, AlertCircle, CheckCircle } from 'lucide-react';
+import { useLanguage } from '@/components/providers/LanguageProvider';
+import pt from '@/lib/i18n/dictionaries/pt';
+import en from '@/lib/i18n/dictionaries/en';
 import Link from 'next/link';
 
 export default function RegisterPage() {
+  const { locale } = useLanguage();
+  const dict = locale.startsWith('en') ? en : pt;
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -31,13 +36,13 @@ export default function RegisterPage() {
 
     // Validações
     if (formData.password !== formData.confirmPassword) {
-      setError('As senhas não coincidem');
+      setError(dict.auth.errorPasswordsMismatch);
       setLoading(false);
       return;
     }
 
     if (formData.password.length < 6) {
-      setError('A senha deve ter pelo menos 6 caracteres');
+      setError(dict.auth.errorPasswordTooShort);
       setLoading(false);
       return;
     }
@@ -61,9 +66,9 @@ export default function RegisterPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.message || 'Erro ao criar conta');
+        setError(data.message || dict.auth.errorRegister);
       } else {
-        setSuccess('Conta criada com sucesso! Redirecionando...');
+        setSuccess(dict.auth.successRegister);
         setTimeout(async () => {
           const result = await signIn('credentials', {
             email: formData.email,
@@ -79,7 +84,7 @@ export default function RegisterPage() {
         }, 2000);
       }
     } catch (error) {
-      setError('Erro ao criar conta. Tente novamente.');
+      setError(dict.auth.errorRegister + '.');
     } finally {
       setLoading(false);
     }
@@ -90,10 +95,10 @@ export default function RegisterPage() {
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="text-center">
           <h2 className="text-3xl font-bold text-gray-900">
-            Junte-se à Associação
+            {dict.auth.registerTitle}
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            Crie sua conta e tenha acesso a conteúdo exclusivo
+            {dict.auth.registerSubtitle}
           </p>
         </div>
       </div>
@@ -125,7 +130,7 @@ export default function RegisterPage() {
 
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                Nome Completo
+                {dict.auth.name}
               </label>
               <div className="mt-1 relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -140,14 +145,14 @@ export default function RegisterPage() {
                   value={formData.name}
                   onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                   className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                  placeholder="Seu nome completo"
+                  placeholder={dict.auth.name}
                 />
               </div>
             </div>
 
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email
+                {dict.auth.email}
               </label>
               <div className="mt-1 relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -162,14 +167,14 @@ export default function RegisterPage() {
                   value={formData.email}
                   onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                   className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                  placeholder="seu@email.com"
+                  placeholder={dict.auth.placeholderEmail}
                 />
               </div>
             </div>
 
             <div>
               <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
-                Telefone (opcional)
+                {dict.auth.phoneOptional}
               </label>
               <div className="mt-1 relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -190,7 +195,7 @@ export default function RegisterPage() {
 
             <div>
               <label htmlFor="company" className="block text-sm font-medium text-gray-700">
-                Empresa (opcional)
+                {dict.auth.companyOptional}
               </label>
               <div className="mt-1 relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -203,14 +208,14 @@ export default function RegisterPage() {
                   value={formData.company}
                   onChange={(e) => setFormData(prev => ({ ...prev, company: e.target.value }))}
                   className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                  placeholder="Nome da sua empresa"
+                  placeholder={dict.auth.companyOptional}
                 />
               </div>
             </div>
 
             <div>
               <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-                Descrição (breve sobre você)
+                {dict.auth.description}
               </label>
               <div className="mt-1">
                 <textarea
@@ -220,14 +225,14 @@ export default function RegisterPage() {
                   value={formData.description}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                   className="appearance-none block w-full pr-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                  placeholder="Fale brevemente sobre você, sua experiência ou objetivo"
+                  placeholder={dict.auth.description}
                 />
               </div>
             </div>
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Senha
+                {dict.auth.password}
               </label>
               <div className="mt-1 relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -242,7 +247,7 @@ export default function RegisterPage() {
                   value={formData.password}
                   onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
                   className="appearance-none block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                  placeholder="Mínimo 6 caracteres"
+                  placeholder={dict.auth.passwordMin}
                 />
                 <button
                   type="button"
@@ -260,7 +265,7 @@ export default function RegisterPage() {
 
             <div>
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                Confirmar Senha
+                {dict.auth.confirmPassword}
               </label>
               <div className="mt-1 relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -275,7 +280,7 @@ export default function RegisterPage() {
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
                   className="appearance-none block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                  placeholder="Confirme sua senha"
+                  placeholder={dict.auth.confirmPassword}
                 />
                 <button
                   type="button"
@@ -297,7 +302,7 @@ export default function RegisterPage() {
                 disabled={loading}
                 className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? 'Criando conta...' : 'Criar conta'}
+                {loading ? dict.auth.creatingAccount : dict.auth.createAccount}
               </button>
             </div>
           </form>
@@ -306,9 +311,9 @@ export default function RegisterPage() {
 
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
-              Já tem uma conta?{' '}
+              {dict.auth.haveAccount}{' '}
               <Link href="/login" className="font-medium text-green-600 hover:text-green-500">
-                Faça login aqui
+                {dict.auth.loginHere}
               </Link>
             </p>
           </div>

@@ -1,9 +1,16 @@
 import type { Metadata } from 'next'
 import dynamic from 'next/dynamic'
+import { cookies } from 'next/headers'
 
-export const metadata: Metadata = {
-  title: 'Quem Somos',
-  description: 'Associação de Porcos em Angola: missão, valores e história.'
+export function generateMetadata(): Metadata {
+  const locale = cookies().get('locale')?.value || 'pt-AO'
+  const isEn = String(locale).startsWith('en')
+  return {
+    title: isEn ? 'About Us' : 'Quem Somos',
+    description: isEn
+      ? 'Pig Farmers Association in Angola: mission, values and history.'
+      : 'Associação de Porcos em Angola: missão, valores e história.'
+  }
 }
 
 const AboutClient = dynamic(() => import('./AboutClient'), { ssr: false })

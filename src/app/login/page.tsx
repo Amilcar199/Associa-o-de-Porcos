@@ -4,9 +4,14 @@ import { useState } from 'react';
 import { signIn, getSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
+import { useLanguage } from '@/components/providers/LanguageProvider';
+import pt from '@/lib/i18n/dictionaries/pt';
+import en from '@/lib/i18n/dictionaries/en';
 import Link from 'next/link';
 
 export default function LoginPage() {
+  const { locale } = useLanguage();
+  const dict = locale.startsWith('en') ? en : pt;
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -29,7 +34,7 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
-        setError('Email ou senha incorretos');
+        setError(dict.auth.errorWrongCredentials);
       } else {
         // Verificar se o login foi bem-sucedido
         const session = await getSession();
@@ -45,7 +50,7 @@ export default function LoginPage() {
         }
       }
     } catch (error) {
-      setError('Erro ao fazer login. Tente novamente.');
+      setError(dict.auth.errorLogin);
     } finally {
       setLoading(false);
     }
@@ -56,10 +61,10 @@ export default function LoginPage() {
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="text-center">
           <h2 className="text-3xl font-bold text-gray-900">
-            Entrar na Associação
+            {dict.auth.loginTitle}
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            Acesse sua conta para continuar
+            {dict.auth.loginSubtitle}
           </p>
         </div>
       </div>
@@ -80,7 +85,7 @@ export default function LoginPage() {
 
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email
+                {dict.auth.email}
               </label>
               <div className="mt-1 relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -95,14 +100,14 @@ export default function LoginPage() {
                   value={formData.email}
                   onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                   className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                  placeholder="seu@email.com"
+                  placeholder={dict.auth.placeholderEmail}
                 />
               </div>
             </div>
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Senha
+                {dict.auth.password}
               </label>
               <div className="mt-1 relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -117,7 +122,7 @@ export default function LoginPage() {
                   value={formData.password}
                   onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
                   className="appearance-none block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                  placeholder="Sua senha"
+                  placeholder={dict.auth.placeholderPassword}
                 />
                 <button
                   type="button"
@@ -142,13 +147,13 @@ export default function LoginPage() {
                   className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
                 />
                 <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
-                  Lembrar de mim
+                  {dict.auth.rememberMe}
                 </label>
               </div>
 
               <div className="text-sm">
                 <Link href="/esqueci-senha" className="font-medium text-green-600 hover:text-green-500">
-                  Esqueceu sua senha?
+                  {dict.auth.forgotPassword}
                 </Link>
               </div>
             </div>
@@ -159,7 +164,7 @@ export default function LoginPage() {
                 disabled={loading}
                 className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? 'Entrando...' : 'Entrar'}
+                {loading ? dict.auth.loggingIn : dict.auth.login}
               </button>
             </div>
           </form>
@@ -168,9 +173,9 @@ export default function LoginPage() {
 
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
-              Não tem uma conta?{' '}
+              {dict.auth.noAccount}{' '}
               <Link href="/registro" className="font-medium text-green-600 hover:text-green-500">
-                Registre-se aqui
+                {dict.auth.registerHere}
               </Link>
             </p>
           </div>

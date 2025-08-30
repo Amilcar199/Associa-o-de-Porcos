@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { User, Settings, History, Shield, LogOut } from 'lucide-react';
+import { useLanguage } from '@/components/providers/LanguageProvider';
+import pt from '@/lib/i18n/dictionaries/pt';
+import en from '@/lib/i18n/dictionaries/en';
 import ImageUpload from '@/components/admin/ui/ImageUpload';
 
 interface UserProfile {
@@ -32,6 +35,8 @@ interface UserProfile {
 }
 
 export default function ProfilePage() {
+  const { locale } = useLanguage();
+  const dict = locale.startsWith('en') ? en : pt;
   const { data: session, status } = useSession();
   const router = useRouter();
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -163,8 +168,8 @@ export default function ProfilePage() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Meu Perfil</h1>
-          <p className="text-gray-600">Gerencie suas informações pessoais e configurações</p>
+          <h1 className="text-3xl font-bold text-gray-900">{dict.profile.pageTitle}</h1>
+          <p className="text-gray-600">{dict.profile.pageSubtitle}</p>
         </div>
 
         <div className="bg-white rounded-lg shadow">
@@ -180,7 +185,7 @@ export default function ProfilePage() {
                 }`}
               >
                 <User className="inline-block w-4 h-4 mr-2" />
-                Perfil
+                {dict.profile.tabs.profile}
               </button>
               <button
                 onClick={() => setActiveTab('settings')}
@@ -191,7 +196,7 @@ export default function ProfilePage() {
                 }`}
               >
                 <Settings className="inline-block w-4 h-4 mr-2" />
-                Configurações
+                {dict.profile.tabs.settings}
               </button>
               <button
                 onClick={() => setActiveTab('security')}
@@ -202,7 +207,7 @@ export default function ProfilePage() {
                 }`}
               >
                 <Shield className="inline-block w-4 h-4 mr-2" />
-                Segurança
+                {dict.profile.tabs.security}
               </button>
             </nav>
           </div>
@@ -220,11 +225,11 @@ export default function ProfilePage() {
                     />
                   </div>
                   <div>
-                    <h3 className="text-lg font-medium text-gray-900">Foto do Perfil</h3>
-                    <p className="text-sm text-gray-500">Atualize sua foto de perfil</p>
+                    <h3 className="text-lg font-medium text-gray-900">{dict.profile.avatarTitle}</h3>
+                    <p className="text-sm text-gray-500">{dict.profile.avatarSubtitle}</p>
                     <ImageUpload
                       onImageUploaded={handleImageUploaded}
-                      label="Upload de Foto"
+                      label={dict.profile.uploadLabel}
                       className="mt-2"
                     />
                   </div>
@@ -234,7 +239,7 @@ export default function ProfilePage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Nome Completo
+                      {dict.profile.name}
                     </label>
                     <input
                       type="text"
@@ -247,7 +252,7 @@ export default function ProfilePage() {
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Email
+                      {dict.auth.email}
                     </label>
                     <input
                       type="email"
@@ -259,7 +264,7 @@ export default function ProfilePage() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Telefone
+                      {dict.profile.phone}
                     </label>
                     <input
                       type="tel"
@@ -271,7 +276,7 @@ export default function ProfilePage() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Empresa
+                      {dict.profile.company}
                     </label>
                     <input
                       type="text"
@@ -283,47 +288,47 @@ export default function ProfilePage() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Localização
+                      {dict.profile.location}
                     </label>
                     <input
                       type="text"
                       value={formData.location}
                       onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                      placeholder="Cidade, Estado"
+                      placeholder={dict.profile.locationPlaceholder}
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Website
+                      {dict.profile.website}
                     </label>
                     <input
                       type="url"
                       value={formData.website}
                       onChange={(e) => setFormData(prev => ({ ...prev, website: e.target.value }))}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                      placeholder="https://..."
+                      placeholder={dict.profile.websitePlaceholder}
                     />
                   </div>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Biografia
+                    {dict.profile.bio}
                   </label>
                   <textarea
                     value={formData.bio}
                     onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
                     rows={4}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    placeholder="Conte um pouco sobre você..."
+                    placeholder={dict.profile.bioPlaceholder}
                   />
                 </div>
 
                 {/* Social Media */}
                 <div>
-                  <h4 className="text-lg font-medium text-gray-900 mb-4">Redes Sociais</h4>
+                  <h4 className="text-lg font-medium text-gray-900 mb-4">{dict.profile.social}</h4>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -381,7 +386,7 @@ export default function ProfilePage() {
                     disabled={saving}
                     className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {saving ? 'Salvando...' : 'Salvar Alterações'}
+                    {saving ? dict.profile.saving : dict.profile.saveChanges}
                   </button>
                 </div>
               </form>
@@ -389,13 +394,13 @@ export default function ProfilePage() {
 
             {activeTab === 'settings' && (
               <div className="space-y-6">
-                <h3 className="text-lg font-medium text-gray-900">Preferências de Notificação</h3>
+                <h3 className="text-lg font-medium text-gray-900">{dict.profile.preferencesTitle}</h3>
                 
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="text-sm font-medium text-gray-900">Notificações por Email</h4>
-                      <p className="text-sm text-gray-500">Receba atualizações importantes por email</p>
+                      <h4 className="text-sm font-medium text-gray-900">{dict.profile.emailNotif.title}</h4>
+                      <p className="text-sm text-gray-500">{dict.profile.emailNotif.desc}</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
@@ -413,8 +418,8 @@ export default function ProfilePage() {
 
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="text-sm font-medium text-gray-900">Notificações por SMS</h4>
-                      <p className="text-sm text-gray-500">Receba alertas importantes por SMS</p>
+                      <h4 className="text-sm font-medium text-gray-900">{dict.profile.smsNotif.title}</h4>
+                      <p className="text-sm text-gray-500">{dict.profile.smsNotif.desc}</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
@@ -432,8 +437,8 @@ export default function ProfilePage() {
 
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="text-sm font-medium text-gray-900">Newsletter</h4>
-                      <p className="text-sm text-gray-500">Receba novidades e dicas por email</p>
+                      <h4 className="text-sm font-medium text-gray-900">{dict.profile.newsletter.title}</h4>
+                      <p className="text-sm text-gray-500">{dict.profile.newsletter.desc}</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
@@ -456,7 +461,7 @@ export default function ProfilePage() {
                     disabled={saving}
                     className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {saving ? 'Salvando...' : 'Salvar Preferências'}
+                    {saving ? dict.profile.saving : dict.profile.savePreferences}
                   </button>
                 </div>
               </div>
@@ -464,7 +469,7 @@ export default function ProfilePage() {
 
             {activeTab === 'security' && (
               <div className="space-y-6">
-                <h3 className="text-lg font-medium text-gray-900">Segurança da Conta</h3>
+                <h3 className="text-lg font-medium text-gray-900">{dict.profile.securityTitle}</h3>
                 
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                   <div className="flex">
@@ -472,13 +477,12 @@ export default function ProfilePage() {
                       <Shield className="h-5 w-5 text-yellow-400" />
                     </div>
                     <div className="ml-3">
-                      <h4 className="text-sm font-medium text-yellow-800">Dicas de Segurança</h4>
+                      <h4 className="text-sm font-medium text-yellow-800">{dict.profile.securityTipsTitle}</h4>
                       <div className="mt-2 text-sm text-yellow-700">
                         <ul className="list-disc list-inside space-y-1">
-                          <li>Use uma senha forte com pelo menos 8 caracteres</li>
-                          <li>Não compartilhe suas credenciais de login</li>
-                          <li>Ative a autenticação de dois fatores se disponível</li>
-                          <li>Mantenha seu email e telefone atualizados</li>
+                          {dict.profile.securityTips.map((tip, i) => (
+                            <li key={i}>{tip}</li>
+                          ))}
                         </ul>
                       </div>
                     </div>
@@ -487,26 +491,26 @@ export default function ProfilePage() {
 
                 <div className="space-y-4">
                   <div className="border border-gray-200 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-gray-900 mb-2">Alterar Senha</h4>
-                    <p className="text-sm text-gray-500 mb-4">Atualize sua senha para manter sua conta segura</p>
+                    <h4 className="text-sm font-medium text-gray-900 mb-2">{dict.profile.changePasswordTitle}</h4>
+                    <p className="text-sm text-gray-500 mb-4">{dict.profile.changePasswordDesc}</p>
                     <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                      Alterar Senha
+                      {dict.profile.changePasswordBtn}
                     </button>
                   </div>
 
                   <div className="border border-gray-200 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-gray-900 mb-2">Sessões Ativas</h4>
-                    <p className="text-sm text-gray-500 mb-4">Gerencie suas sessões ativas em outros dispositivos</p>
+                    <h4 className="text-sm font-medium text-gray-900 mb-2">{dict.profile.sessionsTitle}</h4>
+                    <p className="text-sm text-gray-500 mb-4">{dict.profile.sessionsDesc}</p>
                     <button className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
-                      Ver Sessões
+                      {dict.profile.sessionsBtn}
                     </button>
                   </div>
 
                   <div className="border border-red-200 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-red-900 mb-2">Zona de Perigo</h4>
-                    <p className="text-sm text-red-700 mb-4">Ações irreversíveis para sua conta</p>
+                    <h4 className="text-sm font-medium text-red-900 mb-2">{dict.profile.dangerZoneTitle}</h4>
+                    <p className="text-sm text-red-700 mb-4">{dict.profile.dangerZoneDesc}</p>
                     <button className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
-                      Excluir Conta
+                      {dict.profile.deleteAccountBtn}
                     </button>
                   </div>
                 </div>

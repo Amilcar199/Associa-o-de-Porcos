@@ -3,10 +3,15 @@ export const dynamic = 'force-dynamic'
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import { Tag, Weight, Calendar } from 'lucide-react'
+import { cookies } from 'next/headers'
 
-export const metadata: Metadata = {
-  title: 'Produtos',
-  description: 'Listagem de produtos disponíveis'
+export function generateMetadata(): Metadata {
+  const locale = cookies().get('locale')?.value || 'pt-AO'
+  const isEn = String(locale).startsWith('en')
+  return {
+    title: isEn ? 'Products' : 'Produtos',
+    description: isEn ? 'Available products list' : 'Listagem de produtos disponíveis'
+  }
 }
 
 const placeholderImages = [
@@ -22,7 +27,6 @@ async function getProducts() {
   if (!res.ok) return []
   const json = await res.json()
   const data = json.data || []
-  // Enriquecer com imagem fictícia se não houver
   const enriched = data.map((p: any, idx: number) => ({
     ...p,
     imageUrl: p.imageUrl || placeholderImages[idx % placeholderImages.length]
@@ -45,20 +49,22 @@ async function getProducts() {
 
 export default async function ProdutosPage() {
   const products = await getProducts()
+  const locale = cookies().get('locale')?.value || 'pt-AO'
+  const isEn = String(locale).startsWith('en')
 
   return (
     <section className="">
       {/* Hero simples */}
       <div className="bg-gradient-to-r from-primary-50 to-white border-b border-gray-100">
         <div className="container-custom py-10">
-          <h1 className="text-3xl font-heading font-bold text-primary-800">Produtos</h1>
-          <p className="text-gray-600 mt-2 max-w-2xl">Animais com procedência e qualidade. Imagens ilustrativas; consulte-nos para disponibilidade atual.</p>
+          <h1 className="text-3xl font-heading font-bold text-primary-800">{isEn ? 'Products' : 'Produtos'}</h1>
+          <p className="text-gray-600 mt-2 max-w-2xl">{isEn ? 'Animals with origin and quality. Illustrative images; contact us for current availability.' : 'Animais com procedência e qualidade. Imagens ilustrativas; consulte-nos para disponibilidade atual.'}</p>
         </div>
       </div>
 
       <div className="container-custom py-10">
         {products.length === 0 ? (
-          <div className="bg-white rounded-xl shadow p-8 text-center text-gray-600">Nenhum produto disponível no momento.</div>
+          <div className="bg-white rounded-xl shadow p-8 text-center text-gray-600">{isEn ? 'No products available at the moment.' : 'Nenhum produto disponível no momento.'}</div>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {products.map((p: any, idx: number) => (
@@ -67,7 +73,7 @@ export default async function ProdutosPage() {
                 <div className="relative h-48">
                   <Image
                     src={p.imageUrl}
-                    alt={p.name || 'Produto'}
+                    alt={p.name || (isEn ? 'Product' : 'Produto')}
                     fill
                     className="object-cover"
                     sizes="(max-width:768px) 100vw, 33vw"
@@ -86,15 +92,15 @@ export default async function ProdutosPage() {
                   <div className="mt-2 grid grid-cols-3 gap-2 text-xs text-gray-600">
                     <div className="flex items-center gap-1"><Tag size={14} className="text-primary-600" />{p.breed || '—'}</div>
                     <div className="flex items-center gap-1"><Weight size={14} className="text-primary-600" />{p.weight ? `${p.weight} kg` : '—'}</div>
-                    <div className="flex items-center gap-1"><Calendar size={14} className="text-primary-600" />{p.age ? `${p.age} meses` : '—'}</div>
+                    <div className="flex items-center gap-1"><Calendar size={14} className="text-primary-600" />{p.age ? `${p.age} ${isEn ? 'months' : 'meses'}` : '—'}</div>
                   </div>
 
                   {/* Ações */}
                   <div className="mt-4 flex items-center justify-between">
-                    <span className="text-sm text-gray-500">Código: {p.code || p._id?.slice?.(0, 6) || '—'}</span>
+                    <span className="text-sm text-gray-500">{isEn ? 'Code' : 'Código'}: {p.code || p._id?.slice?.(0, 6) || '—'}</span>
                     <div className="flex items-center gap-3">
-                      <a href="/contato" className="text-primary-700 hover:text-primary-800 font-medium text-sm">Entre em Contato</a>
-                      <a href="tel:+244928476427" className="text-primary-700 hover:text-primary-800 font-medium text-sm">Ligue</a>
+                      <a href="/contato" className="text-primary-700 hover:text-primary-800 font-medium text-sm">{isEn ? 'Contact us' : 'Entre em Contato'}</a>
+                      <a href="tel:+244928476427" className="text-primary-700 hover:text-primary-800 font-medium text-sm">{isEn ? 'Call' : 'Ligue'}</a>
                     </div>
                   </div>
                 </div>

@@ -15,6 +15,7 @@ import {
   TrendingUp,
   Award
 } from 'lucide-react';
+import { useLanguage } from '@/components/providers/LanguageProvider';
 
 interface MemberContent {
   id: string;
@@ -29,6 +30,8 @@ interface MemberContent {
 }
 
 export default function MembersArea() {
+  const { locale } = useLanguage();
+  const isEn = locale.startsWith('en');
   const { data: session, status } = useSession();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
@@ -43,17 +46,8 @@ export default function MembersArea() {
 
   useEffect(() => {
     if (status === 'loading') return;
-    
-    if (!session) {
-      router.push('/login');
-      return;
-    }
-
-    if (session.user?.role === 'visitor') {
-      router.push('/');
-      return;
-    }
-
+    if (!session) { router.push('/login'); return; }
+    if (session.user?.role === 'visitor') { router.push('/'); return; }
     fetchMemberContent();
     fetchMemberStats();
   }, [session, status]);
@@ -66,7 +60,7 @@ export default function MembersArea() {
         setContent(data.data || []);
       }
     } catch (error) {
-      console.error('Erro ao buscar conteúdo:', error);
+      console.error(isEn ? 'Error fetching content:' : 'Erro ao buscar conteúdo:', error);
     } finally {
       setLoading(false);
     }
@@ -80,37 +74,27 @@ export default function MembersArea() {
         setStats(data.data || {});
       }
     } catch (error) {
-      console.error('Erro ao buscar estatísticas:', error);
+      console.error(isEn ? 'Error fetching stats:' : 'Erro ao buscar estatísticas:', error);
     }
   };
 
   const getContentIcon = (type: string) => {
     switch (type) {
-      case 'document':
-        return <FileText className="w-5 h-5" />;
-      case 'video':
-        return <Video className="w-5 h-5" />;
-      case 'article':
-        return <BookOpen className="w-5 h-5" />;
-      case 'event':
-        return <Calendar className="w-5 h-5" />;
-      default:
-        return <FileText className="w-5 h-5" />;
+      case 'document': return <FileText className="w-5 h-5" />;
+      case 'video': return <Video className="w-5 h-5" />;
+      case 'article': return <BookOpen className="w-5 h-5" />;
+      case 'event': return <Calendar className="w-5 h-5" />;
+      default: return <FileText className="w-5 h-5" />;
     }
   };
 
   const getContentColor = (type: string) => {
     switch (type) {
-      case 'document':
-        return 'bg-blue-100 text-blue-800';
-      case 'video':
-        return 'bg-purple-100 text-purple-800';
-      case 'article':
-        return 'bg-green-100 text-green-800';
-      case 'event':
-        return 'bg-orange-100 text-orange-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
+      case 'document': return 'bg-blue-100 text-blue-800';
+      case 'video': return 'bg-purple-100 text-purple-800';
+      case 'article': return 'bg-green-100 text-green-800';
+      case 'event': return 'bg-orange-100 text-orange-800';
+      default: return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -127,9 +111,7 @@ export default function MembersArea() {
     );
   }
 
-  if (!session) {
-    return null;
-  }
+  if (!session) { return null; }
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -138,12 +120,12 @@ export default function MembersArea() {
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Área de Membros</h1>
-              <p className="text-gray-600">Conteúdo exclusivo para membros da associação</p>
+              <h1 className="text-3xl font-bold text-gray-900">{isEn ? 'Members Area' : 'Área de Membros'}</h1>
+              <p className="text-gray-600">{isEn ? 'Exclusive content for association members' : 'Conteúdo exclusivo para membros da associação'}</p>
             </div>
             <div className="flex items-center space-x-4">
               <div className="text-right">
-                <p className="text-sm text-gray-500">Nível de Associação</p>
+                <p className="text-sm text-gray-500">{isEn ? 'Membership Level' : 'Nível de Associação'}</p>
                 <p className="text-lg font-semibold text-green-600">{stats.membershipLevel}</p>
               </div>
               <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
@@ -161,43 +143,40 @@ export default function MembersArea() {
                 <FileText className="w-8 h-8 text-blue-600" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">Documentos</p>
+                <p className="text-sm font-medium text-gray-500">{isEn ? 'Documents' : 'Documentos'}</p>
                 <p className="text-2xl font-bold text-gray-900">{stats.totalDocuments}</p>
               </div>
             </div>
           </div>
-
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <Video className="w-8 h-8 text-purple-600" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">Vídeos</p>
+                <p className="text-sm font-medium text-gray-500">{isEn ? 'Videos' : 'Vídeos'}</p>
                 <p className="text-2xl font-bold text-gray-900">{stats.totalVideos}</p>
               </div>
             </div>
           </div>
-
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <Calendar className="w-8 h-8 text-orange-600" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">Eventos</p>
+                <p className="text-sm font-medium text-gray-500">{isEn ? 'Events' : 'Eventos'}</p>
                 <p className="text-2xl font-bold text-gray-900">{stats.totalEvents}</p>
               </div>
             </div>
           </div>
-
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <Award className="w-8 h-8 text-green-600" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">Benefícios</p>
+                <p className="text-sm font-medium text-gray-500">{isEn ? 'Benefits' : 'Benefícios'}</p>
                 <p className="text-2xl font-bold text-gray-900">+15</p>
               </div>
             </div>
@@ -208,60 +187,25 @@ export default function MembersArea() {
         <div className="bg-white rounded-lg shadow">
           <div className="border-b border-gray-200">
             <nav className="-mb-px flex space-x-8 px-6">
-              <button
-                onClick={() => setActiveTab('overview')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'overview'
-                    ? 'border-green-500 text-green-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
+              <button onClick={() => setActiveTab('overview')} className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'overview' ? 'border-green-500 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
                 <TrendingUp className="inline-block w-4 h-4 mr-2" />
-                Visão Geral
+                {isEn ? 'Overview' : 'Visão Geral'}
               </button>
-              <button
-                onClick={() => setActiveTab('document')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'document'
-                    ? 'border-green-500 text-green-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
+              <button onClick={() => setActiveTab('document')} className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'document' ? 'border-green-500 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
                 <FileText className="inline-block w-4 h-4 mr-2" />
-                Documentos
+                {isEn ? 'Documents' : 'Documentos'}
               </button>
-              <button
-                onClick={() => setActiveTab('video')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'video'
-                    ? 'border-green-500 text-green-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
+              <button onClick={() => setActiveTab('video')} className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'video' ? 'border-green-500 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
                 <Video className="inline-block w-4 h-4 mr-2" />
-                Vídeos
+                {isEn ? 'Videos' : 'Vídeos'}
               </button>
-              <button
-                onClick={() => setActiveTab('article')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'article'
-                    ? 'border-green-500 text-green-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
+              <button onClick={() => setActiveTab('article')} className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'article' ? 'border-green-500 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
                 <BookOpen className="inline-block w-4 h-4 mr-2" />
-                Artigos
+                {isEn ? 'Articles' : 'Artigos'}
               </button>
-              <button
-                onClick={() => setActiveTab('event')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'event'
-                    ? 'border-green-500 text-green-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
+              <button onClick={() => setActiveTab('event')} className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'event' ? 'border-green-500 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
                 <Calendar className="inline-block w-4 h-4 mr-2" />
-                Eventos
+                {isEn ? 'Events' : 'Eventos'}
               </button>
             </nav>
           </div>
@@ -272,8 +216,8 @@ export default function MembersArea() {
                 <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <MessageSquare className="w-8 h-8 text-gray-400" />
                 </div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhum conteúdo encontrado</h3>
-                <p className="text-gray-500">Em breve teremos conteúdo exclusivo para você!</p>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">{isEn ? 'No content found' : 'Nenhum conteúdo encontrado'}</h3>
+                <p className="text-gray-500">{isEn ? 'We will have exclusive content for you soon!' : 'Em breve teremos conteúdo exclusivo para você!'}</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -281,11 +225,7 @@ export default function MembersArea() {
                   <div key={item.id} className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
                     {item.thumbnail && (
                       <div className="aspect-video bg-gray-200">
-                        <img
-                          src={item.thumbnail}
-                          alt={item.title}
-                          className="w-full h-full object-cover"
-                        />
+                        <img src={item.thumbnail} alt={item.title} className="w-full h-full object-cover" />
                       </div>
                     )}
                     <div className="p-6">
@@ -294,20 +234,16 @@ export default function MembersArea() {
                           {getContentIcon(item.type)}
                           <span className="ml-1 capitalize">{item.type}</span>
                         </span>
-                        {item.isFeatured && (
-                          <Star className="w-4 h-4 text-yellow-500" />
-                        )}
+                        {item.isFeatured && (<Star className="w-4 h-4 text-yellow-500" />)}
                       </div>
                       <h3 className="text-lg font-semibold text-gray-900 mb-2">{item.title}</h3>
                       <p className="text-gray-600 text-sm mb-4">{item.description}</p>
                       <div className="flex items-center justify-between">
-                        <span className="text-xs text-gray-500">
-                          {new Date(item.createdAt).toLocaleDateString('pt-AO')}
-                        </span>
+                        <span className="text-xs text-gray-500">{new Date(item.createdAt).toLocaleDateString(isEn ? 'en-US' : 'pt-AO')}</span>
                         {item.url && (
                           <button className="inline-flex items-center text-sm text-green-600 hover:text-green-700">
                             <Download className="w-4 h-4 mr-1" />
-                            Acessar
+                            {isEn ? 'Access' : 'Acessar'}
                           </button>
                         )}
                       </div>
@@ -321,15 +257,15 @@ export default function MembersArea() {
 
         {/* Benefits Section */}
         <div className="mt-8 bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Benefícios da Associação</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">{isEn ? 'Association Benefits' : 'Benefícios da Associação'}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="flex items-start space-x-3">
               <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
                 <Star className="w-4 h-4 text-green-600" />
               </div>
               <div>
-                <h4 className="text-sm font-medium text-gray-900">Conteúdo Exclusivo</h4>
-                <p className="text-sm text-gray-500">Acesso a materiais e recursos exclusivos</p>
+                <h4 className="text-sm font-medium text-gray-900">{isEn ? 'Exclusive Content' : 'Conteúdo Exclusivo'}</h4>
+                <p className="text-sm text-gray-500">{isEn ? 'Access to exclusive materials and resources' : 'Acesso a materiais e recursos exclusivos'}</p>
               </div>
             </div>
             <div className="flex items-start space-x-3">
@@ -337,8 +273,8 @@ export default function MembersArea() {
                 <Calendar className="w-4 h-4 text-green-600" />
               </div>
               <div>
-                <h4 className="text-sm font-medium text-gray-900">Eventos Prioritários</h4>
-                <p className="text-sm text-gray-500">Participação em eventos e workshops</p>
+                <h4 className="text-sm font-medium text-gray-900">{isEn ? 'Priority Events' : 'Eventos Prioritários'}</h4>
+                <p className="text-sm text-gray-500">{isEn ? 'Participation in events and workshops' : 'Participação em eventos e workshops'}</p>
               </div>
             </div>
             <div className="flex items-start space-x-3">
@@ -346,8 +282,8 @@ export default function MembersArea() {
                 <MessageSquare className="w-4 h-4 text-green-600" />
               </div>
               <div>
-                <h4 className="text-sm font-medium text-gray-900">Suporte Especializado</h4>
-                <p className="text-sm text-gray-500">Consultoria e orientação técnica</p>
+                <h4 className="text-sm font-medium text-gray-900">{isEn ? 'Specialized Support' : 'Suporte Especializado'}</h4>
+                <p className="text-sm text-gray-500">{isEn ? 'Consulting and technical guidance' : 'Consultoria e orientação técnica'}</p>
               </div>
             </div>
             <div className="flex items-start space-x-3">
@@ -356,7 +292,7 @@ export default function MembersArea() {
               </div>
               <div>
                 <h4 className="text-sm font-medium text-gray-900">Networking</h4>
-                <p className="text-sm text-gray-500">Conexões com outros profissionais</p>
+                <p className="text-sm text-gray-500">{isEn ? 'Connections with other professionals' : 'Conexões com outros profissionais'}</p>
               </div>
             </div>
             <div className="flex items-start space-x-3">
@@ -364,8 +300,8 @@ export default function MembersArea() {
                 <FileText className="w-4 h-4 text-green-600" />
               </div>
               <div>
-                <h4 className="text-sm font-medium text-gray-900">Documentação</h4>
-                <p className="text-sm text-gray-500">Manuais e guias técnicos</p>
+                <h4 className="text-sm font-medium text-gray-900">{isEn ? 'Documentation' : 'Documentação'}</h4>
+                <p className="text-sm text-gray-500">{isEn ? 'Manuals and technical guides' : 'Manuais e guias técnicos'}</p>
               </div>
             </div>
             <div className="flex items-start space-x-3">
@@ -373,8 +309,8 @@ export default function MembersArea() {
                 <Award className="w-4 h-4 text-green-600" />
               </div>
               <div>
-                <h4 className="text-sm font-medium text-gray-900">Certificações</h4>
-                <p className="text-sm text-gray-500">Programas de certificação profissional</p>
+                <h4 className="text-sm font-medium text-gray-900">{isEn ? 'Certifications' : 'Certificações'}</h4>
+                <p className="text-sm text-gray-500">{isEn ? 'Professional certification programs' : 'Programas de certificação profissional'}</p>
               </div>
             </div>
           </div>

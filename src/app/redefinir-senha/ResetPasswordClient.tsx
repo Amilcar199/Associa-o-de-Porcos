@@ -4,8 +4,11 @@ import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Eye, EyeOff, Lock, AlertCircle, CheckCircle, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
+import { useLanguage } from '@/components/providers/LanguageProvider'
 
 export default function ResetPasswordClient() {
+  const { locale } = useLanguage()
+  const isEn = locale.startsWith('en')
   const [formData, setFormData] = useState({ password: '', confirmPassword: '' })
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -23,7 +26,7 @@ export default function ResetPasswordClient() {
       setToken(tokenParam)
       validateToken(tokenParam)
     } else {
-      setError('Token de recuperação inválido')
+      setError(isEn ? 'Invalid recovery token' : 'Token de recuperação inválido')
     }
   }, [searchParams])
 
@@ -35,9 +38,9 @@ export default function ResetPasswordClient() {
         body: JSON.stringify({ token }),
       })
       if (response.ok) setTokenValid(true)
-      else setError('Token inválido ou expirado')
+      else setError(isEn ? 'Invalid or expired token' : 'Token inválido ou expirado')
     } catch (error) {
-      setError('Erro ao validar token')
+      setError(isEn ? 'Error validating token' : 'Erro ao validar token')
     }
   }
 
@@ -48,13 +51,13 @@ export default function ResetPasswordClient() {
     setSuccess('')
 
     if (formData.password !== formData.confirmPassword) {
-      setError('As senhas não coincidem')
+      setError(isEn ? "Passwords don't match" : 'As senhas não coincidem')
       setLoading(false)
       return
     }
 
     if (formData.password.length < 6) {
-      setError('A senha deve ter pelo menos 6 caracteres')
+      setError(isEn ? 'Password must be at least 6 characters' : 'A senha deve ter pelo menos 6 caracteres')
       setLoading(false)
       return
     }
@@ -66,13 +69,13 @@ export default function ResetPasswordClient() {
         body: JSON.stringify({ token, password: formData.password }),
       })
       const data = await response.json()
-      if (!response.ok) setError(data.message || 'Erro ao redefinir senha')
+      if (!response.ok) setError(data.message || (isEn ? 'Error resetting password' : 'Erro ao redefinir senha'))
       else {
-        setSuccess('Senha redefinida com sucesso! Redirecionando...')
+        setSuccess(isEn ? 'Password reset successfully! Redirecting...' : 'Senha redefinida com sucesso! Redirecionando...')
         setTimeout(() => router.push('/login'), 2000)
       }
     } catch (error) {
-      setError('Erro ao redefinir senha. Tente novamente.')
+      setError(isEn ? 'Error resetting password. Please try again.' : 'Erro ao redefinir senha. Tente novamente.')
     } finally {
       setLoading(false)
     }
@@ -83,11 +86,11 @@ export default function ResetPasswordClient() {
       <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
         <div className="text-center">
           <AlertCircle className="mx-auto h-12 w-12 text-red-400" />
-          <h2 className="mt-4 text-2xl font-bold text-gray-900">Token Inválido</h2>
-          <p className="mt-2 text-gray-600">O link de recuperação é inválido ou expirou.</p>
+          <h2 className="mt-4 text-2xl font-bold text-gray-900">{isEn ? 'Invalid Token' : 'Token Inválido'}</h2>
+          <p className="mt-2 text-gray-600">{isEn ? 'The recovery link is invalid or has expired.' : 'O link de recuperação é inválido ou expirou.'}</p>
           <Link href="/esqueci-senha" className="mt-4 inline-flex items-center text-green-600 hover:text-green-500">
             <ArrowLeft className="w-4 h-4 mr-1" />
-            Solicitar novo link
+            {isEn ? 'Request new link' : 'Solicitar novo link'}
           </Link>
         </div>
       </div>
@@ -98,8 +101,8 @@ export default function ResetPasswordClient() {
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900">Redefinir Senha</h2>
-          <p className="mt-2 text-sm text-gray-600">Digite sua nova senha</p>
+          <h2 className="text-3xl font-bold text-gray-900">{isEn ? 'Reset Password' : 'Redefinir Senha'}</h2>
+          <p className="mt-2 text-sm text-gray-600">{isEn ? 'Enter your new password' : 'Digite sua nova senha'}</p>
         </div>
       </div>
 
@@ -108,7 +111,7 @@ export default function ResetPasswordClient() {
           {!tokenValid ? (
             <div className="text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto" />
-              <p className="mt-2 text-sm text-gray-600">Validando token...</p>
+              <p className="mt-2 text-sm text-gray-600">{isEn ? 'Validating token...' : 'Validando token...'}</p>
             </div>
           ) : (
             <form className="space-y-6" onSubmit={handleSubmit}>
@@ -135,7 +138,7 @@ export default function ResetPasswordClient() {
               )}
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">Nova Senha</label>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700">{isEn ? 'New Password' : 'Nova Senha'}</label>
                 <div className="mt-1 relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Lock className="h-5 w-5 text-gray-400" />
@@ -149,7 +152,7 @@ export default function ResetPasswordClient() {
                     value={formData.password}
                     onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
                     className="appearance-none block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                    placeholder="Mínimo 6 caracteres"
+                    placeholder={isEn ? 'Minimum 6 characters' : 'Mínimo 6 caracteres'}
                   />
                   <button type="button" className="absolute inset-y-0 right-0 pr-3 flex items-center" onClick={() => setShowPassword(!showPassword)}>
                     {showPassword ? (
@@ -162,7 +165,7 @@ export default function ResetPasswordClient() {
               </div>
 
               <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">Confirmar Nova Senha</label>
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">{isEn ? 'Confirm New Password' : 'Confirmar Nova Senha'}</label>
                 <div className="mt-1 relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Lock className="h-5 w-5 text-gray-400" />
@@ -176,7 +179,7 @@ export default function ResetPasswordClient() {
                     value={formData.confirmPassword}
                     onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
                     className="appearance-none block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                    placeholder="Confirme sua nova senha"
+                    placeholder={isEn ? 'Confirm your new password' : 'Confirme sua nova senha'}
                   />
                   <button type="button" className="absolute inset-y-0 right-0 pr-3 flex items-center" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
                     {showConfirmPassword ? (
@@ -190,7 +193,7 @@ export default function ResetPasswordClient() {
 
               <div>
                 <button type="submit" disabled={loading} className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed">
-                  {loading ? 'Redefinindo...' : 'Redefinir Senha'}
+                  {loading ? (isEn ? 'Resetting...' : 'Redefinindo...') : (isEn ? 'Reset Password' : 'Redefinir Senha')}
                 </button>
               </div>
             </form>
@@ -199,7 +202,7 @@ export default function ResetPasswordClient() {
           <div className="mt-6 text-center">
             <Link href="/login" className="inline-flex items-center text-sm text-green-600 hover:text-green-500">
               <ArrowLeft className="w-4 h-4 mr-1" />
-              Voltar para o login
+              {isEn ? 'Back to login' : 'Voltar para o login'}
             </Link>
           </div>
         </div>
