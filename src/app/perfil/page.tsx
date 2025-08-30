@@ -8,6 +8,7 @@ import { useLanguage } from '@/components/providers/LanguageProvider';
 import pt from '@/lib/i18n/dictionaries/pt';
 import en from '@/lib/i18n/dictionaries/en';
 import ImageUpload from '@/components/admin/ui/ImageUpload';
+import { X } from 'lucide-react';
 
 interface UserProfile {
   _id: string;
@@ -43,6 +44,11 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('profile');
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showSessionsModal, setShowSessionsModal] = useState(false);
+  const [pwForm, setPwForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
+  const [pwError, setPwError] = useState('');
+  const [pwLoading, setPwLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -152,6 +158,43 @@ export default function ProfilePage() {
       console.error('Erro ao atualizar avatar:', error);
     }
   };
+
+  const submitPasswordChange = async () => {
+    setPwError('');
+    if (!pwForm.currentPassword || !pwForm.newPassword || !pwForm.confirmPassword) {
+      setPwError('Preencha todos os campos');
+      return;
+    }
+    if (pwForm.newPassword.length < 6) {
+      setPwError('A nova senha deve ter pelo menos 6 caracteres');
+      return;
+    }
+    if (pwForm.newPassword !== pwForm.confirmPassword) {
+      setPwError('As senhas não coincidem');
+      return;
+    }
+    setPwLoading(true);
+    try {
+      const res = await fetch('/api/user/security/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ currentPassword: pwForm.currentPassword, newPassword: pwForm.newPassword })
+      });
+      const j = await res.json();
+      if (res.ok) {
+        alert('Senha alterada com sucesso!');
+        setShowPasswordModal(false);
+        setPwForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      } else {
+        setPwError(j.error || 'Erro ao alterar senha');
+      }
+    } catch (e) {
+      setPwError('Erro ao alterar senha');
+    } finally {
+      setPwLoading(false);
+    }
+  }
 
   if (status === 'loading' || loading) {
     return (
@@ -496,24 +539,7 @@ export default function ProfilePage() {
                     <h4 className="text-sm font-medium text-gray-900 mb-2">{dict.profile.changePasswordTitle}</h4>
                     <p className="text-sm text-gray-500 mb-4">{dict.profile.changePasswordDesc}</p>
                     <button
-                      onClick={async () => {
-                        const currentPassword = window.prompt('Digite a sua senha atual:') || '';
-                        if (!currentPassword) return;
-                        const newPassword = window.prompt('Digite a nova senha (mín. 6 caracteres):') || '';
-                        if (!newPassword) return;
-                        try {
-                          const res = await fetch('/api/user/security/change-password', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            credentials: 'include',
-                            body: JSON.stringify({ currentPassword, newPassword })
-                          });
-                          const j = await res.json();
-                          if (res.ok) alert('Senha alterada com sucesso!'); else alert(j.error || 'Erro ao alterar senha');
-                        } catch (e) {
-                          alert('Erro ao alterar senha');
-                        }
-                      }}
+                      onClick={() => setShowPasswordModal(true)}
                       className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                     >
                       {dict.profile.changePasswordBtn}
@@ -524,18 +550,7 @@ export default function ProfilePage() {
                     <h4 className="text-sm font-medium text-gray-900 mb-2">{dict.profile.sessionsTitle}</h4>
                     <p className="text-sm text-gray-500 mb-4">{dict.profile.sessionsDesc}</p>
                     <button
-                      onClick={async () => {
-                        try {
-                          const res = await fetch('/api/user/security/sessions', {
-                            method: 'POST',
-                            credentials: 'include'
-                          });
-                          const j = await res.json();
-                          if (res.ok) alert('Sessões encerradas em outros dispositivos.'); else alert(j.error || 'Erro ao encerrar sessões');
-                        } catch (e) {
-                          alert('Erro ao encerrar sessões');
-                        }
-                      }}
+                      onClick={() => setShowSessionsModal(true)}
                       className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
                     >
                       {dict.profile.sessionsBtn}
@@ -576,6 +591,97 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
+      {/* Modals */}
+      <PasswordModal
+        open={showPasswordModal}
+        onClose={() => { setShowPasswordModal(false); setPwError(''); setPwForm({ currentPassword: '', newPassword: '', confirmPassword: '' }) }}
+        onSubmit={submitPasswordChange}
+        loading={pwLoading}
+        error={pwError}
+        values={pwForm}
+        setValues={setPwForm}
+      />
+      <ConfirmSessionsModal
+        open={showSessionsModal}
+        onClose={() => setShowSessionsModal(false)}
+        loading={pwLoading}
+        onConfirm={async () => {
+          setPwLoading(true)
+          try {
+            const res = await fetch('/api/user/security/sessions', { method: 'POST', credentials: 'include' })
+            const j = await res.json();
+            if (res.ok) alert('Sessões encerradas em outros dispositivos.'); else alert(j.error || 'Erro ao encerrar sessões');
+            setShowSessionsModal(false)
+          } catch (e) {
+            alert('Erro ao encerrar sessões');
+          } finally {
+            setPwLoading(false)
+          }
+        }}
+      />
     </div>
   );
+}
+/* Render modals at root */
+// @ts-ignore
+// eslint-disable-next-line
+(function ModalsHost(){return null})
+
+// Modals
+function PasswordModal({ open, onClose, onSubmit, loading, error, values, setValues }: any) {
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+        <div className="flex items-center justify-between p-4 border-b">
+          <h3 className="text-lg font-semibold text-gray-900">Alterar senha</h3>
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded">
+            <X className="w-5 h-5 text-gray-600" />
+          </button>
+        </div>
+        <div className="p-4 space-y-4">
+          {error && <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded p-2">{error}</div>}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Senha atual</label>
+            <input type="password" value={values.currentPassword} onChange={(e)=>setValues((v:any)=>({...v,currentPassword:e.target.value}))} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Nova senha</label>
+            <input type="password" value={values.newPassword} onChange={(e)=>setValues((v:any)=>({...v,newPassword:e.target.value}))} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Confirmar nova senha</label>
+            <input type="password" value={values.confirmPassword} onChange={(e)=>setValues((v:any)=>({...v,confirmPassword:e.target.value}))} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" />
+          </div>
+        </div>
+        <div className="p-4 border-t flex justify-end gap-2">
+          <button onClick={onClose} className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">Cancelar</button>
+          <button onClick={onSubmit} disabled={loading} className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50">{loading ? 'Salvando...' : 'Salvar'}</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function ConfirmSessionsModal({ open, onClose, onConfirm, loading }: any) {
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+        <div className="flex items-center justify-between p-4 border-b">
+          <h3 className="text-lg font-semibold text-gray-900">Encerrar outras sessões</h3>
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded">
+            <X className="w-5 h-5 text-gray-600" />
+          </button>
+        </div>
+        <div className="p-4 text-sm text-gray-700">
+          Isso irá encerrar sessões ativas em outros dispositivos e navegadores. Você permanecerá logado neste dispositivo.
+        </div>
+        <div className="p-4 border-t flex justify-end gap-2">
+          <button onClick={onClose} className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">Cancelar</button>
+          <button onClick={onConfirm} disabled={loading} className="px-4 py-2 rounded-lg bg-gray-700 text-white hover:bg-gray-800 disabled:opacity-50">{loading ? 'Processando...' : 'Encerrar sessões'}</button>
+        </div>
+      </div>
+    </div>
+  )
 }
