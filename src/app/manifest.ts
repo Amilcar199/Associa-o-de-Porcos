@@ -1,8 +1,9 @@
 import { MetadataRoute } from 'next'
+import { BRAND_NAME } from '@/lib/brand'
 
 export default function manifest(): MetadataRoute.Manifest {
-  const name = 'Associação de Porcos'
-  const short_name = 'Assoc. Porcos'
+  const name = BRAND_NAME
+  const short_name = 'Suinocultores Norte'
   const theme_color = '#16a34a'
   const background_color = '#ffffff'
 

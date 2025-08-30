@@ -22,6 +22,7 @@ import { useLanguage } from '@/components/providers/LanguageProvider'
 import pt from '@/lib/i18n/dictionaries/pt'
 import en from '@/lib/i18n/dictionaries/en'
 import HeaderLanguageMenu from '@/components/i18n/HeaderLanguageMenu'
+import { BRAND_NAME, BRAND_TITLE_LINE1, BRAND_TITLE_LINE2 } from '@/lib/brand'
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -159,7 +160,7 @@ const Header = () => {
                 ) : (
                   <Image
                     src={LogoPng}
-                    alt="Associação de Porcos"
+                    alt={BRAND_NAME}
                     fill
                     className="object-contain"
                     sizes="(max-width: 640px) 80px, (max-width: 768px) 96px, (max-width: 1024px) 112px, 144px"
@@ -169,8 +170,13 @@ const Header = () => {
               </div>
               <div className="hidden sm:block">
                 <h1 className="text-lg lg:text-3xl font-heading font-bold text-white leading-tight">
+<<<<<<< HEAD
                   Associação de Suinocultores
                   <span className="block">do Norte</span>
+=======
+                  {BRAND_TITLE_LINE1}
+                  <span className="block">{BRAND_TITLE_LINE2}</span>
+>>>>>>> 35d9679eea5ec4ca456ceb527b9a4107b43a2988
                 </h1>
                 <p className="text-xs lg:text-base text-primary-100">{dict.site?.tagline || 'Criação Sustentável'}</p>
               </div>

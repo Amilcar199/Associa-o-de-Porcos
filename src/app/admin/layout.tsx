@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import { BRAND_NAME } from '@/lib/brand'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import AdminSidebar from '@/components/admin/AdminSidebar'
@@ -6,8 +7,8 @@ import AdminHeader from '@/components/admin/AdminHeader'
 import AdminWrapper from '@/components/admin/AdminWrapper'
 
 export const metadata = {
-  title: 'Painel Administrativo - Associação de Porcos',
-  description: 'Painel de administração da Associação de Porcos',
+  title: `Painel Administrativo - ${BRAND_NAME}`,
+  description: `Painel de administração da ${BRAND_NAME}`,
 }
 
 export default async function AdminLayout({

@@ -219,7 +219,7 @@ export default function AboutClient() {
                 viewport={{ once: true }}
                 className="relative h-56 rounded-2xl overflow-hidden shadow"
               >
-                <Image src={src} alt={isEn ? 'Association gallery' : 'Galeria da associação'} fill className="object-cover" sizes="(max-width:768px) 100vw, 33vw" />
+                <Image src={src} alt={isEn ? 'Association gallery' : 'Galeria da Associação de Suinocultores do Norte'} fill className="object-cover" sizes="(max-width:768px) 100vw, 33vw" />
               </motion.div>
             ))}
           </div>

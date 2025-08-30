@@ -6,6 +6,7 @@ import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import { successResponse, errorResponse, sanitizeInput, isValidEmail } from '@/lib/api-utils';
 import { sendEmail } from '@/lib/email';
+import { BRAND_NAME } from '@/lib/brand'
 
 // POST /api/auth/forgot-password - Solicitar recuperação de senha
 export async function POST(req: NextRequest) {
@@ -57,7 +58,7 @@ export async function POST(req: NextRequest) {
         
         <div style="padding: 20px;">
           <h2>Olá, ${user.name}!</h2>
-          <p>Você solicitou a recuperação de sua senha na Associação de Porcos.</p>
+          <p>Você solicitou a recuperação de sua senha na ${BRAND_NAME}.</p>
           
           <div style="text-align: center; margin: 30px 0;">
             <a href="${resetUrl}" style="background-color: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
@@ -77,17 +78,17 @@ export async function POST(req: NextRequest) {
         </div>
         
         <div style="background-color: #f9fafb; padding: 20px; text-align: center; font-size: 12px; color: #6b7280;">
-          <p>© 2024 Associação de Porcos. Todos os direitos reservados.</p>
+          <p>© 2024 ${BRAND_NAME}. Todos os direitos reservados.</p>
         </div>
       </div>
     `;
 
     const emailText = `
-      Recuperação de Senha - Associação de Porcos
+      Recuperação de Senha - ${BRAND_NAME}
       
       Olá, ${user.name}!
       
-      Você solicitou a recuperação de sua senha na Associação de Porcos.
+      Você solicitou a recuperação de sua senha na ${BRAND_NAME}.
       
       Para redefinir sua senha, acesse: ${resetUrl}
       
@@ -96,13 +97,13 @@ export async function POST(req: NextRequest) {
       - Se você não solicitou esta recuperação, ignore este email
       - Por segurança, este link só pode ser usado uma vez
       
-      © 2024 Associação de Porcos. Todos os direitos reservados.
+      © 2024 ${BRAND_NAME}. Todos os direitos reservados.
     `;
 
     try {
       await sendEmail({
         to: sanitizedData.email,
-        subject: 'Recuperação de Senha - Associação de Porcos',
+        subject: `Recuperação de Senha - ${BRAND_NAME}`,
         html: emailHtml,
         text: emailText
       });

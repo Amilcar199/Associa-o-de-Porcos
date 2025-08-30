@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic'
 
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import { headers } from 'next/headers'
 import { Tag, Weight, Calendar } from 'lucide-react'
 import { cookies } from 'next/headers'
 
@@ -22,29 +23,60 @@ const placeholderImages = [
 ]
 
 async function getProducts() {
-  const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
-  const res = await fetch(`${baseUrl}/api/products`, { next: { revalidate: 60 } })
-  if (!res.ok) return []
-  const json = await res.json()
-  const data = json.data || []
-  const enriched = data.map((p: any, idx: number) => ({
-    ...p,
-    imageUrl: p.imageUrl || placeholderImages[idx % placeholderImages.length]
-  }))
-  if (enriched.length === 0) {
-    return [
-      {
-        name: 'Suíno Reprodutor Duroc',
-        breed: 'Duroc',
-        weight: 80,
-        age: 6,
-        priceFormatted: 'AOA 120.000',
-        code: 'DEMO-001',
-        imageUrl: placeholderImages[0]
+  try {
+    const h = headers()
+    const protocol = h.get('x-forwarded-proto') || 'http'
+    const host = h.get('host') || 'localhost:3000'
+    const baseUrl = `${protocol}://${host}`
+
+    const res = await fetch(`${baseUrl}/api/products`, { cache: 'no-store' })
+    if (!res.ok) return []
+    const json = await res.json()
+    let data = json.data || []
+
+    const currencyFormatter = new Intl.NumberFormat('pt-AO', {
+      style: 'currency',
+      currency: 'AOA'
+    })
+
+    let enriched = data.map((p: any, idx: number) => ({
+      ...p,
+      imageUrl: (p.images && p.images[0]) || p.imageUrl || placeholderImages[idx % placeholderImages.length],
+      priceFormatted: p.priceFormatted || (typeof p.price === 'number' ? currencyFormatter.format(p.price) : undefined)
+    }))
+
+    // Fallback: se a lista geral vier vazia, tentar os "featured" (como na home)
+    if (enriched.length === 0) {
+      const resFeatured = await fetch(`${baseUrl}/api/products/featured?limit=12`, { cache: 'no-store' })
+      if (resFeatured.ok) {
+        const jsonFeatured = await resFeatured.json()
+        const dataFeatured = jsonFeatured.data || []
+        enriched = dataFeatured.map((p: any, idx: number) => ({
+          ...p,
+          imageUrl: (p.images && p.images[0]) || p.imageUrl || placeholderImages[idx % placeholderImages.length],
+          priceFormatted: p.priceFormatted || (typeof p.price === 'number' ? currencyFormatter.format(p.price) : undefined)
+        }))
       }
-    ]
+    }
+
+    if (enriched.length === 0) {
+      return [
+        {
+          name: 'Suíno Reprodutor Duroc',
+          breed: 'Duroc',
+          weight: 80,
+          age: 6,
+          priceFormatted: 'AOA 120.000',
+          code: 'DEMO-001',
+          imageUrl: placeholderImages[0]
+        }
+      ]
+    }
+    return enriched
+  } catch (e) {
+    console.error('Falha ao carregar produtos:', e)
+    return []
   }
-  return enriched
 }
 
 export default async function ProdutosPage() {

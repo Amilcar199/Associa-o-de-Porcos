@@ -18,6 +18,7 @@ import { useCookieConsent } from '@/components/cookies/CookieConsentProvider'
 import { useLanguage } from '@/components/providers/LanguageProvider'
 import pt from '@/lib/i18n/dictionaries/pt'
 import en from '@/lib/i18n/dictionaries/en'
+import { BRAND_NAME } from '@/lib/brand'
 
 const Footer = () => {
   const currentYear = new Date().getFullYear()
@@ -90,22 +91,27 @@ const Footer = () => {
           {/* Logo e Descrição */}
           <div className="lg:col-span-1">
             <Link href="/" className="flex items-center space-x-3 mb-4">
-              <div className="w-12 h-12 relative">
+              <div className="w-16 h-16 md:w-20 md:h-20 relative">
                 {siteConfig?.logoUrl ? (
                   <img src={siteConfig.logoUrl} alt="Logo" className="w-full h-full object-contain" />
                 ) : (
                   <Image
                     src={LogoPng}
-                    alt="Associação de Porcos"
+                    alt={BRAND_NAME}
                     fill
                     className="object-contain"
-                    sizes="48px"
+                    sizes="(max-width: 768px) 64px, 80px"
                   />
                 )}
               </div>
               <div>
+<<<<<<< HEAD
                 <h2 className="text-xl font-heading font-bold">
                   Associação de suínocultores do norte
+=======
+                <h2 className="text-lg font-heading font-bold">
+                  {BRAND_NAME}
+>>>>>>> 35d9679eea5ec4ca456ceb527b9a4107b43a2988
                 </h2>
                 <p className="text-sm text-gray-400">
                   {dict.site?.tagline || 'Criação Sustentável'}
@@ -210,7 +216,7 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row items-center justify-between">
             <div className="text-sm text-gray-400 mb-4 md:mb-0">
               <p>
-                {isEn ? `© ${currentYear} Pig Farmers Association. All rights reserved.` : `© ${currentYear} Associação de suínos. Todos os direitos reservados.`}
+                © {currentYear} {BRAND_NAME}. Todos os direitos reservados.
               </p>
             </div>
             

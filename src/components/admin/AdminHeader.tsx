@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import LogoPng from '@/components/assets/Logo.png'
+import { BRAND_NAME } from '@/lib/brand'
 import { signOut } from 'next-auth/react'
 import { 
   Menu, 
@@ -66,7 +67,7 @@ const AdminHeader = ({ user }: AdminHeaderProps) => {
               <div className="w-10 h-10 relative">
                 <Image
                   src={LogoPng}
-                  alt="Associação de Porcos"
+                  alt={BRAND_NAME}
                   fill
                   className="object-contain"
                 />
@@ -76,7 +77,7 @@ const AdminHeader = ({ user }: AdminHeaderProps) => {
                   Painel Admin
                 </h1>
                 <p className="text-xs text-gray-500">
-                  Associação de Porcos
+                  {BRAND_NAME}
                 </p>
               </div>
             </Link>
