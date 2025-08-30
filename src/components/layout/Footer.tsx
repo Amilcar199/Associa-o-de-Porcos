@@ -91,7 +91,7 @@ const Footer = () => {
           {/* Logo e Descrição */}
           <div className="lg:col-span-1">
             <Link href="/" className="flex items-center space-x-3 mb-4">
-              <div className="w-12 h-12 relative">
+              <div className="w-16 h-16 md:w-20 md:h-20 relative">
                 {siteConfig?.logoUrl ? (
                   <img src={siteConfig.logoUrl} alt="Logo" className="w-full h-full object-contain" />
                 ) : (
@@ -100,7 +100,7 @@ const Footer = () => {
                     alt={BRAND_NAME}
                     fill
                     className="object-contain"
-                    sizes="48px"
+                    sizes="(max-width: 768px) 64px, 80px"
                   />
                 )}
               </div>
