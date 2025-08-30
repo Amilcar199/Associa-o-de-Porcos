@@ -103,8 +103,8 @@ const Footer = () => {
                 )}
               </div>
               <div>
-                <h2 className="text-lg font-heading font-bold">
-                  {dict.site?.titleLine1 || 'Associação de suínos'}
+                <h2 className="text-xl font-heading font-bold">
+                  Associação de suínocultores do norte
                 </h2>
                 <p className="text-sm text-gray-400">
                   {dict.site?.tagline || 'Criação Sustentável'}
