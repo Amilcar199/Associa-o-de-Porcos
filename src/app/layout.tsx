@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { BRAND_NAME } from '@/lib/brand'
 import { cookies } from 'next/headers'
 import { Inter, Poppins } from 'next/font/google'
 import './globals.css'
@@ -20,34 +21,34 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   title: {
-    default: 'Associação de Porcos - Criação Sustentável e Parceria',
-    template: '%s | Associação de Porcos'
+    default: `${BRAND_NAME} - Criação Sustentável e Parceria`,
+    template: `%s | ${BRAND_NAME}`
   },
   description: 'Associação dedicada à criação sustentável de suínos, promovendo parcerias entre criadores e oferecendo produtos de qualidade superior.',
   keywords: ['associação', 'porcos', 'suínos', 'criação', 'sustentável', 'parceria', 'agricultura', 'agronegócio'],
-  authors: [{ name: 'Associação de Porcos' }],
-  creator: 'Associação de Porcos',
-  publisher: 'Associação de Porcos',
+  authors: [{ name: BRAND_NAME }],
+  creator: BRAND_NAME,
+  publisher: BRAND_NAME,
   metadataBase: new URL('https://associacaodeporcos.ao'),
   openGraph: {
     type: 'website',
     locale: 'pt_AO',
     url: 'https://associacaodeporcos.ao',
-    title: 'Associação de Suinocultores do norte - Criação Sustentável e Parceria',
+    title: `${BRAND_NAME} - Criação Sustentável e Parceria`,
     description: 'Associação dedicada à criação sustentável de suínos, promovendo parcerias entre criadores.',
-    siteName: 'Associação de Porcos',
+    siteName: BRAND_NAME,
     images: [
       {
         url: '/og',
         width: 1200,
         height: 630,
-        alt: 'Associação de Porcos'
+        alt: BRAND_NAME
       }
     ]
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Associação de Porcos - Criação Sustentável',
+    title: `${BRAND_NAME} - Criação Sustentável`,
     description: 'Promovendo parcerias e criação sustentável de suínos.',
     images: ['/og']
   },

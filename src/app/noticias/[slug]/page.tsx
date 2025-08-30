@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import connectDB from '@/lib/mongodb'
 import News from '@/models/News'
 import { formatDate } from '@/lib/utils'
+import { BRAND_NAME } from '@/lib/brand'
 import ViewCounter from './ViewCounter'
 import { cookies } from 'next/headers'
 
@@ -27,7 +28,7 @@ export async function generateMetadata({ params }: RouteParams): Promise<Metadat
     }
 
     return {
-      title: `${news.title} - Associação de Porcos`,
+      title: `${news.title} - ${BRAND_NAME}`,
       description: news.excerpt,
       openGraph: {
         title: news.title,

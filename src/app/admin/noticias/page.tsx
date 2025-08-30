@@ -1,9 +1,10 @@
 import { Metadata } from 'next'
+import { BRAND_NAME } from '@/lib/brand'
 import NewsManager from '@/components/admin/NewsManager'
 
 export const metadata: Metadata = {
   title: 'Gerenciar Notícias - Painel Administrativo',
-  description: 'Gerenciamento de notícias da Associação de Porcos',
+  description: `Gerenciamento de notícias da ${BRAND_NAME}`,
 }
 
 export default function AdminNewsPage() {

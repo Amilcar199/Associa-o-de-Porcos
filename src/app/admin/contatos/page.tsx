@@ -1,9 +1,10 @@
 import { Metadata } from 'next'
+import { BRAND_NAME } from '@/lib/brand'
 import ContactsManager from '@/components/admin/ContactsManager'
 
 export const metadata: Metadata = {
   title: 'Gerenciar Contatos - Painel Administrativo',
-  description: 'Gerenciamento de contatos da Associação de Porcos',
+  description: `Gerenciamento de contatos da ${BRAND_NAME}`,
 }
 
 export default function AdminContactsPage() {

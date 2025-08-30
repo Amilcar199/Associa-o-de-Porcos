@@ -18,6 +18,7 @@ import { useCookieConsent } from '@/components/cookies/CookieConsentProvider'
 import { useLanguage } from '@/components/providers/LanguageProvider'
 import pt from '@/lib/i18n/dictionaries/pt'
 import en from '@/lib/i18n/dictionaries/en'
+import { BRAND_NAME } from '@/lib/brand'
 
 const Footer = () => {
   const currentYear = new Date().getFullYear()
@@ -96,7 +97,7 @@ const Footer = () => {
                 ) : (
                   <Image
                     src={LogoPng}
-                    alt="Associação de Porcos"
+                    alt={BRAND_NAME}
                     fill
                     className="object-contain"
                     sizes="48px"
@@ -105,7 +106,7 @@ const Footer = () => {
               </div>
               <div>
                 <h2 className="text-lg font-heading font-bold">
-                  {dict.site?.titleLine1 || 'Associação de suínos'}
+                  {BRAND_NAME}
                 </h2>
                 <p className="text-sm text-gray-400">
                   {dict.site?.tagline || 'Criação Sustentável'}
@@ -210,7 +211,7 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row items-center justify-between">
             <div className="text-sm text-gray-400 mb-4 md:mb-0">
               <p>
-                {isEn ? `© ${currentYear} Pig Farmers Association. All rights reserved.` : `© ${currentYear} Associação de suínos. Todos os direitos reservados.`}
+                © {currentYear} {BRAND_NAME}. Todos os direitos reservados.
               </p>
             </div>
             

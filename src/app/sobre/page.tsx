@@ -9,7 +9,7 @@ export function generateMetadata(): Metadata {
     title: isEn ? 'About Us' : 'Quem Somos',
     description: isEn
       ? 'Pig Farmers Association in Angola: mission, values and history.'
-      : 'Associação de Porcos em Angola: missão, valores e história.'
+      : 'Associação de Suinocultores do Norte em Angola: missão, valores e história.'
   }
 }
 

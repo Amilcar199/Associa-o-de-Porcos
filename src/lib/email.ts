@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer';
+import { BRAND_NAME } from '@/lib/brand'
 
 interface EmailOptions {
   to: string;
@@ -32,7 +33,7 @@ export const sendEmail = async (options: EmailOptions): Promise<boolean> => {
     const transporter = createTransporter();
     
     const mailOptions = {
-      from: `"Associação de Porcos" <${process.env.EMAIL_FROM || process.env.EMAIL_SERVER_USER || process.env.SMTP_USER}>`,
+      from: `"${BRAND_NAME}" <${process.env.EMAIL_FROM || process.env.EMAIL_SERVER_USER || process.env.SMTP_USER}>`,
       to: options.to,
       subject: options.subject,
       html: options.html,
@@ -51,16 +52,16 @@ export const sendEmail = async (options: EmailOptions): Promise<boolean> => {
 // Template para email de boas-vindas
 export const getWelcomeEmailTemplate = (userName: string): EmailTemplate => {
   return {
-    subject: 'Bem-vindo à Associação de Porcos!',
+    subject: `Bem-vindo à ${BRAND_NAME}!`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <div style="background-color: #10b981; color: white; padding: 20px; text-align: center;">
-          <h1 style="margin: 0;">Associação de Porcos</h1>
+          <h1 style="margin: 0;">${BRAND_NAME}</h1>
         </div>
         
         <div style="padding: 20px;">
           <h2>Olá, ${userName}!</h2>
-          <p>Seja bem-vindo à Associação de Porcos! Estamos muito felizes em tê-lo como membro da nossa comunidade.</p>
+          <p>Seja bem-vindo à ${BRAND_NAME}! Estamos muito felizes em tê-lo como membro da nossa comunidade.</p>
           
           <div style="background-color: #f3f4f6; padding: 15px; border-radius: 8px; margin: 20px 0;">
             <h3 style="margin-top: 0;">O que você pode fazer agora:</h3>
@@ -82,14 +83,14 @@ export const getWelcomeEmailTemplate = (userName: string): EmailTemplate => {
         </div>
         
         <div style="background-color: #f9fafb; padding: 20px; text-align: center; font-size: 12px; color: #6b7280;">
-          <p>© 2024 Associação de Porcos. Todos os direitos reservados.</p>
+          <p>© 2024 ${BRAND_NAME}. Todos os direitos reservados.</p>
         </div>
       </div>
     `,
     text: `
       Olá, ${userName}!
       
-      Seja bem-vindo à Associação de Porcos! Estamos muito felizes em tê-lo como membro da nossa comunidade.
+      Seja bem-vindo à ${BRAND_NAME}! Estamos muito felizes em tê-lo como membro da nossa comunidade.
       
       O que você pode fazer agora:
       - Acessar conteúdo exclusivo na área de membros
@@ -101,7 +102,7 @@ export const getWelcomeEmailTemplate = (userName: string): EmailTemplate => {
       
       Acesse: ${process.env.NEXTAUTH_URL}/membros
       
-      © 2024 Associação de Porcos. Todos os direitos reservados.
+      © 2024 ${BRAND_NAME}. Todos os direitos reservados.
     `
   };
 };
@@ -142,7 +143,7 @@ export const getContactNotificationTemplate = (contactData: {
         </div>
         
         <div style="background-color: #f9fafb; padding: 20px; text-align: center; font-size: 12px; color: #6b7280;">
-          <p>© 2024 Associação de Porcos. Todos os direitos reservados.</p>
+          <p>© 2024 ${BRAND_NAME}. Todos os direitos reservados.</p>
         </div>
       </div>
     `,
@@ -157,7 +158,7 @@ export const getContactNotificationTemplate = (contactData: {
       
       Ver no Painel Admin: ${process.env.NEXTAUTH_URL}/admin/contatos
       
-      © 2024 Associação de Porcos. Todos os direitos reservados.
+      © 2024 ${BRAND_NAME}. Todos os direitos reservados.
     `
   };
 };
@@ -169,7 +170,7 @@ export const getNewsletterTemplate = (title: string, content: string, unsubscrib
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <div style="background-color: #10b981; color: white; padding: 20px; text-align: center;">
-          <h1 style="margin: 0;">Newsletter - Associação de Porcos</h1>
+          <h1 style="margin: 0;">Newsletter - ${BRAND_NAME}</h1>
         </div>
         
         <div style="padding: 20px;">
@@ -189,12 +190,12 @@ export const getNewsletterTemplate = (title: string, content: string, unsubscrib
         </div>
         
         <div style="background-color: #f9fafb; padding: 20px; text-align: center; font-size: 12px; color: #6b7280;">
-          <p>© 2024 Associação de Porcos. Todos os direitos reservados.</p>
+          <p>© 2024 ${BRAND_NAME}. Todos os direitos reservados.</p>
         </div>
       </div>
     `,
     text: `
-      Newsletter - Associação de Porcos
+      Newsletter - ${BRAND_NAME}
       
       ${title}
       
@@ -202,7 +203,7 @@ export const getNewsletterTemplate = (title: string, content: string, unsubscrib
       
       ${unsubscribeUrl ? `Cancelar inscrição: ${unsubscribeUrl}` : ''}
       
-      © 2024 Associação de Porcos. Todos os direitos reservados.
+      © 2024 ${BRAND_NAME}. Todos os direitos reservados.
     `
   };
 };

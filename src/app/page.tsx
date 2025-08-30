@@ -1,4 +1,5 @@
 import { Metadata } from 'next'
+import { BRAND_NAME } from '@/lib/brand'
 import Hero from '@/components/sections/Hero'
 import FeaturedProducts from '@/components/sections/FeaturedProducts'
 import AboutPreview from '@/components/sections/AboutPreview'
@@ -7,10 +8,10 @@ import CallToAction from '@/components/sections/CallToAction'
 import PartnersSection from '@/components/sections/PartnersSection'
 
 export const metadata: Metadata = {
-  title: 'Home - Associação de Porcos',
-  description: 'Bem-vindo à Associação de Porcos. Sustentabilidade, qualidade e parcerias para impulsionar resultados na suinocultura.',
+  title: `Home - ${BRAND_NAME}`,
+  description: `Bem-vindo à ${BRAND_NAME}. Sustentabilidade, qualidade e parcerias para impulsionar resultados na suinocultura.`,
   openGraph: {
-    title: 'Associação de Porcos - Sustentabilidade e Qualidade',
+    title: `${BRAND_NAME} - Sustentabilidade e Qualidade`,
     description: 'Boas práticas, inovação e parcerias para fortalecer toda a cadeia da suinocultura.',
     type: 'website',
   },

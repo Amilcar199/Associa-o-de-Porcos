@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import AboutImage from '@/components/assets/oksuinos.webp'
+import { BRAND_NAME } from '@/lib/brand'
 import { motion } from 'framer-motion'
 import { 
   Users, 
@@ -93,7 +94,7 @@ const AboutPreview = () => {
             <div className="relative rounded-2xl overflow-hidden shadow-2xl">
               <Image
                 src={AboutImage}
-                alt={locale.startsWith('en') ? 'Association Farm' : 'Fazenda da Associação de Porcos'}
+                alt={locale.startsWith('en') ? 'Association Farm' : `Fazenda da ${BRAND_NAME}`}
                 width={600}
                 height={400}
                 className="object-cover w-full h-[400px]"

@@ -1,4 +1,5 @@
 import { ImageResponse } from 'next/og'
+import { BRAND_NAME } from '@/lib/brand'
 
 export const runtime = 'edge'
 
@@ -27,7 +28,7 @@ export async function GET() {
           alignItems: 'center',
           justifyContent: 'center',
         }}>
-          <div style={{ fontSize: 64, fontWeight: 700 }}>Associação de Porcos</div>
+          <div style={{ fontSize: 64, fontWeight: 700 }}>{BRAND_NAME}</div>
           <div style={{ fontSize: 28, marginTop: 12 }}>Criação Sustentável e Parceria</div>
         </div>
       </div>

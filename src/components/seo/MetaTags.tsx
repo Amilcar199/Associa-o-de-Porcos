@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import { BRAND_NAME } from '@/lib/brand'
 
 interface MetaTagsProps {
   title?: string;
@@ -15,7 +16,7 @@ interface MetaTagsProps {
 }
 
 export default function MetaTags({
-  title = 'Associação de Porcos - Criação Sustentável',
+  title = `${BRAND_NAME} - Criação Sustentável`,
   description = 'Associação dedicada à promoção da criação sustentável de porcos em Angola. Conectamos produtores, compartilhamos conhecimento e fomentamos o desenvolvimento do setor suíno.',
   keywords = 'porcos, suínos, criação, associação, sustentável, Angola, produtores, conhecimento, setor suíno',
   image = '/images/og-image.jpg',
@@ -36,7 +37,7 @@ export default function MetaTags({
       <title>{title}</title>
       <meta name="description" content={description} />
       <meta name="keywords" content={keywords} />
-      <meta name="author" content={author || 'Associação de Porcos'} />
+      <meta name="author" content={author || BRAND_NAME} />
       <meta name="robots" content="index, follow" />
       <meta name="language" content="pt-AO" />
       <meta name="revisit-after" content="7 days" />
@@ -47,7 +48,7 @@ export default function MetaTags({
       <meta property="og:image" content={fullImage} />
       <meta property="og:url" content={fullUrl} />
       <meta property="og:type" content={type} />
-      <meta property="og:site_name" content="Associação de Porcos" />
+      <meta property="og:site_name" content={BRAND_NAME} />
       <meta property="og:locale" content="pt_AO" />
 
       {/* Twitter Card Meta Tags */}
@@ -94,7 +95,7 @@ export default function MetaTags({
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Organization",
-            "name": "Associação de Porcos",
+            "name": "${BRAND_NAME}",
             "description": description,
             "url": process.env.NEXTAUTH_URL,
             "logo": `${process.env.NEXTAUTH_URL}/images/logo.png`,

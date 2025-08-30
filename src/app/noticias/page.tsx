@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic'
 
 import type { Metadata } from 'next'
+import { BRAND_NAME } from '@/lib/brand'
 import Image from 'next/image'
 import { headers } from 'next/headers'
 import { Calendar } from 'lucide-react'
