@@ -105,13 +105,10 @@ const Footer = () => {
                 )}
               </div>
               <div>
-<<<<<<< HEAD
+
                 <h2 className="text-xl font-heading font-bold">
                   Associação de suínocultores do norte
-=======
-                <h2 className="text-lg font-heading font-bold">
-                  {BRAND_NAME}
->>>>>>> 35d9679eea5ec4ca456ceb527b9a4107b43a2988
+
                 </h2>
                 <p className="text-sm text-gray-400">
                   {dict.site?.tagline || 'Criação Sustentável'}
