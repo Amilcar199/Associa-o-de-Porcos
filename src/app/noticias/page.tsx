@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic'
 
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import { headers } from 'next/headers'
 import { Calendar } from 'lucide-react'
 import { cookies } from 'next/headers'
 
@@ -22,7 +23,12 @@ const placeholderImages = [
 
 async function getNews() {
   try {
-    const res = await fetch(`/api/news`, { cache: 'no-store' })
+    const h = headers()
+    const protocol = h.get('x-forwarded-proto') || 'http'
+    const host = h.get('host') || 'localhost:3000'
+    const baseUrl = `${protocol}://${host}`
+
+    const res = await fetch(`${baseUrl}/api/news`, { cache: 'no-store' })
     if (!res.ok) return []
     const json = await res.json()
     const data = json.data || []
