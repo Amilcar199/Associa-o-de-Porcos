@@ -296,6 +296,11 @@ const Header = () => {
                         exit={{ opacity: 0, y: 10 }}
                         className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2"
                       >
+                        {!(session.user as any)?.emailVerified && (
+                          <div className="px-4 py-2 text-xs text-yellow-800 bg-yellow-50 border-b border-yellow-200">
+                            Verifique seu email para liberar todas as funcionalidades.
+                          </div>
+                        )}
                         <Link
                           href="/perfil"
                           className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"

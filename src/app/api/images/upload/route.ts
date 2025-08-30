@@ -2,13 +2,14 @@ export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server';
 import { uploadImage } from '@/lib/gridfs';
-import { authMiddleware } from '@/lib/api-utils';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
-    // Verificar autenticação e autorização
-    const authResult = await authMiddleware(request);
-    if (!authResult.success) {
+    // Verificar autenticação (qualquer usuário logado pode enviar avatar)
+    const session: any = await getServerSession(authOptions as any);
+    if (!session || !session.user) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 

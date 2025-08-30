@@ -6,6 +6,7 @@ import { authOptions } from '@/lib/auth';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import { successResponse, errorResponse, sanitizeInput } from '@/lib/api-utils';
+import ActivityLog from '@/models/ActivityLog';
 
 // GET /api/user/profile - Buscar perfil do usuário logado
 export async function GET(req: NextRequest) {
@@ -45,6 +46,15 @@ export async function PUT(req: NextRequest) {
     const body = await req.json();
     const sanitizedData = sanitizeInput(body);
 
+    // Impedir alterações de perfil se email não verificado
+    const currentUser = await User.findById(session.user.id).select('-password');
+    if (!currentUser) {
+      return errorResponse('Usuário não encontrado', 404);
+    }
+    if (!currentUser.emailVerified) {
+      return errorResponse('Email não verificado. Verifique seu email antes de alterar o perfil.', 400);
+    }
+
     // Remover campos que não devem ser alterados pelo usuário
     delete sanitizedData.email;
     delete sanitizedData.role;
@@ -60,6 +70,16 @@ export async function PUT(req: NextRequest) {
     if (!updatedUser) {
       return errorResponse('Usuário não encontrado', 404);
     }
+
+    try {
+      await ActivityLog.create({
+        user: session.user.id,
+        type: 'profile_update',
+        ip: req.headers.get('x-forwarded-for') || undefined,
+        userAgent: req.headers.get('user-agent') || undefined,
+        metadata: Object.keys(sanitizedData)
+      })
+    } catch {}
 
     return NextResponse.json(
       successResponse(updatedUser, 'Perfil atualizado com sucesso')

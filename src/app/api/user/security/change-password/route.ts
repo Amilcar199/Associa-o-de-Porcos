@@ -5,6 +5,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import connectDB from '@/lib/mongodb'
 import User from '@/models/User'
+import ActivityLog from '@/models/ActivityLog'
 import { errorResponse, successResponse, sanitizeInput } from '@/lib/api-utils'
 
 export async function POST(req: NextRequest) {
@@ -21,12 +22,22 @@ export async function POST(req: NextRequest) {
 
     const user = await User.findById(session.user.id).select('+password')
     if (!user) return errorResponse('Usuário não encontrado', 404)
+    if (!user.emailVerified) return errorResponse('Email não verificado. Verifique seu email antes de alterar a senha.', 400)
 
     const ok = await user.comparePassword(currentPassword)
     if (!ok) return errorResponse('Senha atual incorreta', 400)
 
     user.password = newPassword
     await user.save()
+
+    try {
+      await ActivityLog.create({
+        user: user._id,
+        type: 'password_change',
+        ip: req.headers.get('x-forwarded-for') || undefined,
+        userAgent: req.headers.get('user-agent') || undefined,
+      })
+    } catch {}
 
     return Response.json(successResponse({}, 'Senha alterada com sucesso'))
   } catch (e) {

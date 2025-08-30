@@ -32,16 +32,21 @@ export const sendEmail = async (options: EmailOptions): Promise<boolean> => {
   try {
     const transporter = createTransporter();
     
+    const fromEnv = process.env.EMAIL_FROM;
+    const fromResolved = fromEnv && fromEnv.includes('<')
+      ? fromEnv
+      : `"${BRAND_NAME}" <${process.env.EMAIL_SERVER_USER || process.env.SMTP_USER}>`;
+
     const mailOptions = {
-      from: `"${BRAND_NAME}" <${process.env.EMAIL_FROM || process.env.EMAIL_SERVER_USER || process.env.SMTP_USER}>`,
+      from: fromResolved,
       to: options.to,
       subject: options.subject,
       html: options.html,
       text: options.text || options.html.replace(/<[^>]*>/g, ''),
     };
 
-    await transporter.sendMail(mailOptions);
-    console.log('Email enviado com sucesso para:', options.to);
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Email enviado com sucesso para:', options.to, 'MessageId:', info?.messageId);
     return true;
   } catch (error) {
     console.error('Erro ao enviar email:', error);
@@ -106,6 +111,26 @@ export const getWelcomeEmailTemplate = (userName: string): EmailTemplate => {
     `
   };
 };
+
+export const getVerificationCodeTemplate = (userName: string, code: string): EmailTemplate => {
+  return {
+    subject: `Código de Verificação`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="background-color: #10b981; color: white; padding: 20px; text-align: center;">
+          <h1 style="margin: 0;">Verificação de Email</h1>
+        </div>
+        <div style="padding: 20px;">
+          <p>Olá, ${userName}.</p>
+          <p>Seu código de verificação é:</p>
+          <div style="font-size: 28px; font-weight: bold; letter-spacing: 4px; text-align: center; margin: 16px 0;">${code}</div>
+          <p>Este código expira em 15 minutos.</p>
+        </div>
+      </div>
+    `,
+    text: `Seu código de verificação é ${code} (expira em 15 minutos).`
+  }
+}
 
 // Template para email de notificação de contato
 export const getContactNotificationTemplate = (contactData: {

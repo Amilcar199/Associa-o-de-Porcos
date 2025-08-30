@@ -52,6 +52,10 @@ export const authOptions: NextAuthOptions = {
             throw new Error('Usuário não encontrado ou inativo')
           }
 
+          // Bloquear login se email não verificado
+          if (!user.emailVerified) {
+            throw new Error('Email não verificado. Verifique seu email para entrar.')
+          }
           // Verificar senha
           const isPasswordValid = await user.comparePassword(credentials.password)
           
@@ -117,6 +121,7 @@ export const authOptions: NextAuthOptions = {
             token.name = dbUser.name
             token.role = dbUser.role
             token.avatar = dbUser.avatar
+            ;(token as any).emailVerified = dbUser.emailVerified
           }
         } catch (error) {
           console.error('Erro ao atualizar token:', error)
@@ -131,6 +136,7 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.sub!
         session.user.role = (token.role as 'admin' | 'member' | 'visitor')
         session.user.avatar = token.avatar as string
+        ;(session.user as any).emailVerified = (token as any).emailVerified
       }
       return session
     },
