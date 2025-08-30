@@ -32,16 +32,21 @@ export const sendEmail = async (options: EmailOptions): Promise<boolean> => {
   try {
     const transporter = createTransporter();
     
+    const fromEnv = process.env.EMAIL_FROM;
+    const fromResolved = fromEnv && fromEnv.includes('<')
+      ? fromEnv
+      : `"${BRAND_NAME}" <${process.env.EMAIL_SERVER_USER || process.env.SMTP_USER}>`;
+
     const mailOptions = {
-      from: `"${BRAND_NAME}" <${process.env.EMAIL_FROM || process.env.EMAIL_SERVER_USER || process.env.SMTP_USER}>`,
+      from: fromResolved,
       to: options.to,
       subject: options.subject,
       html: options.html,
       text: options.text || options.html.replace(/<[^>]*>/g, ''),
     };
 
-    await transporter.sendMail(mailOptions);
-    console.log('Email enviado com sucesso para:', options.to);
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Email enviado com sucesso para:', options.to, 'MessageId:', info?.messageId);
     return true;
   } catch (error) {
     console.error('Erro ao enviar email:', error);

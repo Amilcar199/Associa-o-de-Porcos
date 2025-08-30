@@ -255,10 +255,17 @@ export default function MembersArea() {
                       <div className="flex items-center justify-between">
                         <span className="text-xs text-gray-500">{new Date(item.createdAt).toLocaleDateString(isEn ? 'en-US' : 'pt-AO')}</span>
                         {item.url && (
-                          <button className="inline-flex items-center text-sm text-green-600 hover:text-green-700">
-                            <Download className="w-4 h-4 mr-1" />
-                            {isEn ? 'Access' : 'Acessar'}
-                          </button>
+                          ((session.user as any)?.emailVerified ? (
+                            <a href={item.url} className="inline-flex items-center text-sm text-green-600 hover:text-green-700">
+                              <Download className="w-4 h-4 mr-1" />
+                              {isEn ? 'Access' : 'Acessar'}
+                            </a>
+                          ) : (
+                            <button disabled className="inline-flex items-center text-sm text-gray-400 cursor-not-allowed" title={isEn ? 'Verify your email to access' : 'Verifique seu email para acessar'}>
+                              <Download className="w-4 h-4 mr-1" />
+                              {isEn ? 'Access' : 'Acessar'}
+                            </button>
+                          ))
                         )}
                       </div>
                     </div>
