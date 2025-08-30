@@ -12,9 +12,11 @@ export default {
 		login: 'Entrar',
 		signup: 'Faça Parte',
 		profile: 'Meu Perfil',
+		members: 'Área de Membros',
 		admin: 'Painel Admin',
 		logout: 'Sair',
-		loading: 'Carregando...'
+		loading: 'Carregando...',
+		greeting: 'Olá'
 	},
 	footer: {
 		privacy: 'Política de Privacidade',
@@ -24,7 +26,23 @@ export default {
 		newsletterTitle: 'Fique por dentro das novidades',
 		newsletterDesc: 'Receba as últimas notícias e atualizações do setor suinícola',
 		emailPlaceholder: 'Seu melhor e-mail',
-		whatsapp: 'WhatsApp'
+		whatsapp: 'WhatsApp',
+		quickLinksTitle: 'Links Rápidos',
+		ourProductsTitle: 'Nossos Produtos',
+		contactTitle: 'Entre em Contato',
+		madeWith: 'Feito com',
+		forAgribusiness: 'para o agronegócio'
+	},
+	categories: {
+		breeders: 'Suínos Reprodutores',
+		piglets: 'Leitões',
+		fattening: 'Suínos de Engorda',
+		sows: 'Matrizes'
+	},
+	site: {
+		titleLine1: 'Associação de Suinocultores',
+		titleLine2: 'do Norte',
+		tagline: 'Criação Sustentável'
 	},
 	cookies: {
 		title: 'Usamos cookies',
@@ -33,6 +51,13 @@ export default {
 		rejectAll: 'Rejeitar todos',
 		manageTitle: 'Preferências de Cookies',
 		save: 'Salvar preferências',
-		openPreferences: 'Preferências de Cookies'
+		openPreferences: 'Preferências de Cookies',
+		necessaryLabel: 'Necessários (sempre ativos)',
+		analyticsLabel: 'Analíticos',
+		marketingLabel: 'Marketing',
+		cancel: 'Cancelar'
+	},
+	hero: {
+		watchVideo: 'Assista ao Vídeo'
 	}
 } as const

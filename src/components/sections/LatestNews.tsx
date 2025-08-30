@@ -11,6 +11,7 @@ import {
   Clock
 } from 'lucide-react'
 import NewsModal from '@/components/modals/NewsModal'
+import { useLanguage } from '@/components/providers/LanguageProvider'
 
 interface LatestNewsItem {
   _id: string
@@ -26,6 +27,8 @@ interface LatestNewsItem {
 }
 
 const LatestNews = () => {
+  const { locale } = useLanguage()
+  const isEn = locale.startsWith('en')
   const [news, setNews] = useState<LatestNewsItem[]>([])
   const [loading, setLoading] = useState(false)
   const [selectedNews, setSelectedNews] = useState<LatestNewsItem | null>(null)
@@ -52,21 +55,21 @@ const LatestNews = () => {
   const getCategoryInfo = (category: string) => {
     switch (category) {
       case 'news':
-        return { label: 'Notícias', color: 'bg-blue-100 text-blue-800' }
+        return { label: isEn ? 'News' : 'Notícias', color: 'bg-blue-100 text-blue-800' }
       case 'market':
-        return { label: 'Mercado', color: 'bg-green-100 text-green-800' }
+        return { label: isEn ? 'Market' : 'Mercado', color: 'bg-green-100 text-green-800' }
       case 'tips':
-        return { label: 'Dicas', color: 'bg-yellow-100 text-yellow-800' }
+        return { label: isEn ? 'Tips' : 'Dicas', color: 'bg-yellow-100 text-yellow-800' }
       case 'events':
-        return { label: 'Eventos', color: 'bg-purple-100 text-purple-800' }
+        return { label: isEn ? 'Events' : 'Eventos', color: 'bg-purple-100 text-purple-800' }
       default:
-        return { label: 'Geral', color: 'bg-gray-100 text-gray-800' }
+        return { label: isEn ? 'General' : 'Geral', color: 'bg-gray-100 text-gray-800' }
     }
   }
 
   const formatDate = (dateISO: string) => {
     const date = new Date(dateISO)
-    return new Intl.DateTimeFormat('pt-AO', {
+    return new Intl.DateTimeFormat(isEn ? 'en-US' : 'pt-AO', {
       day: 'numeric',
       month: 'long',
       year: 'numeric'
@@ -76,7 +79,7 @@ const LatestNews = () => {
   const calculateReadTime = (excerpt: string) => {
     const words = (excerpt || '').split(' ').length
     const minutes = Math.ceil(words / 200)
-    return `${minutes} min de leitura`
+    return isEn ? `${minutes} min read` : `${minutes} min de leitura`
   }
 
   const openNewsModal = (newsItem: LatestNewsItem) => {
@@ -116,15 +119,16 @@ const LatestNews = () => {
           className="text-center mb-12"
         >
           <span className="inline-block bg-primary-100 text-primary-800 px-3 py-1 rounded-full text-sm font-medium mb-4">
-            Últimas Notícias
+            {isEn ? 'Latest News' : 'Últimas Notícias'}
           </span>
           <h2 className="text-3xl lg:text-4xl font-heading font-bold text-gray-900 mb-6">
-            Fique Por Dentro das
-            <span className="text-gradient"> Novidades</span>
+            {isEn ? 'Stay On Top of' : 'Fique Por Dentro das'}
+            <span className="text-gradient"> {isEn ? 'Updates' : 'Novidades'}</span>
           </h2>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Acompanhe as últimas tendências, inovações e informações importantes 
-            do mercado suinícola angolano e mundial.
+            {isEn
+              ? 'Follow the latest trends, innovations, and key information from the Angolan and global pig market.'
+              : 'Acompanhe as últimas tendências, inovações e informações importantes do mercado suinícola angolano e mundial.'}
           </p>
         </motion.div>
 
@@ -192,7 +196,7 @@ const LatestNews = () => {
                         {news[0]?.views != null && (
                           <div className="flex items-center space-x-1">
                             <Eye size={14} />
-                            <span>{news[0]?.views} visualizações</span>
+                            <span>{news[0]?.views} {isEn ? 'views' : 'visualizações'}</span>
                           </div>
                         )}
                       </div>
@@ -272,13 +276,13 @@ const LatestNews = () => {
           className="text-center"
         >
           <p className="text-gray-600 mb-6">
-            Explore nosso arquivo completo de notícias e artigos especializados
+            {isEn ? 'Explore our full archive of news and expert articles' : 'Explore nosso arquivo completo de notícias e artigos especializados'}
           </p>
           <Link
             href="/noticias"
             className="inline-flex items-center bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105"
           >
-            Ver Todas as Notícias
+            {isEn ? 'See All News' : 'Ver Todas as Notícias'}
             <ArrowRight size={20} className="ml-2" />
           </Link>
         </motion.div>

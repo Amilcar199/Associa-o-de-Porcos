@@ -15,6 +15,9 @@ import {
 import ProductModal from '@/components/modals/ProductModal'
 import Placeholder from '@/components/assets/Foto Suino.webp'
 import { formatPrice, formatAge } from '@/lib/utils'
+import { useLanguage } from '@/components/providers/LanguageProvider'
+import pt from '@/lib/i18n/dictionaries/pt'
+import en from '@/lib/i18n/dictionaries/en'
 
 interface FeaturedProduct {
   _id: string
@@ -32,6 +35,8 @@ interface FeaturedProduct {
 }
 
 const FeaturedProducts = () => {
+  const { locale } = useLanguage()
+  const dict = locale.startsWith('en') ? en : pt
   const [products, setProducts] = useState<FeaturedProduct[]>([])
   const [loading, setLoading] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<FeaturedProduct | null>(null)
@@ -69,9 +74,9 @@ const FeaturedProducts = () => {
 
   const getHealthStatusText = (status?: string) => {
     switch (status) {
-      case 'excellent': return 'Excelente'
-      case 'good': return 'Bom'
-      case 'fair': return 'Regular'
+      case 'excellent': return locale.startsWith('en') ? 'Excellent' : 'Excelente'
+      case 'good': return locale.startsWith('en') ? 'Good' : 'Bom'
+      case 'fair': return locale.startsWith('en') ? 'Fair' : 'Regular'
       default: return 'N/A'
     }
   }
@@ -113,15 +118,16 @@ const FeaturedProducts = () => {
           className="text-center mb-12"
         >
           <span className="inline-block bg-primary-100 text-primary-800 px-3 py-1 rounded-full text-sm font-medium mb-4">
-            Produtos em Destaque
+            {locale.startsWith('en') ? 'Featured Products' : 'Produtos em Destaque'}
           </span>
           <h2 className="text-3xl lg:text-4xl font-heading font-bold text-gray-900 mb-6">
-            Suínos de
-            <span className="text-gradient"> Qualidade Superior</span>
+            {locale.startsWith('en') ? 'Premium' : 'Suínos de'}
+            <span className="text-gradient"> {locale.startsWith('en') ? 'Pig Selection' : 'Qualidade Superior'}</span>
           </h2>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Confira nossa seleção de suínos premium, criados com os mais altos 
-            padrões de qualidade e bem-estar animal pelos nossos associados.
+            {locale.startsWith('en')
+              ? 'Check out our premium selection, raised with the highest standards of quality and animal welfare by our members.'
+              : 'Confira nossa seleção de suínos premium, criados com os mais altos padrões de qualidade e bem-estar animal pelos nossos associados.'}
           </p>
         </motion.div>
 
@@ -163,7 +169,7 @@ const FeaturedProducts = () => {
                     </span>
                     {product.vaccinated && (
                       <span className="bg-blue-100 text-blue-800 px-2 py-1 text-xs font-medium rounded-full block">
-                        Vacinado
+                        {locale.startsWith('en') ? 'Vaccinated' : 'Vacinado'}
                       </span>
                     )}
                   </div>
@@ -208,7 +214,7 @@ const FeaturedProducts = () => {
                       }}
                       className="flex-1 btn-primary text-center text-sm py-2"
                     >
-                      Ver Detalhes
+                      {locale.startsWith('en') ? 'See Details' : 'Ver Detalhes'}
                     </button>
                     <button className="w-10 h-10 bg-gray-100 hover:bg-primary-100 rounded-lg flex items-center justify-center transition-colors">
                       <ShoppingCart size={16} className="text-gray-600 hover:text-primary-600" />
@@ -228,13 +234,13 @@ const FeaturedProducts = () => {
           className="text-center"
         >
           <p className="text-gray-600 mb-6">
-            Explore nossa coleção completa de suínos de alta qualidade
+            {locale.startsWith('en') ? 'Explore our complete collection of high-quality pigs' : 'Explore nossa coleção completa de suínos de alta qualidade'}
           </p>
           <Link
             href="/produtos"
             className="inline-flex items-center bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105"
           >
-            Ver Todos os Produtos
+            {locale.startsWith('en') ? 'See All Products' : 'Ver Todos os Produtos'}
             <ArrowRight size={20} className="ml-2" />
           </Link>
         </motion.div>

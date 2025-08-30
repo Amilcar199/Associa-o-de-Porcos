@@ -5,57 +5,113 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { ChevronRight, Play, Users, Award, Leaf } from 'lucide-react'
+import { useLanguage } from '@/components/providers/LanguageProvider'
+import pt from '@/lib/i18n/dictionaries/pt'
+import en from '@/lib/i18n/dictionaries/en'
 import Slide1 from '@/components/assets/Foto Slider1.jpg'
 import Slide2 from '@/components/assets/Foto slider2.jpg'
 import Slide3 from '@/components/assets/Foto slider 3.jpg'
 
 const Hero = () => {
   const [currentSlide, setCurrentSlide] = useState(0)
+  const { locale } = useLanguage()
+  const dict = locale.startsWith('en') ? en : pt
 
-  const slides = [
-    {
-      id: 1,
-      image: Slide1 as unknown as string,
-      title: 'Excelência na Suinocultura',
-      subtitle: 'Conectando criadores e impulsionando produtividade com qualidade',
-      description: 'Promovemos boas práticas, sustentabilidade e parcerias para resultados consistentes em toda a cadeia.',
-      cta: 'Conheça Nossos Produtos',
-      ctaLink: '/produtos',
-      stats: [
-        { label: 'Criadores Associados', value: '100+' },
-        { label: 'Suínos Comercializados', value: '1K+' },
-        { label: 'Capacitações', value: '20+' }
+  const slides = locale.startsWith('en')
+    ? [
+        {
+          id: 1,
+          image: Slide1 as unknown as string,
+          title: 'Excellence in Pig Farming',
+          subtitle: 'Connecting farmers and boosting productivity with quality',
+          description:
+            'We promote best practices, sustainability, and partnerships for consistent results across the entire chain.',
+          cta: 'Explore Our Products',
+          ctaLink: '/produtos',
+          stats: [
+            { label: 'Associated Farmers', value: '100+' },
+            { label: 'Pigs Traded', value: '1K+' },
+            { label: 'Trainings', value: '20+' },
+          ],
+        },
+        {
+          id: 2,
+          image: Slide2 as unknown as string,
+          title: 'Quality that inspires confidence',
+          subtitle: 'Animal welfare, traceability, and efficiency',
+          description:
+            'We follow strict quality standards to ensure performance, safety, and member satisfaction.',
+          cta: 'Join the Association',
+          ctaLink: '/registro',
+          stats: [
+            { label: 'Certifications', value: '5+' },
+            { label: 'Available Breeds', value: '6+' },
+            { label: 'Member Satisfaction', value: '95%' },
+          ],
+        },
+        {
+          id: 3,
+          image: Slide3 as unknown as string,
+          title: 'Innovation that drives results',
+          subtitle: 'Technology, management, and knowledge applied to the field',
+          description:
+            'Continuous training, data, and technology to raise productivity, welfare, and sustainability.',
+          cta: 'Learn More',
+          ctaLink: '/sobre',
+          stats: [
+            { label: 'Projects Started', value: '5+' },
+            { label: 'Active Partnerships', value: '4+' },
+            { label: 'Trainings Held', value: '20+' },
+          ],
+        },
       ]
-    },
-    {
-      id: 2,
-      image: Slide2 as unknown as string,
-      title: 'Qualidade que inspira confiança',
-      subtitle: 'Bem-estar animal, rastreabilidade e eficiência',
-      description: 'Seguimos padrões rigorosos de qualidade para garantir desempenho, segurança e satisfação dos clientes e associados.',
-      cta: 'Faça Parte da Associação',
-      ctaLink: '/registro',
-      stats: [
-        { label: 'Certificações', value: '5+' },
-        { label: 'Raças Disponíveis', value: '6+' },
-        { label: 'Satisfação dos Associados', value: '95%' }
+    : [
+        {
+          id: 1,
+          image: Slide1 as unknown as string,
+          title: 'Excelência na Suinocultura',
+          subtitle: 'Conectando criadores e impulsionando produtividade com qualidade',
+          description:
+            'Promovemos boas práticas, sustentabilidade e parcerias para resultados consistentes em toda a cadeia.',
+          cta: 'Conheça Nossos Produtos',
+          ctaLink: '/produtos',
+          stats: [
+            { label: 'Criadores Associados', value: '100+' },
+            { label: 'Suínos Comercializados', value: '1K+' },
+            { label: 'Capacitações', value: '20+' },
+          ],
+        },
+        {
+          id: 2,
+          image: Slide2 as unknown as string,
+          title: 'Qualidade que inspira confiança',
+          subtitle: 'Bem-estar animal, rastreabilidade e eficiência',
+          description:
+            'Seguimos padrões rigorosos de qualidade para garantir desempenho, segurança e satisfação dos clientes e associados.',
+          cta: 'Faça Parte da Associação',
+          ctaLink: '/registro',
+          stats: [
+            { label: 'Certificações', value: '5+' },
+            { label: 'Raças Disponíveis', value: '6+' },
+            { label: 'Satisfação dos Associados', value: '95%' },
+          ],
+        },
+        {
+          id: 3,
+          image: Slide3 as unknown as string,
+          title: 'Inovação que impulsiona resultados',
+          subtitle: 'Tecnologia, gestão e conhecimento aplicados ao campo',
+          description:
+            'Capacitação contínua, dados e tecnologia para elevar produtividade, bem-estar e sustentabilidade.',
+          cta: 'Saiba Mais',
+          ctaLink: '/sobre',
+          stats: [
+            { label: 'Projetos Iniciados', value: '5+' },
+            { label: 'Parcerias Ativas', value: '4+' },
+            { label: 'Capacitações Realizadas', value: '20+' },
+          ],
+        },
       ]
-    },
-    {
-      id: 3,
-        image: Slide3 as unknown as string,
-      title: 'Inovação que impulsiona resultados',
-      subtitle: 'Tecnologia, gestão e conhecimento aplicados ao campo',
-      description: 'Capacitação contínua, dados e tecnologia para elevar produtividade, bem-estar e sustentabilidade.',
-      cta: 'Saiba Mais',
-      ctaLink: '/sobre',
-      stats: [
-        { label: 'Projetos Iniciados', value: '5+' },
-        { label: 'Parcerias Ativas', value: '4+' },
-        { label: 'Capacitações Realizadas', value: '20+' }
-      ]
-    }
-  ]
 
   // Auto-slide
   useEffect(() => {
@@ -160,7 +216,7 @@ const Hero = () => {
                   className="inline-flex items-center justify-center border-2 border-white text-white hover:bg-white hover:text-gray-900 font-semibold py-4 px-8 rounded-lg transition-all duration-300"
                 >
                   <Play size={20} className="mr-2" />
-                  Assista ao Vídeo
+                  {dict.hero?.watchVideo || 'Assista ao Vídeo'}
                 </Link>
               </motion.div>
 

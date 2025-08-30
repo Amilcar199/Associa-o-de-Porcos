@@ -110,13 +110,13 @@ const Header = () => {
                 <div className="animate-pulse">{dict.user.loading}</div>
               ) : session ? (
                 <div className="flex items-center space-x-2">
-                  <span>Olá, {session.user?.name}</span>
+                  <span>{dict.user.greeting}, {session.user?.name}</span>
                   {session.user?.role === 'admin' && (
                     <Link 
                       href="/admin" 
                       className="text-primary-200 hover:text-white transition-colors"
                     >
-                      Painel Admin
+                      {dict.user.admin}
                     </Link>
                   )}
                 </div>
@@ -169,17 +169,17 @@ const Header = () => {
               </div>
               <div className="hidden sm:block">
                 <h1 className="text-lg lg:text-3xl font-heading font-bold text-white leading-tight">
-                  Associação de Suinocultores
-                  <span className="block">do Norte</span>
+                  {dict.site?.titleLine1 || 'Associação de Suinocultores'}
+                  <span className="block">{dict.site?.titleLine2 || 'do Norte'}</span>
                 </h1>
-                <p className="text-xs lg:text-base text-primary-100">Criação Sustentável</p>
+                <p className="text-xs lg:text-base text-primary-100">{dict.site?.tagline || 'Criação Sustentável'}</p>
               </div>
             </Link>
 
             {/* Navegação Desktop */}
             <nav className="hidden lg:flex items-center gap-10 xl:gap-12">
               {navItems.map((item) => {
-                if (item.name === 'Quem Somos') {
+                if (item.name === dict.nav.about) {
                   return (
                     <div
                       key={item.name}
@@ -220,13 +220,13 @@ const Header = () => {
                               href="/sobre"
                               className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                             >
-                              Sobre a Associação
+                              {dict.nav.about}
                             </Link>
                             <Link
                               href="/colaboradores"
                               className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                             >
-                              Colaboradores
+                              {dict.nav.team}
                             </Link>
                           </motion.div>
                         )}
@@ -298,7 +298,7 @@ const Header = () => {
                           className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
                         >
                           <User size={16} />
-                          <span>Meu Perfil</span>
+                          <span>{dict.user.profile}</span>
                         </Link>
                         
                         {(session.user?.role === 'member' || session.user?.role === 'admin') && (
@@ -307,7 +307,7 @@ const Header = () => {
                             className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
                           >
                             <Users size={16} />
-                            <span>Área de Membros</span>
+                            <span>{dict.user.members}</span>
                           </Link>
                         )}
                         
@@ -317,7 +317,7 @@ const Header = () => {
                             className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
                           >
                             <Settings size={16} />
-                            <span>Painel Admin</span>
+                            <span>{dict.user.admin}</span>
                           </Link>
                         )}
                         
@@ -328,7 +328,7 @@ const Header = () => {
                           className="flex items-center space-x-2 px-4 py-2 text-red-600 hover:bg-red-50 transition-colors w-full text-left"
                         >
                           <LogOut size={16} />
-                          <span>Sair</span>
+                          <span>{dict.user.logout}</span>
                         </button>
                       </motion.div>
                     )}
@@ -426,7 +426,7 @@ const Header = () => {
                         className="flex items-center space-x-2 py-2 text-gray-700 hover:text-primary-600 transition-colors"
                       >
                         <User size={20} />
-                        <span>Meu Perfil</span>
+                        <span>{dict.user.profile}</span>
                       </Link>
                       
                       {session.user?.role === 'admin' && (
@@ -435,7 +435,7 @@ const Header = () => {
                           className="flex items-center space-x-2 py-2 text-gray-700 hover:text-primary-600 transition-colors"
                         >
                           <Settings size={20} />
-                          <span>Painel Admin</span>
+                          <span>{dict.user.admin}</span>
                         </Link>
                       )}
                       
@@ -444,7 +444,7 @@ const Header = () => {
                         className="flex items-center space-x-2 py-2 text-red-600 hover:text-red-700 transition-colors"
                       >
                         <LogOut size={20} />
-                        <span>Sair</span>
+                        <span>{dict.user.logout}</span>
                       </button>
                     </div>
                   ) : (

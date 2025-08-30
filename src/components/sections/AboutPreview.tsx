@@ -12,9 +12,36 @@ import {
   ArrowRight,
   CheckCircle
 } from 'lucide-react'
+import { useLanguage } from '@/components/providers/LanguageProvider'
+import pt from '@/lib/i18n/dictionaries/pt'
+import en from '@/lib/i18n/dictionaries/en'
 
 const AboutPreview = () => {
-  const features = [
+  const { locale } = useLanguage()
+  const dict = locale.startsWith('en') ? en : pt
+
+  const features = locale.startsWith('en') ? [
+    {
+      icon: Users,
+      title: 'Growing community',
+      description: 'Over 100 farmers united to boost the emerging pig sector'
+    },
+    {
+      icon: Award,
+      title: 'Quality in progress',
+      description: 'Certifications and standards being implemented with focus on animal welfare'
+    },
+    {
+      icon: Leaf,
+      title: 'Sustainability',
+      description: 'Sustainable practices implemented since the start of operations'
+    },
+    {
+      icon: Heart,
+      title: 'Animal welfare',
+      description: 'Care and respect present at every stage of the process'
+    }
+  ] : [
     {
       icon: Users,
       title: 'Comunidade em expansão',
@@ -37,7 +64,13 @@ const AboutPreview = () => {
     }
   ]
 
-  const achievements = [
+  const achievements = locale.startsWith('en') ? [
+    '2-3 years of trajectory with a solid foundation',
+    '100+ active associated farmers',
+    '5+ certifications and standards implemented',
+    '95% member satisfaction',
+    '1,500+ pigs traded'
+  ] : [
     '2-3 anos de trajetória com base sólida',
     '100+ criadores associados ativos',
     '5+ certificações e padrões implantados',
@@ -60,7 +93,7 @@ const AboutPreview = () => {
             <div className="relative rounded-2xl overflow-hidden shadow-2xl">
               <Image
                 src={AboutImage}
-                alt="Fazenda da Associação de Porcos"
+                alt={locale.startsWith('en') ? 'Association Farm' : 'Fazenda da Associação de Porcos'}
                 width={600}
                 height={400}
                 className="object-cover w-full h-[400px]"
@@ -87,7 +120,7 @@ const AboutPreview = () => {
             >
               <div className="text-center">
                 <div className="text-2xl font-bold text-primary-600">20+</div>
-                <div className="text-xs text-gray-600">Capacitações</div>
+                <div className="text-xs text-gray-600">{locale.startsWith('en') ? 'Trainings' : 'Capacitações'}</div>
               </div>
             </motion.div>
 
@@ -100,7 +133,7 @@ const AboutPreview = () => {
             >
               <div className="text-center">
                 <div className="text-2xl font-bold">100+</div>
-                <div className="text-xs opacity-90">Criadores</div>
+                <div className="text-xs opacity-90">{locale.startsWith('en') ? 'Farmers' : 'Criadores'}</div>
               </div>
             </motion.div>
           </motion.div>
@@ -114,23 +147,23 @@ const AboutPreview = () => {
           >
             <div className="mb-6">
               <span className="inline-block bg-primary-100 text-primary-800 px-3 py-1 rounded-full text-sm font-medium mb-4">
-                Sobre Nós
+                {locale.startsWith('en') ? 'About Us' : 'Sobre Nós'}
               </span>
               <h2 className="text-3xl lg:text-4xl font-heading font-bold text-gray-900 mb-6">
-                Excelência e Inovação na
-                <span className="text-gradient"> Suinocultura</span>
+                {locale.startsWith('en') ? 'Excellence and Innovation in' : 'Excelência e Inovação na'}
+                <span className="text-gradient"> {locale.startsWith('en') ? 'Pig Farming' : 'Suinocultura'}</span>
               </h2>
               <p className="text-lg text-gray-600 leading-relaxed mb-8">
-                Promovemos a criação sustentável e responsável de suínos em Angola. 
-                Nossa missão é conectar criadores, apoiar o crescimento e impulsionar 
-                o desenvolvimento do setor com qualidade, tecnologia e parcerias sólidas.
+                {locale.startsWith('en')
+                  ? 'We promote sustainable and responsible pig farming in Angola. Our mission is to connect farmers, support growth, and drive sector development with quality, technology, and strong partnerships.'
+                  : 'Promovemos a criação sustentável e responsável de suínos em Angola. Nossa missão é conectar criadores, apoiar o crescimento e impulsionar o desenvolvimento do setor com qualidade, tecnologia e parcerias sólidas.'}
               </p>
             </div>
 
             {/* Lista de Conquistas */}
             <div className="mb-8">
               <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                Nossos Diferenciais
+                {locale.startsWith('en') ? 'Our Differentials' : 'Nossos Diferenciais'}
               </h3>
               <div className="space-y-3">
                 {achievements.map((achievement, index) => (
@@ -183,7 +216,7 @@ const AboutPreview = () => {
                 href="/sobre"
                 className="inline-flex items-center justify-center bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105"
               >
-                Conheça Nossa História
+                {locale.startsWith('en') ? 'Discover Our Story' : 'Conheça Nossa História'}
                 <ArrowRight size={18} className="ml-2" />
               </Link>
               
@@ -191,7 +224,7 @@ const AboutPreview = () => {
                 href="/contato"
                 className="inline-flex items-center justify-center border-2 border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300"
               >
-                Entre em Contato
+                {dict.footer.contactTitle}
               </Link>
             </motion.div>
           </motion.div>
