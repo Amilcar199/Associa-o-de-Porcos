@@ -47,7 +47,7 @@ export default function MembersArea() {
   useEffect(() => {
     if (status === 'loading') return;
     if (!session) { router.push('/login'); return; }
-    if (session.user?.role === 'visitor') { router.push('/'); return; }
+    if (session.user?.role === 'visitor') { router.push('/perfil'); return; }
     fetchMemberContent();
     fetchMemberStats();
   }, [session, status]);

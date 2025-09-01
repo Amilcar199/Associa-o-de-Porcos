@@ -56,6 +56,10 @@ export default function UserCreateModal({ isOpen, onClose, onUserCreated }: User
       newErrors.confirmPassword = 'As senhas não coincidem'
     }
 
+    if (formData.role === 'member' && !formData.bio.trim()) {
+      newErrors.bio = 'Biografia é obrigatória para membros'
+    }
+
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -271,6 +275,7 @@ export default function UserCreateModal({ isOpen, onClose, onUserCreated }: User
                 <option value="member">Membro</option>
                 <option value="admin">Administrador</option>
               </select>
+              <p className="mt-1 text-xs text-gray-500">Visitante = Cliente (acesso apenas ao perfil)</p>
             </div>
 
             <div>
@@ -378,6 +383,9 @@ export default function UserCreateModal({ isOpen, onClose, onUserCreated }: User
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
               placeholder="Breve descrição sobre o usuário..."
             />
+            {errors.bio && (
+              <p className="text-red-500 text-xs mt-1">{errors.bio}</p>
+            )}
           </div>
 
           {/* Redes Sociais */}

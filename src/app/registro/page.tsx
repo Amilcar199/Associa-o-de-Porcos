@@ -19,7 +19,8 @@ export default function RegisterPage() {
     confirmPassword: '',
     phone: '',
     company: '',
-    description: ''
+    description: '',
+    accountType: '' as '' | 'cliente' | 'membro'
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -36,6 +37,11 @@ export default function RegisterPage() {
     setSuccess('');
 
     // Validações
+    if (!formData.accountType) {
+      setError(dict.auth.errorSelectAccountType);
+      setLoading(false);
+      return;
+    }
     if (formData.password !== formData.confirmPassword) {
       setError(dict.auth.errorPasswordsMismatch);
       setLoading(false);
@@ -44,6 +50,11 @@ export default function RegisterPage() {
 
     if (formData.password.length < 6) {
       setError(dict.auth.errorPasswordTooShort);
+      setLoading(false);
+      return;
+    }
+    if (formData.accountType === 'membro' && !formData.description.trim()) {
+      setError(dict.auth.errorMemberDescriptionRequired);
       setLoading(false);
       return;
     }
@@ -60,7 +71,8 @@ export default function RegisterPage() {
           password: formData.password,
           phone: formData.phone,
           company: formData.company,
-          bio: formData.description
+          bio: formData.description,
+          role: formData.accountType === 'membro' ? 'member' : 'visitor'
         }),
       });
 
@@ -71,7 +83,11 @@ export default function RegisterPage() {
       } else {
         setSuccess(dict.auth.successRegister);
         await signIn('credentials', { email: formData.email, password: formData.password, redirect: false });
-        router.push('/membros');
+        if (formData.accountType === 'membro') {
+          router.push('/membros');
+        } else {
+          router.push('/perfil');
+        }
       }
     } catch (error) {
       setError(dict.auth.errorRegister + '.');
@@ -118,6 +134,29 @@ export default function RegisterPage() {
                 </div>
               </div>
             )}
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                {dict.auth.accountType}
+              </label>
+              <div className="mt-1 grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, accountType: 'cliente' }))}
+                  className={`border rounded-md p-2 text-sm ${formData.accountType === 'cliente' ? 'border-green-600 text-green-700' : 'border-gray-300 text-gray-700'}`}
+                >
+                  {dict.auth.accountTypeClient}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, accountType: 'membro' }))}
+                  className={`border rounded-md p-2 text-sm ${formData.accountType === 'membro' ? 'border-green-600 text-green-700' : 'border-gray-300 text-gray-700'}`}
+                >
+                  {dict.auth.accountTypeMember}
+                </button>
+              </div>
+              <p className="mt-1 text-xs text-gray-500">{dict.auth.accountTypeHint}</p>
+            </div>
 
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700">
@@ -204,6 +243,7 @@ export default function RegisterPage() {
               </div>
             </div>
 
+            {formData.accountType === 'membro' && (
             <div>
               <label htmlFor="description" className="block text-sm font-medium text-gray-700">
                 {dict.auth.description}
@@ -220,6 +260,7 @@ export default function RegisterPage() {
                 />
               </div>
             </div>
+            )}
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">

@@ -35,6 +35,19 @@ export async function POST(req: NextRequest) {
     }
 
 
+    // Normalizar role: aceitar somente 'admin' | 'member' | 'visitor'
+    let role: 'admin' | 'member' | 'visitor' = 'member'
+    if (['admin', 'member', 'visitor'].includes(sanitizedData.role)) {
+      role = sanitizedData.role
+    }
+
+    // Regra: se role for 'member', exigir bio/descrição
+    if (role === 'member') {
+      if (!sanitizedData.bio || !String(sanitizedData.bio).trim()) {
+        return errorResponse('Descrição é obrigatória para membros')
+      }
+    }
+
     // Criar usuário
     const userData = {
       name: sanitizedData.name,
@@ -43,7 +56,7 @@ export async function POST(req: NextRequest) {
       phone: sanitizedData.phone || undefined,
       company: sanitizedData.company || undefined,
       bio: sanitizedData.bio || undefined,
-      role: sanitizedData.role || 'member', // Aceita role personalizado ou usa 'member' como padrão
+      role,
       isActive: sanitizedData.isActive !== undefined ? sanitizedData.isActive : true,
       preferences: {
         newsletter: true,

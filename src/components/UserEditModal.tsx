@@ -88,6 +88,11 @@ export default function UserEditModal({ isOpen, onClose, userId, onUserUpdated }
     e.preventDefault()
     if (!userId) return
 
+    if (formData.role === 'member' && !formData.bio.trim()) {
+      alert('Para usuários com papel Membro, a Biografia é obrigatória.')
+      return
+    }
+
     try {
       setSaving(true)
       const response = await fetch(`/api/admin/users/${userId}`, {
@@ -205,6 +210,7 @@ export default function UserEditModal({ isOpen, onClose, userId, onUserUpdated }
                   <option value="member">Membro</option>
                   <option value="admin">Administrador</option>
                 </select>
+                <p className="mt-1 text-xs text-gray-500">Visitante = Cliente (acesso apenas ao perfil)</p>
               </div>
 
               <div>

@@ -45,7 +45,7 @@ export default function LoginPage() {
           } else if (session.user?.role === 'member') {
             router.push('/membros');
           } else {
-            router.push('/');
+            router.push('/perfil');
           }
         }
       }
