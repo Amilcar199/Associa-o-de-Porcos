@@ -188,3 +188,86 @@ Para suporte, envie um email para `contato@associacaoporcos.ao`
 ---
 
 **Desenvolvido com ❤️ para a Associação de Porcos**
+
+## 📘 Manual de Uso (Cliente)
+
+Este manual explica de forma simples como navegar no site, tanto como visitante quanto como administrador.
+
+### Para Visitantes (público em geral)
+
+- **Cabeçalho e menu**: No topo você encontrará os links principais: Início, Quem Somos, Serviços, Produtos, Notícias e Contato. No canto direito aparecem as opções de Login e Registrar.
+- **Troca de idioma**: Use o seletor de idioma no topo para alternar entre português e inglês.
+- **Início**: Página com destaques e atalhos para as áreas principais.
+- **Quem Somos / Sobre**: Informações sobre a associação. No submenu você encontra também a página de Colaboradores.
+- **Serviços**: Lista de serviços oferecidos.
+- **Produtos**: Lista de produtos. Clique em um item para ver detalhes (quando disponível).
+- **Notícias**: Acompanhe as últimas novidades. Clique na notícia para ler a matéria completa.
+- **Contato**: Formulário simples para enviar uma mensagem para a associação.
+- **Cookies, Privacidade e Termos**: Links de políticas do site estão disponíveis no rodapé.
+
+#### Autenticação e Área do Usuário
+
+- **Registrar**: Crie sua conta fornecendo os dados solicitados.
+- **Login**: Acesse com seu email e senha.
+- **Esqueci a senha**: Use a opção de recuperação para redefinir a senha via email.
+- **Perfil**: Após logado, acesse o menu do usuário no topo para entrar em Perfil, onde é possível ver/editar informações da conta.
+- **Área de Membros**: Se sua conta for membro ou admin, o menu mostrará o link "Membros". Acesse para visualizar conteúdos exclusivos. Usuários não-membros podem solicitar associação (quando habilitado) e aguardar aprovação do admin.
+- **Sair**: Use o menu do usuário > Sair para encerrar a sessão.
+
+### Para Administradores (Painel Admin)
+
+Após fazer login como administrador, um link para o painel aparece no topo (Admin). Clique para abrir o painel.
+
+#### Estrutura do Painel
+
+O menu lateral à esquerda contém as seções abaixo:
+
+- **Dashboard**: Visão geral com indicadores, gráficos e atividades recentes.
+- **Solicitações**: Aprovar ou rejeitar pedidos de associação de usuários.
+- **Usuários**: Listar, criar e editar usuários; ajustar permissões (ex.: admin, member, visitor).
+- **Produtos**:
+  - Todos os Produtos: visualizar, pesquisar e editar.
+  - Adicionar Produto: criar um novo produto.
+  - Categorias: gerenciar categorias.
+- **Conteúdo**:
+  - Notícias: listar e editar notícias existentes.
+  - Nova Notícia: publicar uma notícia rapidamente.
+  - Colaboradores: gerenciar colaboradores exibidos no site público.
+  - Conteúdo de Membros: gerenciar conteúdos exclusivos para a área de membros.
+  - Novo Conteúdo: criar conteúdo exclusivo.
+- **Contatos**: Mensagens recebidas pelo formulário de contato. Marque como lidas/resolvidas conforme necessário.
+- **Mídia**: Gerenciar imagens do site (upload, listar e reutilizar).
+- **Relatórios**: Estatísticas e relatórios de uso/conteúdo.
+- **Configurações**: Ajustes gerais do site (ex.: logo e informações básicas quando disponíveis).
+
+#### Fluxos Comuns no Admin (passo a passo)
+
+- **Publicar uma notícia**:
+  1) Ir em Conteúdo > Nova Notícia.
+  2) Preencher título, conteúdo e imagem (opcional) e salvar.
+  3) A notícia aparecerá em Notícias no site público.
+
+- **Adicionar um produto**:
+  1) Ir em Produtos > Adicionar Produto.
+  2) Preencher dados, selecionar categoria e salvar.
+  3) O produto aparecerá em Produtos no site público.
+
+- **Aprovar solicitação de membro**:
+  1) Ir em Solicitações.
+  2) Analisar o pedido e clicar em Aprovar ou Rejeitar.
+  3) O usuário aprovado passa a acessar a área de Membros.
+
+- **Responder mensagens de contato**:
+  1) Ir em Contatos.
+  2) Abrir a mensagem, copiar o email do remetente e responder via sua caixa de email.
+  3) Marcar como resolvida no painel (se aplicável).
+
+- **Enviar e usar imagens**:
+  1) Ir em Mídia e fazer upload da imagem.
+  2) Ao criar conteúdo (ex.: notícia), selecione a imagem enviada.
+
+#### Dicas Rápidas
+
+- As notificações de sucesso/erro aparecem no topo da tela.
+- Use a busca do painel para encontrar rapidamente registros.
+- Para sair do painel, abra o menu do usuário no topo e clique em Sair.
