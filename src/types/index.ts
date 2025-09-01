@@ -18,7 +18,6 @@ export interface User extends Document {
   }
   company?: string
   isActive: boolean
-  emailVerified?: boolean
   createdAt: Date
   updatedAt: Date
 }

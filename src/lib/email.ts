@@ -112,25 +112,7 @@ export const getWelcomeEmailTemplate = (userName: string): EmailTemplate => {
   };
 };
 
-export const getVerificationCodeTemplate = (userName: string, code: string): EmailTemplate => {
-  return {
-    subject: `Código de Verificação`,
-    html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <div style="background-color: #10b981; color: white; padding: 20px; text-align: center;">
-          <h1 style="margin: 0;">Verificação de Email</h1>
-        </div>
-        <div style="padding: 20px;">
-          <p>Olá, ${userName}.</p>
-          <p>Seu código de verificação é:</p>
-          <div style="font-size: 28px; font-weight: bold; letter-spacing: 4px; text-align: center; margin: 16px 0;">${code}</div>
-          <p>Este código expira em 15 minutos.</p>
-        </div>
-      </div>
-    `,
-    text: `Seu código de verificação é ${code} (expira em 15 minutos).`
-  }
-}
+// (Removido) Template de verificação de email
 
 // Template para email de notificação de contato
 export const getContactNotificationTemplate = (contactData: {

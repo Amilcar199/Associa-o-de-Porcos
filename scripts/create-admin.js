@@ -47,7 +47,6 @@ async function main() {
       password: { type: String, required: true },
       role: { type: String, enum: ['member', 'admin'], default: 'member' },
       isActive: { type: Boolean, default: true },
-      emailVerified: { type: Boolean, default: false },
       preferences: {
         newsletter: { type: Boolean, default: true },
         notifications: { type: Boolean, default: true },
@@ -73,7 +72,6 @@ async function main() {
     password: hashed,
     role: 'admin',
     isActive: true,
-    emailVerified: true,
     preferences: { newsletter: false, notifications: true },
   });
 

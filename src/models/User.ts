@@ -93,19 +93,7 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: null
   },
-  emailVerified: {
-    type: Boolean,
-    default: false
-  },
-  emailVerificationCode: {
-    type: String,
-    default: null
-  },
-  emailVerificationExpires: {
-    type: Date,
-    default: null
-  },
-  emailVerificationToken: String,
+  
   passwordResetToken: String,
   passwordResetExpires: Date,
   loginAttempts: {
@@ -152,14 +140,6 @@ userSchema.methods.resetLoginAttempts = function() {
   return this.updateOne({
     $unset: { loginAttempts: 1, lockUntil: 1 }
   });
-};
-
-// Método para gerar token de verificação de email
-userSchema.methods.generateEmailVerificationToken = function() {
-  const token = require('crypto').randomBytes(32).toString('hex');
-  this.emailVerificationToken = token;
-  this.emailVerificationExpires = Date.now() + 24 * 60 * 60 * 1000; // 24 horas
-  return token;
 };
 
 // Método para gerar token de reset de senha

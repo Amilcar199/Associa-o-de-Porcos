@@ -34,7 +34,6 @@ async function initializeDatabase() {
         password: 'admin123',
         role: 'admin',
         isActive: true,
-        emailVerified: true,
         company: 'Associação de Porcos',
         bio: 'Usuário administrador padrão do sistema',
         location: 'Luanda, Angola',
