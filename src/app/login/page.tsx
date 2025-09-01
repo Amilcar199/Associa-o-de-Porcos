@@ -34,11 +34,7 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
-        if (result.error.toLowerCase().includes('verificado')) {
-          setError('Email não verificado. Verifique seu email ou reenviar código.');
-        } else {
-          setError(dict.auth.errorWrongCredentials);
-        }
+        setError(dict.auth.errorWrongCredentials);
       } else {
         // Verificar se o login foi bem-sucedido
         const session = await getSession();
@@ -172,18 +168,7 @@ export default function LoginPage() {
               </button>
             </div>
           </form>
-          <div className="mt-4 text-sm text-center">
-            <button
-              onClick={async ()=>{
-                if (!formData.email) { setError('Informe seu email para reenviar o código.'); return }
-                setError('');
-                await fetch('/api/auth/resend-code',{method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email: formData.email })})
-              }}
-              className="text-green-600 hover:text-green-700"
-            >
-              Reenviar código de verificação
-            </button>
-          </div>
+          
 
           {/* Seção de login social removida */}
 

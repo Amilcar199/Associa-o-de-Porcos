@@ -116,20 +116,7 @@ export default function MembersArea() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Banner de verificação */}
-        {!((session.user as any)?.emailVerified) && (
-          <div className="mb-6 px-4 py-3 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800 flex items-center justify-between">
-            <div>
-              {isEn ? 'Please verify your email to unlock all member features.' : 'Verifique seu email para liberar todas as funcionalidades de membro.'}
-            </div>
-            <button
-              onClick={async ()=>{ await fetch('/api/auth/resend-code',{ method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email: session.user?.email }) }) }}
-              className="text-yellow-900 underline font-medium"
-            >
-              {isEn ? 'Resend code' : 'Reenviar código'}
-            </button>
-          </div>
-        )}
+        
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
@@ -255,17 +242,10 @@ export default function MembersArea() {
                       <div className="flex items-center justify-between">
                         <span className="text-xs text-gray-500">{new Date(item.createdAt).toLocaleDateString(isEn ? 'en-US' : 'pt-AO')}</span>
                         {item.url && (
-                          ((session.user as any)?.emailVerified ? (
-                            <a href={item.url} className="inline-flex items-center text-sm text-green-600 hover:text-green-700">
-                              <Download className="w-4 h-4 mr-1" />
-                              {isEn ? 'Access' : 'Acessar'}
-                            </a>
-                          ) : (
-                            <button disabled className="inline-flex items-center text-sm text-gray-400 cursor-not-allowed" title={isEn ? 'Verify your email to access' : 'Verifique seu email para acessar'}>
-                              <Download className="w-4 h-4 mr-1" />
-                              {isEn ? 'Access' : 'Acessar'}
-                            </button>
-                          ))
+                          <a href={item.url} className="inline-flex items-center text-sm text-green-600 hover:text-green-700">
+                            <Download className="w-4 h-4 mr-1" />
+                            {isEn ? 'Access' : 'Acessar'}
+                          </a>
                         )}
                       </div>
                     </div>
