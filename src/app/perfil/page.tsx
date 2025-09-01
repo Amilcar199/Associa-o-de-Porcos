@@ -234,6 +234,47 @@ export default function ProfilePage() {
           <p className="text-gray-600">{dict.profile.pageSubtitle}</p>
         </div>
 
+        {/* Upgrade Banner for Visitors */}
+        {session.user?.role === 'visitor' && (
+          <div className="mb-6 rounded-md border border-yellow-200 bg-yellow-50 p-4">
+            <div className="flex items-start">
+              <div className="ml-0">
+                <p className="text-sm text-yellow-800">
+                  {locale.startsWith('en')
+                    ? 'You are currently a Client (Visitor). Become an Association Member to access exclusive content and benefits.'
+                    : 'Você é atualmente um Cliente (Visitante). Torne-se Membro da Associação para acessar conteúdos e benefícios exclusivos.'}
+                </p>
+                <div className="mt-3 flex gap-3">
+                  <button
+                    onClick={async () => {
+                      try {
+                        const res = await fetch('/api/user/membership-request', { method: 'POST' })
+                        if (res.ok) {
+                          alert(locale.startsWith('en') ? 'Request sent successfully!' : 'Solicitação enviada com sucesso!')
+                        } else {
+                          const j = await res.json().catch(() => ({}))
+                          alert(j.error || (locale.startsWith('en') ? 'Error sending request' : 'Erro ao enviar solicitação'))
+                        }
+                      } catch (e) {
+                        alert(locale.startsWith('en') ? 'Error sending request' : 'Erro ao enviar solicitação')
+                      }
+                    }}
+                    className="inline-flex items-center px-3 py-1.5 rounded-md bg-green-600 text-white text-sm hover:bg-green-700"
+                  >
+                    {locale.startsWith('en') ? 'Request Membership' : 'Solicitar Associação'}
+                  </button>
+                  <a
+                    href="/membros"
+                    className="inline-flex items-center px-3 py-1.5 rounded-md border text-sm text-green-700 border-green-200 hover:bg-green-50"
+                  >
+                    {locale.startsWith('en') ? 'Learn more' : 'Saiba mais'}
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="bg-white rounded-lg shadow">
           {/* Tabs */}
           <div className="border-b border-gray-200">
