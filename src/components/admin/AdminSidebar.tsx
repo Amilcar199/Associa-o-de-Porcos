@@ -47,6 +47,11 @@ const AdminSidebar = () => {
       icon: LayoutDashboard
     },
     {
+      name: 'Solicitações',
+      href: '/admin/solicitacoes',
+      icon: UsersRound
+    },
+    {
       name: 'Usuários',
       href: '/admin/usuarios',
       icon: Users
