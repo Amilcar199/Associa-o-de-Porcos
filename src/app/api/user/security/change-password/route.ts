@@ -22,7 +22,6 @@ export async function POST(req: NextRequest) {
 
     const user = await User.findById(session.user.id).select('+password')
     if (!user) return errorResponse('Usuário não encontrado', 404)
-    if (!user.emailVerified) return errorResponse('Email não verificado. Verifique seu email antes de alterar a senha.', 400)
 
     const ok = await user.comparePassword(currentPassword)
     if (!ok) return errorResponse('Senha atual incorreta', 400)
