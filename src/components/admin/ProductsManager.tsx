@@ -47,6 +47,15 @@ export default function ProductsManager() {
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterBreed, setFilterBreed] = useState('');
+  const [filterAvailability, setFilterAvailability] = useState('');
+  const [filterVaccinated, setFilterVaccinated] = useState('');
+  const [filterHealth, setFilterHealth] = useState('');
+  const [minAge, setMinAge] = useState('');
+  const [maxAge, setMaxAge] = useState('');
+  const [minWeight, setMinWeight] = useState('');
+  const [maxWeight, setMaxWeight] = useState('');
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
 
   const [formData, setFormData] = useState<ProductFormData>({
     name: '',
@@ -213,10 +222,32 @@ export default function ProductsManager() {
   };
 
   const filteredProducts = products.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = !filterBreed || product.breed === filterBreed;
-    return matchesSearch && matchesFilter;
+    const name = String(product.name || '').toLowerCase()
+    const description = String(product.description || '').toLowerCase()
+    const matchesSearch = !searchTerm || name.includes(searchTerm.toLowerCase()) || description.includes(searchTerm.toLowerCase());
+    const matchesBreed = !filterBreed || product.breed === filterBreed;
+    const availabilityValue = (product.availability != null)
+      ? String(product.availability)
+      : (product.isAvailable === true ? 'available' : 'reserved')
+    const matchesAvailability = !filterAvailability || availabilityValue === filterAvailability;
+    const matchesVaccinated = !filterVaccinated || String((product as any).vaccinated) === filterVaccinated;
+    const matchesHealth = !filterHealth || String((product as any).healthStatus) === filterHealth;
+    const age = Number(product.age)
+    const weight = Number(product.weight)
+    const price = Number(product.price)
+    const matchesAge = (
+      (minAge === '' || (!Number.isNaN(age) && age >= Number(minAge))) &&
+      (maxAge === '' || (!Number.isNaN(age) && age <= Number(maxAge)))
+    )
+    const matchesWeight = (
+      (minWeight === '' || (!Number.isNaN(weight) && weight >= Number(minWeight))) &&
+      (maxWeight === '' || (!Number.isNaN(weight) && weight <= Number(maxWeight)))
+    )
+    const matchesPrice = (
+      (minPrice === '' || (!Number.isNaN(price) && price >= Number(minPrice))) &&
+      (maxPrice === '' || (!Number.isNaN(price) && price <= Number(maxPrice)))
+    )
+    return matchesSearch && matchesBreed && matchesAvailability && matchesVaccinated && matchesHealth && matchesAge && matchesWeight && matchesPrice
   });
 
   const breeds = Array.from(new Map(products.map((p: any) => [p.breed, p.breed])).values()).filter(Boolean);
@@ -313,13 +344,11 @@ export default function ProductsManager() {
         </button>
       </div>
 
-      {/* Filters */}
+      {/* Filtros avançados */}
       <div className="bg-white rounded-lg shadow p-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Buscar
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Buscar</label>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
               <input
@@ -331,22 +360,100 @@ export default function ProductsManager() {
               />
             </div>
           </div>
-          
+
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Filtrar por Raça
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Raça</label>
             <select
               value={filterBreed}
               onChange={(e) => { setFilterBreed(e.target.value); setPage(1) }}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
             >
-              <option value="">Todas as raças</option>
+              <option value="">Todas</option>
               {breeds.map(breed => (
                 <option key={breed} value={breed}>{breed}</option>
               ))}
             </select>
           </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Disponibilidade</label>
+            <select
+              value={filterAvailability}
+              onChange={(e)=>{ setFilterAvailability(e.target.value); setPage(1) }}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            >
+              <option value="">Todas</option>
+              <option value="available">Disponível</option>
+              <option value="reserved">Reservado</option>
+              <option value="sold">Vendido</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Vacinação</label>
+            <select
+              value={filterVaccinated}
+              onChange={(e)=>{ setFilterVaccinated(e.target.value); setPage(1) }}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            >
+              <option value="">Todas</option>
+              <option value="true">Vacinado</option>
+              <option value="false">Não vacinado</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Saúde</label>
+            <select
+              value={filterHealth}
+              onChange={(e)=>{ setFilterHealth(e.target.value); setPage(1) }}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            >
+              <option value="">Todas</option>
+              <option value="excellent">Excelente</option>
+              <option value="good">Bom</option>
+              <option value="fair">Regular</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Idade (min)</label>
+            <input type="number" value={minAge} onChange={(e)=>{ setMinAge(e.target.value); setPage(1) }} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Idade (max)</label>
+            <input type="number" value={maxAge} onChange={(e)=>{ setMaxAge(e.target.value); setPage(1) }} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500" />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Peso (min kg)</label>
+            <input type="number" step="0.1" value={minWeight} onChange={(e)=>{ setMinWeight(e.target.value); setPage(1) }} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Peso (max kg)</label>
+            <input type="number" step="0.1" value={maxWeight} onChange={(e)=>{ setMaxWeight(e.target.value); setPage(1) }} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500" />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Preço (min Kz)</label>
+            <input type="number" step="0.01" value={minPrice} onChange={(e)=>{ setMinPrice(e.target.value); setPage(1) }} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Preço (max Kz)</label>
+            <input type="number" step="0.01" value={maxPrice} onChange={(e)=>{ setMaxPrice(e.target.value); setPage(1) }} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500" />
+          </div>
+        </div>
+        <div className="mt-4 flex justify-end">
+          <button
+            type="button"
+            onClick={()=>{
+              setSearchTerm(''); setFilterBreed(''); setFilterAvailability(''); setFilterVaccinated(''); setFilterHealth('');
+              setMinAge(''); setMaxAge(''); setMinWeight(''); setMaxWeight(''); setMinPrice(''); setMaxPrice(''); setPage(1)
+            }}
+            className="px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded"
+          >
+            Limpar filtros
+          </button>
         </div>
       </div>
 
