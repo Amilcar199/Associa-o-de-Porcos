@@ -2,6 +2,8 @@ export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
 import { sendEmail } from '@/lib/email'
+import connectDB from '@/lib/mongodb'
+import Contact from '@/models/Contact'
 
 export async function POST(req: NextRequest) {
   try {
@@ -22,7 +24,20 @@ export async function POST(req: NextRequest) {
     })
 
     if (!ok) {
-      return NextResponse.json({ success: false, error: 'Falha ao enviar notificação' }, { status: 500 })
+      // Fallback: registrar como contato no banco (quando possível)
+      try {
+        await connectDB()
+        const contact = new Contact({
+          name: 'Assinante Newsletter',
+          email,
+          subject: 'Assinatura de Novidades',
+          message: 'Eu quero ficar por dentro das novidades.'
+        })
+        await contact.save()
+      } catch (e) {
+        console.error('Falha no fallback de contato:', e)
+        // Mesmo assim, não bloquear a experiência do usuário
+      }
     }
 
     return NextResponse.json({ success: true })
