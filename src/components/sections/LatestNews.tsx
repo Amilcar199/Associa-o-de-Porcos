@@ -227,13 +227,13 @@ const LatestNews = () => {
                     className="group block cursor-pointer"
                   >
                     <div className="card overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
-                      <div className="flex">
-                        <div className="relative w-32 h-24 lg:w-40 lg:h-28 flex-shrink-0 overflow-hidden">
+                      <div className="flex items-stretch">
+                        <div className="relative w-32 lg:w-40 flex-shrink-0 overflow-hidden self-stretch">
                           <Image
                             src={article.featuredImage}
                             alt={article.title}
                             fill
-                            className="object-cover group-hover:scale-110 transition-transform duration-300"
+                            className="object-cover object-center group-hover:scale-110 transition-transform duration-300"
                           />
                         </div>
                         <div className="flex-1 p-4">
