@@ -55,7 +55,7 @@ export default function NewsModal({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="relative h-56 lg:h-64 overflow-hidden">
+        <div className="relative h-64 lg:h-72 overflow-hidden">
           <Image
             src={(news.featuredImage as any) || (Placeholder as any)}
             alt={news.title}
@@ -109,7 +109,7 @@ export default function NewsModal({
         </div>
 
         {/* Conteúdo */}
-        <div className="p-6 lg:p-8 overflow-y-auto max-h-[calc(90vh-18rem)]">
+        <div className="p-6 lg:p-8 overflow-y-auto max-h-[calc(90vh-20rem)]">
           {isLoading ? (
             <div className="space-y-4 animate-pulse">
               <div className="h-8 bg-gray-200 rounded w-3/4" />
