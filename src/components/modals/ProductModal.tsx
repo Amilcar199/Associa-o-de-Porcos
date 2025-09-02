@@ -80,7 +80,7 @@ export default function ProductModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={onClose} onKeyDown={handleKeyDown} tabIndex={0}>
-      <div className="relative w-full max-w-5xl max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
+      <div className="relative w-full max-w-5xl max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
         {/* Header com imagem */}
         <div className="relative h-64 lg:h-72 overflow-hidden">
           <Image src={(images[currentImageIndex] as any) || (Placeholder as any)} alt={(product.name ?? '') as string} fill className="object-cover" priority />
@@ -115,7 +115,7 @@ export default function ProductModal({
         </div>
 
         {/* Conteúdo */}
-        <div className="p-6 lg:p-8 overflow-y-auto max-h-[calc(90vh-20rem)]">
+        <div className="p-6 lg:p-8 overflow-y-auto flex-1">
           {isLoading ? (
             <div className="space-y-4 animate-pulse">
               <div className="h-8 bg-gray-200 rounded w-3/4" />

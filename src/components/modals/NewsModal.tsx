@@ -51,7 +51,7 @@ export default function NewsModal({
       tabIndex={0}
     >
       <div 
-        className="relative w-full max-w-4xl max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden"
+        className="relative w-full max-w-4xl max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -109,7 +109,7 @@ export default function NewsModal({
         </div>
 
         {/* Conteúdo */}
-        <div className="p-6 lg:p-8 overflow-y-auto max-h-[calc(90vh-20rem)]">
+        <div className="p-6 lg:p-8 overflow-y-auto flex-1">
           {isLoading ? (
             <div className="space-y-4 animate-pulse">
               <div className="h-8 bg-gray-200 rounded w-3/4" />
