@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { X, Calendar, Weight, MapPin, Heart, ShoppingCart, Phone, Mail, ArrowLeft, ArrowRight } from 'lucide-react'
+import { X, Calendar, Weight, MapPin, Heart, Phone, Mail, ArrowLeft, ArrowRight, MessageSquare } from 'lucide-react'
 import Image from 'next/image'
 import Placeholder from '@/components/assets/Foto Suino.webp'
 import { formatPrice, formatAge } from '@/lib/utils'
@@ -77,6 +77,21 @@ export default function ProductModal({
   const images = product.images && product.images.length > 0
     ? product.images
     : (product.imageUrl ? [product.imageUrl] : [String(Placeholder as any)])
+
+  const subject = (isEn ? 'Product inquiry: ' : 'Interesse no produto: ') + (product.name || '')
+  const intro = isEn
+    ? 'Hello, I liked this product and would like to know if it is still available.'
+    : 'Olá, gostei deste produto e gostaria de saber se ainda está disponível.'
+  const details = `${isEn ? 'Product info' : 'Informações do produto'}:\n`
+    + `- ${isEn ? 'Name' : 'Nome'}: ${product.name}\n`
+    + `- ${isEn ? 'Breed' : 'Raça'}: ${product.breed || '-'}\n`
+    + `- ${isEn ? 'Weight' : 'Peso'}: ${product.weight ? `${product.weight} kg` : '-'}\n`
+    + `- ${isEn ? 'Age' : 'Idade'}: ${product.age ? `${product.age} ${isEn ? 'months' : 'meses'}` : '-'}\n`
+    + `- ${isEn ? 'Code' : 'Código'}: ${product.code || product._id?.slice?.(0,8) || '-'}`
+  const outro = isEn ? 'Thanks!' : 'Obrigado!'
+  const prefillMessage = `${intro}\n\n${details}\n\n${outro}`
+  const contactHref = `/contato?subject=${encodeURIComponent(subject)}&message=${encodeURIComponent(prefillMessage)}`
+  const whatsappHref = `https://wa.me/244928476427?text=${encodeURIComponent(prefillMessage)}`
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={onClose} onKeyDown={handleKeyDown} tabIndex={0}>
@@ -206,21 +221,13 @@ export default function ProductModal({
               </button>
             </div>
             <div className="flex items-center gap-3">
-              <a
-                href={`/contato?subject=${encodeURIComponent((isEn ? 'Product inquiry: ' : 'Interesse no produto: ') + (product.name || ''))}&message=${encodeURIComponent((isEn
-                  ? `Hello, I liked this product and would like to know if it is still available.`
-                  : `Olá, gostei deste produto e gostaria de saber se ainda está disponível.`) +
-                  `\n\n${isEn ? 'Product info' : 'Informações do produto'}:\n` +
-                  `- ${isEn ? 'Name' : 'Nome'}: ${product.name}\n` +
-                  `- ${isEn ? 'Breed' : 'Raça'}: ${product.breed || '-'}\n` +
-                  `- ${isEn ? 'Weight' : 'Peso'}: ${product.weight ? `${product.weight} kg` : '-'}\n` +
-                  `- ${isEn ? 'Age' : 'Idade'}: ${product.age ? `${product.age} ${isEn ? 'months' : 'meses'}` : '-'}\n` +
-                  `- ${isEn ? 'Code' : 'Código'}: ${product.code || product._id?.slice?.(0,8) || '-'}\n\n` +
-                  (isEn ? 'Thanks!' : 'Obrigado!')}`}
-                className="btn-secondary flex items-center gap-2"
-              >
+              <a href={contactHref} className="btn-secondary flex items-center gap-2">
                 <Mail size={16} />
                 {isEn ? 'Send Message' : 'Enviar Mensagem'}
+              </a>
+              <a href={whatsappHref} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
+                <MessageSquare size={16} />
+                WhatsApp
               </a>
               <a href="tel:+244928476427" className="btn-primary flex items-center gap-2">
                 <Phone size={16} />
