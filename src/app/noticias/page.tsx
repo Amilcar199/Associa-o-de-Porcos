@@ -2,10 +2,10 @@ export const dynamic = 'force-dynamic'
 
 import type { Metadata } from 'next'
 import { BRAND_NAME } from '@/lib/brand'
-import Image from 'next/image'
 import { headers } from 'next/headers'
 import { Calendar } from 'lucide-react'
 import { cookies } from 'next/headers'
+import NewsClient from '@/app/noticias/NewsClient'
 
 export function generateMetadata(): Metadata {
   const locale = cookies().get('locale')?.value || 'pt-AO'
@@ -79,33 +79,7 @@ export default async function NoticiasPage() {
         {news.length === 0 ? (
           <div className="bg-white rounded-xl shadow p-8 text-center text-gray-600">{isEn ? 'No news published at the moment.' : 'Nenhuma notícia publicada no momento.'}</div>
         ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {news.map((n: any, idx: number) => (
-              <article key={n._id || idx} className="group bg-white rounded-xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition">
-                <div className="relative h-44">
-                  <Image
-                    src={n.imageUrl}
-                    alt={n.title || (isEn ? 'News' : 'Notícia')}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width:768px) 100vw, 33vw"
-                  />
-                </div>
-                <div className="p-4">
-                  <h3 className="font-semibold text-gray-900 text-lg line-clamp-2">{n.title}</h3>
-                  {n.publishedAtFormatted && (
-                    <div className="mt-2 flex items-center gap-2 text-xs text-gray-500">
-                      <Calendar size={14} className="text-primary-600" />
-                      <span>{n.publishedAtFormatted}</span>
-                    </div>
-                  )}
-                  {n.excerpt && (
-                    <p className="text-sm text-gray-600 line-clamp-3 mt-2">{n.excerpt}</p>
-                  )}
-                </div>
-              </article>
-            ))}
-          </div>
+          <NewsClient news={news.map((n: any, idx: number) => ({ ...n, _id: n._id || n.slug || String(idx) }))} isEn={isEn} />
         )}
       </div>
     </section>
