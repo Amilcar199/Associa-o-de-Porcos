@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import Image from 'next/image'
 import { Calendar, Eye } from 'lucide-react'
 import NewsModal from '@/components/modals/NewsModal'
@@ -24,18 +24,14 @@ export default function NewsClient({ news, isEn }: { news: NewsItem[]; isEn: boo
   const [list, setList] = useState<NewsItem[]>(news)
   const [selected, setSelected] = useState<NewsItem | null>(null)
   const [open, setOpen] = useState(false)
-  const [incremented, setIncremented] = useState<Record<string, boolean>>({})
 
   const isValidObjectId = (id?: string) => !!id && /^[a-fA-F0-9]{24}$/.test(id)
 
   const openModal = (n: NewsItem) => {
     setSelected(n)
     setOpen(true)
-    // Incrementa visualizações uma vez por item
-    const key = n._id || n.slug || ''
-    if (key && !incremented[key]) {
-      incrementViews(n).catch(() => {})
-    }
+    // Incrementa visualizações SEMPRE que abrir (comportamento tipo YouTube)
+    incrementViews(n).catch(() => {})
   }
   const closeModal = () => {
     setOpen(false)
@@ -58,8 +54,6 @@ export default function NewsClient({ news, isEn }: { news: NewsItem[]; isEn: boo
         }
       }
       if (typeof newViews === 'number') {
-        const key = n._id || n.slug || ''
-        setIncremented(prev => ({ ...prev, [key]: true }))
         setList(prev => prev.map(item => (item._id === n._id ? { ...item, views: newViews } : item)))
         setSelected(prev => (prev ? { ...prev, views: newViews } : prev))
       }
@@ -70,12 +64,20 @@ export default function NewsClient({ news, isEn }: { news: NewsItem[]; isEn: boo
   const goPrev = () => {
     if (!selected) return
     const idx = list.findIndex(n => n._id === selected._id)
-    if (idx > 0) setSelected(list[idx - 1])
+    if (idx > 0) {
+      const nextNews = list[idx - 1]
+      setSelected(nextNews)
+      incrementViews(nextNews).catch(() => {})
+    }
   }
   const goNext = () => {
     if (!selected) return
     const idx = list.findIndex(n => n._id === selected._id)
-    if (idx < list.length - 1) setSelected(list[idx + 1])
+    if (idx < list.length - 1) {
+      const nextNews = list[idx + 1]
+      setSelected(nextNews)
+      incrementViews(nextNews).catch(() => {})
+    }
   }
 
   return (

@@ -199,7 +199,7 @@ export default function ProductModal({
 
         {/* Footer com ações */}
         <div className="px-6 lg:px-8 py-4 bg-gray-50 border-t border-gray-200">
-          <div className="flex flex-col sm:flex-row items-center justify_between gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <button className="w-10 h-10 bg-gray-100 hover:bg-red-100 rounded-lg flex items-center justify-center transition-colors">
                 <Heart size={20} className="text-gray-600 hover:text-red-500" />
