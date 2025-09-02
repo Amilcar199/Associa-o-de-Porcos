@@ -13,6 +13,7 @@ import {
   Heart,
   ArrowRight
 } from 'lucide-react'
+import { useTransition } from 'react'
 import { useEffect, useState } from 'react'
 import { useCookieConsent } from '@/components/cookies/CookieConsentProvider'
 import { useLanguage } from '@/components/providers/LanguageProvider'
@@ -56,6 +57,60 @@ const Footer = () => {
     { name: dict.categories?.sows || 'Matrizes', href: '/produtos?categoria=matrizes' },
   ]
 
+  const NewsletterForm = () => {
+    const [email, setEmail] = useState('')
+    const [sending, setSending] = useState(false)
+    const [done, setDone] = useState<string | null>(null)
+    const [err, setErr] = useState<string | null>(null)
+
+    const submit = async () => {
+      setSending(true)
+      setDone(null)
+      setErr(null)
+      try {
+        const res = await fetch('/api/newsletter/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        })
+        if (res.ok) {
+          setDone(isEn ? 'Subscribed! We will keep you updated.' : 'Inscrição feita! Vamos te manter atualizado.')
+          setEmail('')
+        } else {
+          const j = await res.json().catch(() => ({}))
+          setErr(j?.error || (isEn ? 'Failed, please try again.' : 'Falha, tente novamente.'))
+        }
+      } catch {
+        setErr(isEn ? 'Network error.' : 'Erro de rede.')
+      } finally {
+        setSending(false)
+      }
+    }
+
+    return (
+      <div className="w-full max-w-md">
+        <div className="flex">
+          <input
+            type="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            placeholder={dict.footer.emailPlaceholder}
+            className="flex-1 px-4 py-3 rounded-l-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-400"
+          />
+          <button
+            onClick={submit}
+            disabled={sending || !email}
+            className="bg-primary-800 hover:bg-primary-900 disabled:opacity-60 px-6 py-3 rounded-r-lg transition-colors flex items-center"
+          >
+            <ArrowRight size={20} />
+          </button>
+        </div>
+        {done && <div className="mt-2 text-green-300 text-sm">{done}</div>}
+        {err && <div className="mt-2 text-red-300 text-sm">{err}</div>}
+      </div>
+    )
+  }
+
   return (
     <footer className="bg-gray-900 text-white">
       {/* Newsletter Section */}
@@ -71,16 +126,7 @@ const Footer = () => {
               </p>
             </div>
             
-            <div className="flex w-full max-w-md">
-              <input
-                type="email"
-                placeholder={dict.footer.emailPlaceholder}
-                className="flex-1 px-4 py-3 rounded-l-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-400"
-              />
-              <button className="bg-primary-800 hover:bg-primary-900 px-6 py-3 rounded-r-lg transition-colors flex items-center">
-                <ArrowRight size={20} />
-              </button>
-            </div>
+            <NewsletterForm />
           </div>
         </div>
       </div>
