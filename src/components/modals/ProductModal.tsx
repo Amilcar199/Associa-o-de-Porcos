@@ -204,12 +204,12 @@ export default function ProductModal({
               <button className="w-10 h-10 bg-gray-100 hover:bg-red-100 rounded-lg flex items-center justify-center transition-colors">
                 <Heart size={20} className="text-gray-600 hover:text-red-500" />
               </button>
-              <button className="w-10 h-10 bg-gray-100 hover:bg-primary-100 rounded-lg flex items-center justify-center transition-colors">
-                <ShoppingCart size={20} className="text-gray-600 hover:text-primary-600" />
-              </button>
             </div>
             <div className="flex items-center gap-3">
-              <a href="/contato" className="btn-secondary flex items-center gap-2">
+              <a
+                href={`/contato?subject=${encodeURIComponent((isEn ? 'Product inquiry: ' : 'Interesse no produto: ') + (product.name || ''))}&message=${encodeURIComponent((isEn ? 'Hello, I am interested in this product.' : 'Olá, tenho interesse neste produto.') + `\n\n${isEn ? 'Product' : 'Produto'}: ${product.name}\n${isEn ? 'Breed' : 'Raça'}: ${product.breed || '-'}\n${isEn ? 'Weight' : 'Peso'}: ${product.weight ? `${product.weight} kg` : '-'}\n${isEn ? 'Age' : 'Idade'}: ${product.age ? `${product.age} ${isEn ? 'months' : 'meses'}` : '-'}\n${isEn ? 'Code' : 'Código'}: ${product.code || product._id?.slice?.(0,8) || '-'}`)}`}
+                className="btn-secondary flex items-center gap-2"
+              >
                 <Mail size={16} />
                 {isEn ? 'Send Message' : 'Enviar Mensagem'}
               </a>

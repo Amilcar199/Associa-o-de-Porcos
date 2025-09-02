@@ -216,9 +216,6 @@ const FeaturedProducts = () => {
                     >
                       {locale.startsWith('en') ? 'See Details' : 'Ver Detalhes'}
                     </button>
-                    <button className="w-10 h-10 bg-gray-100 hover:bg-primary-100 rounded-lg flex items-center justify-center transition-colors">
-                      <ShoppingCart size={16} className="text-gray-600 hover:text-primary-600" />
-                    </button>
                   </div>
                 </div>
               </motion.div>

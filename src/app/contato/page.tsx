@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Mail, Phone, Send, MessageSquare, MapPin, Clock } from 'lucide-react'
 import { useLanguage } from '@/components/providers/LanguageProvider'
 
@@ -10,6 +11,25 @@ export default function ContatoPage() {
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const searchParams = useSearchParams()
+
+  useEffect(() => {
+    const subject = searchParams.get('subject')
+    const message = searchParams.get('message')
+    if (subject || message) {
+      const form = document.querySelector('form') as HTMLFormElement | null
+      if (form) {
+        if (subject) {
+          const subj = form.querySelector('input[name="subject"]') as HTMLInputElement | null
+          if (subj) subj.value = subject
+        }
+        if (message) {
+          const msg = form.querySelector('textarea[name="message"]') as HTMLTextAreaElement | null
+          if (msg) msg.value = message
+        }
+      }
+    }
+  }, [searchParams])
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
