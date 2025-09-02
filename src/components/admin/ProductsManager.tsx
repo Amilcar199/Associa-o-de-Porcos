@@ -472,6 +472,7 @@ export default function ProductsManager() {
         pagination={{ page, limit, total, pages }}
         onPageChange={(p) => setPage(Math.min(Math.max(1, p), pages))}
         onSort={(key, order) => { setSortKey(key); setSortOrder(order) }}
+        showHeader={false}
       />
 
       {/* Add/Edit Modal */}
