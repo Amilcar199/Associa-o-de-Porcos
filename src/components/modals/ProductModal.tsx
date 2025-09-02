@@ -76,7 +76,7 @@ export default function ProductModal({
 
   const images = product.images && product.images.length > 0
     ? product.images
-    : (product.imageUrl ? [product.imageUrl] : [Placeholder as unknown as string])
+    : (product.imageUrl ? [product.imageUrl] : [String(Placeholder as any)])
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={onClose} onKeyDown={handleKeyDown} tabIndex={0}>
@@ -207,7 +207,16 @@ export default function ProductModal({
             </div>
             <div className="flex items-center gap-3">
               <a
-                href={`/contato?subject=${encodeURIComponent((isEn ? 'Product inquiry: ' : 'Interesse no produto: ') + (product.name || ''))}&message=${encodeURIComponent((isEn ? 'Hello, I am interested in this product.' : 'Olá, tenho interesse neste produto.') + `\n\n${isEn ? 'Product' : 'Produto'}: ${product.name}\n${isEn ? 'Breed' : 'Raça'}: ${product.breed || '-'}\n${isEn ? 'Weight' : 'Peso'}: ${product.weight ? `${product.weight} kg` : '-'}\n${isEn ? 'Age' : 'Idade'}: ${product.age ? `${product.age} ${isEn ? 'months' : 'meses'}` : '-'}\n${isEn ? 'Code' : 'Código'}: ${product.code || product._id?.slice?.(0,8) || '-'}`)}`}
+                href={`/contato?subject=${encodeURIComponent((isEn ? 'Product inquiry: ' : 'Interesse no produto: ') + (product.name || ''))}&message=${encodeURIComponent((isEn
+                  ? `Hello, I liked this product and would like to know if it is still available.`
+                  : `Olá, gostei deste produto e gostaria de saber se ainda está disponível.`) +
+                  `\n\n${isEn ? 'Product info' : 'Informações do produto'}:\n` +
+                  `- ${isEn ? 'Name' : 'Nome'}: ${product.name}\n` +
+                  `- ${isEn ? 'Breed' : 'Raça'}: ${product.breed || '-'}\n` +
+                  `- ${isEn ? 'Weight' : 'Peso'}: ${product.weight ? `${product.weight} kg` : '-'}\n` +
+                  `- ${isEn ? 'Age' : 'Idade'}: ${product.age ? `${product.age} ${isEn ? 'months' : 'meses'}` : '-'}\n` +
+                  `- ${isEn ? 'Code' : 'Código'}: ${product.code || product._id?.slice?.(0,8) || '-'}\n\n` +
+                  (isEn ? 'Thanks!' : 'Obrigado!')}`}
                 className="btn-secondary flex items-center gap-2"
               >
                 <Mail size={16} />
