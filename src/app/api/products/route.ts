@@ -104,6 +104,13 @@ export async function POST(req: NextRequest) {
       return errorResponse('Pelo menos uma imagem é obrigatória')
     }
 
+    // Garantir código do produto (server-side fallback)
+    try {
+      productData.code = sanitizedData.code || await Product.generateCode(sanitizedData.breed)
+    } catch (e) {
+      return errorResponse('Falha ao gerar código automático')
+    }
+
     // Criar produto
     const product = new Product(productData)
     await product.save()
