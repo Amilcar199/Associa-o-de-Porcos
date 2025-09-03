@@ -49,7 +49,7 @@ export default function ProductsClient({ products }: ProductsClientProps) {
 
   // Load currency for client-side formatted fallbacks
   useEffect(()=>{
-    ;(async()=>{ try { const r = await fetch('/api/admin/config',{cache:'no-store'}); if(r.ok){ const j = await r.json(); setCurrency(j?.data?.currency || 'AOA'); setShowConverted(locale.startsWith('en')) } } catch {} })()
+    ;(async()=>{ try { const r = await fetch('/api/admin/config',{cache:'no-store'}); if(r.ok){ const j = await r.json(); const curr = j?.data?.currency || 'AOA'; setCurrency(curr); setShowConverted(locale.startsWith('en') && curr !== 'USD') } } catch {} })()
   },[])
 
   const goToPreviousProduct = () => {
@@ -92,7 +92,7 @@ export default function ProductsClient({ products }: ProductsClientProps) {
                   {product.priceFormatted || (
                     showConverted
                       ? convertedCache[String(product._id)] || (
-                        (()=>{ convertAndFormat((product.price as number) || 0, 'AOA', 'USD', locale).then(f=>setConvertedCache(prev=>({...prev, [String(product._id)]: f })) ); return formatPrice((product.price as number) || 0, 'AOA', locale) })()
+                        (()=>{ convertAndFormat((product.price as number) || 0, currency, 'USD', locale).then(f=>setConvertedCache(prev=>({...prev, [String(product._id)]: f })) ); return formatPrice((product.price as number) || 0, currency, locale) })()
                       )
                       : formatPrice(product.price as number, currency, locale)
                   )}

@@ -9,6 +9,12 @@ const SiteConfigSchema = new Schema({
   contactEmail: { type: String, default: '' },
   contactPhone: { type: String, default: '' },
   whatsappNumber: { type: String, default: '' },
+  facebookUrl: { type: String, default: '' },
+  instagramUrl: { type: String, default: '' },
+  linkedinUrl: { type: String, default: '' },
+  youtubeUrl: { type: String, default: '' },
+  twitterUrl: { type: String, default: '' },
+  tiktokUrl: { type: String, default: '' },
 }, { timestamps: true, collection: 'site_config' })
 
 export default models.SiteConfig || model('SiteConfig', SiteConfigSchema)
