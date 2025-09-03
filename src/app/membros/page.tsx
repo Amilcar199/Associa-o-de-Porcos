@@ -187,27 +187,29 @@ export default function MembersArea() {
         {/* Tabs */}
         <div className="bg-white rounded-lg shadow">
           <div className="border-b border-gray-200">
-            <nav className="-mb-px flex space-x-8 px-6">
-              <button onClick={() => setActiveTab('overview')} className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'overview' ? 'border-green-500 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
+            <nav className="-mb-px flex overflow-x-auto no-scrollbar px-4 sm:px-6">
+              <div className="flex space-x-6 sm:space-x-8 min-w-max">
+              <button onClick={() => setActiveTab('overview')} className={`shrink-0 py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'overview' ? 'border-green-500 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
                 <TrendingUp className="inline-block w-4 h-4 mr-2" />
                 {isEn ? 'Overview' : 'Visão Geral'}
               </button>
-              <button onClick={() => setActiveTab('document')} className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'document' ? 'border-green-500 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
+              <button onClick={() => setActiveTab('document')} className={`shrink-0 py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'document' ? 'border-green-500 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
                 <FileText className="inline-block w-4 h-4 mr-2" />
                 {isEn ? 'Documents' : 'Documentos'}
               </button>
-              <button onClick={() => setActiveTab('video')} className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'video' ? 'border-green-500 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
+              <button onClick={() => setActiveTab('video')} className={`shrink-0 py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'video' ? 'border-green-500 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
                 <Video className="inline-block w-4 h-4 mr-2" />
                 {isEn ? 'Videos' : 'Vídeos'}
               </button>
-              <button onClick={() => setActiveTab('article')} className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'article' ? 'border-green-500 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
+              <button onClick={() => setActiveTab('article')} className={`shrink-0 py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'article' ? 'border-green-500 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
                 <BookOpen className="inline-block w-4 h-4 mr-2" />
                 {isEn ? 'Articles' : 'Artigos'}
               </button>
-              <button onClick={() => setActiveTab('event')} className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'event' ? 'border-green-500 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
+              <button onClick={() => setActiveTab('event')} className={`shrink-0 py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'event' ? 'border-green-500 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
                 <Calendar className="inline-block w-4 h-4 mr-2" />
                 {isEn ? 'Events' : 'Eventos'}
               </button>
+              </div>
             </nav>
           </div>
 
