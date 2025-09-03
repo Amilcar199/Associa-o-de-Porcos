@@ -36,6 +36,12 @@ export default function ProductsClient({ products }: ProductsClientProps) {
   const [showConverted, setShowConverted] = useState(false)
   const [convertedCache, setConvertedCache] = useState<Record<string, string>>({})
   const [modalOpen, setModalOpen] = useState(false)
+  const [query, setQuery] = useState('')
+  const [health, setHealth] = useState<string>('')
+  const [vaccinated, setVaccinated] = useState<string>('')
+  const [maxPrice, setMaxPrice] = useState<string>('')
+  const [minWeight, setMinWeight] = useState<string>('')
+  const [maxAge, setMaxAge] = useState<string>('')
 
   const openProductModal = (product: Product) => {
     setSelectedProduct(product)
@@ -68,10 +74,52 @@ export default function ProductsClient({ products }: ProductsClientProps) {
     }
   }
 
+  const filtered = products.filter(p => {
+    if (query && !(`${p.name} ${p.breed} ${p.description || ''}`.toLowerCase().includes(query.toLowerCase()))) return false
+    if (health && p.healthStatus !== health) return false
+    if (vaccinated && String(!!p.vaccinated) !== vaccinated) return false
+    if (maxPrice && typeof p.price === 'number' && p.price > Number(maxPrice)) return false
+    if (minWeight && typeof p.weight === 'number' && p.weight < Number(minWeight)) return false
+    if (maxAge && typeof p.age === 'number' && p.age > Number(maxAge)) return false
+    return true
+  })
+
   return (
     <>
+      {/* Filters */}
+      <div className="mb-6 bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
+          <input
+            value={query}
+            onChange={e=>setQuery(e.target.value)}
+            placeholder={isEn ? 'Search by name, breed...' : 'Buscar por nome, raça...'}
+            className="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+          />
+          <select value={health} onChange={e=>setHealth(e.target.value)} className="px-3 py-2 border rounded-lg">
+            <option value="">{isEn ? 'Health (all)' : 'Saúde (todas)'}</option>
+            <option value="excellent">{isEn ? 'Excellent' : 'Excelente'}</option>
+            <option value="good">{isEn ? 'Good' : 'Bom'}</option>
+            <option value="fair">{isEn ? 'Fair' : 'Regular'}</option>
+          </select>
+          <select value={vaccinated} onChange={e=>setVaccinated(e.target.value)} className="px-3 py-2 border rounded-lg">
+            <option value="">{isEn ? 'Vaccinated (all)' : 'Vacinado (todos)'}</option>
+            <option value="true">{isEn ? 'Vaccinated' : 'Vacinado'}</option>
+            <option value="false">{isEn ? 'Not Vaccinated' : 'Não vacinado'}</option>
+          </select>
+          <input type="number" min="0" value={maxPrice} onChange={e=>setMaxPrice(e.target.value)} placeholder={isEn ? 'Max price' : 'Preço máx.'} className="px-3 py-2 border rounded-lg" />
+          <input type="number" min="0" value={minWeight} onChange={e=>setMinWeight(e.target.value)} placeholder={isEn ? 'Min weight (kg)' : 'Peso mín. (kg)'} className="px-3 py-2 border rounded-lg" />
+          <input type="number" min="0" value={maxAge} onChange={e=>setMaxAge(e.target.value)} placeholder={isEn ? 'Max age (months)' : 'Idade máx. (meses)'} className="px-3 py-2 border rounded-lg" />
+        </div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {(query || health || vaccinated || maxPrice || minWeight || maxAge) && (
+            <button onClick={()=>{ setQuery(''); setHealth(''); setVaccinated(''); setMaxPrice(''); setMinWeight(''); setMaxAge('') }} className="text-sm px-3 py-1.5 rounded border text-gray-700 hover:bg-gray-50">{isEn ? 'Clear filters' : 'Limpar filtros'}</button>
+          )}
+          <span className="text-sm text-gray-500 ml-auto">{isEn ? 'Results' : 'Resultados'}: {filtered.length}</span>
+        </div>
+      </div>
+
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {products.map((product, idx) => (
+        {filtered.map((product, idx) => (
           <div 
             key={product._id || idx} 
             onClick={() => openProductModal(product)}
