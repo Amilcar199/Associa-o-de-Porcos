@@ -17,6 +17,7 @@ import {
   Home
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import HeaderLanguageMenu from '@/components/i18n/HeaderLanguageMenu'
 
 interface AdminHeaderProps {
   user: {
@@ -100,6 +101,11 @@ const AdminHeader = ({ user }: AdminHeaderProps) => {
                   className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
                 />
               </div>
+            </div>
+
+            {/* Language */}
+            <div className="hidden md:block">
+              <HeaderLanguageMenu />
             </div>
 
             {/* Notifications */}

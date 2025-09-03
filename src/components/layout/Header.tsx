@@ -265,7 +265,9 @@ const Header = () => {
             {/* User Menu Desktop */}
             <div className="hidden lg:flex items-center gap-5 lg:ml-8 xl:ml-10 text-white">
               {session ? (
-                <div className="relative">
+                <div className="flex items-center gap-5">
+                  <HeaderLanguageMenu />
+                  <div className="relative">
                   <button
                     onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                     className="flex items-center space-x-2 p-2 rounded-lg hover:bg-white/10 transition-colors"
@@ -337,6 +339,7 @@ const Header = () => {
                       </motion.div>
                     )}
                   </AnimatePresence>
+                  </div>
                 </div>
               ) : (
                 <div className="flex items-center space-x-5">
@@ -401,6 +404,9 @@ const Header = () => {
                   
                   {session ? (
                     <div className="pt-4 border-t border-gray-200 space-y-4">
+                      <div>
+                        <HeaderLanguageMenu />
+                      </div>
                       <div className="flex items-center space-x-3">
                         <div className="w-10 h-10 rounded-full bg-primary-600 flex items-center justify-center text-white font-medium">
                           {session.user?.avatar ? (
