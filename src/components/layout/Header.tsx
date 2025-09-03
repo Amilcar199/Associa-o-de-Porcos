@@ -98,7 +98,7 @@ const Header = () => {
               </div>
               <div className="flex items-center space-x-2">
                 <Mail size={14} />
-                <span>contato@associacaodeporcos.ao</span>
+                <span>{siteConfig?.contactEmail || 'contato@associacaodeporcos.ao'}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <MapPin size={14} />
