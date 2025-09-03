@@ -30,6 +30,13 @@ export default function SettingsClient() {
     load()
   },[])
 
+  // Sincroniza moeda ao alterar locale
+  useEffect(()=>{
+    const lower = (locale || '').toLowerCase()
+    if (lower.startsWith('en')) setCurrency('USD')
+    else if (lower.startsWith('pt')) setCurrency('AOA')
+  }, [locale])
+
   const save = async () => {
     try {
       setSaving(true)
