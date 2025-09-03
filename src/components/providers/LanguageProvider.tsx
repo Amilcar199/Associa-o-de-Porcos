@@ -33,17 +33,25 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 	}, [])
 
 	const setLocale = (next: Locale, options?: { updateRoute?: boolean }) => {
-		Cookies.set(LOCALE_COOKIE_KEY, next, { expires: 365, sameSite: 'lax' })
+		Cookies.set(LOCALE_COOKIE_KEY, next, { expires: 365, sameSite: 'lax', path: '/' })
 		setLocaleState(next)
-		if (options?.updateRoute !== false && pathname) {
-			const parts = pathname.split('/').filter(Boolean)
-			const first = parts[0]
-			const hasLangPrefix = first === 'pt' || first === 'en'
-			const rest = hasLangPrefix ? parts.slice(1).join('/') : parts.join('/')
-			const segment = languageToRouteSegment(next)
-			const newPath = `/${segment}/${rest}`.replace(/\/$/, '')
-			router.push(newPath || `/${segment}`)
+		const parts = (pathname || '/').split('/').filter(Boolean)
+		const first = parts[0]
+		const hasLangPrefix = first === 'pt' || first === 'en'
+		const rest = hasLangPrefix ? parts.slice(1).join('/') : parts.join('/')
+		const segment = languageToRouteSegment(next)
+		const newPath = `/${segment}/${rest}`.replace(/\/$/, '')
+
+		if (options?.updateRoute === false) {
+			// Force server components to re-read cookies
+			router.refresh()
+			return
 		}
+
+		// Replace URL to avoid stacking history and ensure middleware sets cookie prefix
+		router.replace(newPath || `/${segment}`)
+		// Ensure a refresh so server-rendered parts (layout, RSC) re-read cookie immediately
+		setTimeout(() => { try { router.refresh() } catch {} }, 0)
 	}
 
 	const value = useMemo(() => ({ locale, setLocale }), [locale])

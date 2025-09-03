@@ -435,6 +435,15 @@ const Header = () => {
                         <User size={20} />
                         <span>{dict.user.profile}</span>
                       </Link>
+                      {(session.user?.role === 'member' || session.user?.role === 'admin') && (
+                        <Link
+                          href="/membros"
+                          className="flex items-center space-x-2 py-2 text-gray-700 hover:text-primary-600 transition-colors"
+                        >
+                          <Users size={20} />
+                          <span>{dict.user.members}</span>
+                        </Link>
+                      )}
                       
                       {session.user?.role === 'admin' && (
                         <Link
