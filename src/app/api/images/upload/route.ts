@@ -15,6 +15,8 @@ export async function POST(request: NextRequest) {
 
     const formData = await request.formData();
     const file = formData.get('file') as File;
+    const category = (formData.get('category') as string) || ''
+    const replaceId = (formData.get('replaceId') as string) || ''
 
     if (!file) {
       return NextResponse.json(
@@ -44,8 +46,16 @@ export async function POST(request: NextRequest) {
     // Converter arquivo para Buffer
     const buffer = Buffer.from(await file.arrayBuffer());
     
-    // Fazer upload da imagem
-    const result = await uploadImage(buffer, file.name, file.type);
+    // Fazer upload da imagem (com metadados)
+    const result = await uploadImage(buffer, file.name, file.type, { category });
+
+    // Se replaceId foi informado, deletar a antiga
+    if (replaceId) {
+      try {
+        const { deleteImage } = await import('@/lib/gridfs')
+        await deleteImage(replaceId)
+      } catch {}
+    }
 
     return NextResponse.json({
       success: true,

@@ -8,12 +8,14 @@ export interface UploadResult {
   contentType: string;
   size: number;
   url: string;
+  category?: string;
 }
 
 export async function uploadImage(
   file: Buffer,
   filename: string,
-  contentType: string
+  contentType: string,
+  metadata?: Record<string, any>
 ): Promise<UploadResult> {
   await connectDB();
   const db = (mongoose.connection as any).db as Db;
@@ -30,7 +32,8 @@ export async function uploadImage(
     metadata: {
       contentType,
       originalName: filename,
-      uploadedAt: new Date()
+      uploadedAt: new Date(),
+      ...(metadata || {})
     }
   });
 
@@ -45,7 +48,8 @@ export async function uploadImage(
           filename: uniqueFilename,
           contentType: fileDoc?.metadata?.contentType || contentType,
           size: fileDoc?.length || file.byteLength || 0,
-          url: `/api/images/${fileId.toString()}`
+          url: `/api/images/${fileId.toString()}`,
+          category: fileDoc?.metadata?.category
         });
       } catch (err) {
         reject(err);

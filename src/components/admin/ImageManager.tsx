@@ -23,6 +23,9 @@ export default function ImageManager() {
   const [selectedImage, setSelectedImage] = useState<Image | null>(null);
   const [imageToDelete, setImageToDelete] = useState<Image | null>(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'all' | 'products' | 'news' | 'logos' | 'collaborators'>('all')
+  const [uploadCategory, setUploadCategory] = useState<'products' | 'news' | 'logos' | 'collaborators'>('products')
+  const [replaceTarget, setReplaceTarget] = useState<string>('')
 
   // Paginação client-side
   const [page, setPage] = useState(1)
@@ -31,7 +34,12 @@ export default function ImageManager() {
   const pages = Math.max(1, Math.ceil(total / limit))
   const start = (page - 1) * limit
   const end = start + limit
-  const paginatedImages = images.slice(start, end)
+  const filteredByTab = images.filter((img:any)=>{
+    if (activeTab === 'all') return true
+    const cat = (img as any).category || (img as any).metadata?.category || ''
+    return cat === activeTab
+  })
+  const paginatedImages = filteredByTab.slice(start, end)
 
   useEffect(() => {
     fetchImages();
@@ -123,6 +131,25 @@ export default function ImageManager() {
     <div className="space-y-6">
       {/* Upload Section */}
       <div className="bg-white rounded-lg shadow p-6">
+        <div className="mb-4">
+          <div className="inline-flex bg-gray-100 rounded-lg p-1">
+            {[
+              {key:'all',label:'Todos'},
+              {key:'products',label:'Produtos'},
+              {key:'news',label:'Notícias'},
+              {key:'logos',label:'Logos'},
+              {key:'collaborators',label:'Colaboradores'}
+            ].map(t => (
+              <button
+                key={t.key}
+                onClick={()=>{ setActiveTab(t.key as any); setPage(1) }}
+                className={`px-3 py-1 rounded ${activeTab===t.key ? 'bg-white shadow text-gray-900' : 'text-gray-600'}`}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+        </div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-900">Upload de Imagens</h2>
           <button
@@ -167,6 +194,13 @@ export default function ImageManager() {
                      }}
                      className="bg-green-600 text-white p-1 rounded hover:bg-green-700 transition-colors"
                      title="Definir como logo"
+                   >
+                     <Upload size={14} />
+                   </button>
+                   <button
+                     onClick={() => { setReplaceTarget(image.fileId); setShowUploadModal(true) }}
+                     className="bg-orange-500 text-white p-1 rounded hover:bg-orange-600 transition-colors"
+                     title="Substituir imagem"
                    >
                      <Upload size={14} />
                    </button>
@@ -227,10 +261,42 @@ export default function ImageManager() {
         onClose={() => setShowUploadModal(false)}
         title="Upload de Imagem"
       >
+        <div className="grid md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label className="block text-sm text-gray-700 mb-1">Categoria</label>
+            <select value={uploadCategory} onChange={(e)=>setUploadCategory(e.target.value as any)} className="w-full px-3 py-2 border rounded-lg">
+              <option value="products">Produtos</option>
+              <option value="news">Notícias</option>
+              <option value="logos">Logos</option>
+              <option value="collaborators">Colaboradores</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm text-gray-700 mb-1">Substituir imagem existente (opcional)</label>
+            <input value={replaceTarget} onChange={(e)=>setReplaceTarget(e.target.value)} placeholder="fileId da imagem" className="w-full px-3 py-2 border rounded-lg" />
+            <p className="text-xs text-gray-500 mt-1">Dica: clique em "Substituir imagem" no card para preencher automaticamente</p>
+          </div>
+        </div>
         <ImageUpload
           onImageUploaded={handleImageUploaded}
           className="mb-4"
         />
+        <form
+          onSubmit={async (e)=>{
+            e.preventDefault()
+            const input = document.querySelector('input[type="file"]') as HTMLInputElement | null
+            const file = input?.files?.[0]
+            if (!file) return
+            const fd = new FormData()
+            fd.append('file', file)
+            fd.append('category', uploadCategory)
+            if (replaceTarget) fd.append('replaceId', replaceTarget)
+            const res = await fetch('/api/images/upload',{ method:'POST', body: fd })
+            if (res.ok){ toast.success('Upload concluído'); setReplaceTarget(''); setUploadCategory('products'); handleImageUploaded((await res.json()).data.url) } else { toast.error('Falha no upload') }
+          }}
+        >
+          <button type="submit" className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Confirmar envio</button>
+        </form>
         {uploadedImageUrl && (
           <div className="bg-green-50 border border-green-200 rounded-lg p-4">
             <p className="text-green-800 text-sm">
