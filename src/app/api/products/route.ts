@@ -15,8 +15,9 @@ export async function GET(req: NextRequest) {
     const pagination = getPaginationParams(searchParams)
     const filters = getSearchFilters(searchParams)
 
-    // Construir query
-    const query = buildMongoQuery(filters)
+    // Construir query (apenas produtos ativos e disponíveis por padrão)
+    const baseQuery: any = { isActive: true }
+    const query = { ...baseQuery, ...buildMongoQuery(filters) }
     const sort = buildMongoSort(
       pagination.sort ?? 'createdAt', // valor padrão
       pagination.order ?? 'desc'      // valor padrão
