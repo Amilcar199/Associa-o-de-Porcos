@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { Tag, Weight, Calendar, Eye } from 'lucide-react'
 import ProductModal from '@/components/modals/ProductModal'
 import { useLanguage } from '@/components/providers/LanguageProvider'
-import { formatPrice } from '@/lib/utils'
+import { formatPrice, convertAndFormat } from '@/lib/utils'
 
 interface Product {
   _id: string
@@ -33,6 +33,8 @@ export default function ProductsClient({ products }: ProductsClientProps) {
   const isEn = locale.startsWith('en')
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [currency, setCurrency] = useState('AOA')
+  const [showConverted, setShowConverted] = useState(false)
+  const [convertedCache, setConvertedCache] = useState<Record<string, string>>({})
   const [modalOpen, setModalOpen] = useState(false)
 
   const openProductModal = (product: Product) => {
@@ -47,7 +49,7 @@ export default function ProductsClient({ products }: ProductsClientProps) {
 
   // Load currency for client-side formatted fallbacks
   useEffect(()=>{
-    ;(async()=>{ try { const r = await fetch('/api/admin/config',{cache:'no-store'}); if(r.ok){ const j = await r.json(); setCurrency(j?.data?.currency || 'AOA') } } catch {} })()
+    ;(async()=>{ try { const r = await fetch('/api/admin/config',{cache:'no-store'}); if(r.ok){ const j = await r.json(); setCurrency(j?.data?.currency || 'AOA'); setShowConverted(locale.startsWith('en')) } } catch {} })()
   },[])
 
   const goToPreviousProduct = () => {
@@ -87,7 +89,13 @@ export default function ProductsClient({ products }: ProductsClientProps) {
               {/* Badge de preço */}
               {(product.priceFormatted || typeof product.price === 'number') && (
                 <div className="absolute top-3 right-3 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-primary-700 text-sm font-semibold shadow">
-                  {product.priceFormatted || formatPrice(product.price as number, currency, locale)}
+                  {product.priceFormatted || (
+                    showConverted
+                      ? convertedCache[String(product._id)] || (
+                        (()=>{ convertAndFormat((product.price as number) || 0, 'AOA', 'USD', locale).then(f=>setConvertedCache(prev=>({...prev, [String(product._id)]: f })) ); return formatPrice((product.price as number) || 0, 'AOA', locale) })()
+                      )
+                      : formatPrice(product.price as number, currency, locale)
+                  )}
                 </div>
               )}
               {/* Overlay de hover */}

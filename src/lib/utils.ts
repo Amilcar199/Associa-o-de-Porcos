@@ -85,6 +85,27 @@ export function formatPrice(price: number, currencyCode?: string, locale?: strin
 }
 
 /**
+ * Converte valores via API interna (exchangerate.host) e formata o resultado
+ */
+export async function convertAndFormat(
+  amount: number,
+  from: string,
+  to: string,
+  locale = 'pt-AO'
+): Promise<string> {
+  try {
+    const res = await fetch(`/api/currency/convert?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&amount=${encodeURIComponent(String(amount))}`, { cache: 'no-store' })
+    if (!res.ok) throw new Error('rate')
+    const j = await res.json()
+    const converted = Number(j?.converted) || 0
+    return formatCurrency(converted, to, locale)
+  } catch {
+    // fallback: apenas formata no destino assumindo taxa ~1
+    return formatCurrency(amount, to, locale)
+  }
+}
+
+/**
  * Formata a idade de um animal
  */
 export function formatAge(age: number): string {

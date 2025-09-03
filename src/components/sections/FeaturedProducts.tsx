@@ -14,7 +14,7 @@ import {
 } from 'lucide-react'
 import ProductModal from '@/components/modals/ProductModal'
 import Placeholder from '@/components/assets/Foto Suino.webp'
-import { formatPrice, formatAge } from '@/lib/utils'
+import { formatPrice, formatAge, convertAndFormat } from '@/lib/utils'
 import { useLanguage } from '@/components/providers/LanguageProvider'
 import pt from '@/lib/i18n/dictionaries/pt'
 import en from '@/lib/i18n/dictionaries/en'
@@ -39,6 +39,8 @@ const FeaturedProducts = () => {
   const dict = locale.startsWith('en') ? en : pt
   const [products, setProducts] = useState<FeaturedProduct[]>([])
   const [currency, setCurrency] = useState('AOA')
+  const [showConverted, setShowConverted] = useState(false)
+  const [convertedCache, setConvertedCache] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<FeaturedProduct | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
@@ -60,7 +62,7 @@ const FeaturedProducts = () => {
 
   useEffect(() => {
     fetchFeaturedProducts()
-    ;(async()=>{ try { const r = await fetch('/api/admin/config',{ cache:'no-store' }); if(r.ok){ const j = await r.json(); setCurrency(j?.data?.currency || 'AOA') } } catch {} })()
+    ;(async()=>{ try { const r = await fetch('/api/admin/config',{ cache:'no-store' }); if(r.ok){ const j = await r.json(); const curr = j?.data?.currency || 'AOA'; setCurrency(curr); setShowConverted(locale.startsWith('en')) } } catch {} })()
   }, [])
 
 
@@ -180,7 +182,15 @@ const FeaturedProducts = () => {
                   </button>
                   <div className="absolute bottom-3 left-3">
                     <span className="bg-primary-600 text-white px-3 py-1 text-sm font-bold rounded-full">
-                      {product.price !== undefined ? formatPrice(product.price, currency, locale) : 'Preço sob consulta'}
+                      {product.price !== undefined ? (
+                        showConverted ? (
+                          convertedCache[String(product._id)] || (
+                            (()=>{ convertAndFormat(product.price || 0, 'AOA', 'USD', locale).then(f=>setConvertedCache(prev=>({...prev, [String(product._id)]: f })) ); return formatPrice(product.price || 0, 'AOA', locale) })()
+                          )
+                        ) : (
+                          formatPrice(product.price, currency, locale)
+                        )
+                      ) : 'Preço sob consulta'}
                     </span>
                   </div>
                 </div>
