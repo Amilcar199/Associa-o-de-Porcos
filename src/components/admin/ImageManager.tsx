@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Trash2, Download, Eye, Upload } from 'lucide-react';
 import ImageUpload from './ui/ImageUpload';
 import ConfirmDialog from './ui/ConfirmDialog';
@@ -26,6 +27,7 @@ export default function ImageManager() {
   const [activeTab, setActiveTab] = useState<'all' | 'products' | 'news' | 'logos' | 'collaborators'>('all')
   const [uploadCategory, setUploadCategory] = useState<'products' | 'news' | 'logos' | 'collaborators'>('products')
   const [replaceTarget, setReplaceTarget] = useState<string>('')
+  const searchParams = useSearchParams()
 
   // Paginação client-side
   const [page, setPage] = useState(1)
@@ -44,6 +46,17 @@ export default function ImageManager() {
   useEffect(() => {
     fetchImages();
   }, []);
+
+  // Definir aba inicial via query string (?tab=logos|products|news|collaborators|all)
+  useEffect(()=>{
+    const t = (searchParams?.get('tab') || '').toLowerCase()
+    if (['all','products','news','logos','collaborators'].includes(t)) {
+      setActiveTab(t as any)
+      setPage(1)
+      if (t === 'logos') setUploadCategory('logos')
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams])
 
   const fetchImages = async () => {
     try {
@@ -142,7 +155,15 @@ export default function ImageManager() {
             ].map(t => (
               <button
                 key={t.key}
-                onClick={()=>{ setActiveTab(t.key as any); setPage(1) }}
+                onClick={()=>{ 
+                  setActiveTab(t.key as any); 
+                  setPage(1);
+                  try {
+                    const url = new URL(window.location.href)
+                    url.searchParams.set('tab', String(t.key))
+                    window.history.replaceState(null, '', url.toString())
+                  } catch {}
+                }}
                 className={`px-3 py-1 rounded ${activeTab===t.key ? 'bg-white shadow text-gray-900' : 'text-gray-600'}`}
               >
                 {t.label}
