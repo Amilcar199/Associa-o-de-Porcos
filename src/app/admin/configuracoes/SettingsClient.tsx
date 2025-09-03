@@ -9,6 +9,8 @@ export default function SettingsClient() {
   const [locale, setLocale] = useState('pt-AO')
   const [contactEmail, setContactEmail] = useState('contato@associacaoporcos.ao')
   const [saving, setSaving] = useState(false)
+  const [contactPhone, setContactPhone] = useState('')
+  const [whatsappNumber, setWhatsappNumber] = useState('')
 
   useEffect(()=>{
     const load = async () => {
@@ -20,6 +22,8 @@ export default function SettingsClient() {
           if (c.currency) setCurrency(c.currency)
           if (c.locale) setLocale(c.locale)
           if (c.contactEmail) setContactEmail(c.contactEmail)
+          if (c.contactPhone) setContactPhone(c.contactPhone)
+          if (c.whatsappNumber) setWhatsappNumber(c.whatsappNumber)
         }
       } catch {}
     }
@@ -29,7 +33,7 @@ export default function SettingsClient() {
   const save = async () => {
     try {
       setSaving(true)
-      const res = await fetch('/api/admin/config', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ currency, locale, contactEmail }) })
+      const res = await fetch('/api/admin/config', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ currency, locale, contactEmail, contactPhone, whatsappNumber }) })
       if (!res.ok) {
         try { const j = await res.json(); toast.error(j?.error || 'Falha ao salvar configurações') } catch { toast.error('Falha ao salvar configurações') }
         return
@@ -66,6 +70,15 @@ export default function SettingsClient() {
         <div className="md:col-span-2">
           <label className="block text-sm text-gray-700 mb-1">Email de contato</label>
           <input type="email" value={contactEmail} onChange={e=>setContactEmail(e.target.value)} className="w-full px-3 py-2 border rounded-lg" placeholder="contato@exemplo.com" />
+        </div>
+        <div>
+          <label className="block text-sm text-gray-700 mb-1">Telefone</label>
+          <input value={contactPhone} onChange={e=>setContactPhone(e.target.value)} className="w-full px-3 py-2 border rounded-lg" placeholder="+244 9xx xxx xxx" />
+        </div>
+        <div>
+          <label className="block text-sm text-gray-700 mb-1">WhatsApp (apenas números com DDI)</label>
+          <input value={whatsappNumber} onChange={e=>setWhatsappNumber(e.target.value)} className="w-full px-3 py-2 border rounded-lg" placeholder="2449xxxxxxxx" />
+          <p className="text-xs text-gray-500 mt-1">Ex.: 244928476427</p>
         </div>
       </div>
 

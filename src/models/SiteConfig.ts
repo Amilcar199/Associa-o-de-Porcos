@@ -7,6 +7,8 @@ const SiteConfigSchema = new Schema({
   currency: { type: String, default: 'AOA' },
   locale: { type: String, default: 'pt-AO' },
   contactEmail: { type: String, default: '' },
+  contactPhone: { type: String, default: '' },
+  whatsappNumber: { type: String, default: '' },
 }, { timestamps: true, collection: 'site_config' })
 
 export default models.SiteConfig || model('SiteConfig', SiteConfigSchema)

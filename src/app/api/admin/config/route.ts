@@ -30,6 +30,8 @@ export async function PUT(req: NextRequest) {
     if (typeof body.currency === 'string') update.currency = body.currency
     if (typeof body.locale === 'string') update.locale = body.locale
     if (typeof body.contactEmail === 'string') update.contactEmail = body.contactEmail
+    if (typeof body.contactPhone === 'string') update.contactPhone = body.contactPhone
+    if (typeof body.whatsappNumber === 'string') update.whatsappNumber = body.whatsappNumber
 
     const cfg = await SiteConfig.findOneAndUpdate({}, update, { new: true, upsert: true })
     return NextResponse.json(successResponse(cfg, 'Configurações atualizadas'))

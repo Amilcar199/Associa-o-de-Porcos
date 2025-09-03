@@ -229,8 +229,8 @@ const Footer = () => {
               
               <div className="flex items-center space-x-3">
                 <Phone size={16} className="text-primary-400 flex-shrink-0" />
-                <a href="tel:+244928476427" className="text-sm text-gray-300 hover:text-primary-400 transition-colors">
-                  +244 928 476 427
+                <a href={`tel:${siteConfig?.contactPhone || '+244928476427'}`} className="text-sm text-gray-300 hover:text-primary-400 transition-colors">
+                  {siteConfig?.contactPhone || '+244 928 476 427'}
                 </a>
               </div>
               
@@ -244,7 +244,7 @@ const Footer = () => {
 
             {/* WhatsApp CTA */}
             <div className="mt-6">
-              <a href="https://wa.me/244928476427" target="_blank" rel="noopener noreferrer" className="inline-flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+              <a href={`https://wa.me/${siteConfig?.whatsappNumber || '244928476427'}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
                 <Phone size={16} />
                 <span>{dict.footer.whatsapp}</span>
               </a>
