@@ -107,6 +107,8 @@ const Header = () => {
             </div>
             
             <div className="flex items-center space-x-4">
+              {/* Language switcher always visible on desktop top bar */}
+              <HeaderLanguageMenu />
               {status === 'loading' ? (
                 <div className="animate-pulse">{dict.user.loading}</div>
               ) : session ? (
