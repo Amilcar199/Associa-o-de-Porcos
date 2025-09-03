@@ -107,7 +107,6 @@ const Header = () => {
             </div>
             
             <div className="flex items-center space-x-4">
-              <HeaderLanguageMenu />
               {status === 'loading' ? (
                 <div className="animate-pulse">{dict.user.loading}</div>
               ) : session ? (
