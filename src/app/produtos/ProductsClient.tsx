@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { Tag, Weight, Calendar, Eye } from 'lucide-react'
 import ProductModal from '@/components/modals/ProductModal'
 import { useLanguage } from '@/components/providers/LanguageProvider'
+import { formatPrice } from '@/lib/utils'
 
 interface Product {
   _id: string
@@ -31,6 +32,7 @@ export default function ProductsClient({ products }: ProductsClientProps) {
   const { locale } = useLanguage()
   const isEn = locale.startsWith('en')
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const [currency, setCurrency] = useState('AOA')
   const [modalOpen, setModalOpen] = useState(false)
 
   const openProductModal = (product: Product) => {
@@ -42,6 +44,11 @@ export default function ProductsClient({ products }: ProductsClientProps) {
     setModalOpen(false)
     setSelectedProduct(null)
   }
+
+  // Load currency for client-side formatted fallbacks
+  useEffect(()=>{
+    ;(async()=>{ try { const r = await fetch('/api/admin/config',{cache:'no-store'}); if(r.ok){ const j = await r.json(); setCurrency(j?.data?.currency || 'AOA') } } catch {} })()
+  },[])
 
   const goToPreviousProduct = () => {
     if (!selectedProduct) return
@@ -78,9 +85,9 @@ export default function ProductsClient({ products }: ProductsClientProps) {
                 sizes="(max-width:768px) 100vw, 33vw"
               />
               {/* Badge de preço */}
-              {product.priceFormatted && (
+              {(product.priceFormatted || typeof product.price === 'number') && (
                 <div className="absolute top-3 right-3 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-primary-700 text-sm font-semibold shadow">
-                  {product.priceFormatted}
+                  {product.priceFormatted || formatPrice(product.price as number, currency, locale)}
                 </div>
               )}
               {/* Overlay de hover */}

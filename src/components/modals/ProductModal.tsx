@@ -36,6 +36,7 @@ export default function ProductModal({
   isOpen, onClose, product, onPrevious, onNext, hasPrevious = false, hasNext = false 
 }: ProductModalProps) {
   const { locale } = useLanguage()
+  const [currency, setCurrency] = useState('AOA')
   const isEn = locale.startsWith('en')
   const [isLoading, setIsLoading] = useState(false)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
@@ -47,6 +48,10 @@ export default function ProductModal({
       setTimeout(() => setIsLoading(false), 300)
     }
   }, [isOpen, product])
+
+  useEffect(()=>{
+    ;(async()=>{ try { const r = await fetch('/api/admin/config',{cache:'no-store'}); if(r.ok){ const j = await r.json(); setCurrency(j?.data?.currency || 'AOA') } } catch {} })()
+  },[])
 
   if (!isOpen || !product) return null
 
@@ -117,7 +122,7 @@ export default function ProductModal({
           </div>
           <div className="absolute bottom-4 right-4">
             <span className="bg-primary-600 text-white px-4 py-2 text-lg font-bold rounded-full shadow-lg">
-              {product.price ? formatPrice(product.price) : (isEn ? 'Price on request' : 'Preço sob consulta')}
+              {product.price ? formatPrice(product.price, currency, locale) : (isEn ? 'Price on request' : 'Preço sob consulta')}
             </span>
           </div>
           {images.length > 1 && (

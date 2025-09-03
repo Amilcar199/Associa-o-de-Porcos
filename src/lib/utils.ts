@@ -59,12 +59,14 @@ export function truncateText(text: string, maxLength: number): string {
 }
 
 /**
- * Formata um número para o formato de moeda de Angola (AOA)
+ * Formata um número para o formato de moeda, usando a moeda configurada (fallback AOA)
  */
-export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('pt-AO', {
+export function formatCurrency(amount: number, currencyCode?: string, locale?: string): string {
+  const code = currencyCode || 'AOA'
+  const loc = locale || 'pt-AO'
+  return new Intl.NumberFormat(loc, {
     style: 'currency',
-    currency: 'AOA'
+    currency: code
   }).format(amount)
 }
 
@@ -78,8 +80,8 @@ export function formatNumber(num: number): string {
 /**
  * Formata um preço para exibição (alias para formatCurrency)
  */
-export function formatPrice(price: number): string {
-  return formatCurrency(price)
+export function formatPrice(price: number, currencyCode?: string, locale?: string): string {
+  return formatCurrency(price, currencyCode, locale)
 }
 
 /**

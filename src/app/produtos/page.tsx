@@ -28,14 +28,19 @@ async function getProducts() {
     const host = h.get('host') || 'localhost:3000'
     const baseUrl = `${protocol}://${host}`
 
+    const cfgRes = await fetch(`${baseUrl}/api/admin/config`, { cache: 'no-store' })
+    const cfgJson = cfgRes.ok ? await cfgRes.json() : { data: {} }
+    const currency = cfgJson?.data?.currency || 'AOA'
+    const locale = cfgJson?.data?.locale || 'pt-AO'
+
     const res = await fetch(`${baseUrl}/api/products`, { cache: 'no-store' })
     if (!res.ok) return []
     const json = await res.json()
     let data = json.data || []
 
-    const currencyFormatter = new Intl.NumberFormat('pt-AO', {
+    const currencyFormatter = new Intl.NumberFormat(locale, {
       style: 'currency',
-      currency: 'AOA'
+      currency
     })
 
     let enriched = data.map((p: any, idx: number) => ({
@@ -65,7 +70,7 @@ async function getProducts() {
           breed: 'Duroc',
           weight: 80,
           age: 6,
-          priceFormatted: 'AOA 120.000',
+          priceFormatted: currencyFormatter.format(120000),
           code: 'DEMO-001',
           imageUrl: placeholderImages[0]
         }

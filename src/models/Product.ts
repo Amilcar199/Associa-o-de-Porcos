@@ -181,6 +181,7 @@ ProductSchema.virtual('ageFormatted').get(function (this: IProduct) {
 // Virtual para preço formatado
 ProductSchema.virtual('priceFormatted').get(function (this: IProduct) {
   if (!this.price) return 'Preço sob consulta'
+  // Mantém AOA como fallback para evitar dependência de config no model
   return new Intl.NumberFormat('pt-AO', {
     style: 'currency',
     currency: 'AOA'

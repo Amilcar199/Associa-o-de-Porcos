@@ -38,6 +38,7 @@ const FeaturedProducts = () => {
   const { locale } = useLanguage()
   const dict = locale.startsWith('en') ? en : pt
   const [products, setProducts] = useState<FeaturedProduct[]>([])
+  const [currency, setCurrency] = useState('AOA')
   const [loading, setLoading] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<FeaturedProduct | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
@@ -59,6 +60,7 @@ const FeaturedProducts = () => {
 
   useEffect(() => {
     fetchFeaturedProducts()
+    ;(async()=>{ try { const r = await fetch('/api/admin/config',{ cache:'no-store' }); if(r.ok){ const j = await r.json(); setCurrency(j?.data?.currency || 'AOA') } } catch {} })()
   }, [])
 
 
@@ -178,7 +180,7 @@ const FeaturedProducts = () => {
                   </button>
                   <div className="absolute bottom-3 left-3">
                     <span className="bg-primary-600 text-white px-3 py-1 text-sm font-bold rounded-full">
-                      {product.price !== undefined ? formatPrice(product.price) : 'Preço sob consulta'}
+                      {product.price !== undefined ? formatPrice(product.price, currency, locale) : 'Preço sob consulta'}
                     </span>
                   </div>
                 </div>

@@ -1,10 +1,11 @@
 "use client"
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Tag, Weight, Calendar, DollarSign, Image as ImageIcon, Save } from 'lucide-react'
 
 export default function NewProductClient() {
   const [loading, setLoading] = useState(false)
+  const [currency, setCurrency] = useState('AOA')
   const [form, setForm] = useState({
     name: '',
     description: '',
@@ -25,6 +26,10 @@ export default function NewProductClient() {
   const allowedBreeds = [
     'Landrace','Large White','Duroc','Hampshire','Pietrain','Yorkshire','Chester White','Spotted','Tamworth','Gloucester Old Spots','Mangalitsa','Ossabaw Island Hog','Mulefoot','Caipira','Piau','Moura','Canastra','Cruzado','Outro'
   ]
+
+  useEffect(()=>{
+    ;(async()=>{ try { const r = await fetch('/api/admin/config',{cache:'no-store'}); if(r.ok){ const j = await r.json(); setCurrency(j?.data?.currency || 'AOA') } } catch {} })()
+  },[])
 
   const generateAutoCode = async () => {
     if (form.breed) {
@@ -128,7 +133,7 @@ export default function NewProductClient() {
             </div>
           </div>
           <div>
-            <label className="block text-sm text-gray-700 mb-1">Preço (Kz)</label>
+            <label className="block text-sm text-gray-700 mb-1">Preço ({currency})</label>
             <div className="relative">
               <DollarSign className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
               <input type="number" value={form.price ?? ''} onChange={(e)=>setForm(p=>({...p,price:e.target.value===''?undefined:parseFloat(e.target.value)}))} className="w-full pl-9 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="120000" />

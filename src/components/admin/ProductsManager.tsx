@@ -7,6 +7,7 @@ import DataTable from './ui/DataTable';
 import Modal from './ui/Modal';
 import ConfirmDialog from './ui/ConfirmDialog';
 import ImageUpload from './ui/ImageUpload';
+import { useLanguage } from '@/components/providers/LanguageProvider'
 
 interface Product {
   _id: string;
@@ -40,6 +41,8 @@ interface ProductFormData {
 }
 
 export default function ProductsManager() {
+  const { locale } = useLanguage()
+  const [currency, setCurrency] = useState('AOA')
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -75,6 +78,7 @@ export default function ProductsManager() {
 
   useEffect(() => {
     fetchProducts();
+    (async ()=>{ try { const r = await fetch('/api/admin/config',{cache:'no-store'}); if(r.ok){ const j = await r.json(); setCurrency(j?.data?.currency || 'AOA') } } catch {} })()
   }, []);
 
   const fetchProducts = async () => {
@@ -260,14 +264,14 @@ export default function ProductsManager() {
     { key: 'breed', title: 'Raça', sortable: true },
     { key: 'age', title: 'Idade (meses)', sortable: true },
     { key: 'weight', title: 'Peso (kg)', sortable: true },
-    { key: 'price', title: 'Preço (Kz)' },
+    { key: 'price', title: `Preço (${currency})` },
     { key: 'availability', title: 'Disponibilidade' }
   ];
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('pt-AO', {
+    return new Intl.NumberFormat(locale || 'pt-AO', {
       style: 'currency',
-      currency: 'AOA'
+      currency
     }).format(price);
   };
 
@@ -321,23 +325,23 @@ export default function ProductsManager() {
  
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+      <div className="flex items_center justify_center h-64">
+        <div className="animate_spin rounded_full h-8 w-8 border_b-2 border_green-600"></div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space_y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items_center justify_between">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900">Gerenciar Produtos</h2>
-          <p className="text-gray-600">Gerencie os produtos disponíveis</p>
+          <h2 className="text_xl font_semibold text_gray-900">Gerenciar Produtos</h2>
+          <p className="text_gray-600">Gerencie os produtos disponíveis</p>
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+          className="flex items_center space_x-2 bg_green-600 text_white px-4 py-2 rounded_lg hover_bg_green-700 transition_colors"
         >
           <Plus size={16} />
           <span>Adicionar Produto</span>
@@ -345,28 +349,28 @@ export default function ProductsManager() {
       </div>
 
       {/* Filtros avançados */}
-      <div className="bg-white rounded-lg shadow p-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="bg_white rounded_lg shadow p-4">
+        <div className="grid grid_cols-1 md_grid_cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Buscar</label>
+            <label className="block text_sm font_medium text_gray-700 mb-1">Buscar</label>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+              <Search className="absolute left-3 top-1/2 transform -translate_y-1/2 text_gray-400" size={16} />
               <input
                 type="text"
                 placeholder="Buscar por nome ou descrição..."
                 value={searchTerm}
                 onChange={(e) => { setSearchTerm(e.target.value); setPage(1) }}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w_full pl-10 pr-4 py-2 border border_gray-300 rounded_lg focus_ring-2 focus_ring_green-500 focus_border-transparent"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Raça</label>
+            <label className="block text_sm font_medium text_gray-700 mb-1">Raça</label>
             <select
               value={filterBreed}
               onChange={(e) => { setFilterBreed(e.target.value); setPage(1) }}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w_full px-3 py-2 border border_gray-300 rounded_lg focus_ring-2 focus_ring_green-500 focus_border-transparent"
             >
               <option value="">Todas</option>
               {breeds.map(breed => (
@@ -376,11 +380,11 @@ export default function ProductsManager() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Disponibilidade</label>
+            <label className="block text_sm font_medium text_gray-700 mb-1">Disponibilidade</label>
             <select
               value={filterAvailability}
               onChange={(e)=>{ setFilterAvailability(e.target.value); setPage(1) }}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w_full px-3 py-2 border border_gray-300 rounded_lg focus_ring-2 focus_ring_green-500 focus_border-transparent"
             >
               <option value="">Todas</option>
               <option value="available">Disponível</option>
@@ -390,11 +394,11 @@ export default function ProductsManager() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Vacinação</label>
+            <label className="block text_sm font_medium text_gray-700 mb-1">Vacinação</label>
             <select
               value={filterVaccinated}
               onChange={(e)=>{ setFilterVaccinated(e.target.value); setPage(1) }}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w_full px-3 py-2 border border_gray-300 rounded_lg focus_ring-2 focus_ring_green-500 focus_border-transparent"
             >
               <option value="">Todas</option>
               <option value="true">Vacinado</option>
@@ -403,11 +407,11 @@ export default function ProductsManager() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Saúde</label>
+            <label className="block text_sm font_medium text_gray-700 mb-1">Saúde</label>
             <select
               value={filterHealth}
               onChange={(e)=>{ setFilterHealth(e.target.value); setPage(1) }}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w_full px-3 py-2 border border_gray-300 rounded_lg focus_ring-2 focus_ring_green-500 focus_border-transparent"
             >
               <option value="">Todas</option>
               <option value="excellent">Excelente</option>
@@ -435,11 +439,11 @@ export default function ProductsManager() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Preço (min Kz)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Preço (min {currency})</label>
             <input type="number" step="0.01" value={minPrice} onChange={(e)=>{ setMinPrice(e.target.value); setPage(1) }} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Preço (max Kz)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Preço (max {currency})</label>
             <input type="number" step="0.01" value={maxPrice} onChange={(e)=>{ setMaxPrice(e.target.value); setPage(1) }} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500" />
           </div>
         </div>
@@ -540,7 +544,7 @@ export default function ProductsManager() {
             
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Preço (Kz)
+                Preço ({currency})
               </label>
               <input
                 type="number"
@@ -637,11 +641,6 @@ export default function ProductsManager() {
                   </button>
                 )}
               </div>
-              {formData.codeType === 'auto' && !formData.breed && (
-                <p className="text-sm text-amber-600 mt-1">
-                  ⚠️ Selecione uma raça para gerar o código automaticamente
-                </p>
-              )}
             </div>
           </div>
 
@@ -692,12 +691,11 @@ export default function ProductsManager() {
             </div>
           </div>
 
-                     {/* Image Upload */}
-           <ImageUpload
-             onImageUploaded={handleImageUploaded}
-             label="Imagem do Produto (upload local ou cole uma URL acima)"
-             className="mb-4"
-           />
+          <ImageUpload
+            onImageUploaded={handleImageUploaded}
+            label="Imagem do Produto (upload local ou cole uma URL acima)"
+            className="mb-4"
+          />
 
           {formData.imageUrl && (
             <div className="bg-gray-50 rounded-lg p-4">
@@ -710,29 +708,28 @@ export default function ProductsManager() {
             </div>
           )}
 
-                     <div className="flex justify-end space-x-3">
-             <button
-               type="button"
-               onClick={() => {
-                 setShowModal(false);
-                 setEditingProduct(null);
-                 resetForm();
-               }}
-               className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
-             >
-               Cancelar
-             </button>
-             <button
-               type="submit"
-               className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-             >
-               {editingProduct ? 'Atualizar' : 'Salvar'}
-             </button>
-           </div>
+          <div className="flex justify-end space-x-3">
+            <button
+              type="button"
+              onClick={() => {
+                setShowModal(false);
+                setEditingProduct(null);
+                resetForm();
+              }}
+              className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+            >
+              {editingProduct ? 'Atualizar' : 'Salvar'}
+            </button>
+          </div>
         </form>
       </Modal>
 
-      {/* Delete Confirmation */}
       <ConfirmDialog
         isOpen={!!productToDelete}
         onClose={() => setProductToDelete(null)}
