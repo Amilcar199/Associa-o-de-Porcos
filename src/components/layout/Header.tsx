@@ -355,7 +355,7 @@ const Header = () => {
                   >
                     {dict.user.signup}
                   </Link>
-                  <HeaderLanguageMenu />
+                  
                 </div>
               )}
             </div>
