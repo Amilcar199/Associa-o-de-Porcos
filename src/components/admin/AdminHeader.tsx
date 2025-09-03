@@ -65,12 +65,8 @@ const AdminHeader = ({ user }: AdminHeaderProps) => {
             {/* Logo */}
             <Link href="/admin" className="flex items-center space-x-3 ml-4 lg:ml-0">
               <div className="w-10 h-10 relative">
-                <Image
-                  src={LogoPng}
-                  alt={BRAND_NAME}
-                  fill
-                  className="object-contain"
-                />
+                {/* Admin logo via config (fallback para logo padrão) */}
+                <img id="admin-logo" src="/api/admin/config/logo-admin-proxy" alt={BRAND_NAME} className="w-full h-full object-contain" />
               </div>
               <div className="hidden sm:block">
                 <h1 className="text-lg font-bold text-gray-900">

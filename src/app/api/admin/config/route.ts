@@ -25,6 +25,8 @@ export async function PUT(req: NextRequest) {
     const body = await req.json()
     const update: any = {}
     if (typeof body.logoUrl === 'string') update.logoUrl = body.logoUrl
+    if (typeof body.publicLogoUrl === 'string') update.publicLogoUrl = body.publicLogoUrl
+    if (typeof body.adminLogoUrl === 'string') update.adminLogoUrl = body.adminLogoUrl
     if (typeof body.currency === 'string') update.currency = body.currency
     if (typeof body.locale === 'string') update.locale = body.locale
     if (typeof body.contactEmail === 'string') update.contactEmail = body.contactEmail

@@ -186,14 +186,27 @@ export default function ImageManager() {
                    </button>
                    <button
                      onClick={async () => {
-                       // Definir como logo do site
+                       // Definir como Logo do Site
                        try {
-                         await fetch('/api/admin/config', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ logoUrl: `/api/images/${image.fileId}` }) })
-                         toast.success('Logo atualizado')
+                         await fetch('/api/admin/config', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ publicLogoUrl: `/api/images/${image.fileId}` }) })
+                         toast.success('Logo do site atualizada')
                        } catch {}
                      }}
                      className="bg-green-600 text-white p-1 rounded hover:bg-green-700 transition-colors"
-                     title="Definir como logo"
+                     title="Definir como logo do site"
+                   >
+                     <Upload size={14} />
+                   </button>
+                   <button
+                     onClick={async () => {
+                       // Definir como Logo do Admin
+                       try {
+                         await fetch('/api/admin/config', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ adminLogoUrl: `/api/images/${image.fileId}` }) })
+                         toast.success('Logo do admin atualizada')
+                       } catch {}
+                     }}
+                     className="bg-blue-600 text-white p-1 rounded hover:bg-blue-700 transition-colors"
+                     title="Definir como logo do admin"
                    >
                      <Upload size={14} />
                    </button>
