@@ -107,7 +107,7 @@ const Header = () => {
             </div>
             
             <div className="flex items-center space-x-4">
-              {/* Seletor de idioma removido do header conforme solicitação */}
+              <HeaderLanguageMenu />
               {status === 'loading' ? (
                 <div className="animate-pulse">{dict.user.loading}</div>
               ) : session ? (
@@ -454,6 +454,9 @@ const Header = () => {
                           <span>{dict.user.admin}</span>
                         </Link>
                       )}
+                      <div>
+                        <HeaderLanguageMenu />
+                      </div>
                       
                       <button
                         onClick={handleSignOut}
