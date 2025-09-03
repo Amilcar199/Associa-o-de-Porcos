@@ -107,8 +107,7 @@ const Header = () => {
             </div>
             
             <div className="flex items-center space-x-4">
-              {/* Language switcher always visible on desktop top bar */}
-              <HeaderLanguageMenu />
+              {/* Seletor de idioma removido do header conforme solicitação */}
               {status === 'loading' ? (
                 <div className="animate-pulse">{dict.user.loading}</div>
               ) : session ? (
@@ -268,7 +267,6 @@ const Header = () => {
             <div className="hidden lg:flex items-center gap-5 lg:ml-8 xl:ml-10 text-white">
               {session ? (
                 <div className="flex items-center gap-5">
-                  <HeaderLanguageMenu />
                   <div className="relative">
                   <button
                     onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
@@ -406,9 +404,6 @@ const Header = () => {
                   
                   {session ? (
                     <div className="pt-4 border-t border-gray-200 space-y-4">
-                      <div>
-                        <HeaderLanguageMenu />
-                      </div>
                       <div className="flex items-center space-x-3">
                         <div className="w-10 h-10 rounded-full bg-primary-600 flex items-center justify-center text-white font-medium">
                           {session.user?.avatar ? (

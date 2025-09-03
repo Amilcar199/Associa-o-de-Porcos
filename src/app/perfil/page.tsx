@@ -5,6 +5,7 @@ import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { User, Settings, History, Shield, LogOut } from 'lucide-react';
 import { useLanguage } from '@/components/providers/LanguageProvider';
+import HeaderLanguageMenu from '@/components/i18n/HeaderLanguageMenu'
 import pt from '@/lib/i18n/dictionaries/pt';
 import en from '@/lib/i18n/dictionaries/en';
 import ImageUpload from '@/components/admin/ui/ImageUpload';
@@ -511,6 +512,15 @@ export default function ProfilePage() {
                 <h3 className="text-lg font-medium text-gray-900">{dict.profile.preferencesTitle}</h3>
                 
                 <div className="space-y-4">
+                  {/* Idioma */}
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-900">Idioma</h4>
+                      <p className="text-sm text-gray-500">Selecione o idioma de navegação</p>
+                    </div>
+                    <HeaderLanguageMenu />
+                  </div>
+                  <hr className="border-gray-200" />
                   <div className="flex items-center justify-between">
                     <div>
                       <h4 className="text-sm font-medium text-gray-900">{dict.profile.emailNotif.title}</h4>

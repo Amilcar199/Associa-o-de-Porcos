@@ -17,7 +17,6 @@ import {
   Home
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import HeaderLanguageMenu from '@/components/i18n/HeaderLanguageMenu'
 
 interface AdminHeaderProps {
   user: {
@@ -103,10 +102,7 @@ const AdminHeader = ({ user }: AdminHeaderProps) => {
               </div>
             </div>
 
-            {/* Language */}
-            <div className="hidden md:block">
-              <HeaderLanguageMenu />
-            </div>
+            {/* Seletor de idioma removido do header admin conforme solicitação */}
 
             {/* Notifications */}
             <div className="relative">
