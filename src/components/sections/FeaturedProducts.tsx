@@ -48,7 +48,7 @@ const FeaturedProducts = () => {
   const fetchFeaturedProducts = async () => {
     setLoading(true)
     try {
-      const res = await fetch('/api/products/featured?limit=8', { cache: 'no-store' })
+      const res = await fetch('/api/products/featured?limit=4', { cache: 'no-store' })
       if (!res.ok) throw new Error('Falha ao buscar produtos')
       const json = await res.json()
       const data: FeaturedProduct[] = json.data || []
