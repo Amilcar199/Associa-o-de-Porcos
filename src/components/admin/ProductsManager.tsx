@@ -173,7 +173,7 @@ export default function ProductsManager() {
         
         if (response.ok) {
           const data = await response.json();
-          setFormData(prev => ({ ...prev, code: data.code }));
+          setFormData(prev => ({ ...prev, code: (data?.data?.code as string) || '' }));
         }
       } catch (error) {
         console.error('Erro ao gerar código:', error);
