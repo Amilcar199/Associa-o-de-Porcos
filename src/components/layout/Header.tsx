@@ -54,7 +54,7 @@ const Header = () => {
 
   // Prefetch programático das rotas mais acessadas
   useEffect(() => {
-    const routesToPrefetch = ['/', '/sobre', '/colaboradores', '/servicos', '/produtos', '/noticias', '/contato', '/login', '/registro']
+    const routesToPrefetch = ['/', '/sobre', '/colaboradores', '/servicos', '/produtos', '/relatorio', '/noticias', '/contato', '/login', '/registro']
     routesToPrefetch.forEach((route) => {
       try { router.prefetch(route) } catch {}
     })
