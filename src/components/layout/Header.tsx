@@ -140,6 +140,7 @@ const Header = () => {
                   </Link>
                 </div>
               )}
+              <div className="ml-2"><HeaderLanguageMenu /></div>
             </div>
           </div>
         </div>
@@ -355,7 +356,6 @@ const Header = () => {
                   >
                     {dict.user.signup}
                   </Link>
-                  <HeaderLanguageMenu />
                 </div>
               )}
             </div>
