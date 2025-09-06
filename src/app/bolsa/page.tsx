@@ -15,6 +15,13 @@ export function generateMetadata(): Metadata {
 export default function BolsaPage() {
   const locale = cookies().get('locale')?.value || 'pt-AO'
   const isEn = String(locale).startsWith('en')
+  const rows = Array.from({ length: 8 }).map((_, i) => ({
+    date: `2025-09-0${i + 1}`,
+    region: 'Luanda',
+    category: isEn ? 'Fattening' : 'Engorda',
+    price: (i + 1) * 1000,
+    variation: i % 2 === 0 ? 1.5 : -0.8
+  }))
   return (
     <section>
       <div className="bg-gradient-to-r from-primary-50 to-white border-b border-gray-100">
@@ -25,6 +32,8 @@ export default function BolsaPage() {
       </div>
 
       <div className="container-custom py-10 space-y-6">
+        {/* Gráfico e Download */}
+        <ReportClient rows={rows as any} isEn={isEn} />
         {/* Filtros simples */}
         <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
           <div className="grid gap-3 md:grid-cols-5">
@@ -64,14 +73,14 @@ export default function BolsaPage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {[...Array(8)].map((_, i) => (
+                {rows.map((r, i) => (
                   <tr key={i}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">2025-09-0{i+1}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Luanda</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{isEn ? 'Fattening' : 'Engorda'}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">AOA {((i+1)*1000).toLocaleString('pt-AO')}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{r.date}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{r.region}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{r.category}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">AOA {r.price.toLocaleString('pt-AO')}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <span className={`px-2 py-1 text-xs rounded-full ${i % 2 === 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>{i % 2 === 0 ? '+1,5%' : '-0,8%'}</span>
+                      <span className={`px-2 py-1 text-xs rounded-full ${r.variation >= 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>{r.variation >= 0 ? `+${r.variation}%` : `${r.variation}%`}</span>
                     </td>
                   </tr>
                 ))}
