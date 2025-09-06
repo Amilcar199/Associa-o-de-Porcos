@@ -49,7 +49,7 @@ const CollaboratorSchema = new Schema<ICollaborator>({
   },
   description: {
     type: String,
-    required: [true, 'Descrição é obrigatória'],
+    required: false,
     trim: true,
     maxlength: [500, 'Descrição não pode ter mais que 500 caracteres'],
   },

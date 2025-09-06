@@ -151,7 +151,7 @@ const Header = () => {
         }`}
       >
         <div className="container-custom">
-          <div className="flex items-center justify-between h-20 lg:h-36">
+          <div className="flex items-center justify-between h-24 md:h-28 lg:h-36">
             {/* Logo */}
             <Link href="/" className="flex items-center space-x-3 lg:space-x-5">
               <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-36 lg:h-36 relative">
