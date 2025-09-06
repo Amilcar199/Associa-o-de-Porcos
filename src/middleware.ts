@@ -39,7 +39,7 @@ export default withAuth(
     }
 
     // Allow public read-only API endpoints
-    if (pathname.startsWith('/api/products') || pathname.startsWith('/api/news')) {
+    if (pathname.startsWith('/api/products') || pathname.startsWith('/api/news') || pathname.startsWith('/api/collaborators')) {
       return NextResponse.next()
     }
 
@@ -101,7 +101,8 @@ export default withAuth(
           pathname.startsWith('/favicon') ||
           pathname === '/api/contact' ||
           pathname.startsWith('/api/products') ||
-          pathname.startsWith('/api/news')
+          pathname.startsWith('/api/news') ||
+          pathname.startsWith('/api/collaborators')
         ) {
           return true
         }
