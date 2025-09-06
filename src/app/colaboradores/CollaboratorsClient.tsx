@@ -52,7 +52,7 @@ export default function CollaboratorsClient({ initial }: { initial: Collaborator
       {list.map((c) => (
         <div key={c._id} className="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden">
           {/* Foto grande em cima */}
-          <div className="relative h-80 sm:h-96 bg-gray-100">
+          <div className="relative h-96 md:h-[28rem] bg-gray-100">
             {c as any && (c as any).avatar ? (
               <Image src={(c as any).avatar as string} alt={c.name} fill className="object-cover" />
             ) : null}
