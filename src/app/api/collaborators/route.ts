@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
     const baseQuery = buildMongoQuery(filters)
     const finalQuery = { 
       ...baseQuery,
-      isActive: true 
+      $or: [ { isActive: true }, { isActive: { $exists: false } } ]
     }
 
     // Executar consulta com paginação
