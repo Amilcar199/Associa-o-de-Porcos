@@ -99,11 +99,7 @@ export default async function ProdutosPage() {
       </div>
 
       <div className="container-custom py-10">
-        {normalizedProducts.length === 0 ? (
-          <div className="bg-white rounded-xl shadow p-8 text-center text-gray-600">{isEn ? 'No products available at the moment.' : 'Nenhum produto disponível no momento.'}</div>
-        ) : (
-          <ProductsClient products={normalizedProducts} />
-        )}
+        <ProductsClient products={normalizedProducts} />
       </div>
     </section>
   )
