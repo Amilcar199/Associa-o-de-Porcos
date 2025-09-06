@@ -36,6 +36,7 @@ export default function ProductsClient({ products }: ProductsClientProps) {
   const [showConverted, setShowConverted] = useState(false)
   const [convertedCache, setConvertedCache] = useState<Record<string, string>>({})
   const [modalOpen, setModalOpen] = useState(false)
+  const [list, setList] = useState<Product[]>(products || [])
   const [query, setQuery] = useState('')
   const [health, setHealth] = useState<string>('')
   const [vaccinated, setVaccinated] = useState<string>('')
@@ -58,23 +59,57 @@ export default function ProductsClient({ products }: ProductsClientProps) {
     ;(async()=>{ try { const r = await fetch('/api/admin/config',{cache:'no-store'}); if(r.ok){ const j = await r.json(); const curr = j?.data?.currency || 'AOA'; setCurrency(curr); setShowConverted(locale.startsWith('en') && curr !== 'USD') } } catch {} })()
   },[])
 
+  // Client-side fetch fallback if no SSR products (to mirror homepage behavior)
+  useEffect(()=>{
+    if ((products || []).length > 0) return
+    const placeholderImages = [
+      'https://images.unsplash.com/photo-1556228720-195a672e8a03?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80',
+      'https://images.unsplash.com/photo-1556229061-3f99a5d6c2ba?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80',
+      'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80',
+      'https://images.unsplash.com/photo-1599327576016-7cc3f4f1bb4a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80'
+    ]
+    ;(async()=>{
+      try {
+        const res = await fetch('/api/products', { cache: 'no-store' })
+        const json = res.ok ? await res.json() : { data: [] }
+        let data: any[] = json?.data || []
+        let enriched = data.map((p: any, idx: number) => ({
+          ...p,
+          _id: p._id || p.code || String(idx),
+          imageUrl: (p.images && p.images[0]) || p.imageUrl || placeholderImages[idx % placeholderImages.length]
+        }))
+        if (enriched.length === 0) {
+          const rf = await fetch('/api/products/featured?limit=12', { cache: 'no-store' })
+          const jf = rf.ok ? await rf.json() : { data: [] }
+          const df: any[] = jf?.data || []
+          enriched = df.map((p: any, idx: number) => ({
+            ...p,
+            _id: p._id || p.code || String(idx),
+            imageUrl: (p.images && p.images[0]) || p.imageUrl || placeholderImages[idx % placeholderImages.length]
+          }))
+        }
+        setList(enriched as any)
+      } catch {}
+    })()
+  },[products])
+
   const goToPreviousProduct = () => {
     if (!selectedProduct) return
-    const currentIndex = products.findIndex(p => p._id === selectedProduct._id)
+    const currentIndex = list.findIndex(p => p._id === selectedProduct._id)
     if (currentIndex > 0) {
-      setSelectedProduct(products[currentIndex - 1])
+      setSelectedProduct(list[currentIndex - 1])
     }
   }
 
   const goToNextProduct = () => {
     if (!selectedProduct) return
-    const currentIndex = products.findIndex(p => p._id === selectedProduct._id)
-    if (currentIndex < products.length - 1) {
-      setSelectedProduct(products[currentIndex + 1])
+    const currentIndex = list.findIndex(p => p._id === selectedProduct._id)
+    if (currentIndex < list.length - 1) {
+      setSelectedProduct(list[currentIndex + 1])
     }
   }
 
-  const filtered = products.filter(p => {
+  const filtered = list.filter(p => {
     if (query && !(`${p.name} ${p.breed} ${p.description || ''}`.toLowerCase().includes(query.toLowerCase()))) return false
     if (health && p.healthStatus !== health) return false
     if (vaccinated && String(!!p.vaccinated) !== vaccinated) return false
@@ -206,8 +241,8 @@ export default function ProductsClient({ products }: ProductsClientProps) {
         product={selectedProduct}
         onPrevious={goToPreviousProduct}
         onNext={goToNextProduct}
-        hasPrevious={selectedProduct ? products.findIndex(p => p._id === selectedProduct._id) > 0 : false}
-        hasNext={selectedProduct ? products.findIndex(p => p._id === selectedProduct._id) < products.length - 1 : false}
+        hasPrevious={selectedProduct ? list.findIndex(p => p._id === selectedProduct._id) > 0 : false}
+        hasNext={selectedProduct ? list.findIndex(p => p._id === selectedProduct._id) < list.length - 1 : false}
       />
     </>
   )
