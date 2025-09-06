@@ -72,6 +72,7 @@ const Header = () => {
     { name: dict.nav.about, href: '/sobre' },
     { name: dict.nav.services, href: '/servicos' },
     { name: dict.nav.products, href: '/produtos' },
+    { name: dict.nav.market, href: '/bolsa' },
     { name: dict.nav.news, href: '/noticias' },
     { name: dict.nav.contact, href: '/contato' },
   ]

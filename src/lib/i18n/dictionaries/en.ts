@@ -7,6 +7,7 @@ export default {
 		news: 'News',
 		contact: 'Contact',
 		team: 'Team',
+		market: 'Pig Market',
 	},
 	user: {
 		login: 'Sign in',
