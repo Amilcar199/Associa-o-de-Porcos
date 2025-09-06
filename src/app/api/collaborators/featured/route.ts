@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '4')
 
     const collaborators = await Collaborator.find({ 
-      isActive: true, 
+      $or: [ { isActive: true }, { isActive: { $exists: false } } ],
       featured: true 
     })
     .sort({ order: 1, createdAt: -1 })

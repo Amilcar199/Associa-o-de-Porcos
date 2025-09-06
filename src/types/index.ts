@@ -71,7 +71,7 @@ export interface Collaborator extends Document {
   name: string
   role: string
   company?: string
-  description: string
+  description?: string
   avatar: string
   email?: string
   phone?: string
