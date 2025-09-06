@@ -79,11 +79,13 @@ const PartnersSection = () => {
         ) : collaborators.length === 0 ? null : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
             {collaborators.slice(0, 4).map((c) => (
-              <div key={c._id} className="bg-white rounded-2xl shadow hover:shadow-xl transition overflow-hidden pt-16 pb-6 px-6 text-center relative">
-                <div className="absolute -top-14 left-1/2 -translate-x-1/2 w-32 h-32 md:w-36 md:h-36 rounded-full ring-4 ring-white shadow overflow-hidden bg-gray-100">
-                  <Image src={c.avatar} alt={c.name} fill className="object-cover" />
+              <div key={c._id} className="bg-white rounded-2xl shadow hover:shadow-xl transition p-6 text-center">
+                <div className="mx-auto w-32 h-32 md:w-36 md:h-36 rounded-full ring-4 ring-white shadow overflow-hidden bg-gray-100">
+                  <div className="relative w-full h-full">
+                    <Image src={c.avatar} alt={c.name} fill className="object-cover" />
+                  </div>
                 </div>
-                <h3 className="mt-2 font-bold text-lg text-gray-900">{c.name}</h3>
+                <h3 className="mt-4 font-bold text-lg text-gray-900">{c.name}</h3>
                 <p className="text-sm text-gray-600">{c.role}{c.company ? ` · ${c.company}` : ''}</p>
                 {c.description && (
                   <p className="text-sm text-gray-700 leading-relaxed mt-3 line-clamp-3">{c.description}</p>
