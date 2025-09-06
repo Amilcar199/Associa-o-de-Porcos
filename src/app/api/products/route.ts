@@ -15,8 +15,8 @@ export async function GET(req: NextRequest) {
     const pagination = getPaginationParams(searchParams)
     const filters = getSearchFilters(searchParams)
 
-    // Construir query (apenas produtos ativos e disponíveis por padrão)
-    const baseQuery: any = { isActive: true }
+    // Construir query (apenas produtos ativos por padrão; incluir registros antigos sem o campo isActive)
+    const baseQuery: any = { $or: [ { isActive: true }, { isActive: { $exists: false } } ] }
     const query = { ...baseQuery, ...buildMongoQuery(filters) }
     const sort = buildMongoSort(
       pagination.sort ?? 'createdAt', // valor padrão

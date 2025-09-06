@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '6')
 
     const products = await Product.find({ 
-      isActive: true, 
+      $or: [ { isActive: true }, { isActive: { $exists: false } } ],
       availability: 'available' 
     })
     .populate('seller', 'name email phone company avatar')
