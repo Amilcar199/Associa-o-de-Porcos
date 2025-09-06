@@ -271,13 +271,13 @@ const Header = () => {
                     onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                     className="flex items-center space-x-2 p-2 rounded-lg hover:bg-white/10 transition-colors"
                   >
-                    <div className="w-8 h-8 rounded-full bg-primary-600 flex items-center justify-center text-white font-medium">
+                    <div className="w-12 h-12 rounded-full bg-primary-600 flex items-center justify-center text-white font-medium">
                       {session.user?.avatar ? (
                         <Image
                           src={session.user.avatar}
                           alt={session.user.name || 'Avatar'}
-                          width={32}
-                          height={32}
+                          width={48}
+                          height={48}
                           className="rounded-full"
                         />
                       ) : (
@@ -404,13 +404,13 @@ const Header = () => {
                   {session ? (
                     <div className="pt-4 border-t border-gray-200 space-y-4">
                       <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 rounded-full bg-primary-600 flex items-center justify-center text-white font-medium">
+                        <div className="w-14 h-14 rounded-full bg-primary-600 flex items-center justify-center text-white font-medium">
                           {session.user?.avatar ? (
                             <Image
                               src={session.user.avatar}
                               alt={session.user.name || 'Avatar'}
-                              width={40}
-                              height={40}
+                              width={56}
+                              height={56}
                               className="rounded-full"
                             />
                           ) : (
