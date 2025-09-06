@@ -78,14 +78,18 @@ const PartnersSection = () => {
         ) : collaborators.length === 0 ? null : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
             {collaborators.map((c) => (
-              <div key={c._id} className="card">
-                <div className="relative h-40">
-                  <Image src={c.avatar} alt={c.name} fill className="object-cover rounded-t-lg" />
+              <div key={c._id} className="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden">
+                {/* Foto grande no topo */}
+                <div className="relative h-80 md:h-96 bg-gray-100">
+                  <Image src={c.avatar} alt={c.name} fill className="object-cover" />
                 </div>
-                <div className="card-body">
-                  <h3 className="font-bold text-lg text-gray-900">{c.name}</h3>
-                  <p className="text-sm text-gray-600">{c.role}{c.company ? ` · ${c.company}` : ''}</p>
-                  <p className="text-sm text-gray-600 mt-2 line-clamp-3">{c.description}</p>
+                {/* Conteúdo */}
+                <div className="p-6">
+                  <h3 className="font-bold text-xl text-gray-900">{c.name}</h3>
+                  <p className="text-sm text-gray-600 mt-1">{c.role}{c.company ? ` · ${c.company}` : ''}</p>
+                  {c.description && (
+                    <p className="text-gray-700 leading-relaxed mt-4 line-clamp-4">{c.description}</p>
+                  )}
                 </div>
               </div>
             ))}
