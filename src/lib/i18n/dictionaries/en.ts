@@ -8,6 +8,7 @@ export default {
 		contact: 'Contact',
 		team: 'Team',
 		market: 'Pig Market',
+		report: 'Report',
 	},
 	user: {
 		login: 'Sign in',
