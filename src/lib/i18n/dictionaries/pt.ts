@@ -7,6 +7,8 @@ export default {
 		news: 'Notícias',
 		contact: 'Contato',
 		team: 'Colaboradores',
+		market: 'Bolsa de Suínos',
+		report: 'Relatório',
 	},
 	user: {
 		login: 'Entrar',

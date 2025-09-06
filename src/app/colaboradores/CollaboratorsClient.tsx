@@ -48,20 +48,21 @@ export default function CollaboratorsClient({ initial }: { initial: Collaborator
   }
 
   return (
-    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {list.map((c) => (
-        <div key={c._id} className="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden p-6 flex items-center gap-4">
-          <div className="relative w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0">
-            <div className="absolute inset-0 rounded-full bg-gray-100 overflow-hidden">
-              {c as any && (c as any).avatar ? (
+        <div key={c._id} className="bg-white rounded-2xl shadow hover:shadow-xl transition p-6 text-center">
+          <div className="mx-auto w-44 h-44 md:w-56 md:h-56 rounded-full ring-4 ring-white shadow overflow-hidden bg-gray-100">
+            <div className="relative w-full h-full">
+              {(c as any)?.avatar && (
                 <Image src={(c as any).avatar as string} alt={c.name} fill className="object-cover" />
-              ) : null}
+              )}
             </div>
           </div>
-          <div className="min-w-0">
-            <h3 className="font-semibold text-gray-900 text-lg truncate">{c.name}</h3>
-            <p className="text-sm text-gray-600 mt-1 truncate">{c.role}{c.company ? ` • ${c.company}` : ''}</p>
-          </div>
+          <h3 className="mt-6 font-bold text-lg text-gray-900">{c.name}</h3>
+          <p className="text-sm text-gray-600">{c.role}{c.company ? ` • ${c.company}` : ''}</p>
+          {(c as any)?.description && (
+            <p className="text-sm text-gray-700 leading-relaxed mt-3 line-clamp-3">{(c as any).description}</p>
+          )}
         </div>
       ))}
     </div>
