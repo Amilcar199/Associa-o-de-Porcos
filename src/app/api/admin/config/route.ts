@@ -32,6 +32,12 @@ export async function PUT(req: NextRequest) {
     if (typeof body.contactEmail === 'string') update.contactEmail = body.contactEmail
     if (typeof body.contactPhone === 'string') update.contactPhone = body.contactPhone
     if (typeof body.whatsappNumber === 'string') update.whatsappNumber = body.whatsappNumber
+    if (typeof body.facebookUrl === 'string') update.facebookUrl = body.facebookUrl
+    if (typeof body.instagramUrl === 'string') update.instagramUrl = body.instagramUrl
+    if (typeof body.linkedinUrl === 'string') update.linkedinUrl = body.linkedinUrl
+    if (typeof body.youtubeUrl === 'string') update.youtubeUrl = body.youtubeUrl
+    if (typeof body.twitterUrl === 'string') update.twitterUrl = body.twitterUrl
+    if (typeof body.tiktokUrl === 'string') update.tiktokUrl = body.tiktokUrl
 
     const cfg = await SiteConfig.findOneAndUpdate({}, update, { new: true, upsert: true })
     return NextResponse.json(successResponse(cfg, 'Configurações atualizadas'))

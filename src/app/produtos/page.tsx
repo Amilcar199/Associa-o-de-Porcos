@@ -1,7 +1,6 @@
 export const dynamic = 'force-dynamic'
 
 import type { Metadata } from 'next'
-import { headers } from 'next/headers'
 import { cookies } from 'next/headers'
 import ProductsClient from '@/app/produtos/ProductsClient'
 
@@ -23,17 +22,12 @@ const placeholderImages = [
 
 async function getProducts() {
   try {
-    const h = headers()
-    const protocol = h.get('x-forwarded-proto') || 'http'
-    const host = h.get('host') || 'localhost:3000'
-    const baseUrl = `${protocol}://${host}`
-
-    const cfgRes = await fetch(`${baseUrl}/api/admin/config`, { cache: 'no-store' })
+    const cfgRes = await fetch(`/api/admin/config`, { cache: 'no-store' })
     const cfgJson = cfgRes.ok ? await cfgRes.json() : { data: {} }
     const currency = cfgJson?.data?.currency || 'AOA'
     const locale = cfgJson?.data?.locale || 'pt-AO'
 
-    const res = await fetch(`${baseUrl}/api/products`, { cache: 'no-store' })
+    const res = await fetch(`/api/products`, { cache: 'no-store' })
     if (!res.ok) return []
     const json = await res.json()
     let data = json.data || []
@@ -51,7 +45,7 @@ async function getProducts() {
 
     // Fallback: se a lista geral vier vazia, tentar os "featured" (como na home)
     if (enriched.length === 0) {
-      const resFeatured = await fetch(`${baseUrl}/api/products/featured?limit=12`, { cache: 'no-store' })
+      const resFeatured = await fetch(`/api/products/featured?limit=12`, { cache: 'no-store' })
       if (resFeatured.ok) {
         const jsonFeatured = await resFeatured.json()
         const dataFeatured = jsonFeatured.data || []

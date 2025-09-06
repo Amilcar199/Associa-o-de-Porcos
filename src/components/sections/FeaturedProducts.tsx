@@ -48,7 +48,7 @@ const FeaturedProducts = () => {
   const fetchFeaturedProducts = async () => {
     setLoading(true)
     try {
-      const res = await fetch('/api/products/featured?limit=8', { cache: 'no-store' })
+      const res = await fetch('/api/products/featured?limit=4', { cache: 'no-store' })
       if (!res.ok) throw new Error('Falha ao buscar produtos')
       const json = await res.json()
       const data: FeaturedProduct[] = json.data || []
@@ -62,7 +62,7 @@ const FeaturedProducts = () => {
 
   useEffect(() => {
     fetchFeaturedProducts()
-    ;(async()=>{ try { const r = await fetch('/api/admin/config',{ cache:'no-store' }); if(r.ok){ const j = await r.json(); const curr = j?.data?.currency || 'AOA'; setCurrency(curr); setShowConverted(locale.startsWith('en')) } } catch {} })()
+    ;(async()=>{ try { const r = await fetch('/api/admin/config',{ cache:'no-store' }); if(r.ok){ const j = await r.json(); const curr = j?.data?.currency || 'AOA'; setCurrency(curr); setShowConverted(locale.startsWith('en') && curr !== 'USD') } } catch {} })()
   }, [])
 
 
@@ -185,7 +185,7 @@ const FeaturedProducts = () => {
                       {product.price !== undefined ? (
                         showConverted ? (
                           convertedCache[String(product._id)] || (
-                            (()=>{ convertAndFormat(product.price || 0, 'AOA', 'USD', locale).then(f=>setConvertedCache(prev=>({...prev, [String(product._id)]: f })) ); return formatPrice(product.price || 0, 'AOA', locale) })()
+                            (()=>{ convertAndFormat(product.price || 0, currency, 'USD', locale).then(f=>setConvertedCache(prev=>({...prev, [String(product._id)]: f })) ); return formatPrice(product.price || 0, currency, locale) })()
                           )
                         ) : (
                           formatPrice(product.price, currency, locale)

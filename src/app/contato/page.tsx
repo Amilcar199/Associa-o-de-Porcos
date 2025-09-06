@@ -8,6 +8,7 @@ import { useLanguage } from '@/components/providers/LanguageProvider'
 export default function ContatoPage() {
   const { locale } = useLanguage()
   const isEn = locale.startsWith('en')
+  const [siteConfig, setSiteConfig] = useState<any>(null)
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -30,6 +31,10 @@ export default function ContatoPage() {
       }
     }
   }, [searchParams])
+
+  useEffect(()=>{
+    (async()=>{ try { const r = await fetch('/api/admin/config', { cache: 'no-store' }); if (r.ok) { const j = await r.json(); setSiteConfig(j?.data || null) } } catch {} })()
+  },[])
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -83,8 +88,8 @@ export default function ContatoPage() {
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">{isEn ? 'Contact Channels' : 'Canais de Atendimento'}</h2>
             <div className="space-y-3 text-gray-700">
-              <a href="mailto:contato@associacaodeporcos.ao" className="flex items-center gap-3 hover:text-primary-700">
-                <Mail size={18} className="text-primary-600" /> contato@associacaodeporcos.ao
+              <a href={`mailto:${siteConfig?.contactEmail || 'contato@associacaodeporcos.ao'}`} className="flex items-center gap-3 hover:text-primary-700">
+                <Mail size={18} className="text-primary-600" /> {siteConfig?.contactEmail || 'contato@associacaodeporcos.ao'}
               </a>
               <a href="tel:+244928476427" className="flex items-center gap-3 hover:text-primary-700">
                 <Phone size={18} className="text-primary-600" /> +244 928 476 427

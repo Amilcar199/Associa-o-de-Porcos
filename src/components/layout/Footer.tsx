@@ -168,15 +168,20 @@ const Footer = () => {
             
             {/* Redes Sociais */}
             <div className="flex space-x-4">
-              <a href="https://facebook.com/associacaodeporcos" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-800 hover:bg-primary-600 rounded-full flex items-center justify-center transition-colors">
+              <a href={siteConfig?.facebookUrl || 'https://facebook.com/associacaodeporcos'} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-800 hover:bg-primary-600 rounded-full flex items-center justify-center transition-colors">
                 <Facebook size={20} />
               </a>
-              <a href="https://instagram.com/associacaodeporcos" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-800 hover:bg-primary-600 rounded-full flex items-center justify-center transition-colors">
+              <a href={siteConfig?.instagramUrl || 'https://instagram.com/associacaodeporcos'} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-800 hover:bg-primary-600 rounded-full flex items-center justify-center transition-colors">
                 <Instagram size={20} />
               </a>
-              <a href="https://linkedin.com/company/associacaodeporcos" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-800 hover:bg-primary-600 rounded-full flex items-center justify-center transition-colors">
+              <a href={siteConfig?.linkedinUrl || 'https://linkedin.com/company/associacaodeporcos'} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-800 hover:bg-primary-600 rounded-full flex items-center justify-center transition-colors">
                 <Linkedin size={20} />
               </a>
+              {siteConfig?.youtubeUrl && (
+                <a href={siteConfig.youtubeUrl} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-800 hover:bg-primary-600 rounded-full flex items-center justify-center transition-colors">
+                  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor" aria-hidden="true"><path d="M23.498 6.186a2.994 2.994 0 0 0-2.108-2.12C19.633 3.5 12 3.5 12 3.5s-7.633 0-9.39.566A2.994 2.994 0 0 0 .502 6.186 31.37 31.37 0 0 0 0 12a31.37 31.37 0 0 0 .502 5.814 2.994 2.994 0 0 0 2.108 2.12C4.367 20.5 12 20.5 12 20.5s7.633 0 9.39-.566a2.994 2.994 0 0 0 2.108-2.12A31.37 31.37 0 0 0 24 12a31.37 31.37 0 0 0-.502-5.814ZM9.75 15.5v-7l6 3.5-6 3.5Z"/></svg>
+                </a>
+              )}
             </div>
           </div>
 

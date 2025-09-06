@@ -22,7 +22,8 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
       return errorResponse('ID do produto inválido')
     }
 
-    const product = await Product.findById(id)
+    // Buscar o produto, mesmo se o campo isActive não existir (registros antigos)
+    const product = await Product.findOne({ _id: id, $or: [ { isActive: true }, { isActive: { $exists: false } } ] })
 
     if (!product) {
       return errorResponse('Produto não encontrado', 404)

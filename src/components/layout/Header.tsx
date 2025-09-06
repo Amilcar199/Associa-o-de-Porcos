@@ -98,7 +98,7 @@ const Header = () => {
               </div>
               <div className="flex items-center space-x-2">
                 <Mail size={14} />
-                <span>contato@associacaodeporcos.ao</span>
+                <span>{siteConfig?.contactEmail || 'contato@associacaodeporcos.ao'}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <MapPin size={14} />
@@ -107,7 +107,9 @@ const Header = () => {
             </div>
             
             <div className="flex items-center space-x-4">
+
               {/* Seletor de idioma removido do header conforme solicitação */}
+
               {status === 'loading' ? (
                 <div className="animate-pulse">{dict.user.loading}</div>
               ) : session ? (
@@ -355,7 +357,7 @@ const Header = () => {
                   >
                     {dict.user.signup}
                   </Link>
-                  
+                  <HeaderLanguageMenu />
                 </div>
               )}
             </div>

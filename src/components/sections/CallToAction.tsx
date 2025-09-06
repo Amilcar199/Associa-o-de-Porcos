@@ -12,10 +12,14 @@ import {
   Mail
 } from 'lucide-react'
 import { useLanguage } from '@/components/providers/LanguageProvider'
+import { useEffect, useState } from 'react'
 
 const CallToAction = () => {
   const { locale } = useLanguage()
   const isEn = locale.startsWith('en')
+  const [siteConfig, setSiteConfig] = useState<any>(null)
+
+  useEffect(()=>{ (async()=>{ try { const r = await fetch('/api/admin/config',{ cache:'no-store' }); if(r.ok){ const j = await r.json(); setSiteConfig(j?.data || null) } } catch {} })() },[])
 
   const benefits = isEn ? [
     { icon: Users, title: 'Active Community', description: 'Connect with over 500 experienced farmers' },
@@ -194,7 +198,7 @@ const CallToAction = () => {
                     <Mail size={18} className="text-white" />
                   </div>
                   <div>
-                    <p className="text-white font-medium">contato@associacaodeporcos.ao</p>
+                    <p className="text-white font-medium">{siteConfig?.contactEmail || 'contato@associacaodeporcos.ao'}</p>
                     <p className="text-primary-200 text-sm">{isEn ? 'We reply within 24h' : 'Respondemos em até 24h'}</p>
                   </div>
                 </div>

@@ -44,7 +44,7 @@ export default function NewProductClient() {
         
         if (response.ok) {
           const data = await response.json();
-          setForm(prev => ({ ...prev, code: data.code }));
+          setForm(prev => ({ ...prev, code: (data?.data?.code as string) || '' }));
         }
       } catch (error) {
         console.error('Erro ao gerar código:', error);
@@ -70,6 +70,7 @@ export default function NewProductClient() {
           ...form,
           breed: allowedBreeds.includes(form.breed) ? form.breed : 'Outro',
           images: imageList,
+          isAvailable: true,
           code: form.code,
         }),
       })
@@ -136,7 +137,7 @@ export default function NewProductClient() {
             <label className="block text-sm text-gray-700 mb-1">Preço ({currency})</label>
             <div className="relative">
               <DollarSign className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
-              <input type="number" value={form.price ?? ''} onChange={(e)=>setForm(p=>({...p,price:e.target.value===''?undefined:parseFloat(e.target.value)}))} className="w-full pl-9 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="120000" />
+              <input type="number" value={form.price ?? ''} onChange={(e)=>setForm(p=>({...p,price:e.target.value===''?undefined:parseFloat(e.target.value)}))} className="w-full pl-9 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="120000" required />
             </div>
           </div>
         </div>

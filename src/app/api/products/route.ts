@@ -15,8 +15,9 @@ export async function GET(req: NextRequest) {
     const pagination = getPaginationParams(searchParams)
     const filters = getSearchFilters(searchParams)
 
-    // Construir query
-    const query = buildMongoQuery(filters)
+    // Construir query (apenas produtos ativos por padrão; incluir registros antigos sem o campo isActive)
+    const baseQuery: any = { $or: [ { isActive: true }, { isActive: { $exists: false } } ] }
+    const query = { ...baseQuery, ...buildMongoQuery(filters) }
     const sort = buildMongoSort(
       pagination.sort ?? 'createdAt', // valor padrão
       pagination.order ?? 'desc'      // valor padrão
@@ -102,6 +103,13 @@ export async function POST(req: NextRequest) {
     }
     if (!productData.images || productData.images.length === 0) {
       return errorResponse('Pelo menos uma imagem é obrigatória')
+    }
+
+    // Garantir código do produto (server-side fallback)
+    try {
+      productData.code = sanitizedData.code || await Product.generateCode(sanitizedData.breed)
+    } catch (e) {
+      return errorResponse('Falha ao gerar código automático')
     }
 
     // Criar produto
