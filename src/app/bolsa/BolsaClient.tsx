@@ -237,24 +237,6 @@ export default function BolsaClient() {
 
   return (
     <div className="relative">
-      <div className="absolute inset-0 pointer-events-none select-none">
-        <svg viewBox="0 0 1000 220" preserveAspectRatio="none" className="w-full h-52 md:h-64">
-          <defs>
-            <linearGradient id="grad" x1="0" x2="0" y1="0" y2="1">
-              <stop offset="0%" stopColor="#16a34a" stopOpacity="0.2" />
-              <stop offset="100%" stopColor="#16a34a" stopOpacity="0.02" />
-            </linearGradient>
-          </defs>
-          {chartPoints.length > 1 && (
-            <>
-              <path d={computePath(chartPoints)} stroke="#16a34a" strokeWidth="2" fill="none" />
-              <path d={`${computePath([{...chartPoints[0]},{...chartPoints[0]}])} `} stroke="none" fill="none" />
-              <path d={`M ${chartPoints[0].x} 220 ${computePath(chartPoints).replace('M ', 'L ')} L ${chartPoints[chartPoints.length-1].x} 220 Z`} fill="url(#grad)" opacity="0.8" />
-            </>
-          )}
-        </svg>
-      </div>
-
       <div className="relative container-custom py-8 space-y-6">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
           <div>
