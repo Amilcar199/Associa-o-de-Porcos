@@ -25,11 +25,12 @@ export async function GET(req: NextRequest) {
     }
 
     if (start && end) {
-      matchStage.$and.push({ createdAt: { $gte: start, $lt: end } })
+      matchStage.$and.push({ updatedAt: { $gte: start, $lt: end } })
     }
     if (region) {
       matchStage.$and.push({ location: { $regex: new RegExp(region, 'i') } })
     }
+    matchStage.$and.push({ availability: 'available' })
 
     const pipeline: any[] = [
       { $match: matchStage },

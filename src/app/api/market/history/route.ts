@@ -27,7 +27,8 @@ export async function GET(req: NextRequest) {
     const matchStage: any = {
       $and: [
         { $or: [ { isActive: true }, { isActive: { $exists: false } } ] },
-        { createdAt: { $gte: start, $lt: end } },
+        { availability: 'available' },
+        { updatedAt: { $gte: start, $lt: end } },
       ]
     }
 
@@ -62,7 +63,7 @@ export async function GET(req: NextRequest) {
     }
 
     pipeline.push(
-      { $addFields: { day: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } } } },
+      { $addFields: { day: { $dateToString: { format: '%Y-%m-%d', date: '$updatedAt' } } } },
       {
         $group: {
           _id: '$day',

@@ -9,9 +9,9 @@ export async function GET(req: NextRequest) {
   try {
     await connectDB()
 
-    const lastDoc = await (Product as any).findOne({ $or: [ { isActive: true }, { isActive: { $exists: false } } ] })
-      .sort({ createdAt: -1 })
-      .select({ createdAt: 1 })
+    const lastDoc = await (Product as any).findOne({ $or: [ { isActive: true }, { isActive: { $exists: false } } ], availability: 'available' })
+      .sort({ updatedAt: -1 })
+      .select({ updatedAt: 1 })
       .lean()
 
     const regions = await (Product as any).distinct('location', { $or: [ { isActive: true }, { isActive: { $exists: false } } ] })
@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
     const methodologyEN = 'Prices per kg estimated as total price divided by reported weight. Derived categories: Piglet (<25kg or <2 months), Fattening (25–90kg or 2–6 months), Breeders (>90kg or >6 months). Indicators compute changes vs the equivalent prior period.'
 
     return NextResponse.json(successResponse({
-      lastUpdated: lastDoc?.createdAt || null,
+      lastUpdated: lastDoc?.updatedAt || null,
       regions: regions.filter(Boolean).sort(),
       categories,
       methodology: {

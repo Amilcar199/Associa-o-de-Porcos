@@ -27,7 +27,8 @@ async function computeAverage(unit: Unit, start: Date, end: Date, region?: strin
   const matchStage: any = {
     $and: [
       { $or: [ { isActive: true }, { isActive: { $exists: false } } ] },
-      { createdAt: range(start, end) },
+      { availability: 'available' },
+      { updatedAt: range(start, end) },
     ]
   }
 

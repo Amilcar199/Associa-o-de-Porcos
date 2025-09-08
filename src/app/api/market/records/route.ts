@@ -33,6 +33,7 @@ export async function GET(req: NextRequest) {
     if (region) {
       matchStage.$and.push({ location: { $regex: new RegExp(region, 'i') } })
     }
+    matchStage.$and.push({ availability: 'available' })
 
     const pipeline: any[] = [
       { $match: matchStage },
@@ -60,14 +61,14 @@ export async function GET(req: NextRequest) {
       pipeline.push({ $match: { categoryKey: category } })
     }
 
-    pipeline.push({ $sort: { createdAt: -1 } })
+    pipeline.push({ $sort: { updatedAt: -1 } })
     pipeline.push({ $limit: limit })
     pipeline.push({
       $project: {
         _id: 0,
         id: '$_id',
         name: '$name',
-        date: '$createdAt',
+        date: '$updatedAt',
         region: '$location',
         weight: 1,
         price: 1,
