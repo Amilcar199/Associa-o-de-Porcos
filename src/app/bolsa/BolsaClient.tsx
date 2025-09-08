@@ -299,7 +299,7 @@ export default function BolsaClient() {
 
         <div className="grid md:grid-cols-3 gap-4">
           <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-            <div className="text-xs text-gray-500">Preço médio atual (AOA/kg)</div>
+            <div className="text-xs text-gray-500">Preço médio atual (AOA)</div>
             <div className="text-3xl font-bold mt-1">{formatCurrencyAOA(summary?.data?.current?.avg ?? null)}</div>
             <div className="text-xs text-gray-500 mt-1">Base {summary?.data?.current?.count || 0} registos</div>
           </div>

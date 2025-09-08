@@ -39,13 +39,6 @@ export async function GET(req: NextRequest) {
     const pipeline: any[] = [
       { $match: matchStage },
       { $addFields: {
-        pricePerKg: {
-          $cond: [
-            { $and: [ { $gt: ['$price', 0] }, { $gt: ['$weight', 0] } ] },
-            { $divide: ['$price', '$weight'] },
-            null
-          ]
-        },
         ts: { $ifNull: ['$updatedAt', '$createdAt'] }
       }},
     ]
@@ -60,7 +53,7 @@ export async function GET(req: NextRequest) {
         $group: {
           _id: '$day',
           count: { $sum: 1 },
-          avg: { $avg: unit === 'kg' ? '$pricePerKg' : '$price' }
+          avg: { $avg: '$price' }
         }
       },
       { $sort: { _id: 1 } }

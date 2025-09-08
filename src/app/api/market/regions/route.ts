@@ -53,9 +53,9 @@ export async function GET(req: NextRequest) {
       $group: {
         _id: '$location',
         count: { $sum: 1 },
-        avg: { $avg: unit === 'kg' ? '$pricePerKg' : '$price' },
-        min: { $min: unit === 'kg' ? '$pricePerKg' : '$price' },
-        max: { $max: unit === 'kg' ? '$pricePerKg' : '$price' },
+        avg: { $avg: '$price' },
+        min: { $min: '$price' },
+        max: { $max: '$price' },
       }
     })
     pipeline.push({ $sort: { _id: 1 } })

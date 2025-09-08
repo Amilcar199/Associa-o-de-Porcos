@@ -59,7 +59,7 @@ async function computeAverage(unit: Unit, start: Date, end: Date, region?: strin
     $group: {
       _id: null,
       count: { $sum: 1 },
-      avgValue: { $avg: unit === 'kg' ? '$pricePerKg' : '$price' }
+      avgValue: { $avg: '$price' }
     }
   })
 
@@ -117,7 +117,7 @@ export async function GET(req: NextRequest) {
     }
 
     return NextResponse.json(successResponse({
-      unit,
+      unit: 'head',
       current: effectiveCurrent,
       variation: {
         daily: changePct(effectiveCurrent.avg, prevDay.avg),

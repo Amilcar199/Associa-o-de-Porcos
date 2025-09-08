@@ -17,8 +17,8 @@ export async function GET(req: NextRequest) {
     const regions = await (Product as any).distinct('location', { $or: [ { isActive: true }, { isActive: { $exists: false } } ] })
     const breeds = await (Product as any).distinct('breed', { $or: [ { isActive: true }, { isActive: { $exists: false } } ] })
 
-    const methodologyPT = 'Preços por kg calculados como preço informado dividido pelo peso do produto (quando disponível). Para produtos sem peso, o ponto é ignorado no cálculo por kg. As variações (dia/semana/mês) comparam médias com seus períodos imediatamente anteriores. Fonte: base interna de produtos.'
-    const methodologyEN = 'Prices per kg are computed as total price divided by product weight (when available). Products without weight are excluded from per‑kg calculations. Variations (daily/weekly/monthly) compare averages against their immediate prior periods. Source: internal products database.'
+    const methodologyPT = 'Os indicadores e séries desta Bolsa utilizam a média simples dos preços informados (AOA) dos produtos disponíveis no período e filtros selecionados. As variações (dia/semana/mês) comparam as médias com os períodos imediatamente anteriores. Fonte: base interna de produtos.'
+    const methodologyEN = 'Indicators and series use the simple average of reported prices (AOA) for available products within the selected period and filters. Variations (daily/weekly/monthly) compare averages against the immediately prior periods. Source: internal products database.'
 
     return NextResponse.json(successResponse({
       lastUpdated: lastDoc?.updatedAt || null,
