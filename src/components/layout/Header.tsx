@@ -54,7 +54,7 @@ const Header = () => {
 
   // Prefetch programático das rotas mais acessadas
   useEffect(() => {
-    const routesToPrefetch = ['/', '/sobre', '/colaboradores', '/servicos', '/produtos', '/relatorio', '/noticias', '/contato', '/login', '/registro']
+    const routesToPrefetch = ['/', '/sobre', '/colaboradores', '/servicos', '/produtos', '/bolsa', '/relatorio', '/noticias', '/contato', '/login', '/registro']
     routesToPrefetch.forEach((route) => {
       try { router.prefetch(route) } catch {}
     })
@@ -72,6 +72,7 @@ const Header = () => {
     { name: dict.nav.about, href: '/sobre' },
     { name: dict.nav.services, href: '/servicos' },
     { name: dict.nav.products, href: '/produtos' },
+    { name: dict.nav.market, href: '/bolsa' },
     { name: dict.nav.report, href: '/relatorio' },
     { name: dict.nav.news, href: '/noticias' },
     { name: dict.nav.contact, href: '/contato' },

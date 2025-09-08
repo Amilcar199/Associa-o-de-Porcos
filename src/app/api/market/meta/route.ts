@@ -9,12 +9,12 @@ export async function GET(req: NextRequest) {
   try {
     await connectDB()
 
-    const lastDoc = await Product.findOne({ $or: [ { isActive: true }, { isActive: { $exists: false } } ] })
+    const lastDoc = await (Product as any).findOne({ $or: [ { isActive: true }, { isActive: { $exists: false } } ] })
       .sort({ createdAt: -1 })
       .select({ createdAt: 1 })
       .lean()
 
-    const regions = await Product.distinct('location', { $or: [ { isActive: true }, { isActive: { $exists: false } } ] })
+    const regions = await (Product as any).distinct('location', { $or: [ { isActive: true }, { isActive: { $exists: false } } ] })
 
     const categories = [
       { key: 'piglet', label: 'Leitão' },

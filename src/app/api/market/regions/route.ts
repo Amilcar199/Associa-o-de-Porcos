@@ -68,8 +68,8 @@ export async function GET(req: NextRequest) {
     })
     pipeline.push({ $sort: { _id: 1 } })
 
-    const result = await Product.aggregate(pipeline)
-    return NextResponse.json(successResponse({ unit, regions: result.map(r => ({ region: r._id, count: r.count, avg: r.avg, min: r.min, max: r.max })) }))
+    const result = await (Product as any).aggregate(pipeline)
+    return NextResponse.json(successResponse({ unit, regions: (result as any[]).map((r: any) => ({ region: r._id as string, count: r.count as number, avg: r.avg as number | null, min: r.min as number | null, max: r.max as number | null })) }))
   } catch (error) {
     console.error('Erro em /api/market/regions:', error)
     return errorResponse('Erro interno do servidor', 500)

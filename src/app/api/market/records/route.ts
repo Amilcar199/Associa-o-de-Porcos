@@ -77,8 +77,8 @@ export async function GET(req: NextRequest) {
       }
     })
 
-    const docs = await Product.aggregate(pipeline)
-    const data = docs.map(d => {
+    const docs = await (Product as any).aggregate(pipeline)
+    const data = (docs as any[]).map((d: any) => {
       const cat = deriveCategory(d.weight, d.age)
       const value = unit === 'kg' ? (d.pricePerKg ?? null) : (d.price ?? null)
       return {

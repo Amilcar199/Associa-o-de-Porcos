@@ -71,7 +71,7 @@ async function computeAverage(unit: Unit, start: Date, end: Date, region?: strin
     }
   })
 
-  const result = await Product.aggregate(pipeline)
+  const result = await (Product as any).aggregate(pipeline)
   if (!result.length || result[0].avgValue == null) {
     return { avg: null as number | null, count: result[0]?.count || 0 }
   }

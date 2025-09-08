@@ -73,8 +73,8 @@ export async function GET(req: NextRequest) {
       { $sort: { _id: 1 } }
     )
 
-    const result = await Product.aggregate(pipeline)
-    return NextResponse.json(successResponse({ unit, series: result.map(r => ({ date: r._id, avg: r.avg, count: r.count })) }))
+    const result = await (Product as any).aggregate(pipeline)
+    return NextResponse.json(successResponse({ unit, series: (result as any[]).map((r: any) => ({ date: r._id as string, avg: r.avg as number | null, count: r.count as number })) }))
   } catch (error) {
     console.error('Erro em /api/market/history:', error)
     return errorResponse('Erro interno do servidor', 500)
