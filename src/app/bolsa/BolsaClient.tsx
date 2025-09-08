@@ -485,9 +485,28 @@ function Comparisons({ unit, mode, items, periodStartISO }: { unit: Unit, mode: 
   return (
     <div className="h-72">
       <svg viewBox="0 0 1000 260" preserveAspectRatio="none" className="w-full h-full">
-        {[a, b].map((s, idx) => (
-          s.coords.length > 1 ? <path key={idx} d={computePath(s.coords)} stroke={s.color} strokeWidth="2" fill="none" /> : null
-        ))}
+        <defs>
+          <linearGradient id="compA" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stopColor="#15803d" stopOpacity="0.25" />
+            <stop offset="100%" stopColor="#15803d" stopOpacity="0" />
+          </linearGradient>
+          <linearGradient id="compB" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stopColor="#1d4ed8" stopOpacity="0.20" />
+            <stop offset="100%" stopColor="#1d4ed8" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        {a.coords.length > 1 && (
+          <>
+            <path d={`M ${a.coords[0].x} 260 ${computePath(a.coords).replace('M ', 'L ')} L ${a.coords[a.coords.length-1].x} 260 Z`} fill="url(#compA)" />
+            <path d={computePath(a.coords)} stroke={a.color} strokeWidth="2" fill="none" />
+          </>
+        )}
+        {b.coords.length > 1 && (
+          <>
+            <path d={`M ${b.coords[0].x} 260 ${computePath(b.coords).replace('M ', 'L ')} L ${b.coords[b.coords.length-1].x} 260 Z`} fill="url(#compB)" />
+            <path d={computePath(b.coords)} stroke={b.color} strokeWidth="2" fill="none" />
+          </>
+        )}
         {a.coords.length <= 1 && b.coords.length <= 1 && (
           <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" className="fill-gray-400 text-sm">Selecione itens para comparar</text>
         )}
