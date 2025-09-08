@@ -7,13 +7,6 @@ import { errorResponse, successResponse } from '@/lib/api-utils'
 
 type Unit = 'kg' | 'head'
 
-function deriveCategory(weight?: number, age?: number) {
-  if (weight !== undefined && weight < 25) return { key: 'piglet', label: 'Leitão' }
-  if (age !== undefined && age < 2) return { key: 'piglet', label: 'Leitão' }
-  if ((weight !== undefined && weight <= 90) || (age !== undefined && age <= 6)) return { key: 'fattening', label: 'Engorda' }
-  return { key: 'breeders', label: 'Reprodutores' }
-}
-
 export async function GET(req: NextRequest) {
   try {
     await connectDB()
@@ -61,11 +54,11 @@ export async function GET(req: NextRequest) {
         name: '$name',
         date: '$updatedAt',
         region: '$location',
+        breed: '$breed',
         weight: 1,
         price: 1,
         pricePerKg: 1,
-        age: 1,
-        categoryKey: 1
+        age: 1
       }
     })
 

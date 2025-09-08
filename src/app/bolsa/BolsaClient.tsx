@@ -197,7 +197,7 @@ export default function BolsaClient() {
       id: r.id,
       data: formatDate(r.date),
       regiao: r.region,
-      categoria: r.categoryLabel,
+      raca: r.breed,
       unidade: r.unit,
       valor: r.value ?? ''
     }))
@@ -205,7 +205,7 @@ export default function BolsaClient() {
       { key: 'id', label: 'ID' },
       { key: 'data', label: 'Data' },
       { key: 'regiao', label: 'Região' },
-      { key: 'categoria', label: 'Categoria' },
+      { key: 'raca', label: 'Raça' },
       { key: 'unidade', label: 'Unidade' },
       { key: 'valor', label: 'Valor' },
     ])
