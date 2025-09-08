@@ -502,13 +502,14 @@ function Comparisons({ unit, mode, items, periodStartISO, version }: { unit: Uni
       if (mode === 'category') p.set('breed', value)
       p.set('start', periodStartISO)
       p.set('end', endISO)
+      p.set('v', String(version))
       return `/api/market/history?${p.toString()}`
     }
     return items.filter(Boolean).slice(0, 2).map(build)
   }, [mode, items, unit, periodStartISO, endISO, version])
 
-  const { data: s1 } = useFetch<HistoryResponse>(urls[0] || null, [urls[0]])
-  const { data: s2 } = useFetch<HistoryResponse>(urls[1] || null, [urls[1]])
+  const { data: s1 } = useFetch<HistoryResponse>(urls[0] || null, [urls[0], version])
+  const { data: s2 } = useFetch<HistoryResponse>(urls[1] || null, [urls[1], version])
 
   const makeScale = (series: (HistoryPoint[])[]) => {
     const values = series.flat().map(p => p.avg || 0)
@@ -517,8 +518,8 @@ function Comparisons({ unit, mode, items, periodStartISO, version }: { unit: Uni
     return { minY, maxY }
   }
 
-  const pointsA = s1?.data?.series || []
-  const pointsB = s2?.data?.series || []
+  const pointsA = Array.isArray(s1?.data?.series) ? (s1?.data?.series as any[]) : []
+  const pointsB = Array.isArray(s2?.data?.series) ? (s2?.data?.series as any[]) : []
   const { minY, maxY } = makeScale([pointsA, pointsB])
   const rangeY = Math.max(1, maxY - minY)
 
