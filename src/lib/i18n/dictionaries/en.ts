@@ -10,6 +10,57 @@ export default {
 		market: 'Pig Market',
 		report: 'Report',
 	},
+	marketPage: {
+		title: 'Pig Market',
+		description: 'Reference prices, trends and indicators for the pig chain.',
+		filters: {
+			regionAll: 'Region (all)',
+			breedAll: 'Breed (all)',
+			period30: '30 days',
+			period90: '90 days',
+			period180: '6 months',
+			period365: '12 months',
+			metricPrice: 'Price',
+			metricVolume: 'Volume/Activity',
+			compareRegions: 'Compare regions',
+			compareBreeds: 'Compare breeds',
+			selectFirst: 'Select 1st',
+			selectSecond: 'Select 2nd',
+			generateCompare: 'Generate comparison'
+		},
+		actions: {
+			exportCsv: 'Export CSV',
+			share: 'Share'
+		},
+		cards: {
+			overallTitle: 'Current average price (AOA) — overall',
+			baseRecords: 'Base',
+			dailyVariation: 'Daily variation',
+			weeklyVariation: 'Weekly variation',
+			monthlyVariation: 'Monthly variation'
+		},
+		sections: {
+			history: 'Historical series',
+			regions: 'Prices by region',
+			comparisons: 'Comparisons',
+			recentRecords: 'Recent records',
+			methodology: 'Methodology and data source'
+		},
+		table: {
+			date: 'Date',
+			region: 'Region',
+			breed: 'Breed',
+			price: 'Price'
+		},
+		empty: {
+			noData: 'Not enough data',
+			selectAndGenerate: 'Select and click “Generate comparison”'
+		},
+		labels: {
+			source: 'Source',
+			lastUpdated: 'Last update'
+		}
+	},
 	user: {
 		login: 'Sign in',
 		signup: 'Join Us',
