@@ -115,7 +115,7 @@ export default function BolsaClient() {
   const [unit, setUnit] = useState<Unit>('kg')
   const [region, setRegion] = useState<string>('')
   const [breed, setBreed] = useState<string>('')
-  const [periodDays, setPeriodDays] = useState<number>(90)
+  const [periodDays, setPeriodDays] = useState<number>(180)
   const [compareMode, setCompareMode] = useState<'none' | 'region' | 'category'>('none')
   const [compareItems, setCompareItems] = useState<string[]>([])
   const [bgChartMetric, setBgChartMetric] = useState<'price' | 'volume'>('price')

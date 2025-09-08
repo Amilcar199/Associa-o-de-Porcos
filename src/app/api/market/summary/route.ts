@@ -28,7 +28,7 @@ async function computeAverage(unit: Unit, start: Date, end: Date, region?: strin
     $and: [
       { $or: [ { isActive: true }, { isActive: { $exists: false } } ] },
       { availability: 'available' },
-      { updatedAt: range(start, end) },
+      { $or: [ { updatedAt: range(start, end) }, { createdAt: range(start, end) } ] },
     ]
   }
 

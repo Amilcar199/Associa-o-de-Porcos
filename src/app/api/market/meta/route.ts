@@ -22,8 +22,8 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(successResponse({
       lastUpdated: lastDoc?.updatedAt || null,
-      regions: regions.filter(Boolean).sort(),
-      breeds: (breeds as string[]).filter(Boolean).sort(),
+      regions: regions.filter(Boolean).map((r: string) => String(r).trim()).filter(Boolean).sort(),
+      breeds: (breeds as string[]).filter(Boolean).map((b: string) => String(b).trim()).filter(Boolean).sort(),
       methodology: {
         pt: methodologyPT,
         en: methodologyEN
