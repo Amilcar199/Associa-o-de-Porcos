@@ -2,8 +2,8 @@ export const dynamic = 'force-dynamic'
 
 import type { Metadata } from 'next'
 import { cookies } from 'next/headers'
-import dynamic from 'next/dynamic'
-const BolsaClient = dynamic(() => import('./BolsaClient'), { ssr: false })
+import dynamicImport from 'next/dynamic'
+const BolsaClient = dynamicImport(() => import('./BolsaClient'), { ssr: false })
 
 export function generateMetadata(): Metadata {
   const locale = cookies().get('locale')?.value || 'pt-AO'
