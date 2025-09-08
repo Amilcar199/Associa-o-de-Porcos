@@ -184,14 +184,15 @@ export default function BolsaClient() {
     const series = historyPoints.filter(p => p.avg != null)
     if (!series.length) return [] as { x: number, y: number }[]
     const width = 1000
-    const height = 220
-    const paddingX = 20
+    const height = 240
+    const paddingX = 40
     const paddingY = 20
     const xs = series.map((_, i) => i)
     const ys = series.map(p => p.avg as number)
-    const minY = Math.min(...ys)
-    const maxY = Math.max(...ys)
-    const rangeY = Math.max(1, maxY - minY)
+    let minY = Math.min(...ys)
+    let maxY = Math.max(...ys)
+    if (maxY === minY) { minY = minY - 1; maxY = maxY + 1 }
+    const rangeY = Math.max(1e-6, maxY - minY)
     return series.map((p, i) => {
       const x = paddingX + (i / Math.max(1, series.length - 1)) * (width - paddingX * 2)
       const y = height - paddingY - ((p.avg! - minY) / rangeY) * (height - paddingY * 2)
@@ -375,8 +376,9 @@ export default function BolsaClient() {
                     return <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" className="fill-gray-400 text-sm">Sem dados suficientes</text>
                   }
                   const values = historyPoints.filter(p=>p.avg!=null).map(p=>p.avg as number)
-                  const minY = Math.min(...values)
-                  const maxY = Math.max(...values)
+                  let minY = Math.min(...values)
+                  let maxY = Math.max(...values)
+                  if (values.length === 1 || maxY === minY) { minY = minY - 1; maxY = maxY + 1 }
                   const ticks = 4
                   const height = 260
                   const paddingY = 20
