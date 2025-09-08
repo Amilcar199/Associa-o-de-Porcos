@@ -341,15 +341,55 @@ export default function BolsaClient() {
               <div className="text-xs text-gray-500">{historyPoints.length} pontos</div>
             </div>
             <div className="h-64">
-              <svg viewBox="0 0 1000 240" preserveAspectRatio="none" className="w-full h-full">
+              <svg viewBox="0 0 1000 260" preserveAspectRatio="none" className="w-full h-full">
                 <defs>
                   <linearGradient id="grad2" x1="0" x2="0" y1="0" y2="1">
                     <stop offset="0%" stopColor="#16a34a" stopOpacity="0.25" />
                     <stop offset="100%" stopColor="#16a34a" stopOpacity="0" />
                   </linearGradient>
                 </defs>
+                {/* Axes */}
+                <g>
+                  <line x1="40" y1="10" x2="40" y2="240" stroke="#e5e7eb" />
+                  <line x1="40" y1="240" x2="980" y2="240" stroke="#e5e7eb" />
+                </g>
                 {chartPoints.length > 1 ? (
                   <>
+                    {/* Y ticks */}
+                    {(() => {
+                      const values = historyPoints.filter(p=>p.avg!=null).map(p=>p.avg as number)
+                      if(values.length===0) return null
+                      const minY = Math.min(...values)
+                      const maxY = Math.max(...values)
+                      const ticks = 4
+                      const height = 260
+                      const paddingY = 20
+                      const scaleY = (v: number) => height - paddingY - ((v - minY) / Math.max(1, maxY - minY)) * (height - paddingY * 2)
+                      return Array.from({length: ticks+1}).map((_,i)=>{
+                        const v = minY + (i*(maxY-minY)/ticks)
+                        const y = scaleY(v)
+                        return (
+                          <g key={i}>
+                            <line x1="40" x2="980" y1={y} y2={y} stroke="#f3f4f6" />
+                            <text x="36" y={y} textAnchor="end" dominantBaseline="middle" className="fill-gray-400 text-[10px]">{formatNumber(v,0)}</text>
+                          </g>
+                        )
+                      })
+                    })()}
+                    {/* X ticks (start/middle/end) */}
+                    {(() => {
+                      const labels = [0, Math.floor(historyPoints.length/2), Math.max(0, historyPoints.length-1)]
+                      const width = 1000
+                      const paddingX = 40
+                      return labels.map((idx, i)=>{
+                        const x = paddingX + (historyPoints.length<=1?0:(idx/(historyPoints.length-1)))*(width - paddingX - 20)
+                        const d = historyPoints[idx]?.date || ''
+                        return (
+                          <text key={i} x={x} y={252} textAnchor="middle" className="fill-gray-400 text-[10px]">{d}</text>
+                        )
+                      })
+                    })()}
+                    {/* Area and line */}
                     <path d={computePath(chartPoints)} stroke="#16a34a" strokeWidth="2" fill="none" />
                     <path d={`M ${chartPoints[0].x} 240 ${computePath(chartPoints).replace('M ', 'L ')} L ${chartPoints[chartPoints.length-1].x} 240 Z`} fill="url(#grad2)" />
                   </>
