@@ -123,6 +123,7 @@ export default function BolsaClient() {
   const [periodDays, setPeriodDays] = useState<number>(180)
   const [compareMode, setCompareMode] = useState<'none' | 'region' | 'category'>('region')
   const [compareItems, setCompareItems] = useState<string[]>([])
+  const [compareVersion, setCompareVersion] = useState<number>(0)
   const [bgChartMetric, setBgChartMetric] = useState<'price' | 'volume'>('price')
 
   const periodStartISO = useMemo(() => {
@@ -289,9 +290,6 @@ export default function BolsaClient() {
               <select value={compareItems[0] || ''} onChange={e => {
                 const next = [e.target.value, compareItems[1]] as string[]
                 setCompareItems(next)
-                if (next[0] && next[1]) {
-                  const el = document.getElementById('comparativos'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                }
               }} className="px-3 py-2 border rounded-lg">
                 <option value="">Selecione o 1º</option>
                 {(compareMode === 'region' ? regions : breeds).map(v => (
@@ -301,15 +299,21 @@ export default function BolsaClient() {
               <select value={compareItems[1] || ''} onChange={e => {
                 const next = [compareItems[0], e.target.value] as string[]
                 setCompareItems(next)
-                if (next[0] && next[1]) {
-                  const el = document.getElementById('comparativos'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                }
               }} className="px-3 py-2 border rounded-lg">
                 <option value="">Selecione o 2º</option>
                 {(compareMode === 'region' ? regions : breeds).map(v => (
                   <option key={v} value={v}>{v}</option>
                 ))}
               </select>
+              <div className="flex items-end">
+                <button
+                  onClick={() => { setCompareVersion(v => v + 1); const el = document.getElementById('comparativos'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }) }}
+                  disabled={!compareItems[0] || !compareItems[1]}
+                  className={`px-3 py-2 rounded-lg border ${(!compareItems[0] || !compareItems[1]) ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' : 'bg-primary-600 text-white border-primary-600 hover:bg-primary-700'}`}
+                >
+                  Gerar comparação
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -445,7 +449,7 @@ export default function BolsaClient() {
             <h3 className="font-semibold text-gray-800">Comparativos</h3>
             <div className="text-xs text-gray-500">Até 2 séries</div>
           </div>
-          <Comparisons unit={unit} mode={compareMode} items={compareItems} periodStartISO={periodStartISO} />
+          <Comparisons unit={unit} mode={compareMode} items={compareItems} periodStartISO={periodStartISO} version={compareVersion} />
         </div>
 
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
@@ -487,7 +491,7 @@ export default function BolsaClient() {
   )
 }
 
-function Comparisons({ unit, mode, items, periodStartISO }: { unit: Unit, mode: 'none' | 'region' | 'category', items: string[], periodStartISO: string }) {
+function Comparisons({ unit, mode, items, periodStartISO, version }: { unit: Unit, mode: 'none' | 'region' | 'category', items: string[], periodStartISO: string, version: number }) {
   const endISO = new Date().toISOString()
   const urls = useMemo(() => {
     if (mode === 'none') return [] as string[]
@@ -501,7 +505,7 @@ function Comparisons({ unit, mode, items, periodStartISO }: { unit: Unit, mode: 
       return `/api/market/history?${p.toString()}`
     }
     return items.filter(Boolean).slice(0, 2).map(build)
-  }, [mode, items, unit, periodStartISO, endISO])
+  }, [mode, items, unit, periodStartISO, endISO, version])
 
   const { data: s1 } = useFetch<HistoryResponse>(urls[0] || null, [urls[0]])
   const { data: s2 } = useFetch<HistoryResponse>(urls[1] || null, [urls[1]])
