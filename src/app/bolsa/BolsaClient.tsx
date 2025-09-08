@@ -112,7 +112,7 @@ function toCSV(rows: any[], headers: { key: string, label: string }[]) {
 
 export default function BolsaClient() {
   const router = useRouter()
-  const [unit, setUnit] = useState<Unit>('kg')
+  const [unit] = useState<Unit>('kg')
   const [region, setRegion] = useState<string>('')
   const [breed, setBreed] = useState<string>('')
   const [periodDays, setPeriodDays] = useState<number>(180)
@@ -254,7 +254,7 @@ export default function BolsaClient() {
         </div>
 
         <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-          <div className="grid gap-3 md:grid-cols-6">
+          <div className="grid gap-3 md:grid-cols-5">
             <select value={region} onChange={e => setRegion(e.target.value)} className="px-3 py-2 border rounded-lg">
               <option value="">Região (todas)</option>
               {regions.map(r => (<option key={r} value={r}>{r}</option>))}
@@ -262,10 +262,6 @@ export default function BolsaClient() {
             <select value={breed} onChange={e => setBreed(e.target.value)} className="px-3 py-2 border rounded-lg">
               <option value="">Raça (todas)</option>
               {breeds.map(b => (<option key={b} value={b}>{b}</option>))}
-            </select>
-            <select value={unit} onChange={e => setUnit(e.target.value as Unit)} className="px-3 py-2 border rounded-lg">
-              <option value="kg">por kg</option>
-              <option value="head">por cabeça</option>
             </select>
             <select value={periodDays} onChange={e => setPeriodDays(parseInt(e.target.value))} className="px-3 py-2 border rounded-lg">
               <option value={30}>30 dias</option>
@@ -303,7 +299,7 @@ export default function BolsaClient() {
 
         <div className="grid md:grid-cols-3 gap-4">
           <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-            <div className="text-xs text-gray-500">Preço médio atual ({unit === 'kg' ? 'AOA/kg' : 'AOA/cab'})</div>
+            <div className="text-xs text-gray-500">Preço médio atual (AOA/kg)</div>
             <div className="text-3xl font-bold mt-1">{formatCurrencyAOA(summary?.data?.current?.avg ?? null)}</div>
             <div className="text-xs text-gray-500 mt-1">Base {summary?.data?.current?.count || 0} registos</div>
           </div>

@@ -17,8 +17,8 @@ export async function GET(req: NextRequest) {
     const regions = await (Product as any).distinct('location', { $or: [ { isActive: true }, { isActive: { $exists: false } } ] })
     const breeds = await (Product as any).distinct('breed', { $or: [ { isActive: true }, { isActive: { $exists: false } } ] })
 
-    const methodologyPT = 'Preços por kg estimados como preço total dividido pelo peso informado. Categorias derivadas: Leitão (<25kg ou <2 meses), Engorda (25–90kg ou 2–6 meses), Reprodutores (>90kg ou >6 meses). Indicadores calculam variações vs. período anterior equivalente.'
-    const methodologyEN = 'Prices per kg estimated as total price divided by reported weight. Derived categories: Piglet (<25kg or <2 months), Fattening (25–90kg or 2–6 months), Breeders (>90kg or >6 months). Indicators compute changes vs the equivalent prior period.'
+    const methodologyPT = 'Preços por kg calculados como preço informado dividido pelo peso do produto (quando disponível). Para produtos sem peso, o ponto é ignorado no cálculo por kg. As variações (dia/semana/mês) comparam médias com seus períodos imediatamente anteriores. Fonte: base interna de produtos.'
+    const methodologyEN = 'Prices per kg are computed as total price divided by product weight (when available). Products without weight are excluded from per‑kg calculations. Variations (daily/weekly/monthly) compare averages against their immediate prior periods. Source: internal products database.'
 
     return NextResponse.json(successResponse({
       lastUpdated: lastDoc?.updatedAt || null,
