@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
       $and: [
         { $or: [ { isActive: true }, { isActive: { $exists: false } } ] },
         { $or: [ { updatedAt: { $gte: start, $lt: end } }, { createdAt: { $gte: start, $lt: end } } ] },
-        { availability: 'available' },
+        { $or: [ { availability: 'available' }, { availability: { $exists: false } } ] },
       ]
     }
 

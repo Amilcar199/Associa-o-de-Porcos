@@ -508,13 +508,13 @@ function Comparisons({ unit, mode, items, periodStartISO, version }: { unit: Uni
     return items.filter(Boolean).slice(0, 2).map(build)
   }, [mode, items, unit, periodStartISO, endISO, version])
 
-  const { data: s1 } = useFetch<HistoryResponse>(urls[0] || null, [urls[0], version])
-  const { data: s2 } = useFetch<HistoryResponse>(urls[1] || null, [urls[1], version])
+  const { data: s1 } = useFetch<HistoryResponse>(urls[0] || null, [urls[0], version, periodStartISO])
+  const { data: s2 } = useFetch<HistoryResponse>(urls[1] || null, [urls[1], version, periodStartISO])
 
   const makeScale = (series: (HistoryPoint[])[]) => {
-    const values = series.flat().map(p => p.avg || 0)
-    const minY = Math.min(...values, 0)
-    const maxY = Math.max(...values, 1)
+    const values = series.flat().map(p => (p && typeof p.avg === 'number') ? p.avg : 0)
+    const minY = values.length ? Math.min(...values) : 0
+    const maxY = values.length ? Math.max(...values) : 1
     return { minY, maxY }
   }
 
@@ -566,7 +566,7 @@ function Comparisons({ unit, mode, items, periodStartISO, version }: { unit: Uni
           </>
         )}
         {a.coords.length <= 1 && b.coords.length <= 1 && (
-          <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" className="fill-gray-400 text-sm">Selecione itens para comparar</text>
+          <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" className="fill-gray-400 text-sm">Selecione e clique em “Gerar comparação”</text>
         )}
       </svg>
     </div>

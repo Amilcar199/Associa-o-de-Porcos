@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
     if (region) {
       matchStage.$and.push({ location: { $regex: new RegExp(region, 'i') } })
     }
-    matchStage.$and.push({ availability: 'available' })
+    matchStage.$and.push({ $or: [ { availability: 'available' }, { availability: { $exists: false } } ] })
 
     const pipeline: any[] = [
       { $match: matchStage },
