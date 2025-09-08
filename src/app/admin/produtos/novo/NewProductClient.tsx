@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Tag, Weight, Calendar, DollarSign, Image as ImageIcon, Save } from 'lucide-react'
 
 export default function NewProductClient() {
@@ -18,6 +18,9 @@ export default function NewProductClient() {
     healthStatus: 'good' as 'excellent' | 'good' | 'fair',
     vaccinated: false,
     location: '',
+    province: '',
+    municipality: '',
+    customLocation: '',
     tags: [] as string[],
     code: '',
     codeType: 'auto' as 'auto' | 'manual',
@@ -26,6 +29,33 @@ export default function NewProductClient() {
   const allowedBreeds = [
     'Landrace','Large White','Duroc','Hampshire','Pietrain','Yorkshire','Chester White','Spotted','Tamworth','Gloucester Old Spots','Mangalitsa','Ossabaw Island Hog','Mulefoot','Caipira','Piau','Moura','Canastra','Cruzado','Outro'
   ]
+
+  const ANGOLA_PROVINCES: Record<string, string[]> = {
+    'Bengo': ['Ambriz','Dande','Dembos','Nambuangongo','Pango Aluquém','Outro'],
+    'Benguela': ['Benguela','Baía Farta','Balombo','Bocoio','Caimbambo','Catumbela','Chongorói','Cubal','Ganda','Lobito','Outro'],
+    'Bié': ['Kuito','Andulo','Camacupa','Catabola','Chinguar','Chitembo','Cuemba','Cunhinga','Nharea','Outro'],
+    'Cabinda': ['Cabinda','Belize','Buco-Zau','Cacongo','Outro'],
+    'Cuando Cubango': ['Menongue','Calai','Cuangar','Cuchi','Cuito Cuanavale','Dirico','Mavinga','Nancova','Rivungo','Outro'],
+    'Cuanza Norte': ['Ndalatando','Ambaca','Banga','Bolongongo','Cambambe','Cazengo','Golungo Alto','Gonguembo','Lucala','Quiculungo','Samba Cajú','Outro'],
+    'Cuanza Sul': ['Sumbe','Amboim (Gabela)','Cassongue','Cela (Waku-Kungo)','Conda','Ebo','Libolo','Mussende','Porto Amboim','Quibala','Quilenda','Seles','Outro'],
+    'Cunene': ['Ondjiva','Cahama','Cuanhama','Curoca','Cuvelai','Namacunde','Ombadja','Outro'],
+    'Huambo': ['Huambo','Bailundo','Cachiungo','Caála','Ekunha','Londuimbali','Longonjo','Mungo','Catchiungo','Tchicala-Tcholoanga','Ucuma','Outro'],
+    'Huíla': ['Lubango','Caluquembe','Caconda','Chiange','Chibia','Chicomba','Chipindo','Cuvango','Humpata','Jamba','Matala','Quilengues','Quipungo','Outros'],
+    'Luanda': ['Luanda','Belas','Cacuaco','Cazenga','Ícolo e Bengo','Kissama','Quilamba Quiaxi','Talatona','Viana','Outro'],
+    'Lunda Norte': ['Dundo','Cambulo','Capenda-Camulemba','Caungula','Chitato','Cuango','Cuilo','Lóvua','Lubalo','Lucapa','Xá-Muteba','Outro'],
+    'Lunda Sul': ['Saurimo','Cacolo','Dala','Muconda','Outro'],
+    'Malanje': ['Malanje','Cacuso','Calandula','Cambundi-Catembo','Cangandala','Caombo','Cuaba Nzoji','Cunda-Dia-Baze','Kiwaba Nzoji','Luquembo','Marimba','Massango','Mucari','Quela','Quirima','Outro'],
+    'Moxico': ['Luena','Alto Zambeze','Bundas','Camanongue','Léua','Luchazes','Cameia','Luau','Moxico','Outro'],
+    'Namibe': ['Moçâmedes','Bibala','Camucuio','Tômbwa','Virei','Outro'],
+    'Uíge': ['Uíge','Alto Cauale','Ambuíla','Bembe','Buengas','Bungo','Damba','Milunga','Mucaba','Negage','Puri','Quimbele','Quitexe','Sanza Pombo','Songo','Zombo','Outro'],
+    'Zaire': ['Mbanza Kongo','Cuimba','Noqui','Nzózi','Soyo','Tomboco','Outro']
+  }
+
+  const provinceList = useMemo(() => Object.keys(ANGOLA_PROVINCES).sort().concat('Outro'), [])
+  const municipalityList = useMemo(() => {
+    if (!form.province || !ANGOLA_PROVINCES[form.province]) return [] as string[]
+    return ANGOLA_PROVINCES[form.province]
+  }, [form.province])
 
   useEffect(()=>{
     ;(async()=>{ try { const r = await fetch('/api/admin/config',{cache:'no-store'}); if(r.ok){ const j = await r.json(); setCurrency(j?.data?.currency || 'AOA') } } catch {} })()
@@ -63,6 +93,23 @@ export default function NewProductClient() {
         return
       }
 
+      // Montar localização final
+      let finalLocation = ''
+      const hasCustom = form.customLocation && form.customLocation.trim().length > 0
+      const hasStructured = form.province && form.municipality
+      if (hasCustom) {
+        finalLocation = form.customLocation.trim()
+      } else if (hasStructured) {
+        finalLocation = `${form.municipality}, ${form.province}`
+      } else if (form.location) {
+        // fallback para o campo livre antigo
+        finalLocation = form.location
+      }
+      if (!finalLocation) {
+        alert('Informe a localização (selecione província/município ou insira personalizada).')
+        return
+      }
+
       const res = await fetch('/api/products', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -72,6 +119,7 @@ export default function NewProductClient() {
           images: imageList,
           isAvailable: true,
           code: form.code,
+          location: finalLocation,
         }),
       })
       if (!res.ok) {
@@ -80,7 +128,7 @@ export default function NewProductClient() {
       }
       setForm({
         name: '', description: '', breed: '', age: 0, weight: 0, price: undefined,
-        images: [''], features: [], healthStatus: 'good', vaccinated: false, location: '', tags: [],
+        images: [''], features: [], healthStatus: 'good', vaccinated: false, location: '', province: '', municipality: '', customLocation: '', tags: [],
         code: '', codeType: 'auto'
       })
       alert('Produto criado com sucesso')
@@ -167,8 +215,25 @@ export default function NewProductClient() {
             </div>
           </div>
           <div>
-            <label className="block text-sm text-gray-700 mb-1">Localização</label>
-            <input value={form.location} onChange={(e)=>setForm(p=>({...p,location:e.target.value}))} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="Ex.: Luanda, Angola" required />
+            <label className="block text-sm text-gray-700 mb-1">Província</label>
+            <select value={form.province} onChange={(e)=>setForm(p=>({...p,province:e.target.value, municipality: ''}))} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+              <option value="">Selecione...</option>
+              {provinceList.map(pv => (<option key={pv} value={pv}>{pv}</option>))}
+            </select>
+            {form.province && form.province !== 'Outro' && (
+              <div className="mt-3">
+                <label className="block text-sm text-gray-700 mb-1">Município</label>
+                <select value={form.municipality} onChange={(e)=>setForm(p=>({...p,municipality:e.target.value}))} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+                  <option value="">Selecione...</option>
+                  {municipalityList.map(m => (<option key={m} value={m}>{m}</option>))}
+                </select>
+              </div>
+            )}
+            <div className="mt-3">
+              <label className="block text-sm text-gray-700 mb-1">Localização personalizada (opcional)</label>
+              <input value={form.customLocation} onChange={(e)=>setForm(p=>({...p,customLocation:e.target.value}))} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="Ex.: Viana, Luanda" />
+              <p className="text-xs text-gray-500 mt-1">Se informar este campo, ele terá prioridade sobre os seletores.</p>
+            </div>
           </div>
         </div>
 
