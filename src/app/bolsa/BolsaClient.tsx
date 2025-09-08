@@ -116,7 +116,7 @@ export default function BolsaClient() {
   const [region, setRegion] = useState<string>('')
   const [breed, setBreed] = useState<string>('')
   const [periodDays, setPeriodDays] = useState<number>(180)
-  const [compareMode, setCompareMode] = useState<'none' | 'region' | 'category'>('none')
+  const [compareMode, setCompareMode] = useState<'none' | 'region' | 'category'>('region')
   const [compareItems, setCompareItems] = useState<string[]>([])
   const [bgChartMetric, setBgChartMetric] = useState<'price' | 'volume'>('price')
 
@@ -274,20 +274,31 @@ export default function BolsaClient() {
               <option value="volume" disabled={!meta?.data?.volumeSeriesAvailable}>Volume/Atividade</option>
             </select>
             <select value={compareMode} onChange={e => { setCompareMode(e.target.value as any); setCompareItems([]) }} className="px-3 py-2 border rounded-lg">
-              <option value="none">Sem comparativo</option>
               <option value="region">Comparar regiões</option>
               <option value="category">Comparar raças</option>
             </select>
           </div>
           {compareMode !== 'none' && (
             <div className="mt-3 grid gap-3 md:grid-cols-3">
-              <select value={compareItems[0] || ''} onChange={e => setCompareItems([e.target.value, compareItems[1]])} className="px-3 py-2 border rounded-lg">
+              <select value={compareItems[0] || ''} onChange={e => {
+                const next = [e.target.value, compareItems[1]] as string[]
+                setCompareItems(next)
+                if (next[0] && next[1]) {
+                  const el = document.getElementById('comparativos'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                }
+              }} className="px-3 py-2 border rounded-lg">
                 <option value="">Selecione o 1º</option>
                 {(compareMode === 'region' ? regions : breeds).map(v => (
                   <option key={v} value={v}>{v}</option>
                 ))}
               </select>
-              <select value={compareItems[1] || ''} onChange={e => setCompareItems([compareItems[0], e.target.value])} className="px-3 py-2 border rounded-lg">
+              <select value={compareItems[1] || ''} onChange={e => {
+                const next = [compareItems[0], e.target.value] as string[]
+                setCompareItems(next)
+                if (next[0] && next[1]) {
+                  const el = document.getElementById('comparativos'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                }
+              }} className="px-3 py-2 border rounded-lg">
                 <option value="">Selecione o 2º</option>
                 {(compareMode === 'region' ? regions : breeds).map(v => (
                   <option key={v} value={v}>{v}</option>
@@ -423,7 +434,7 @@ export default function BolsaClient() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
+        <div id="comparativos" className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-semibold text-gray-800">Comparativos</h3>
             <div className="text-xs text-gray-500">Até 2 séries</div>
