@@ -31,8 +31,7 @@ interface RecordsRow {
   name: string
   date: string
   region: string
-  categoryKey: string
-  categoryLabel: string
+  breed: string
   unit: Unit
   value: number | null
 }
@@ -43,7 +42,7 @@ interface MetaResponse {
   data: {
     lastUpdated: string | null
     regions: string[]
-    categories: { key: string, label: string }[]
+    breeds: string[]
     methodology: { pt: string, en: string }
     dataSource: string
     volumeSeriesAvailable: boolean
@@ -115,7 +114,7 @@ export default function BolsaClient() {
   const router = useRouter()
   const [unit, setUnit] = useState<Unit>('kg')
   const [region, setRegion] = useState<string>('')
-  const [category, setCategory] = useState<string>('')
+  const [breed, setBreed] = useState<string>('')
   const [periodDays, setPeriodDays] = useState<number>(90)
   const [compareMode, setCompareMode] = useState<'none' | 'region' | 'category'>('none')
   const [compareItems, setCompareItems] = useState<string[]>([])
@@ -131,40 +130,40 @@ export default function BolsaClient() {
     const p = new URLSearchParams()
     p.set('unit', unit)
     if (region) p.set('region', region)
-    if (category) p.set('category', category)
+    if (breed) p.set('breed', breed)
     return `/api/market/summary?${p.toString()}`
-  }, [unit, region, category])
+  }, [unit, region, breed])
 
   const regionsUrl = useMemo(() => {
     const p = new URLSearchParams()
     p.set('unit', unit)
     if (region) p.set('region', region)
-    if (category) p.set('category', category)
+    if (breed) p.set('breed', breed)
     const end = new Date().toISOString()
     p.set('start', periodStartISO)
     p.set('end', end)
     return `/api/market/regions?${p.toString()}`
-  }, [unit, region, category, periodStartISO])
+  }, [unit, region, breed, periodStartISO])
 
   const historyUrl = useMemo(() => {
     const p = new URLSearchParams()
     p.set('unit', unit)
     if (region) p.set('region', region)
-    if (category) p.set('category', category)
+    if (breed) p.set('breed', breed)
     const end = new Date().toISOString()
     p.set('start', periodStartISO)
     p.set('end', end)
     return `/api/market/history?${p.toString()}`
-  }, [unit, region, category, periodStartISO])
+  }, [unit, region, breed, periodStartISO])
 
   const recordsUrl = useMemo(() => {
     const p = new URLSearchParams()
     p.set('unit', unit)
     if (region) p.set('region', region)
-    if (category) p.set('category', category)
+    if (breed) p.set('breed', breed)
     p.set('limit', '300')
     return `/api/market/records?${p.toString()}`
-  }, [unit, region, category])
+  }, [unit, region, breed])
 
   const { data: meta } = useFetch<MetaResponse>('/api/market/meta', [])
   const { data: summary } = useFetch<SummaryResponse>(summaryUrl, [summaryUrl])
@@ -233,7 +232,7 @@ export default function BolsaClient() {
     } catch {}
   }
 
-  const categories = meta?.data?.categories || []
+  const breeds = meta?.data?.breeds || []
   const regions = meta?.data?.regions || []
 
   return (
@@ -278,9 +277,9 @@ export default function BolsaClient() {
               <option value="">Região (todas)</option>
               {regions.map(r => (<option key={r} value={r}>{r}</option>))}
             </select>
-            <select value={category} onChange={e => setCategory(e.target.value)} className="px-3 py-2 border rounded-lg">
-              <option value="">Categoria (todas)</option>
-              {categories.map(c => (<option key={c.key} value={c.key}>{c.label}</option>))}
+            <select value={breed} onChange={e => setBreed(e.target.value)} className="px-3 py-2 border rounded-lg">
+              <option value="">Raça (todas)</option>
+              {breeds.map(b => (<option key={b} value={b}>{b}</option>))}
             </select>
             <select value={unit} onChange={e => setUnit(e.target.value as Unit)} className="px-3 py-2 border rounded-lg">
               <option value="kg">por kg</option>
@@ -299,21 +298,21 @@ export default function BolsaClient() {
             <select value={compareMode} onChange={e => { setCompareMode(e.target.value as any); setCompareItems([]) }} className="px-3 py-2 border rounded-lg">
               <option value="none">Sem comparativo</option>
               <option value="region">Comparar regiões</option>
-              <option value="category">Comparar categorias</option>
+              <option value="category">Comparar raças</option>
             </select>
           </div>
           {compareMode !== 'none' && (
             <div className="mt-3 grid gap-3 md:grid-cols-3">
               <select value={compareItems[0] || ''} onChange={e => setCompareItems([e.target.value, compareItems[1]])} className="px-3 py-2 border rounded-lg">
                 <option value="">Selecione o 1º</option>
-                {(compareMode === 'region' ? regions : categories.map(c=>c.key)).map(v => (
-                  <option key={v} value={v}>{compareMode === 'region' ? v : (categories.find(c=>c.key===v)?.label || v)}</option>
+                {(compareMode === 'region' ? regions : breeds).map(v => (
+                  <option key={v} value={v}>{v}</option>
                 ))}
               </select>
               <select value={compareItems[1] || ''} onChange={e => setCompareItems([compareItems[0], e.target.value])} className="px-3 py-2 border rounded-lg">
                 <option value="">Selecione o 2º</option>
-                {(compareMode === 'region' ? regions : categories.map(c=>c.key)).map(v => (
-                  <option key={v} value={v}>{compareMode === 'region' ? v : (categories.find(c=>c.key===v)?.label || v)}</option>
+                {(compareMode === 'region' ? regions : breeds).map(v => (
+                  <option key={v} value={v}>{v}</option>
                 ))}
               </select>
             </div>
@@ -425,7 +424,7 @@ export default function BolsaClient() {
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Região</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoria</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Raça</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Preço</th>
                 </tr>
               </thead>
@@ -434,7 +433,7 @@ export default function BolsaClient() {
                   <tr key={r.id}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatDate(r.date)}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{r.region}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{r.categoryLabel}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{r.breed}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatCurrencyAOA(r.value)}</td>
                   </tr>
                 ))}
@@ -461,7 +460,7 @@ function Comparisons({ unit, mode, items, periodStartISO }: { unit: Unit, mode: 
       const p = new URLSearchParams()
       p.set('unit', unit)
       if (mode === 'region') p.set('region', value)
-      if (mode === 'category') p.set('category', value)
+      if (mode === 'category') p.set('breed', value)
       p.set('start', periodStartISO)
       p.set('end', endISO)
       return `/api/market/history?${p.toString()}`

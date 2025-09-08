@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url)
     const unit = (searchParams.get('unit') as Unit) || 'kg'
     const region = searchParams.get('region') || undefined
-    const category = searchParams.get('category') || undefined
+    const breed = searchParams.get('breed') || undefined
     const limit = Math.min(parseInt(searchParams.get('limit') || '100'), 500)
 
     const matchStage: any = {
@@ -44,21 +44,12 @@ export async function GET(req: NextRequest) {
             { $divide: ['$price', '$weight'] },
             null
           ]
-        },
-        categoryKey: {
-          $switch: {
-            branches: [
-              { case: { $or: [ { $lt: ['$weight', 25] }, { $lt: ['$age', 2] } ] }, then: 'piglet' },
-              { case: { $or: [ { $and: [ { $gte: ['$weight', 25] }, { $lte: ['$weight', 90] } ] }, { $and: [ { $gte: ['$age', 2] }, { $lte: ['$age', 6] } ] } ] }, then: 'fattening' },
-            ],
-            default: 'breeders'
-          }
         }
       }},
     ]
 
-    if (category) {
-      pipeline.push({ $match: { categoryKey: category } })
+    if (breed) {
+      pipeline.push({ $match: { breed } })
     }
 
     pipeline.push({ $sort: { updatedAt: -1 } })
@@ -80,15 +71,13 @@ export async function GET(req: NextRequest) {
 
     const docs = await (Product as any).aggregate(pipeline)
     const data = (docs as any[]).map((d: any) => {
-      const cat = deriveCategory(d.weight, d.age)
       const value = unit === 'kg' ? (d.pricePerKg ?? null) : (d.price ?? null)
       return {
         id: String(d.id),
         name: d.name,
         date: d.date,
         region: d.region,
-        categoryKey: cat.key,
-        categoryLabel: cat.label,
+        breed: d.breed,
         unit,
         value
       }

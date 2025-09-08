@@ -23,7 +23,7 @@ function range(start: Date, end: Date) {
   return { $gte: start, $lt: end }
 }
 
-async function computeAverage(unit: Unit, start: Date, end: Date, region?: string, category?: string) {
+async function computeAverage(unit: Unit, start: Date, end: Date, region?: string, breed?: string) {
   const matchStage: any = {
     $and: [
       { $or: [ { isActive: true }, { isActive: { $exists: false } } ] },
@@ -43,15 +43,6 @@ async function computeAverage(unit: Unit, start: Date, end: Date, region?: strin
         { $divide: ['$price', '$weight'] },
         null
       ]
-    },
-    categoryKey: {
-      $switch: {
-        branches: [
-          { case: { $or: [ { $lt: ['$weight', 25] }, { $lt: ['$age', 2] } ] }, then: 'piglet' },
-          { case: { $or: [ { $and: [ { $gte: ['$weight', 25] }, { $lte: ['$weight', 90] } ] }, { $and: [ { $gte: ['$age', 2] }, { $lte: ['$age', 6] } ] } ] }, then: 'fattening' },
-        ],
-        default: 'breeders'
-      }
     }
   }
 
@@ -60,8 +51,8 @@ async function computeAverage(unit: Unit, start: Date, end: Date, region?: strin
     { $addFields: addFields },
   ]
 
-  if (category) {
-    pipeline.push({ $match: { categoryKey: category } })
+  if (breed) {
+    pipeline.push({ $match: { breed } })
   }
 
   pipeline.push({
@@ -86,13 +77,13 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url)
     const unit = (searchParams.get('unit') as Unit) || 'kg'
     const region = searchParams.get('region') || undefined
-    const category = searchParams.get('category') || undefined
+    const breed = searchParams.get('breed') || undefined
 
     const now = new Date()
     const todayStart = startOfDay(now)
     const tomorrowStart = addDays(todayStart, 1)
 
-    const current = await computeAverage(unit, todayStart, tomorrowStart, region, category)
+    const current = await computeAverage(unit, todayStart, tomorrowStart, region, breed)
 
     // If no data today, fallback to last available day within 14 days
     let effectiveCurrent = current
@@ -102,7 +93,7 @@ export async function GET(req: NextRequest) {
       for (let i = 1; i <= 14; i++) {
         const s = addDays(todayStart, -i)
         const e = addDays(todayStart, -(i - 1))
-        const tmp = await computeAverage(unit, s, e, region, category)
+        const tmp = await computeAverage(unit, s, e, region, breed)
         if (tmp.avg != null) {
           effectiveCurrent = tmp
           effectiveDayStart = s
@@ -112,13 +103,13 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    const prevDay = await computeAverage(unit, addDays(effectiveDayStart, -1), effectiveDayStart, region, category)
+    const prevDay = await computeAverage(unit, addDays(effectiveDayStart, -1), effectiveDayStart, region, breed)
 
-    const last7 = await computeAverage(unit, addDays(effectiveDayEnd, -7), effectiveDayEnd, region, category)
-    const prev7 = await computeAverage(unit, addDays(effectiveDayEnd, -14), addDays(effectiveDayEnd, -7), region, category)
+    const last7 = await computeAverage(unit, addDays(effectiveDayEnd, -7), effectiveDayEnd, region, breed)
+    const prev7 = await computeAverage(unit, addDays(effectiveDayEnd, -14), addDays(effectiveDayEnd, -7), region, breed)
 
-    const last30 = await computeAverage(unit, addDays(effectiveDayEnd, -30), effectiveDayEnd, region, category)
-    const prev30 = await computeAverage(unit, addDays(effectiveDayEnd, -60), addDays(effectiveDayEnd, -30), region, category)
+    const last30 = await computeAverage(unit, addDays(effectiveDayEnd, -30), effectiveDayEnd, region, breed)
+    const prev30 = await computeAverage(unit, addDays(effectiveDayEnd, -60), addDays(effectiveDayEnd, -30), region, breed)
 
     function changePct(cur: number | null, prev: number | null) {
       if (cur == null || prev == null || prev === 0) return null
