@@ -75,6 +75,7 @@ export default {
 		privacy: 'Política de Privacidade',
 		terms: 'Termos de Uso',
 		cookies: 'Cookies',
+		legal: 'Jurídico e Legal',
 		cookiePreferences: 'Preferências de Cookies',
 		newsletterTitle: 'Fique por dentro das novidades',
 		newsletterDesc: 'Receba as últimas notícias e atualizações do setor suinícola',

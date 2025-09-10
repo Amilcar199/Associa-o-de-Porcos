@@ -13,7 +13,6 @@ import {
   Heart,
   ArrowRight
 } from 'lucide-react'
-import { useTransition } from 'react'
 import { useEffect, useState } from 'react'
 import { useCookieConsent } from '@/components/cookies/CookieConsentProvider'
 import { useLanguage } from '@/components/providers/LanguageProvider'
@@ -48,6 +47,7 @@ const Footer = () => {
     { name: dict.footer.privacy, href: '/privacidade' },
     { name: dict.footer.terms, href: '/termos' },
     { name: dict.footer.cookies, href: '/cookies' },
+    { name: dict.footer.legal || (isEn ? 'Legal & Compliance' : 'Jurídico e Legal'), href: '/juridico-legal' },
   ]
 
   const productCategories = [
@@ -285,7 +285,7 @@ const Footer = () => {
                 </button>
               </div>
               
-              <div className="flex items-center text-sm text_gray-400">
+              <div className="flex items-center text-sm text-gray-400">
                 <span>{dict.footer.madeWith}</span>
                 <Heart size={14} className="text-red-500 mx-1" />
                 <span>{dict.footer.forAgribusiness}</span>

@@ -308,7 +308,7 @@ export default function ImageManager() {
           <div>
             <label className="block text-sm text-gray-700 mb-1">Substituir imagem existente (opcional)</label>
             <input value={replaceTarget} onChange={(e)=>setReplaceTarget(e.target.value)} placeholder="fileId da imagem" className="w-full px-3 py-2 border rounded-lg" />
-            <p className="text-xs text-gray-500 mt-1">Dica: clique em "Substituir imagem" no card para preencher automaticamente</p>
+            <p className="text-xs text-gray-500 mt-1">Dica: clique em &quot;Substituir imagem&quot; no card para preencher automaticamente</p>
           </div>
         </div>
         <ImageUpload

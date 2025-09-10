@@ -75,6 +75,7 @@ export default {
 		privacy: 'Privacy Policy',
 		terms: 'Terms of Use',
 		cookies: 'Cookies',
+		legal: 'Legal & Compliance',
 		cookiePreferences: 'Cookie Preferences',
 		newsletterTitle: 'Stay up to date',
 		newsletterDesc: 'Get the latest news and updates from the pig farming sector',
