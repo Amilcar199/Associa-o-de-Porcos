@@ -8,12 +8,16 @@ const ProductSchema = new Schema<IProduct>({
     trim: true,
     maxlength: [100, 'Nome não pode ter mais que 100 caracteres'],
   },
+  name_i18n: { type: Object, default: {} },
   description: {
     type: String,
     required: [true, 'Descrição é obrigatória'],
     trim: true,
     maxlength: [1000, 'Descrição não pode ter mais que 1000 caracteres'],
   },
+  shortDescription_i18n: { type: Object, default: {} },
+  description_i18n: { type: Object, default: {} },
+  slug_i18n: { type: Object, default: {} },
   breed: {
     type: String,
     required: [true, 'Raça é obrigatória'],
@@ -131,6 +135,7 @@ const ProductSchema = new Schema<IProduct>({
     type: Boolean,
     default: true,
   },
+  meta_i18n: { type: Object, default: {} },
 }, {
   timestamps: true,
   collection: 'products',
@@ -247,7 +252,7 @@ ProductSchema.statics.generateCode = async function (breed: string) {
 }
 
 // Middleware para validar seller antes de salvar
-ProductSchema.pre('save', async function (next) {
+ProductSchema.pre('save', async function (this: any, next: (err?: any) => void) {
   if (this.isModified('seller')) {
     const User = mongoose.models.User
     if (User) {

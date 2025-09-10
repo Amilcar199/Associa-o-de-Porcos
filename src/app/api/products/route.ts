@@ -5,6 +5,10 @@ import connectDB from '@/lib/mongodb'
 import Product from '@/models/Product'
 import User from '@/models/User'
 import { validateSession, errorResponse, successResponse, sanitizeInput, getPaginationParams, getSearchFilters, buildMongoQuery, buildMongoSort, paginateResults } from '@/lib/api-utils'
+import { getGlossary } from '@/lib/translation/glossary'
+import { getTargetLocales, DEFAULT_CONTENT_LOCALE } from '@/lib/translation/config'
+import { translateRichText } from '@/lib/translation/service'
+import { generateSlug } from '@/lib/api-utils'
 
 // GET /api/products - Listar produtos
 export async function GET(req: NextRequest) {
@@ -111,6 +115,62 @@ export async function POST(req: NextRequest) {
     } catch (e) {
       return errorResponse('Falha ao gerar código automático')
     }
+
+    // i18n: gerar traduções e slugs por idioma
+    const glossary = getGlossary()
+    const targets = getTargetLocales()
+    const namePt: string = productData.name || ''
+    const { sanitizeHtmlSafe } = await import('@/lib/sanitize')
+    const descPt: string = sanitizeHtmlSafe(productData.description || '')
+    const shortPt: string = (sanitizedData.shortDescription || '').toString()
+
+    const name_i18n: any = { [DEFAULT_CONTENT_LOCALE]: namePt }
+    const description_i18n: any = { [DEFAULT_CONTENT_LOCALE]: descPt }
+    const shortDescription_i18n: any = { [DEFAULT_CONTENT_LOCALE]: shortPt }
+    const slug_i18n: any = {}
+    const meta_i18n: any = { autoTranslated: {}, lockedByLocale: {} }
+
+    // slug base pt usando name
+    slug_i18n[DEFAULT_CONTENT_LOCALE] = generateSlug(namePt)
+
+    for (const locale of targets) {
+      const manualName = sanitizedData[`name_${locale}`]
+      if (manualName) {
+        name_i18n[locale] = manualName
+      } else if (namePt) {
+        const { text } = await translateRichText(namePt, 'pt', locale, glossary)
+        name_i18n[locale] = text
+        meta_i18n.autoTranslated.name = { ...(meta_i18n.autoTranslated.name || {}), [locale]: true }
+      }
+
+      const manualShort = sanitizedData[`shortDescription_${locale}`]
+      if (manualShort) {
+        shortDescription_i18n[locale] = manualShort
+      } else if (shortPt) {
+        const { text } = await translateRichText(shortPt, 'pt', locale, glossary)
+        shortDescription_i18n[locale] = text
+        meta_i18n.autoTranslated.shortDescription = { ...(meta_i18n.autoTranslated.shortDescription || {}), [locale]: true }
+      }
+
+      const manualDesc = sanitizedData[`description_${locale}`]
+      if (manualDesc) {
+        description_i18n[locale] = manualDesc
+      } else if (descPt) {
+        const { text } = await translateRichText(descPt, 'pt', locale, glossary)
+        description_i18n[locale] = sanitizeHtmlSafe(text)
+        meta_i18n.autoTranslated.description = { ...(meta_i18n.autoTranslated.description || {}), [locale]: true }
+      }
+
+      const manualSlug = sanitizedData[`slug_${locale}`]
+      const baseTitle = name_i18n[locale] || manualName || namePt
+      slug_i18n[locale] = manualSlug || generateSlug(baseTitle)
+    }
+
+    productData.name_i18n = name_i18n
+    productData.description_i18n = description_i18n
+    productData.shortDescription_i18n = shortDescription_i18n
+    productData.slug_i18n = slug_i18n
+    productData.meta_i18n = meta_i18n
 
     // Criar produto
     const product = new Product(productData)

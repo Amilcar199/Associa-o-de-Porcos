@@ -15,6 +15,9 @@ import {
   validateSession,
   generateSlug
 } from '@/lib/api-utils'
+import { getTargetLocales, DEFAULT_CONTENT_LOCALE } from '@/lib/translation/config'
+import { getGlossary } from '@/lib/translation/glossary'
+import { translateRichText } from '@/lib/translation/service'
 
 // GET /api/news - Listar notícias com paginação e filtros
 export async function GET(req: NextRequest) {
@@ -114,6 +117,72 @@ export async function POST(req: NextRequest) {
     if (sanitizedData.published && !sanitizedData.publishedAt) {
       sanitizedData.publishedAt = new Date()
     }
+
+    // i18n: preencher campos base e gerar traduções quando necessário
+    const glossary = getGlossary()
+    const targets = getTargetLocales()
+
+    // Base PT (DEFAULT_CONTENT_LOCALE)
+    const titlePt: string = sanitizedData.title || ''
+    const excerptPt: string = sanitizedData.excerpt || ''
+    const contentPt: string = sanitizeInput(sanitizedData.content || '')
+    const { sanitizeHtmlSafe } = await import('@/lib/sanitize')
+    const contentPtSan = sanitizeHtmlSafe(contentPt)
+
+    const title_i18n: any = { [DEFAULT_CONTENT_LOCALE]: titlePt }
+    const excerpt_i18n: any = { [DEFAULT_CONTENT_LOCALE]: excerptPt }
+    const content_i18n: any = { [DEFAULT_CONTENT_LOCALE]: contentPtSan }
+    const slug_i18n: any = {}
+    const meta_i18n: any = { autoTranslated: {}, lockedByLocale: {} }
+
+    // Garantir slug base PT
+    sanitizedData.slug = sanitizedData.slug || generateSlug(titlePt)
+    slug_i18n[DEFAULT_CONTENT_LOCALE] = sanitizedData.slug
+
+    // Traduzir para cada alvo se não veio manualmente
+    for (const locale of targets) {
+      // title
+      const manualTitle = sanitizedData[`title_${locale}`]
+      if (manualTitle) {
+        title_i18n[locale] = manualTitle
+      } else {
+        const { text, provider } = await translateRichText(titlePt, 'pt', locale, glossary)
+        title_i18n[locale] = text
+        meta_i18n.autoTranslated.title = { ...(meta_i18n.autoTranslated.title || {}), [locale]: true }
+      }
+
+      // excerpt -> summary
+      const manualExcerpt = sanitizedData[`excerpt_${locale}`]
+      if (manualExcerpt) {
+        excerpt_i18n[locale] = manualExcerpt
+      } else {
+        const { text } = await translateRichText(excerptPt, 'pt', locale, glossary)
+        excerpt_i18n[locale] = text
+        meta_i18n.autoTranslated.summary = { ...(meta_i18n.autoTranslated.summary || {}), [locale]: true }
+      }
+
+      // content -> body
+      const manualContent = sanitizedData[`content_${locale}`]
+      if (manualContent) {
+        content_i18n[locale] = manualContent
+      } else {
+        const { text } = await translateRichText(contentPtSan, 'pt', locale, glossary)
+        content_i18n[locale] = sanitizeHtmlSafe(text)
+        meta_i18n.autoTranslated.body = { ...(meta_i18n.autoTranslated.body || {}), [locale]: true }
+      }
+
+      // slug por idioma (derivado do título traduzido, editável depois)
+      const manualSlug = sanitizedData[`slug_${locale}`]
+      const baseTitle = title_i18n[locale] || manualTitle || titlePt
+      slug_i18n[locale] = manualSlug || generateSlug(baseTitle)
+    }
+
+    // Incorporar no payload
+    sanitizedData.title_i18n = title_i18n
+    sanitizedData.excerpt_i18n = excerpt_i18n
+    sanitizedData.content_i18n = content_i18n
+    sanitizedData.slug_i18n = slug_i18n
+    sanitizedData.meta_i18n = meta_i18n
 
     // Criar notícia
     const news = new News(sanitizedData)

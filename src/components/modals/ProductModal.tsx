@@ -93,12 +93,12 @@ export default function ProductModal({
     ? product.images
     : (product.imageUrl ? [product.imageUrl] : [String(Placeholder as any)])
 
-  const subject = (isEn ? 'Product inquiry: ' : 'Interesse no produto: ') + (product.name || '')
+  const subject = (isEn ? 'Product inquiry: ' : 'Interesse no produto: ') + (((product as any).name_i18n?.[isEn ? 'en' : 'pt']) || product.name || '')
   const intro = isEn
     ? 'Hello, I liked this product and would like to know if it is still available.'
     : 'Olá, gostei deste produto e gostaria de saber se ainda está disponível.'
   const details = `${isEn ? 'Product info' : 'Informações do produto'}:\n`
-    + `- ${isEn ? 'Name' : 'Nome'}: ${product.name}\n`
+    + `- ${isEn ? 'Name' : 'Nome'}: ${((product as any).name_i18n?.[isEn ? 'en' : 'pt']) || product.name}\n`
     + `- ${isEn ? 'Breed' : 'Raça'}: ${product.breed || '-'}\n`
     + `- ${isEn ? 'Weight' : 'Peso'}: ${product.weight ? `${product.weight} kg` : '-'}\n`
     + `- ${isEn ? 'Age' : 'Idade'}: ${product.age ? `${product.age} ${isEn ? 'months' : 'meses'}` : '-'}\n`
@@ -158,7 +158,7 @@ export default function ProductModal({
           ) : (
             <>
               <div className="mb-6">
-                <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2 leading-tight">{product.name}</h1>
+                <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2 leading-tight">{((product as any).name_i18n?.[isEn ? 'en' : 'pt']) || product.name}</h1>
                 <p className="text-xl text-primary-600 font-semibold">{product.breed}</p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -202,10 +202,10 @@ export default function ProductModal({
                   </div>
                 </div>
               </div>
-              {product.description && (
+              {((product as any).description_i18n?.[isEn ? 'en' : 'pt'] || product.description) && (
                 <div className="mb-8">
                   <h3 className="text-xl font-semibold text-gray-900 mb-3">{isEn ? 'Description' : 'Descrição'}</h3>
-                  <p className="text-gray-700 leading-relaxed">{product.description}</p>
+                  <p className="text-gray-700 leading-relaxed">{(product as any).description_i18n?.[isEn ? 'en' : 'pt'] || product.description}</p>
                 </div>
               )}
               {product.features && product.features.length > 0 && (
