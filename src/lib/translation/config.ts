@@ -1,4 +1,4 @@
-export type TranslationProvider = 'deepl' | 'google' | 'aws' | 'none'
+export type TranslationProvider = 'deepl' | 'google' | 'aws' | 'libre' | 'none'
 
 export type LocaleKey = 'pt' | 'en' | 'es'
 
@@ -18,9 +18,9 @@ export function getTargetLocales(): LocaleKey[] {
 }
 
 export function getProvider(): TranslationProvider {
-  const p = (process.env.TRANSLATION_PROVIDER || 'none').toLowerCase()
-  if (p === 'deepl' || p === 'google' || p === 'aws') return p
-  return 'none'
+  const p = (process.env.TRANSLATION_PROVIDER || 'libre').toLowerCase()
+  if (p === 'deepl' || p === 'google' || p === 'aws' || p === 'libre') return p as TranslationProvider
+  return 'libre'
 }
 
 export function getProviderApiKey(): string | undefined {

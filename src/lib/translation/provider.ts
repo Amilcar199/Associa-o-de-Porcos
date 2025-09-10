@@ -19,8 +19,30 @@ export async function providerTranslate(
 
   const joined = chunks.join('\n')
 
+  if (provider === 'libre') {
+    try {
+      const endpoint = process.env.LIBRETRANSLATE_URL || 'https://libretranslate.de/translate'
+      const body = {
+        q: joined,
+        source: opts.source,
+        target: opts.target,
+        format: 'html'
+      }
+      const resp = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      })
+      if (resp.ok) {
+        const json: any = await resp.json()
+        const text = json?.translatedText || joined
+        return { text, provider: 'libre', cost: 0 }
+      }
+    } catch {}
+    return { text: joined, provider: 'libre', cost: 0 }
+  }
+
   if (provider === 'none' || !apiKey) {
-    // Fallback: return original text to avoid breaking the pipeline
     return { text: joined, provider: 'none', cost: 0 }
   }
 

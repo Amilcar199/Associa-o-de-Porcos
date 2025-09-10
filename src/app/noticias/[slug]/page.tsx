@@ -41,7 +41,7 @@ export async function generateMetadata({ params }: RouteParams): Promise<Metadat
       alternates: {
         languages: {
           'pt': `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/pt/noticias/${(news as any).slug_i18n?.pt || news.slug}`,
-          'en': `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/en/news/${(news as any).slug_i18n?.en || (news as any).slug_i18n?.pt || news.slug}`
+          'en': `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/en/noticias/${(news as any).slug_i18n?.en || (news as any).slug_i18n?.pt || news.slug}`
         }
       },
       openGraph: {
