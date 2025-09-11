@@ -173,7 +173,7 @@ const Header = () => {
               <div className="hidden sm:block">
                 <h1 className="text-lg lg:text-3xl font-heading font-bold text-white leading-tight">
 
-                  Associação de Suinocultores
+                  Associação dos Suinocultores
                   <span className="block">do Norte</span>
 
                 </h1>
