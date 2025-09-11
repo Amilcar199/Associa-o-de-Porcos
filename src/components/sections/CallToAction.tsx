@@ -179,7 +179,7 @@ const CallToAction = () => {
                 {isEn ? 'Still have questions?' : 'Ainda tem Dúvidas?'}
               </h3>
               <p className="text-primary-100 mb-6 leading-relaxed">
-                {isEn ? 'Our team is ready to clarify your questions and help you find the best solution for your business.' : 'Nossa equipe está pronta para esclarecer todas as suas questões e ajudá-lo a encontrar a melhor solução para seu negócio.'}
+                {isEn ? 'Our team is ready to clarify your questions and help you find the best solution.' : 'Nossa equipa está pronta para esclarecer todas as suas questões e ajudá-lo a encontrar a melhor solução.'}
               </p>
               
               <div className="space-y-4">
@@ -238,7 +238,7 @@ const CallToAction = () => {
           className="text-center mt-12"
         >
           <p className="text-primary-200 text-lg">
-            {isEn ? '✨ Transform your business today. Join us! ✨' : '✨ Transforme seu negócio hoje mesmo. Junte-se a nós! ✨'}
+            {isEn ? '✨ Transform your results today. Join us! ✨' : '✨ Transforme seus resultados hoje mesmo. Junte-se a nós! ✨'}
           </p>
         </motion.div>
       </div>
