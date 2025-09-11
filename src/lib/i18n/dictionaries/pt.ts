@@ -5,7 +5,7 @@ export default {
 		services: 'Serviços',
 		products: 'Produtos',
 		news: 'Notícias',
-		contact: 'Contato',
+		contact: 'Contactos',
 		team: 'Colaboradores',
 		market: 'Bolsa de Suínos',
 		report: 'Relatório',
