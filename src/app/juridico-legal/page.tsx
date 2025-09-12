@@ -1,6 +1,7 @@
 import { cookies, headers } from 'next/headers'
 import fs from 'fs'
 import path from 'path'
+import dynamic from 'next/dynamic'
 
 export function generateMetadata() {
   const locale = cookies().get('locale')?.value || 'pt-AO'
@@ -97,7 +98,12 @@ export default async function LegalCompliancePage() {
         </p>
 
         {/* Grid of images from public/Conteudos Suinos/pdf_paginas_png */}
-        <DocsGrid urls={docUrls} />
+        {docUrls.length > 0 ? (
+          <DocsGrid urls={docUrls} />
+        ) : (
+          // Fallback: load from assets via client-side context if public folder is empty
+          <ConstitutionDocsFromAssets />
+        )}
 
         <h2>{isEn ? 'Contact for Legal Matters' : 'Contato para Assuntos Jurídicos'}</h2>
         <p>
@@ -137,4 +143,6 @@ function DocsGrid({ urls }: { urls: string[] }) {
     </div>
   )
 }
+
+const ConstitutionDocsFromAssets = dynamic(() => import('./ConstitutionDocsClient'), { ssr: false })
 
