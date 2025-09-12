@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from 'next/server'
 import connectDB from '@/lib/mongodb'
 import Product from '@/models/Product'
+import MarketQuote from '@/models/MarketQuote'
 import { errorResponse, successResponse } from '@/lib/api-utils'
 
 type Unit = 'kg' | 'head'
@@ -38,12 +39,18 @@ async function computeAverage(unit: Unit, start: Date, end: Date, region?: strin
 
   const addFields: any = {
     pricePerKg: {
-      $cond: [
-        { $and: [ { $gt: ['$price', 0] }, { $gt: ['$weight', 0] } ] },
-        { $divide: ['$price', '$weight'] },
-        null
+      $ifNull: [
+        '$pricePerKg',
+        {
+          $cond: [
+            { $and: [ { $gt: ['$price', 0] }, { $gt: ['$weight', 0] } ] },
+            { $divide: ['$price', '$weight'] },
+            null
+          ]
+        }
       ]
-    }
+    },
+    value: unit === 'kg' ? '$pricePerKg' : '$price'
   }
 
   const pipeline: any[] = [
@@ -59,7 +66,7 @@ async function computeAverage(unit: Unit, start: Date, end: Date, region?: strin
     $group: {
       _id: null,
       count: { $sum: 1 },
-      avgValue: { $avg: '$price' }
+      avgValue: { $avg: '$value' }
     }
   })
 
@@ -116,14 +123,22 @@ export async function GET(req: NextRequest) {
       return ((cur - prev) / prev) * 100
     }
 
+    // Anexar referência de cotação oficial (se houver)
+    let officialRef: number | null = null
+    try {
+      const mq = await (MarketQuote as any).findOne({ status: 'approved' }).sort({ updatedAt: -1 }).lean()
+      if (mq) officialRef = unit === 'kg' ? (mq.refPricePerKg ?? null) : (mq.refPricePerHead ?? null)
+    } catch {}
+
     return NextResponse.json(successResponse({
-      unit: 'head',
+      unit,
       current: effectiveCurrent,
       variation: {
         daily: changePct(effectiveCurrent.avg, prevDay.avg),
         weekly: changePct(last7.avg, prev7.avg),
         monthly: changePct(last30.avg, prev30.avg)
-      }
+      },
+      officialRef
     }))
   } catch (error) {
     console.error('Erro em /api/market/summary:', error)

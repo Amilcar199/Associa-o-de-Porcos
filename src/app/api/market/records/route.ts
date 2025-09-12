@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import connectDB from '@/lib/mongodb'
 import Product from '@/models/Product'
 import { errorResponse, successResponse } from '@/lib/api-utils'
+import MarketQuote from '@/models/MarketQuote'
 
 type Unit = 'kg' | 'head'
 
@@ -37,7 +38,8 @@ export async function GET(req: NextRequest) {
             { $divide: ['$price', '$weight'] },
             null
           ]
-        }
+        },
+        value: { $cond: [ { $eq: [unit, 'kg'] }, '$pricePerKg', '$price' ] }
       }},
     ]
 
@@ -58,25 +60,39 @@ export async function GET(req: NextRequest) {
         weight: 1,
         price: 1,
         pricePerKg: 1,
+        value: 1,
         age: 1
       }
     })
 
     const docs = await (Product as any).aggregate(pipeline)
-    const data = (docs as any[]).map((d: any) => {
-      const value = unit === 'kg' ? (d.pricePerKg ?? null) : (d.price ?? null)
-      return {
-        id: String(d.id),
-        name: d.name,
-        date: d.date,
-        region: d.region,
-        breed: d.breed,
-        unit,
-        value
-      }
-    })
 
-    return NextResponse.json(successResponse({ unit, records: data }))
+    // Faixa-âncora baseada na cotação oficial mais recente para a região (se existir)
+    let anchor: { ref: number | null, bandPct: number } = { ref: null, bandPct: 0.1 }
+    try {
+      if (region) {
+        const weekISO = new Date().toISOString().slice(0,10) // simplificado; poderia converter para semana ISO
+        const mq = await (MarketQuote as any).findOne({ region: new RegExp(region, 'i'), status: 'approved' }).sort({ updatedAt: -1 }).lean()
+        if (mq) {
+          anchor.ref = unit === 'kg' ? (mq.refPricePerKg ?? null) : (mq.refPricePerHead ?? null)
+        }
+      }
+    } catch {}
+    const data = (docs as any[]).map((d: any) => ({
+      id: String(d.id),
+      name: d.name,
+      date: d.date,
+      region: d.region,
+      breed: d.breed,
+      unit,
+      value: d.value ?? null,
+      // flag fora da banda se existir âncora
+      outOfBand: anchor.ref != null && d.value != null ? (
+        (d.value < (anchor.ref * (1 - anchor.bandPct))) || (d.value > (anchor.ref * (1 + anchor.bandPct)))
+      ) : false
+    }))
+
+    return NextResponse.json(successResponse({ unit, records: data, anchor }))
   } catch (error) {
     console.error('Erro em /api/market/records:', error)
     return errorResponse('Erro interno do servidor', 500)

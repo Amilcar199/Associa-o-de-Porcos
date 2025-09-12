@@ -161,6 +161,23 @@ export interface ApiResponse<T = any> {
   error?: string
 }
 
+// Cotações oficiais de mercado (admin)
+export interface MarketQuote extends Document {
+  _id: string
+  weekISO: string // ex: 2025-W37
+  region: string
+  saleForm: 'carcaça' | 'vivo'
+  status: 'draft' | 'approved' | 'archived'
+  refPricePerKg: number // preço de referência AOA/kg
+  refPricePerHead?: number // opcional quando aplicável
+  minSamples: number
+  methodologyNote?: string
+  createdBy: string
+  approvedBy?: string
+  createdAt: Date
+  updatedAt: Date
+}
+
 export interface PaginatedResponse<T> extends ApiResponse<T[]> {
   pagination: {
     page: number

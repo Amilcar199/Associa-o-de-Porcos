@@ -36,12 +36,18 @@ export async function GET(req: NextRequest) {
       { $match: matchStage },
       { $addFields: {
         pricePerKg: {
-          $cond: [
-            { $and: [ { $gt: ['$price', 0] }, { $gt: ['$weight', 0] } ] },
-            { $divide: ['$price', '$weight'] },
-            null
+          $ifNull: [
+            '$pricePerKg',
+            {
+              $cond: [
+                { $and: [ { $gt: ['$price', 0] }, { $gt: ['$weight', 0] } ] },
+                { $divide: ['$price', '$weight'] },
+                null
+              ]
+            }
           ]
-        }
+        },
+        value: { $cond: [ { $eq: [unit, 'kg'] }, '$pricePerKg', '$price' ] }
       }},
     ]
 
@@ -53,9 +59,9 @@ export async function GET(req: NextRequest) {
       $group: {
         _id: '$location',
         count: { $sum: 1 },
-        avg: { $avg: '$price' },
-        min: { $min: '$price' },
-        max: { $max: '$price' },
+        avg: { $avg: '$value' },
+        min: { $min: '$value' },
+        max: { $max: '$value' },
       }
     })
     pipeline.push({ $sort: { _id: 1 } })
