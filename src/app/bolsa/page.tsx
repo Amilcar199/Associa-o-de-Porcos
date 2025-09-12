@@ -2,6 +2,8 @@ export const dynamic = 'force-dynamic'
 
 import type { Metadata } from 'next'
 import { cookies } from 'next/headers'
+import dynamicImport from 'next/dynamic'
+const BolsaClient = dynamicImport(() => import('./BolsaClient'), { ssr: false })
 
 export function generateMetadata(): Metadata {
   const locale = cookies().get('locale')?.value || 'pt-AO'
@@ -13,6 +15,7 @@ export function generateMetadata(): Metadata {
 }
 
 export default function BolsaPage() {
+<<<<<<< HEAD
   const locale = cookies().get('locale')?.value || 'pt-AO'
   const isEn = String(locale).startsWith('en')
   const rows = Array.from({ length: 8 }).map((_, i) => ({
@@ -89,6 +92,11 @@ export default function BolsaPage() {
           </div>
         </div>
       </div>
+=======
+  return (
+    <section>
+      <BolsaClient />
+>>>>>>> cfa2197dd3ba3b02355b9a8f68f8a1c31afacbc5
     </section>
   )
 }

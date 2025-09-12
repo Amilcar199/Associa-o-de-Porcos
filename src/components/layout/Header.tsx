@@ -54,7 +54,7 @@ const Header = () => {
 
   // Prefetch programático das rotas mais acessadas
   useEffect(() => {
-    const routesToPrefetch = ['/', '/sobre', '/colaboradores', '/servicos', '/produtos', '/relatorio', '/noticias', '/contato', '/login', '/registro']
+    const routesToPrefetch = ['/', '/sobre', '/colaboradores', '/servicos', '/produtos', '/bolsa', '/noticias', '/contato', '/login', '/registro']
     routesToPrefetch.forEach((route) => {
       try { router.prefetch(route) } catch {}
     })
@@ -72,7 +72,7 @@ const Header = () => {
     { name: dict.nav.about, href: '/sobre' },
     { name: dict.nav.services, href: '/servicos' },
     { name: dict.nav.products, href: '/produtos' },
-    { name: dict.nav.report, href: '/relatorio' },
+    { name: 'Bolsa', href: '/bolsa' },
     { name: dict.nav.news, href: '/noticias' },
     { name: dict.nav.contact, href: '/contato' },
   ]
@@ -176,7 +176,7 @@ const Header = () => {
               <div className="hidden sm:block">
                 <h1 className="text-lg lg:text-3xl font-heading font-bold text-white leading-tight">
 
-                  Associação de Suinocultores
+                  Associação dos Suinocultores
                   <span className="block">do Norte</span>
 
                 </h1>
@@ -235,6 +235,12 @@ const Header = () => {
                               className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                             >
                               {dict.nav.team}
+                            </Link>
+                            <Link
+                              href="/juridico-legal"
+                              className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                            >
+                              {dict.footer.legal}
                             </Link>
                           </motion.div>
                         )}
@@ -380,7 +386,7 @@ const Header = () => {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="lg:hidden bg-white border-t border-gray-200"
+              className="lg:hidden bg-white border-t border-gray-200 max-h-[calc(100vh-6rem)] md:max-h-[calc(100vh-7rem)] overflow-y-auto overscroll-contain"
             >
               <div className="container-custom py-4">
                 <nav className="space-y-4">
@@ -396,10 +402,11 @@ const Header = () => {
                       >
                         {item.name}
                       </Link>
-                      {item.name === 'Quem Somos' && (
+                      {item.name === dict.nav.about && (
                         <div className="ml-4 border-l border-gray-200 pl-4 space-y-1">
                           <Link href="/sobre" className="block py-1 text-sm text-gray-600 hover:text-primary-600">Sobre a Associação</Link>
                           <Link href="/colaboradores" className="block py-1 text-sm text-gray-600 hover:text-primary-600">Colaboradores</Link>
+                          <Link href="/juridico-legal" className="block py-1 text-sm text-gray-600 hover:text-primary-600">{dict.footer.legal}</Link>
                         </div>
                       )}
                     </div>

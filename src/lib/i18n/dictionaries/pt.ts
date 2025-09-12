@@ -5,10 +5,61 @@ export default {
 		services: 'Serviços',
 		products: 'Produtos',
 		news: 'Notícias',
-		contact: 'Contato',
+		contact: 'Contactos',
 		team: 'Colaboradores',
 		market: 'Bolsa de Suínos',
 		report: 'Relatório',
+	},
+	marketPage: {
+		title: 'Bolsa de Suínos',
+		description: 'Preços de referência, tendências e indicadores da cadeia suinícola.',
+		filters: {
+			regionAll: 'Região (todas)',
+			breedAll: 'Raça (todas)',
+			period30: '30 dias',
+			period90: '90 dias',
+			period180: '6 meses',
+			period365: '12 meses',
+			metricPrice: 'Preço',
+			metricVolume: 'Volume/Atividade',
+			compareRegions: 'Comparar regiões',
+			compareBreeds: 'Comparar raças',
+			selectFirst: 'Selecione o 1º',
+			selectSecond: 'Selecione o 2º',
+			generateCompare: 'Gerar comparação'
+		},
+		actions: {
+			exportCsv: 'Exportar CSV',
+			share: 'Partilhar'
+		},
+		cards: {
+			overallTitle: 'Preço médio atual (AOA) — média geral',
+			baseRecords: 'Base',
+			dailyVariation: 'Variação diária',
+			weeklyVariation: 'Variação semanal',
+			monthlyVariation: 'Variação mensal'
+		},
+		sections: {
+			history: 'Série histórica',
+			regions: 'Preços por região',
+			comparisons: 'Comparativos',
+			recentRecords: 'Registos recentes',
+			methodology: 'Metodologia e fonte dos dados'
+		},
+		table: {
+			date: 'Data',
+			region: 'Região',
+			breed: 'Raça',
+			price: 'Preço'
+		},
+		empty: {
+			noData: 'Sem dados suficientes',
+			selectAndGenerate: 'Selecione e clique em “Gerar comparação”'
+		},
+		labels: {
+			source: 'Fonte',
+			lastUpdated: 'Última atualização'
+		}
 	},
 	user: {
 		login: 'Entrar',
@@ -24,6 +75,7 @@ export default {
 		privacy: 'Política de Privacidade',
 		terms: 'Termos de Uso',
 		cookies: 'Cookies',
+		legal: 'Jurídico e Legal',
 		cookiePreferences: 'Preferências de Cookies',
 		newsletterTitle: 'Fique por dentro das novidades',
 		newsletterDesc: 'Receba as últimas notícias e atualizações do setor suinícola',

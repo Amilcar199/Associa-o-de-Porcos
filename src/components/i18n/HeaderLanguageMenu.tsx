@@ -39,7 +39,7 @@ export default function HeaderLanguageMenu() {
         </span>
       </button>
       {open && (
-        <div className="absolute right-0 mt-2 w-48 rounded-md border border-gray-200 bg-white shadow-lg z-[70]">
+        <div className="relative md:absolute md:right-0 mt-2 w-48 rounded-md border border-gray-200 bg-white shadow-lg z-[70]">
           <ul className="py-1 text-sm">
             {OPTIONS.map(opt => (
               <li key={opt.value}>

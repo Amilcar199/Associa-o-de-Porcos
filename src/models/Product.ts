@@ -57,6 +57,16 @@ const ProductSchema = new Schema<IProduct>({
     required: false,
     min: [0, 'Preço não pode ser negativo'],
   },
+  pricePerKg: {
+    type: Number,
+    required: false,
+    min: [0, 'Preço por kg não pode ser negativo'],
+  },
+  saleForm: {
+    type: String,
+    enum: ['carcaça', 'vivo'],
+    required: false,
+  },
   images: {
     type: [String],
     required: [true, 'Pelo menos uma imagem é obrigatória'],
@@ -140,6 +150,8 @@ const ProductSchema = new Schema<IProduct>({
 ProductSchema.index({ name: 'text', description: 'text', breed: 'text', location: 'text' })
 ProductSchema.index({ breed: 1, availability: 1, isActive: 1 })
 ProductSchema.index({ price: 1, availability: 1, isActive: 1 })
+ProductSchema.index({ pricePerKg: 1, availability: 1, isActive: 1 })
+ProductSchema.index({ saleForm: 1, availability: 1, isActive: 1 })
 ProductSchema.index({ age: 1, weight: 1 })
 ProductSchema.index({ seller: 1, isActive: 1 })
 ProductSchema.index({ createdAt: -1 })
@@ -248,6 +260,21 @@ ProductSchema.statics.generateCode = async function (breed: string) {
 
 // Middleware para validar seller antes de salvar
 ProductSchema.pre('save', async function (next) {
+  // Normalização de pricePerKg: converter AOA/cabeça -> AOA/kg sempre que possível
+  try {
+    const self: any = this as any
+    const hasValidWeight = typeof self.weight === 'number' && self.weight > 0
+    const hasPrice = typeof self.price === 'number' && self.price >= 0
+    if (hasValidWeight) {
+      if (hasPrice) {
+        self.pricePerKg = self.price / self.weight
+      } else if (typeof self.pricePerKg !== 'number' && self.pricePerKg != null) {
+        // noop: já tem pricePerKg definido
+      }
+    }
+  } catch (e) {
+    // segue sem bloquear caso cálculo falhe
+  }
   if (this.isModified('seller')) {
     const User = mongoose.models.User
     if (User) {
@@ -257,6 +284,27 @@ ProductSchema.pre('save', async function (next) {
         return
       }
     }
+  }
+  next()
+})
+
+// Normalização também em updates atômicos
+ProductSchema.pre('findOneAndUpdate', function (next) {
+  try {
+    const update: any = (this as any).getUpdate() || {}
+    const $set = update.$set || update
+    const weight = $set.weight ?? update.weight
+    const price = $set.price ?? update.price
+    const pricePerKg = $set.pricePerKg ?? update.pricePerKg
+    // Se tivermos weight e price, recalcula pricePerKg
+    if (typeof weight === 'number' && weight > 0 && typeof price === 'number' && price >= 0) {
+      const computed = price / weight
+      if (update.$set) update.$set.pricePerKg = computed; else update.pricePerKg = computed
+    } else if (typeof weight === 'number' && weight > 0 && typeof pricePerKg === 'number' && pricePerKg >= 0) {
+      // Se veio pricePerKg e weight, não força price
+    }
+  } catch (e) {
+    // ignora erros de computação
   }
   next()
 })
