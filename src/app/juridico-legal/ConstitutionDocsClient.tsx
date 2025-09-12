@@ -7,7 +7,7 @@ export default function ConstitutionDocsClient() {
   try {
     // Look for images specifically under assets/Conteudos Suinos/pdf_paginas_png
     // Use relative path from this file to ensure webpack resolves correctly
-    const req = require.context('../../components/assets', true, /Conteudos Suinos\/pdf_paginas_png\/(.*)\.(png|jpe?g|webp)$/i)
+    const req = (require as any).context('../../components/assets', true, /Conteudos Suinos\/pdf_paginas_png\/(.*)\.(png|jpe?g|webp)$/i)
     imageUrls = req.keys().map((key: string) => req(key))
   } catch {
     imageUrls = []
