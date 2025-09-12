@@ -9,7 +9,7 @@ import bcrypt from 'bcryptjs';
 const root = process.cwd();
 const candidates = [path.join(root, '.env.local'), path.join(root, '.env')];
 let loaded = false;
-
+0
 for (const p of candidates) {
   if (fs.existsSync(p)) {
     dotenv.config({ path: p });
