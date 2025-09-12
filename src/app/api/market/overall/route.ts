@@ -11,6 +11,15 @@ export async function GET(req: NextRequest) {
 
     const pipeline: any[] = [
       { $match: { $and: [ { $or: [ { isActive: true }, { isActive: { $exists: false } } ] }, { availability: 'available' } ] } },
+      { $addFields: {
+        pricePerKg: {
+          $cond: [
+            { $and: [ { $gt: ['$price', 0] }, { $gt: ['$weight', 0] } ] },
+            { $divide: ['$price', '$weight'] },
+            null
+          ]
+        }
+      }},
       { $group: { _id: null, count: { $sum: 1 }, avg: { $avg: '$price' } } }
     ]
 

@@ -119,9 +119,8 @@ export default function BolsaClient() {
   const router = useRouter()
   const [unit] = useState<Unit>('kg')
   const [region, setRegion] = useState<string>('')
-  const [breed, setBreed] = useState<string>('')
   const [periodDays, setPeriodDays] = useState<number>(180)
-  const [compareMode, setCompareMode] = useState<'none' | 'region' | 'category'>('region')
+  const compareMode: 'region' = 'region'
   const [compareItems, setCompareItems] = useState<string[]>([])
   const [compareVersion, setCompareVersion] = useState<number>(0)
   const [bgChartMetric, setBgChartMetric] = useState<'price' | 'volume'>('price')
@@ -136,40 +135,36 @@ export default function BolsaClient() {
     const p = new URLSearchParams()
     p.set('unit', unit)
     if (region) p.set('region', region)
-    if (breed) p.set('breed', breed)
     return `/api/market/summary?${p.toString()}`
-  }, [unit, region, breed])
+  }, [unit, region])
 
   const regionsUrl = useMemo(() => {
     const p = new URLSearchParams()
     p.set('unit', unit)
     if (region) p.set('region', region)
-    if (breed) p.set('breed', breed)
     const end = new Date().toISOString()
     p.set('start', periodStartISO)
     p.set('end', end)
     return `/api/market/regions?${p.toString()}`
-  }, [unit, region, breed, periodStartISO])
+  }, [unit, region, periodStartISO])
 
   const historyUrl = useMemo(() => {
     const p = new URLSearchParams()
     p.set('unit', unit)
     if (region) p.set('region', region)
-    if (breed) p.set('breed', breed)
     const end = new Date().toISOString()
     p.set('start', periodStartISO)
     p.set('end', end)
     return `/api/market/history?${p.toString()}`
-  }, [unit, region, breed, periodStartISO])
+  }, [unit, region, periodStartISO])
 
   const recordsUrl = useMemo(() => {
     const p = new URLSearchParams()
     p.set('unit', unit)
     if (region) p.set('region', region)
-    if (breed) p.set('breed', breed)
     p.set('limit', '300')
     return `/api/market/records?${p.toString()}`
-  }, [unit, region, breed])
+  }, [unit, region])
 
   const { data: meta } = useFetch<MetaResponse>('/api/market/meta', [])
   const { data: summary } = useFetch<SummaryResponse>(summaryUrl, [summaryUrl])
@@ -205,7 +200,6 @@ export default function BolsaClient() {
       id: r.id,
       data: formatDate(r.date),
       regiao: r.region,
-      raca: r.breed,
       unidade: r.unit,
       valor: r.value ?? ''
     }))
@@ -213,7 +207,6 @@ export default function BolsaClient() {
       { key: 'id', label: 'ID' },
       { key: 'data', label: 'Data' },
       { key: 'regiao', label: 'Região' },
-      { key: 'raca', label: 'Raça' },
       { key: 'unidade', label: 'Unidade' },
       { key: 'valor', label: 'Valor' },
     ])
@@ -240,7 +233,6 @@ export default function BolsaClient() {
     } catch {}
   }
 
-  const breeds = meta?.data?.breeds || []
   const regions = meta?.data?.regions || []
 
   return (
@@ -262,14 +254,10 @@ export default function BolsaClient() {
         </div>
 
         <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-          <div className="grid gap-3 md:grid-cols-5">
+          <div className="grid gap-3 md:grid-cols-3">
             <select value={region} onChange={e => setRegion(e.target.value)} className="px-3 py-2 border rounded-lg">
               <option value="">Região (todas)</option>
               {regions.map(r => (<option key={r} value={r}>{r}</option>))}
-            </select>
-            <select value={breed} onChange={e => setBreed(e.target.value)} className="px-3 py-2 border rounded-lg">
-              <option value="">Raça (todas)</option>
-              {breeds.map(b => (<option key={b} value={b}>{b}</option>))}
             </select>
             <select value={periodDays} onChange={e => setPeriodDays(parseInt(e.target.value))} className="px-3 py-2 border rounded-lg">
               <option value={30}>30 dias</option>
@@ -281,10 +269,6 @@ export default function BolsaClient() {
               <option value="price">Preço</option>
               <option value="volume" disabled={!meta?.data?.volumeSeriesAvailable}>Volume/Atividade</option>
             </select>
-            <select value={compareMode} onChange={e => { setCompareMode(e.target.value as any); setCompareItems([]) }} className="px-3 py-2 border rounded-lg">
-              <option value="region">Comparar regiões</option>
-              <option value="category">Comparar raças</option>
-            </select>
           </div>
           {compareMode !== 'none' && (
             <div className="mt-3 grid gap-3 md:grid-cols-3">
@@ -293,7 +277,7 @@ export default function BolsaClient() {
                 setCompareItems(next)
               }} className="px-3 py-2 border rounded-lg">
                 <option value="">Selecione o 1º</option>
-                {(compareMode === 'region' ? regions : breeds).map(v => (
+                {regions.map(v => (
                   <option key={v} value={v}>{v}</option>
                 ))}
               </select>
@@ -302,7 +286,7 @@ export default function BolsaClient() {
                 setCompareItems(next)
               }} className="px-3 py-2 border rounded-lg">
                 <option value="">Selecione o 2º</option>
-                {(compareMode === 'region' ? regions : breeds).map(v => (
+                {regions.map(v => (
                   <option key={v} value={v}>{v}</option>
                 ))}
               </select>
@@ -467,7 +451,6 @@ export default function BolsaClient() {
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Região</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Raça</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Preço</th>
                 </tr>
               </thead>
@@ -476,7 +459,6 @@ export default function BolsaClient() {
                   <tr key={r.id}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatDate(r.date)}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{r.region}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{r.breed}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatCurrencyAOA(r.value)}</td>
                   </tr>
                 ))}
