@@ -62,5 +62,3 @@ export default function ReportClient({ rows, isEn }: { rows: Row[]; isEn: boolea
     </div>
   )
 }
-
-export default function placeholder() { return null }

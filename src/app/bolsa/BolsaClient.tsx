@@ -270,7 +270,7 @@ export default function BolsaClient() {
               <option value="volume" disabled={!meta?.data?.volumeSeriesAvailable}>Volume/Atividade</option>
             </select>
           </div>
-          {compareMode !== 'none' && (
+          {(compareMode as string) !== 'none' && (
             <div className="mt-3 grid gap-3 md:grid-cols-3">
               <select value={compareItems[0] || ''} onChange={e => {
                 const next = [e.target.value, compareItems[1]] as string[]
