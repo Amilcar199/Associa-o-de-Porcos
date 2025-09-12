@@ -3,7 +3,10 @@ export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from 'next/server'
 import connectDB from '@/lib/mongodb'
 import News from '@/models/News'
-import { validateSession, errorResponse, successResponse, isValidObjectId, sanitizeInput } from '@/lib/api-utils'
+import { validateSession, errorResponse, successResponse, isValidObjectId, sanitizeInput, generateSlug } from '@/lib/api-utils'
+import { getGlossary } from '@/lib/translation/glossary'
+import { getTargetLocales, DEFAULT_CONTENT_LOCALE } from '@/lib/translation/config'
+import { translateRichText } from '@/lib/translation/service'
 
 interface RouteParams {
   params: {
@@ -66,13 +69,76 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
     const body = await req.json()
     const sanitizedData = sanitizeInput(body)
 
-    // Validar dados obrigatórios
-    if (!sanitizedData.title || !sanitizedData.content) {
-      return errorResponse('Título e conteúdo são obrigatórios')
+    // Atualizar notícia base
+    if (sanitizedData.title) news.title = sanitizedData.title
+    if (sanitizedData.excerpt) news.excerpt = sanitizedData.excerpt
+    if (sanitizedData.content) {
+      const { sanitizeHtmlSafe } = await import('@/lib/sanitize')
+      news.content = sanitizeHtmlSafe(sanitizedData.content)
+    }
+    if (sanitizedData.category) news.category = sanitizedData.category
+    if (sanitizedData.tags) news.tags = sanitizedData.tags
+    if (typeof sanitizedData.published === 'boolean') news.published = sanitizedData.published
+    if (sanitizedData.featuredImage) news.featuredImage = sanitizedData.featuredImage
+    if (Array.isArray(sanitizedData.images)) news.images = sanitizedData.images
+
+    // i18n update: fill only missing targets, respect manual overrides
+    const targets = getTargetLocales()
+    const glossary = getGlossary()
+    news.title_i18n = news.title_i18n || ({} as any)
+    news.excerpt_i18n = news.excerpt_i18n || ({} as any)
+    news.content_i18n = news.content_i18n || ({} as any)
+    news.slug_i18n = news.slug_i18n || ({} as any)
+    news.meta_i18n = news.meta_i18n || ({} as any)
+    news.meta_i18n.autoTranslated = news.meta_i18n.autoTranslated || {}
+    news.meta_i18n.lockedByLocale = news.meta_i18n.lockedByLocale || {}
+
+    // ensure base pt stored
+    news.title_i18n[DEFAULT_CONTENT_LOCALE] = news.title
+    news.excerpt_i18n[DEFAULT_CONTENT_LOCALE] = news.excerpt
+    news.content_i18n[DEFAULT_CONTENT_LOCALE] = news.content
+    news.slug_i18n[DEFAULT_CONTENT_LOCALE] = news.slug || generateSlug(news.title)
+
+    for (const locale of targets) {
+      if (news.meta_i18n.lockedByLocale?.[locale]) continue
+
+      const manualTitle = sanitizedData[`title_${locale}`]
+      if (manualTitle) {
+        news.title_i18n[locale] = manualTitle
+      } else if (!news.title_i18n[locale] && news.title) {
+        const { text } = await translateRichText(news.title, 'pt', locale, glossary)
+        news.title_i18n[locale] = text
+        news.meta_i18n.autoTranslated.title = { ...(news.meta_i18n.autoTranslated.title || {}), [locale]: true }
+      }
+
+      const manualExcerpt = sanitizedData[`excerpt_${locale}`]
+      if (manualExcerpt) {
+        news.excerpt_i18n[locale] = manualExcerpt
+      } else if (!news.excerpt_i18n[locale] && news.excerpt) {
+        const { text } = await translateRichText(news.excerpt, 'pt', locale, glossary)
+        news.excerpt_i18n[locale] = text
+        news.meta_i18n.autoTranslated.summary = { ...(news.meta_i18n.autoTranslated.summary || {}), [locale]: true }
+      }
+
+      const manualContent = sanitizedData[`content_${locale}`]
+      if (manualContent) {
+        news.content_i18n[locale] = manualContent
+      } else if (!news.content_i18n[locale] && news.content) {
+        const { sanitizeHtmlSafe } = await import('@/lib/sanitize')
+        const { text } = await translateRichText(news.content, 'pt', locale, glossary)
+        news.content_i18n[locale] = sanitizeHtmlSafe(text)
+        news.meta_i18n.autoTranslated.body = { ...(news.meta_i18n.autoTranslated.body || {}), [locale]: true }
+      }
+
+      const manualSlug = sanitizedData[`slug_${locale}`]
+      if (manualSlug) {
+        news.slug_i18n[locale] = manualSlug
+      } else if (!news.slug_i18n[locale]) {
+        const baseTitle = news.title_i18n[locale] || news.title
+        news.slug_i18n[locale] = generateSlug(baseTitle)
+      }
     }
 
-    // Atualizar notícia
-    Object.assign(news, sanitizedData)
     await news.save()
 
     return NextResponse.json(

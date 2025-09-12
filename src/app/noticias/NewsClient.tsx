@@ -99,7 +99,7 @@ export default function NewsClient({ news, isEn }: { news: NewsItem[]; isEn: boo
               />
             </div>
             <div className="p-4">
-              <h3 className="font-semibold text-gray-900 text-lg line-clamp-2">{n.title}</h3>
+              <h3 className="font-semibold text-gray-900 text-lg line-clamp-2">{(n as any).title_i18n?.[isEn ? 'en' : 'pt'] || n.title}</h3>
               {(n.publishedAtFormatted || n.publishedAt) && (
                 <div className="mt-2 flex items-center gap-2 text-xs text-gray-500">
                   <Calendar size={14} className="text-primary-600" />
@@ -109,8 +109,8 @@ export default function NewsClient({ news, isEn }: { news: NewsItem[]; isEn: boo
                   )}
                 </div>
               )}
-              {n.excerpt && (
-                <p className="text-sm text-gray-600 line-clamp-3 mt-2">{n.excerpt}</p>
+              {(n as any).excerpt_i18n?.[isEn ? 'en' : 'pt'] || n.excerpt ? (
+                <p className="text-sm text-gray-600 line-clamp-3 mt-2">{(n as any).excerpt_i18n?.[isEn ? 'en' : 'pt'] || n.excerpt}</p>
               )}
             </div>
           </article>

@@ -3,7 +3,10 @@ export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from 'next/server'
 import connectDB from '@/lib/mongodb'
 import Product from '@/models/Product'
-import { validateSession, errorResponse, successResponse, isValidObjectId, sanitizeInput } from '@/lib/api-utils'
+import { validateSession, errorResponse, successResponse, isValidObjectId, sanitizeInput, generateSlug } from '@/lib/api-utils'
+import { getGlossary } from '@/lib/translation/glossary'
+import { getTargetLocales, DEFAULT_CONTENT_LOCALE } from '@/lib/translation/config'
+import { translateRichText } from '@/lib/translation/service'
 
 interface RouteParams {
   params: {
@@ -99,6 +102,64 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
 
     // Atualizar produto
     Object.assign(product, updateData)
+
+    // i18n updates
+    const targets = getTargetLocales()
+    const glossary = getGlossary()
+    ;(product as any).name_i18n = (product as any).name_i18n || {}
+    ;(product as any).description_i18n = (product as any).description_i18n || {}
+    ;(product as any).shortDescription_i18n = (product as any).shortDescription_i18n || {}
+    ;(product as any).slug_i18n = (product as any).slug_i18n || {}
+    ;(product as any).meta_i18n = (product as any).meta_i18n || {}
+    ;(product as any).meta_i18n.autoTranslated = (product as any).meta_i18n.autoTranslated || {}
+    ;(product as any).meta_i18n.lockedByLocale = (product as any).meta_i18n.lockedByLocale || {}
+
+    ;(product as any).name_i18n[DEFAULT_CONTENT_LOCALE] = product.name
+    ;(product as any).description_i18n[DEFAULT_CONTENT_LOCALE] = product.description
+    if (sanitizedData.shortDescription) {
+      ;(product as any).shortDescription_i18n[DEFAULT_CONTENT_LOCALE] = sanitizedData.shortDescription
+    }
+    ;(product as any).slug_i18n[DEFAULT_CONTENT_LOCALE] = generateSlug(product.name)
+
+    for (const locale of targets) {
+      if ((product as any).meta_i18n.lockedByLocale?.[locale]) continue
+      const manualName = sanitizedData[`name_${locale}`]
+      if (manualName) {
+        ;(product as any).name_i18n[locale] = manualName
+      } else if (!(product as any).name_i18n[locale] && product.name) {
+        const { text } = await translateRichText(product.name, 'pt', locale, glossary)
+        ;(product as any).name_i18n[locale] = text
+        ;(product as any).meta_i18n.autoTranslated.name = { ...((product as any).meta_i18n.autoTranslated.name || {}), [locale]: true }
+      }
+
+      const manualShort = sanitizedData[`shortDescription_${locale}`]
+      const baseShort = sanitizedData.shortDescription || product.shortDescription_i18n?.[DEFAULT_CONTENT_LOCALE]
+      if (manualShort) {
+        ;(product as any).shortDescription_i18n[locale] = manualShort
+      } else if (!(product as any).shortDescription_i18n[locale] && baseShort) {
+        const { text } = await translateRichText(baseShort, 'pt', locale, glossary)
+        ;(product as any).shortDescription_i18n[locale] = text
+        ;(product as any).meta_i18n.autoTranslated.shortDescription = { ...((product as any).meta_i18n.autoTranslated.shortDescription || {}), [locale]: true }
+      }
+
+      const manualDesc = sanitizedData[`description_${locale}`]
+      if (manualDesc) {
+        ;(product as any).description_i18n[locale] = manualDesc
+      } else if (!(product as any).description_i18n[locale] && product.description) {
+        const { text } = await translateRichText(product.description, 'pt', locale, glossary)
+        ;(product as any).description_i18n[locale] = text
+        ;(product as any).meta_i18n.autoTranslated.description = { ...((product as any).meta_i18n.autoTranslated.description || {}), [locale]: true }
+      }
+
+      const manualSlug = sanitizedData[`slug_${locale}`]
+      if (manualSlug) {
+        ;(product as any).slug_i18n[locale] = manualSlug
+      } else if (!(product as any).slug_i18n[locale]) {
+        const base = (product as any).name_i18n[locale] || product.name
+        ;(product as any).slug_i18n[locale] = generateSlug(base)
+      }
+    }
+
     await product.save()
 
     return NextResponse.json(

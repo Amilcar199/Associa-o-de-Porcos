@@ -8,6 +8,10 @@ const NewsSchema = new Schema<INews>({
     trim: true,
     maxlength: [200, 'Título não pode ter mais que 200 caracteres'],
   },
+  title_i18n: {
+    type: Object,
+    default: {},
+  },
   slug: {
     type: String,
     required: [true, 'Slug é obrigatório'],
@@ -19,16 +23,28 @@ const NewsSchema = new Schema<INews>({
       'Slug deve conter apenas letras minúsculas, números e hífens',
     ],
   },
+  slug_i18n: {
+    type: Object,
+    default: {},
+  },
   content: {
     type: String,
     required: [true, 'Conteúdo é obrigatório'],
     trim: true,
+  },
+  content_i18n: {
+    type: Object,
+    default: {},
   },
   excerpt: {
     type: String,
     required: [true, 'Resumo é obrigatório'],
     trim: true,
     maxlength: [300, 'Resumo não pode ter mais que 300 caracteres'],
+  },
+  excerpt_i18n: {
+    type: Object,
+    default: {},
   },
   featuredImage: {
     type: String,
@@ -86,6 +102,10 @@ const NewsSchema = new Schema<INews>({
     type: Date,
     required: false,
   },
+  meta_i18n: {
+    type: Object,
+    default: {},
+  }
 }, {
   timestamps: true,
   collection: 'news',
@@ -138,20 +158,20 @@ NewsSchema.virtual('url').get(function (this: INews) {
 })
 
 // Middleware para gerar slug automaticamente
-NewsSchema.pre('save', function (next) {
+NewsSchema.pre('save', function (this: any, next: (err?: any) => void) {
   if (this.isModified('title') && !this.slug) {
     this.slug = this.title
       .toLowerCase()
       .trim()
-      .replace(/[^\w\s-]/g, '') // Remove caracteres especiais
-      .replace(/[\s_-]+/g, '-') // Substitui espaços e underscores por hífens
-      .replace(/^-+|-+$/g, '') // Remove hífens do início e fim
+      .replace(/[^\w\s-]/g, '')
+      .replace(/[\s_-]+/g, '-')
+      .replace(/^-+|-+$/g, '')
   }
   next()
 })
 
 // Middleware para definir publishedAt quando published for true
-NewsSchema.pre('save', function (next) {
+NewsSchema.pre('save', function (this: any, next: (err?: any) => void) {
   if (this.isModified('published') && this.published && !this.publishedAt) {
     this.publishedAt = new Date()
   }
@@ -159,7 +179,7 @@ NewsSchema.pre('save', function (next) {
 })
 
 // Middleware para validar autor antes de salvar
-NewsSchema.pre('save', async function (next) {
+NewsSchema.pre('save', async function (this: any, next: (err?: any) => void) {
   if (this.isModified('author')) {
     const User = mongoose.models.User
     if (User) {

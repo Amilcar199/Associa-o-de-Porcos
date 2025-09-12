@@ -195,7 +195,7 @@ export default function ProductsClient({ products }: ProductsClientProps) {
             {/* Conteúdo */}
             <div className="p-4">
               <h3 className="font-semibold text-gray-900 text-lg line-clamp-1 group-hover:text-primary-600 transition-colors">
-                {product.name}
+                {((product as any).name_i18n?.[isEn ? 'en' : 'pt']) || product.name}
               </h3>
               <div className="mt-2 grid grid-cols-3 gap-2 text-xs text-gray-600">
                 <div className="flex items-center gap-1">

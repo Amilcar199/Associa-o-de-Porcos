@@ -27,6 +27,19 @@ export interface Product extends Document {
   _id: string
   name: string
   description: string
+  // i18n (novo, mantendo compatibilidade com campos existentes)
+  name_i18n?: { pt?: string; en?: string; es?: string }
+  shortDescription_i18n?: { pt?: string; en?: string; es?: string }
+  description_i18n?: { pt?: string; en?: string; es?: string }
+  slug_i18n?: { pt?: string; en?: string; es?: string }
+  meta_i18n?: {
+    autoTranslated?: {
+      name?: { en?: boolean; es?: boolean }
+      shortDescription?: { en?: boolean; es?: boolean }
+      description?: { en?: boolean; es?: boolean }
+    }
+    lockedByLocale?: { en?: boolean; es?: boolean }
+  }
   breed: string // raça
   age: number // idade em meses
   weight: number // peso em kg
@@ -52,6 +65,19 @@ export interface News extends Document {
   slug: string
   content: string
   excerpt: string
+  // i18n (novo, mantendo compatibilidade com campos existentes)
+  title_i18n?: { pt?: string; en?: string; es?: string }
+  slug_i18n?: { pt?: string; en?: string; es?: string }
+  content_i18n?: { pt?: string; en?: string; es?: string }
+  excerpt_i18n?: { pt?: string; en?: string; es?: string }
+  meta_i18n?: {
+    autoTranslated?: {
+      title?: { en?: boolean; es?: boolean }
+      summary?: { en?: boolean; es?: boolean }
+      body?: { en?: boolean; es?: boolean }
+    }
+    lockedByLocale?: { en?: boolean; es?: boolean }
+  }
   featuredImage: string
   images?: string[]
   author: User | string

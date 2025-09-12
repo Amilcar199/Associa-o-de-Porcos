@@ -6,6 +6,7 @@ import { formatDate } from '@/lib/utils'
 import { BRAND_NAME } from '@/lib/brand'
 import ViewCounter from './ViewCounter'
 import { cookies } from 'next/headers'
+import { resolveLocaleKey } from '@/lib/translation/config'
 
 interface RouteParams {
   params: {
@@ -15,11 +16,18 @@ interface RouteParams {
 
 // Gerar metadados dinâmicos para SEO
 export async function generateMetadata({ params }: RouteParams): Promise<Metadata> {
-  const locale = cookies().get('locale')?.value || 'pt-AO'
-  const isEn = String(locale).startsWith('en')
+  const cookieLocale = cookies().get('locale')?.value || 'pt-AO'
+  const localeKey = resolveLocaleKey(cookieLocale)
+  const isEn = localeKey === 'en'
   try {
     await connectDB()
-    const news = await News.findOne({ slug: params.slug, published: true }).populate('author', 'name')
+    // Tenta por slug base; se não, tenta por slug_i18n[locale]
+    let news = await News.findOne({ slug: params.slug, published: true }).populate('author', 'name')
+    if (!news) {
+      const q: any = { published: true }
+      q[`slug_i18n.${localeKey}`] = params.slug
+      news = await News.findOne(q).populate('author', 'name')
+    }
     if (!news) {
       return {
         title: isEn ? 'News not found' : 'Notícia não encontrada',
@@ -28,11 +36,17 @@ export async function generateMetadata({ params }: RouteParams): Promise<Metadat
     }
 
     return {
-      title: `${news.title} - ${BRAND_NAME}`,
-      description: news.excerpt,
+      title: `${(news as any).title_i18n?.[localeKey] || news.title} - ${BRAND_NAME}`,
+      description: (news as any).excerpt_i18n?.[localeKey] || news.excerpt,
+      alternates: {
+        languages: {
+          'pt': `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/pt/noticias/${(news as any).slug_i18n?.pt || news.slug}`,
+          'en': `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/en/noticias/${(news as any).slug_i18n?.en || (news as any).slug_i18n?.pt || news.slug}`
+        }
+      },
       openGraph: {
-        title: news.title,
-        description: news.excerpt,
+        title: (news as any).title_i18n?.[localeKey] || news.title,
+        description: (news as any).excerpt_i18n?.[localeKey] || news.excerpt,
         images: news.featuredImage ? [news.featuredImage] : [],
         type: 'article',
         publishedTime: news.publishedAt?.toISOString(),
@@ -59,11 +73,17 @@ export async function generateStaticParams() {
 }
 
 export default async function NewsPage({ params }: RouteParams) {
-  const locale = cookies().get('locale')?.value || 'pt-AO'
-  const isEn = String(locale).startsWith('en')
+  const cookieLocale = cookies().get('locale')?.value || 'pt-AO'
+  const localeKey = resolveLocaleKey(cookieLocale)
+  const isEn = localeKey === 'en'
   try {
     await connectDB()
-    const news = await News.findOne({ slug: params.slug, published: true }).populate('author', 'name avatar').lean()
+    let news: any = await News.findOne({ slug: params.slug, published: true }).populate('author', 'name avatar').lean()
+    if (!news) {
+      const q: any = { published: true }
+      q[`slug_i18n.${localeKey}`] = params.slug
+      news = await News.findOne(q).populate('author', 'name avatar').lean()
+    }
     if (!news) {
       notFound()
     }
@@ -83,7 +103,7 @@ export default async function NewsPage({ params }: RouteParams) {
                news.category === 'market' ? (isEn ? 'Market' : 'Mercado') : news.category}
             </span>
           </div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">{news.title}</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">{news.title_i18n?.[localeKey] || news.title}</h1>
           <div className="flex items-center space-x-4 text-gray-600 mb-6">
             {news.author && (
               <div className="flex items-center space-x-2">
@@ -103,14 +123,17 @@ export default async function NewsPage({ params }: RouteParams) {
         {/* Imagem de destaque */}
         {news.featuredImage && (
           <div className="mb-8">
-            <img src={news.featuredImage} alt={news.title} className="w-full h-64 md:h-96 object-cover rounded-lg" />
+            <img src={news.featuredImage} alt={news.title_i18n?.[localeKey] || news.title} className="w-full h-64 md:h-96 object-cover rounded-lg" />
           </div>
         )}
 
         {/* Conteúdo da notícia */}
         <div className="prose prose-lg max-w-none">
-          <div dangerouslySetInnerHTML={{ __html: news.content }} />
+          <div dangerouslySetInnerHTML={{ __html: news.content_i18n?.[localeKey] || news.content }} />
         </div>
+        {(news.meta_i18n?.autoTranslated?.body?.[localeKey] || news.meta_i18n?.autoTranslated?.summary?.[localeKey] || news.meta_i18n?.autoTranslated?.title?.[localeKey]) && (
+          <div className="mt-3"><span className="inline-block px-2 py-1 text-xs rounded bg-amber-100 text-amber-800">{isEn ? 'Machine-translated (awaiting review)' : 'Tradução automática (aguarda revisão)'}</span></div>
+        )}
 
         {/* Tags */}
         {news.tags && news.tags.length > 0 && (
