@@ -377,7 +377,7 @@ const Header = () => {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="lg:hidden bg-white border-t border-gray-200"
+              className="lg:hidden bg-white border-t border-gray-200 max-h-[calc(100vh-6rem)] md:max-h-[calc(100vh-7rem)] overflow-y-auto overscroll-contain"
             >
               <div className="container-custom py-4">
                 <nav className="space-y-4">
