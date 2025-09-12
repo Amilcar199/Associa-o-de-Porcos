@@ -5,8 +5,9 @@ import React from 'react'
 export default function ConstitutionDocsClient() {
   let imageUrls: string[] = []
   try {
-    // Look for images under any folder matching pdf_paginas_png inside assets
-    const req = require.context('@/components/assets', true, /pdf_paginas_png\/(.*)\.(png|jpe?g|webp)$/i)
+    // Look for images specifically under assets/Conteudos Suinos/pdf_paginas_png
+    // Use relative path from this file to ensure webpack resolves correctly
+    const req = require.context('../../components/assets', true, /Conteudos Suinos\/pdf_paginas_png\/(.*)\.(png|jpe?g|webp)$/i)
     imageUrls = req.keys().map((key: string) => req(key))
   } catch {
     imageUrls = []
