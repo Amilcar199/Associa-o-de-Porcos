@@ -31,6 +31,8 @@ export interface Product extends Document {
   age: number // idade em meses
   weight: number // peso em kg
   price?: number
+  pricePerKg?: number
+  saleForm?: 'carcaça' | 'vivo'
   images: string[]
   features: string[] // características especiais
   healthStatus: 'excellent' | 'good' | 'fair'
@@ -184,6 +186,8 @@ export interface ProductFormData {
   age: number
   weight: number
   price?: number
+  pricePerKg?: number
+  saleForm?: 'carcaça' | 'vivo'
   features: string[]
   healthStatus: 'excellent' | 'good' | 'fair'
   vaccinated: boolean
