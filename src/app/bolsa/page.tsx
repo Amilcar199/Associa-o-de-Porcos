@@ -1,7 +1,6 @@
 export const dynamic = 'force-dynamic'
-
-import dynamic from 'next/dynamic'
-const BolsaClient = dynamic(() => import('./BolsaClient'), { ssr: false })
+import nextDynamic from 'next/dynamic'
+const BolsaClient = nextDynamic(() => import('./BolsaClient'), { ssr: false })
 
 export default function BolsaPage() {
   return (
