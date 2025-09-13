@@ -1,4 +1,5 @@
-import { redirect } from 'next/navigation'
+// Using NextResponse redirect instead of next/navigation redirect for compatibility
+import { NextResponse } from 'next/server'
 import { BRAND_NAME } from '@/lib/brand'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
@@ -18,7 +19,7 @@ export default async function AdminLayout({
 }) {
   const session = await getServerSession(authOptions)
   if (!session || session.user.role !== 'admin') {
-    redirect('/login?error=insufficient_permissions')
+    return NextResponse.redirect(new URL('/login?error=insufficient_permissions', process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'))
   }
   const user = session.user
 

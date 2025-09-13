@@ -1,4 +1,3 @@
-import { Suspense } from 'react';
 import ImageManager from '@/components/admin/ImageManager';
 
 export default function ImagesPage() {
@@ -11,9 +10,7 @@ export default function ImagesPage() {
         </p>
       </div>
 
-      <Suspense fallback={<div>Carregando...</div>}>
-        <ImageManager />
-      </Suspense>
+      <ImageManager />
     </div>
   );
 }

@@ -2,18 +2,10 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { 
-  FileText, 
-  Video, 
-  BookOpen, 
-  Calendar,
-  Upload,
-  X,
-  Plus
-} from 'lucide-react'
+// Icons removed to avoid lucide-react export issues
 import { useToast } from '@/components/Toast'
 
-interface FormData {
+interface NewMemberContentFormData {
   title: string
   description: string
   type: 'document' | 'video' | 'article' | 'event'
@@ -33,7 +25,7 @@ export default function NewMemberContentClient() {
   const router = useRouter()
   const { showSuccess, showError } = useToast()
   const [loading, setLoading] = useState(false)
-  const [formData, setFormData] = useState<FormData>({
+  const initialFormData: NewMemberContentFormData = {
     title: '',
     description: '',
     type: 'document',
@@ -47,10 +39,11 @@ export default function NewMemberContentClient() {
     eventLocation: '',
     isFeatured: false,
     tags: []
-  })
+  }
+  const [formData, setFormData] = useState(initialFormData)
   const [newTag, setNewTag] = useState('')
 
-  const categories = {
+  const categories: Record<NewMemberContentFormData['type'], string[]> = {
     document: ['Técnico', 'Saúde', 'Nutrição', 'Sanidade', 'Reprodução'],
     video: ['Técnico', 'Educacional', 'Nutrição', 'Sanidade'],
     article: ['Técnico', 'Mercado', 'Educacional', 'Saúde'],
@@ -85,17 +78,17 @@ export default function NewMemberContentClient() {
 
   const addTag = () => {
     if (newTag.trim() && !formData.tags.includes(newTag.trim()) && formData.tags.length < 10) {
-      setFormData(prev => ({ ...prev, tags: [...prev.tags, newTag.trim()] }))
+      setFormData((prev: NewMemberContentFormData) => ({ ...prev, tags: [...prev.tags, newTag.trim()] }))
       setNewTag('')
     }
   }
 
   const removeTag = (tagToRemove: string) => {
-    setFormData(prev => ({ ...prev, tags: prev.tags.filter(tag => tag !== tagToRemove) }))
+    setFormData((prev: NewMemberContentFormData) => ({ ...prev, tags: prev.tags.filter(tag => tag !== tagToRemove) }))
   }
 
   const handleTypeChange = (newType: 'document' | 'video' | 'article' | 'event') => {
-    setFormData(prev => ({ 
+    setFormData((prev: NewMemberContentFormData) => ({ 
       ...prev, 
       type: newType,
       category: '',
@@ -118,11 +111,11 @@ export default function NewMemberContentClient() {
             </label>
             <div className="grid grid-cols-2 gap-2">
               {[
-                { value: 'document', icon: FileText, label: 'Documento' },
-                { value: 'video', icon: Video, label: 'Vídeo' },
-                { value: 'article', icon: BookOpen, label: 'Artigo' },
-                { value: 'event', icon: Calendar, label: 'Evento' }
-              ].map(({ value, icon: Icon, label }) => (
+                { value: 'document', symbol: '📄', label: 'Documento' },
+                { value: 'video', symbol: '🎬', label: 'Vídeo' },
+                { value: 'article', symbol: '📰', label: 'Artigo' },
+                { value: 'event', symbol: '📅', label: 'Evento' }
+              ].map(({ value, symbol, label }) => (
                 <button
                   key={value}
                   type="button"
@@ -133,7 +126,7 @@ export default function NewMemberContentClient() {
                       : 'border-gray-300 hover:border-gray-400'
                   }`}
                 >
-                  <Icon className="w-5 h-5" />
+                  <span aria-hidden className="text-lg">{symbol}</span>
                   <span className="text-sm font-medium">{label}</span>
                 </button>
               ))}
@@ -146,12 +139,12 @@ export default function NewMemberContentClient() {
             </label>
             <select
               value={formData.category}
-              onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
+              onChange={(e) => setFormData((prev: NewMemberContentFormData) => ({ ...prev, category: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               required
             >
               <option value="">Selecione uma categoria</option>
-              {categories[formData.type]?.map(category => (
+              {(categories[formData.type as NewMemberContentFormData['type']] ?? []).map((category: string) => (
                 <option key={category} value={category}>{category}</option>
               ))}
             </select>
@@ -167,7 +160,7 @@ export default function NewMemberContentClient() {
             <input
               type="text"
               value={formData.title}
-              onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+              onChange={(e) => setFormData((prev: NewMemberContentFormData) => ({ ...prev, title: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               placeholder="Ex.: Manual de Boas Práticas na Criação de Porcos"
               required
@@ -181,7 +174,7 @@ export default function NewMemberContentClient() {
             </label>
             <textarea
               value={formData.description}
-              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              onChange={(e) => setFormData((prev: NewMemberContentFormData) => ({ ...prev, description: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               placeholder="Descrição breve do conteúdo..."
               rows={3}
@@ -198,7 +191,7 @@ export default function NewMemberContentClient() {
           </label>
           <textarea
             value={formData.content}
-            onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
+            onChange={(e) => setFormData((prev: NewMemberContentFormData) => ({ ...prev, content: e.target.value }))}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             placeholder="Conteúdo detalhado, instruções, etc..."
             rows={6}
@@ -216,7 +209,7 @@ export default function NewMemberContentClient() {
               <input
                 type="url"
                 value={formData.fileUrl}
-                onChange={(e) => setFormData(prev => ({ ...prev, fileUrl: e.target.value }))}
+                onChange={(e) => setFormData((prev: NewMemberContentFormData) => ({ ...prev, fileUrl: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 placeholder="https://exemplo.com/arquivo.pdf"
               />
@@ -231,7 +224,7 @@ export default function NewMemberContentClient() {
               <input
                 type="url"
                 value={formData.videoUrl}
-                onChange={(e) => setFormData(prev => ({ ...prev, videoUrl: e.target.value }))}
+                onChange={(e) => setFormData((prev: NewMemberContentFormData) => ({ ...prev, videoUrl: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 placeholder="https://youtube.com/watch?v=..."
               />
@@ -247,7 +240,7 @@ export default function NewMemberContentClient() {
                 <input
                   type="datetime-local"
                   value={formData.eventDate}
-                  onChange={(e) => setFormData(prev => ({ ...prev, eventDate: e.target.value }))}
+                  onChange={(e) => setFormData((prev: NewMemberContentFormData) => ({ ...prev, eventDate: e.target.value }))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 />
               </div>
@@ -258,7 +251,7 @@ export default function NewMemberContentClient() {
                 <input
                   type="text"
                   value={formData.eventLocation}
-                  onChange={(e) => setFormData(prev => ({ ...prev, eventLocation: e.target.value }))}
+                  onChange={(e) => setFormData((prev: NewMemberContentFormData) => ({ ...prev, eventLocation: e.target.value }))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="Ex.: Auditório da Associação, Luanda"
                 />
@@ -273,7 +266,7 @@ export default function NewMemberContentClient() {
             <input
               type="url"
               value={formData.url}
-              onChange={(e) => setFormData(prev => ({ ...prev, url: e.target.value }))}
+              onChange={(e) => setFormData((prev: NewMemberContentFormData) => ({ ...prev, url: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               placeholder="https://exemplo.com"
             />
@@ -286,7 +279,7 @@ export default function NewMemberContentClient() {
             <input
               type="url"
               value={formData.thumbnail}
-              onChange={(e) => setFormData(prev => ({ ...prev, thumbnail: e.target.value }))}
+              onChange={(e) => setFormData((prev: NewMemberContentFormData) => ({ ...prev, thumbnail: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               placeholder="https://exemplo.com/imagem.jpg"
             />
@@ -315,13 +308,13 @@ export default function NewMemberContentClient() {
                 disabled={!newTag.trim() || formData.tags.length >= 10}
                 className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                <Plus className="w-4 h-4" />
+                <span className="w-4 h-4" aria-hidden>+</span>
               </button>
             </div>
             
             {formData.tags.length > 0 && (
               <div className="flex flex-wrap gap-2">
-                {formData.tags.map(tag => (
+                {formData.tags.map((tag: string) => (
                   <span
                     key={tag}
                     className="inline-flex items-center gap-1 px-3 py-1 bg-primary-100 text-primary-800 rounded-full text-sm"
@@ -332,7 +325,7 @@ export default function NewMemberContentClient() {
                       onClick={() => removeTag(tag)}
                       className="hover:text-primary-600"
                     >
-                      <X className="w-3 h-3" />
+                      <span className="w-3 h-3" aria-hidden>×</span>
                     </button>
                   </span>
                 ))}
@@ -347,7 +340,7 @@ export default function NewMemberContentClient() {
             <input
               type="checkbox"
               checked={formData.isFeatured}
-              onChange={(e) => setFormData(prev => ({ ...prev, isFeatured: e.target.checked }))}
+              onChange={(e) => setFormData((prev: NewMemberContentFormData) => ({ ...prev, isFeatured: e.target.checked }))}
               className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
             />
             <span className="ml-2 text-sm text-gray-700">Destacar este conteúdo</span>
@@ -375,7 +368,7 @@ export default function NewMemberContentClient() {
               </>
             ) : (
               <>
-                <Plus className="w-4 h-4" />
+                <span className="w-4 h-4" aria-hidden>+</span>
                 Criar Conteúdo
               </>
             )}

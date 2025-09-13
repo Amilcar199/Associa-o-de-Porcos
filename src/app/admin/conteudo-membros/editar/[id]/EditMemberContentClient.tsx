@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 // Icons removed to avoid lucide-react export mismatches
 import { useToast } from '@/components/Toast'
 
-interface FormData {
+interface MemberContentFormData {
   title: string
   description: string
   type: 'document' | 'video' | 'article' | 'event'
@@ -30,7 +30,7 @@ export default function EditMemberContentClient({ contentId }: EditMemberContent
   const { showSuccess, showError } = useToast()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [formData, setFormData] = useState<FormData>({
+  const initialFormData: MemberContentFormData = {
     title: '',
     description: '',
     type: 'document',
@@ -44,10 +44,11 @@ export default function EditMemberContentClient({ contentId }: EditMemberContent
     eventLocation: '',
     isFeatured: false,
     tags: []
-  })
+  }
+  const [formData, setFormData] = useState(initialFormData)
   const [newTag, setNewTag] = useState('')
 
-  const categories = {
+  const categories: Record<MemberContentFormData['type'], string[]> = {
     document: ['Técnico', 'Saúde', 'Nutrição', 'Sanidade', 'Reprodução'],
     video: ['Técnico', 'Educacional', 'Nutrição', 'Sanidade'],
     article: ['Técnico', 'Mercado', 'Educacional', 'Saúde'],
@@ -72,10 +73,10 @@ export default function EditMemberContentClient({ contentId }: EditMemberContent
           eventDate = date.toISOString().slice(0, 16)
         }
 
-        setFormData({
+        const newData: MemberContentFormData = {
           title: content.title || '',
           description: content.description || '',
-          type: content.type || 'document',
+          type: (['document','video','article','event'].includes(content.type) ? content.type : 'document') as MemberContentFormData['type'],
           category: content.category || '',
           content: content.content || '',
           url: content.url || '',
@@ -86,7 +87,8 @@ export default function EditMemberContentClient({ contentId }: EditMemberContent
           eventLocation: content.eventLocation || '',
           isFeatured: content.isFeatured || false,
           tags: content.tags || []
-        })
+        }
+        setFormData(newData)
       } else {
         showError('Erro ao carregar conteúdo')
         router.push('/admin/conteudo-membros')
@@ -128,17 +130,17 @@ export default function EditMemberContentClient({ contentId }: EditMemberContent
 
   const addTag = () => {
     if (newTag.trim() && !formData.tags.includes(newTag.trim()) && formData.tags.length < 10) {
-      setFormData(prev => ({ ...prev, tags: [...prev.tags, newTag.trim()] }))
+      setFormData((prev: MemberContentFormData) => ({ ...prev, tags: [...prev.tags, newTag.trim()] }))
       setNewTag('')
     }
   }
 
   const removeTag = (tagToRemove: string) => {
-    setFormData(prev => ({ ...prev, tags: prev.tags.filter(tag => tag !== tagToRemove) }))
+    setFormData((prev: MemberContentFormData) => ({ ...prev, tags: prev.tags.filter(tag => tag !== tagToRemove) }))
   }
 
   const handleTypeChange = (newType: 'document' | 'video' | 'article' | 'event') => {
-    setFormData(prev => ({ 
+    setFormData((prev: MemberContentFormData) => ({ 
       ...prev, 
       type: newType,
       category: '',
@@ -197,12 +199,12 @@ export default function EditMemberContentClient({ contentId }: EditMemberContent
             </label>
             <select
               value={formData.category}
-              onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
+              onChange={(e) => setFormData((prev: MemberContentFormData) => ({ ...prev, category: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               required
             >
               <option value="">Selecione uma categoria</option>
-              {categories[formData.type]?.map(category => (
+              {(categories[formData.type as MemberContentFormData['type']] ?? []).map(category => (
                 <option key={category} value={category}>{category}</option>
               ))}
             </select>
@@ -218,7 +220,7 @@ export default function EditMemberContentClient({ contentId }: EditMemberContent
             <input
               type="text"
               value={formData.title}
-              onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+              onChange={(e) => setFormData((prev: MemberContentFormData) => ({ ...prev, title: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               placeholder="Ex.: Manual de Boas Práticas na Criação de Porcos"
               required
@@ -232,7 +234,7 @@ export default function EditMemberContentClient({ contentId }: EditMemberContent
             </label>
             <textarea
               value={formData.description}
-              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              onChange={(e) => setFormData((prev: MemberContentFormData) => ({ ...prev, description: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               placeholder="Descrição breve do conteúdo..."
               rows={3}
@@ -249,7 +251,7 @@ export default function EditMemberContentClient({ contentId }: EditMemberContent
           </label>
           <textarea
             value={formData.content}
-            onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
+            onChange={(e) => setFormData((prev: MemberContentFormData) => ({ ...prev, content: e.target.value }))}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             placeholder="Conteúdo detalhado, instruções, etc..."
             rows={6}
@@ -267,7 +269,7 @@ export default function EditMemberContentClient({ contentId }: EditMemberContent
               <input
                 type="url"
                 value={formData.fileUrl}
-                onChange={(e) => setFormData(prev => ({ ...prev, fileUrl: e.target.value }))}
+                onChange={(e) => setFormData((prev: MemberContentFormData) => ({ ...prev, fileUrl: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 placeholder="https://exemplo.com/arquivo.pdf"
               />
@@ -282,7 +284,7 @@ export default function EditMemberContentClient({ contentId }: EditMemberContent
               <input
                 type="url"
                 value={formData.videoUrl}
-                onChange={(e) => setFormData(prev => ({ ...prev, videoUrl: e.target.value }))}
+                onChange={(e) => setFormData((prev: MemberContentFormData) => ({ ...prev, videoUrl: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 placeholder="https://youtube.com/watch?v=..."
               />
@@ -298,7 +300,7 @@ export default function EditMemberContentClient({ contentId }: EditMemberContent
                 <input
                   type="datetime-local"
                   value={formData.eventDate}
-                  onChange={(e) => setFormData(prev => ({ ...prev, eventDate: e.target.value }))}
+                  onChange={(e) => setFormData((prev: MemberContentFormData) => ({ ...prev, eventDate: e.target.value }))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 />
               </div>
@@ -309,7 +311,7 @@ export default function EditMemberContentClient({ contentId }: EditMemberContent
                 <input
                   type="text"
                   value={formData.eventLocation}
-                  onChange={(e) => setFormData(prev => ({ ...prev, eventLocation: e.target.value }))}
+                  onChange={(e) => setFormData((prev: MemberContentFormData) => ({ ...prev, eventLocation: e.target.value }))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="Ex.: Auditório da Associação, Luanda"
                 />
@@ -324,7 +326,7 @@ export default function EditMemberContentClient({ contentId }: EditMemberContent
             <input
               type="url"
               value={formData.url}
-              onChange={(e) => setFormData(prev => ({ ...prev, url: e.target.value }))}
+              onChange={(e) => setFormData((prev: MemberContentFormData) => ({ ...prev, url: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               placeholder="https://exemplo.com"
             />
@@ -337,7 +339,7 @@ export default function EditMemberContentClient({ contentId }: EditMemberContent
             <input
               type="url"
               value={formData.thumbnail}
-              onChange={(e) => setFormData(prev => ({ ...prev, thumbnail: e.target.value }))}
+              onChange={(e) => setFormData((prev: MemberContentFormData) => ({ ...prev, thumbnail: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               placeholder="https://exemplo.com/imagem.jpg"
             />
@@ -372,7 +374,7 @@ export default function EditMemberContentClient({ contentId }: EditMemberContent
             
             {formData.tags.length > 0 && (
               <div className="flex flex-wrap gap-2">
-                {formData.tags.map(tag => (
+                {formData.tags.map((tag: string) => (
                   <span
                     key={tag}
                     className="inline-flex items-center gap-1 px-3 py-1 bg-primary-100 text-primary-800 rounded-full text-sm"
@@ -398,7 +400,7 @@ export default function EditMemberContentClient({ contentId }: EditMemberContent
             <input
               type="checkbox"
               checked={formData.isFeatured}
-              onChange={(e) => setFormData(prev => ({ ...prev, isFeatured: e.target.checked }))}
+              onChange={(e) => setFormData((prev: MemberContentFormData) => ({ ...prev, isFeatured: e.target.checked }))}
               className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
             />
             <span className="ml-2 text-sm text-gray-700">Destacar este conteúdo</span>
