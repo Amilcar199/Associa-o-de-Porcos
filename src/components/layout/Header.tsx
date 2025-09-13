@@ -386,7 +386,7 @@ const Header = () => {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="lg:hidden bg-white border-t border-gray-200 max-h-[calc(100vh-6rem)] md:max-h-[calc(100vh-7rem)] overflow-y-auto overscroll-contain"
+              className="lg:hidden fixed inset-x-0 top-24 md:top-28 bottom-0 bg-white border-t border-gray-200 overflow-y-auto overscroll-contain z-[60]"
             >
               <div className="container-custom py-4">
                 <nav className="space-y-4">
@@ -472,6 +472,10 @@ const Header = () => {
                         <LogOut size={20} />
                         <span>{dict.user.logout}</span>
                       </button>
+
+                      <div className="pt-2 border-t border-gray-200">
+                        <HeaderLanguageMenu />
+                      </div>
                     </div>
                   ) : (
                     <div className="pt-4 border-t border-gray-200 space-y-4">
