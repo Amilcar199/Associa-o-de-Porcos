@@ -3,8 +3,6 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { 
-  Video, 
-  BookOpen, 
   Calendar,
   X,
   Plus,
@@ -177,11 +175,11 @@ export default function EditMemberContentClient({ contentId }: EditMemberContent
             </label>
             <div className="grid grid-cols-2 gap-2">
               {[
-                { value: 'document', icon: BookOpen, label: 'Documento' },
-                { value: 'video', icon: Video, label: 'Vídeo' },
-                { value: 'article', icon: BookOpen, label: 'Artigo' },
-                { value: 'event', icon: Calendar, label: 'Evento' }
-              ].map(({ value, icon: Icon, label }) => (
+                { value: 'document', label: 'Documento' },
+                { value: 'video', label: 'Vídeo' },
+                { value: 'article', label: 'Artigo' },
+                { value: 'event', label: 'Evento' }
+              ].map(({ value, label }) => (
                 <button
                   key={value}
                   type="button"
@@ -192,7 +190,6 @@ export default function EditMemberContentClient({ contentId }: EditMemberContent
                       : 'border-gray-300 hover:border-gray-400'
                   }`}
                 >
-                  <Icon className="w-5 h-5" />
                   <span className="text-sm font-medium">{label}</span>
                 </button>
               ))}
