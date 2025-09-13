@@ -49,6 +49,18 @@ export default function BolsaPage() {
             </div>
           </div>
         </div>
+
+        <div className="mt-8 bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-semibold text-gray-800">Série histórica</h3>
+            <div className="text-xs text-gray-500">Exportar: <button className="underline">SVG</button> · <button className="underline">PNG</button></div>
+          </div>
+          <div className="h-64 flex items-center justify-center text-gray-400 text-sm">Gráfico será exibido aqui</div>
+        </div>
+        <div className="mt-4 bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
+          <h3 className="font-semibold text-gray-800 mb-3">Comparação entre regiões</h3>
+          <div className="h-64 flex items-center justify-center text-gray-400 text-sm">Gráfico de comparação (2 regiões) será exibido aqui</div>
+        </div>
       </div>
     </section>
   )
