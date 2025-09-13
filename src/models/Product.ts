@@ -52,6 +52,12 @@ const ProductSchema = new Schema<IProduct>({
     min: [1, 'Peso deve ser maior que 1kg'],
     max: [500, 'Peso não pode ser maior que 500kg'],
   },
+  carcassWeight: {
+    type: Number,
+    required: false,
+    min: [0, 'Peso de carcaça não pode ser negativo'],
+    max: [500, 'Peso de carcaça não pode ser maior que 500kg'],
+  },
   price: {
     type: Number,
     required: false,

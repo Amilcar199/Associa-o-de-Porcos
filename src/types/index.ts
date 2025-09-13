@@ -30,6 +30,7 @@ export interface Product extends Document {
   breed: string // raça
   age: number // idade em meses
   weight: number // peso em kg
+  carcassWeight?: number // peso da carcaça em kg (quando forma = carcaça)
   price?: number
   pricePerKg?: number
   saleForm?: 'carcaça' | 'vivo'

@@ -19,6 +19,9 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
       updates.approvedBy = (auth.user as any)?.id
       delete updates.approve
     }
+    if (updates.status === 'approved' && !updates.approvedBy) {
+      updates.approvedBy = (auth.user as any)?.id
+    }
 
     const doc = await (MarketQuote as any).findByIdAndUpdate(id, updates, { new: true })
     if (!doc) return errorResponse('Não encontrado', 404)

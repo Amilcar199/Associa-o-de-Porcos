@@ -9,23 +9,44 @@ export async function GET(req: NextRequest) {
   try {
     await connectDB()
 
+    const { searchParams } = new URL(req.url)
+    const unit = (searchParams.get('unit') as ('kg' | 'head')) || 'kg'
+    const saleFormParam = searchParams.get('saleForm') as ('carcaça' | 'vivo') | null
+    const region = searchParams.get('region') || undefined
+    const breed = searchParams.get('breed') || undefined
+
+    const matchStage: any = {
+      $and: [
+        { $or: [ { isActive: true }, { isActive: { $exists: false } } ] },
+        { $or: [ { availability: 'available' }, { availability: { $exists: false } } ] },
+      ]
+    }
+    if (region) matchStage.$and.push({ location: { $regex: new RegExp(region, 'i') } })
+    if (saleFormParam) matchStage.$and.push({ saleForm: saleFormParam })
+
     const pipeline: any[] = [
-      { $match: { $and: [ { $or: [ { isActive: true }, { isActive: { $exists: false } } ] }, { availability: 'available' } ] } },
+      { $match: matchStage },
       { $addFields: {
         pricePerKg: {
-          $cond: [
-            { $and: [ { $gt: ['$price', 0] }, { $gt: ['$weight', 0] } ] },
-            { $divide: ['$price', '$weight'] },
-            null
+          $ifNull: [
+            '$pricePerKg',
+            {
+              $cond: [
+                { $and: [ { $gt: ['$price', 0] }, { $gt: ['$weight', 0] } ] },
+                { $divide: ['$price', '$weight'] },
+                null
+              ]
+            }
           ]
-        }
+        },
+        value: { $cond: [ { $eq: [unit, 'kg'] }, '$pricePerKg', '$price' ] }
       }},
-      { $group: { _id: null, count: { $sum: 1 }, avg: { $avg: '$price' } } }
+      { $group: { _id: null, count: { $sum: 1 }, avg: { $avg: '$value' } } }
     ]
 
     const result = await (Product as any).aggregate(pipeline)
     const data = result?.[0] || { count: 0, avg: null }
-    return NextResponse.json(successResponse({ count: data.count as number, avg: (data.avg as number | null) ?? null }))
+    return NextResponse.json(successResponse({ unit, count: data.count as number, avg: (data.avg as number | null) ?? null }))
   } catch (error) {
     console.error('Erro em /api/market/overall:', error)
     return errorResponse('Erro interno do servidor', 500)

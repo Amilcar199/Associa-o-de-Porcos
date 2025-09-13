@@ -82,7 +82,8 @@ export async function GET(req: NextRequest) {
     await connectDB()
 
     const { searchParams } = new URL(req.url)
-    const unit = (searchParams.get('unit') as Unit) || 'kg'
+    const saleFormParam = searchParams.get('saleForm') as ('carcaça' | 'vivo') | null
+    const unit: Unit = (searchParams.get('unit') as Unit) || (saleFormParam === 'vivo' ? 'head' : 'kg')
     const region = searchParams.get('region') || undefined
     const breed = searchParams.get('breed') || undefined
 
@@ -96,6 +97,7 @@ export async function GET(req: NextRequest) {
     let effectiveCurrent = current
     let effectiveDayStart = todayStart
     let effectiveDayEnd = tomorrowStart
+    let usedFallback = false
     if (current.avg == null) {
       for (let i = 1; i <= 14; i++) {
         const s = addDays(todayStart, -i)
@@ -105,6 +107,7 @@ export async function GET(req: NextRequest) {
           effectiveCurrent = tmp
           effectiveDayStart = s
           effectiveDayEnd = e
+          usedFallback = true
           break
         }
       }
@@ -126,7 +129,10 @@ export async function GET(req: NextRequest) {
     // Anexar referência de cotação oficial (se houver)
     let officialRef: number | null = null
     try {
-      const mq = await (MarketQuote as any).findOne({ status: 'approved' }).sort({ updatedAt: -1 }).lean()
+      const mqQuery: any = { status: 'approved' }
+      if (region) mqQuery.region = new RegExp(region, 'i')
+      if (saleFormParam) mqQuery.saleForm = saleFormParam
+      const mq = await (MarketQuote as any).findOne(mqQuery).sort({ updatedAt: -1 }).lean()
       if (mq) officialRef = unit === 'kg' ? (mq.refPricePerKg ?? null) : (mq.refPricePerHead ?? null)
     } catch {}
 
@@ -138,7 +144,9 @@ export async function GET(req: NextRequest) {
         weekly: changePct(last7.avg, prev7.avg),
         monthly: changePct(last30.avg, prev30.avg)
       },
-      officialRef
+      officialRef,
+      usedFallback,
+      effectiveDate: effectiveDayStart.toISOString()
     }))
   } catch (error) {
     console.error('Erro em /api/market/summary:', error)
