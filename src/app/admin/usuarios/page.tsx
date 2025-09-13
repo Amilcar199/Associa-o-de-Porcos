@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { Search, UserPlus, Mail, Shield, Edit, PowerOff, Power, Trash2 } from 'lucide-react'
 // Icons removed to avoid lucide-react export issues
 import UserEditModal from '@/components/UserEditModal'
 import UserCreateModal from '@/components/UserCreateModal'

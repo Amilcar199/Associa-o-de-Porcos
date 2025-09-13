@@ -163,7 +163,8 @@ export default function BolsaClient() {
     await new Promise<void>((resolve, reject)=>{ img.onload=()=>resolve(); img.onerror=()=>reject(); img.src=url })
     const canvas = document.createElement('canvas')
     canvas.width = 1000; canvas.height = 260
-    const ctx = canvas.getContext(' 2d'.trim())!
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
     ctx.fillStyle = '#ffffff'
     ctx.fillRect(0,0,1000,260)
     ctx.drawImage(img,0,0)
