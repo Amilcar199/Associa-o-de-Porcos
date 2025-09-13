@@ -7,6 +7,7 @@ import DataTable from './ui/DataTable';
 import Modal from './ui/Modal';
 import ConfirmDialog from './ui/ConfirmDialog';
 import ImageUpload from './ui/ImageUpload';
+import MediaUploader from './ui/MediaUploader';
 
 interface News {
   _id: string;
@@ -396,12 +397,31 @@ export default function NewsManager() {
             />
           </div>
 
-          {/* Image Upload */}
+          {/* Uploads práticos */}
           <ImageUpload
             onImageUploaded={handleImageUploaded}
-            label="Imagem de Destaque"
+            label="Imagem de Destaque (rápido)"
             className="mb-4"
           />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <MediaUploader
+              label="Imagens Adicionais"
+              accept="image/*"
+              maxSizeBytes={5*1024*1024}
+              uploadEndpoint="/api/images/upload"
+              values={formData.images || []}
+              onChange={(urls)=>setFormData(prev=>({...prev, images: urls}))}
+            />
+            <MediaUploader
+              label="Vídeos"
+              accept="video/*"
+              maxSizeBytes={100*1024*1024}
+              uploadEndpoint="/api/videos/upload"
+              values={formData.videos || []}
+              onChange={(urls)=>setFormData(prev=>({...prev, videos: urls}))}
+            />
+          </div>
 
           {formData.imageUrl && (
             <div className="bg-gray-50 rounded-lg p-4">
@@ -414,26 +434,7 @@ export default function NewsManager() {
             </div>
           )}
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Imagens (uma por linha)</label>
-            <textarea
-              rows={3}
-              value={(formData.images||[]).join('\n')}
-              onChange={(e)=>setFormData(prev=>({...prev, images: e.target.value.split(/\n+/)}))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              placeholder={'https://imagem1.jpg\nhttps://imagem2.jpg'}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Vídeos (uma por linha)</label>
-            <textarea
-              rows={3}
-              value={(formData.videos||[]).join('\n')}
-              onChange={(e)=>setFormData(prev=>({...prev, videos: e.target.value.split(/\n+/)}))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              placeholder={'https://youtu.be/xyz\nhttps://meuservidor.com/video.mp4'}
-            />
-          </div>
+          {/* As textareas de URL foram substituídas pelo MediaUploader com campo opcional de URL */}
 
           <div className="flex justify-end space-x-3">
             <button

@@ -60,6 +60,53 @@ export async function uploadImage(
   });
 }
 
+export async function uploadVideo(
+  file: Buffer,
+  filename: string,
+  contentType: string,
+  metadata?: Record<string, any>
+): Promise<UploadResult> {
+  await connectDB();
+  const db = (mongoose.connection as any).db as Db;
+  if (!db) {
+    throw new Error('Database connection not available')
+  }
+  const bucket = new GridFSBucket(db, { bucketName: 'videos' });
+
+  const uniqueFilename = `${Date.now()}-${filename}`;
+
+  const uploadStream = bucket.openUploadStream(uniqueFilename, {
+    metadata: {
+      contentType,
+      originalName: filename,
+      uploadedAt: new Date(),
+      ...(metadata || {})
+    }
+  });
+
+  return new Promise((resolve, reject) => {
+    uploadStream.on('error', reject);
+    uploadStream.on('finish', async () => {
+      try {
+        const fileId = uploadStream.id as ObjectId;
+        const fileDoc = await bucket.find({ _id: fileId }).next();
+        resolve({
+          fileId: fileId.toString(),
+          filename: uniqueFilename,
+          contentType: fileDoc?.metadata?.contentType || contentType,
+          size: fileDoc?.length || file.byteLength || 0,
+          url: `/api/videos/${fileId.toString()}`,
+          category: fileDoc?.metadata?.category
+        });
+      } catch (err) {
+        reject(err);
+      }
+    });
+
+    uploadStream.end(file);
+  });
+}
+
 export async function getImage(fileId: string): Promise<{ stream: any; contentType: string } | null> {
   try {
     await connectDB();

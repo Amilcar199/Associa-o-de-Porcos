@@ -2,6 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react'
 import { Tag, Weight, Calendar, DollarSign, Image as ImageIcon, Save } from 'lucide-react'
+import MediaUploader from '@/components/admin/ui/MediaUploader'
 
 export default function NewProductClient() {
   const [loading, setLoading] = useState(false)
@@ -194,34 +195,14 @@ export default function NewProductClient() {
 
         <div className="grid md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm text-gray-700 mb-1">Imagens (uma por linha)</label>
-            <div className="relative">
-              <ImageIcon className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
-              <textarea value={(form.images||[]).join('\n')} onChange={(e)=>setForm(p=>({...p,images:e.target.value.split(/\n+/)}))} rows={4} className="w-full pl-9 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="https://imagem1.jpg\nhttps://imagem2.jpg" />
-            </div>
-            <div className="mt-2">
-              <label className="block text-sm text-gray-700 mb-1">ou Upload local</label>
-              <input type="file" accept="image/*" onChange={async (e)=>{
-                const file=e.target.files?.[0];
-                if(!file) return;
-                const fd=new FormData();
-                fd.append('file',file);
-                const res=await fetch('/api/images/upload',{method:'POST',body:fd});
-                if(res.ok){
-                  const json=await res.json();
-                  setForm(p=>({...p,images:[...(p.images||[]), json.data.url]}));
-                } else {
-                  alert('Falha no upload da imagem');
-                }
-              }} className="w-full" />
-            </div>
-            {(form.images||[]).filter(Boolean).length>0 && (
-              <div className="mt-3 grid grid-cols-3 gap-2">
-                {(form.images||[]).filter(Boolean).slice(0,6).map((url,idx)=>(
-                  <img key={idx} src={url} className="w-full h-20 object-cover rounded" alt="Pré-visualização" />
-                ))}
-              </div>
-            )}
+            <MediaUploader
+              label="Imagens"
+              accept="image/*"
+              maxSizeBytes={5*1024*1024}
+              uploadEndpoint="/api/images/upload"
+              values={form.images || []}
+              onChange={(urls)=>setForm(p=>({...p, images: urls}))}
+            />
           </div>
           <div>
             <label className="block text-sm text-gray-700 mb-1">Província</label>
@@ -247,9 +228,14 @@ export default function NewProductClient() {
         </div>
 
         <div>
-          <label className="block text-sm text-gray-700 mb-1">Vídeos (URLs — uma por linha)</label>
-          <textarea value={(form.videos||[]).join('\n')} onChange={(e)=>setForm(p=>({...p,videos:e.target.value.split(/\n+/)}))} rows={3} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="https://youtu.be/xyz\nhttps://meuservidor.com/video.mp4" />
-          <p className="text-xs text-gray-500 mt-1">Aceita YouTube/Vimeo ou links diretos (MP4/WEBM).</p>
+          <MediaUploader
+            label="Vídeos"
+            accept="video/*"
+            maxSizeBytes={100*1024*1024}
+            uploadEndpoint="/api/videos/upload"
+            values={form.videos || []}
+            onChange={(urls)=>setForm(p=>({...p, videos: urls}))}
+          />
         </div>
 
         <div className="grid md:grid-cols-2 gap-4">

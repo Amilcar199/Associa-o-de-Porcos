@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import { Save, Image as ImageIcon, FileText, Type, Tag } from 'lucide-react'
+import MediaUploader from '@/components/admin/ui/MediaUploader'
 
 const categories = [
   { value: 'news', label: 'Notícias' },
@@ -108,16 +109,23 @@ export default function NewNewsClient(){
           </select>
         </div>
       </div>
-
-      <div>
-        <label className="block text-sm text-gray-700 mb-1">Imagens adicionais (uma por linha)</label>
-        <textarea value={(form.images||[]).join('\n')} onChange={(e)=>setForm(p=>({...p, images: e.target.value.split(/\n+/)}))} rows={3} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder={'https://imagem1.jpg\nhttps://imagem2.jpg'} />
-      </div>
-
-      <div>
-        <label className="block text-sm text-gray-700 mb-1">Vídeos (URLs — uma por linha)</label>
-        <textarea value={(form.videos||[]).join('\n')} onChange={(e)=>setForm(p=>({...p, videos: e.target.value.split(/\n+/)}))} rows={3} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder={'https://youtu.be/xyz\nhttps://meuservidor.com/video.mp4'} />
-        <p className="text-xs text-gray-500 mt-1">Aceita YouTube/Vimeo ou links diretos (MP4/WEBM).</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <MediaUploader
+          label="Imagens Adicionais"
+          accept="image/*"
+          maxSizeBytes={5*1024*1024}
+          uploadEndpoint="/api/images/upload"
+          values={form.images || []}
+          onChange={(urls)=>setForm(p=>({...p, images: urls}))}
+        />
+        <MediaUploader
+          label="Vídeos"
+          accept="video/*"
+          maxSizeBytes={100*1024*1024}
+          uploadEndpoint="/api/videos/upload"
+          values={form.videos || []}
+          onChange={(urls)=>setForm(p=>({...p, videos: urls}))}
+        />
       </div>
 
       <div className="pt-2">
