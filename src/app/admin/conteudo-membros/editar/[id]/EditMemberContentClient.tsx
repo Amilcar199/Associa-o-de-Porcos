@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { 
-  File as FileIcon,
+  FileText,
   Video, 
   BookOpen, 
   Calendar,
@@ -178,7 +178,7 @@ export default function EditMemberContentClient({ contentId }: EditMemberContent
             </label>
             <div className="grid grid-cols-2 gap-2">
               {[
-                { value: 'document', icon: FileIcon, label: 'Documento' },
+                { value: 'document', icon: FileText, label: 'Documento' },
                 { value: 'video', icon: Video, label: 'Vídeo' },
                 { value: 'article', icon: BookOpen, label: 'Artigo' },
                 { value: 'event', icon: Calendar, label: 'Evento' }
