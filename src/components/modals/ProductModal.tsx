@@ -92,7 +92,7 @@ export default function ProductModal({
   const images = product.images && product.images.length > 0
     ? product.images
     : (product.imageUrl ? [product.imageUrl] : [String(Placeholder as any)])
-  const videos = Array.isArray(product as any?.videos) ? ((product as any).videos as string[]) : []
+  const videos = Array.isArray((product as any).videos) ? ((product as any).videos as string[]) : []
 
   const subject = (isEn ? 'Product inquiry: ' : 'Interesse no produto: ') + (product.name || '')
   const intro = isEn
