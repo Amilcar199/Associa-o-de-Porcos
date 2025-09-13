@@ -27,6 +27,11 @@ export default function BolsaClient() {
   const [region, setRegion] = useState<string>('')
   const [periodDays, setPeriodDays] = useState<number>(90)
   const [regionsList, setRegionsList] = useState<string[]>([])
+  const [cleanOutliers, setCleanOutliers] = useState<boolean>(false)
+  const [weighted, setWeighted] = useState<boolean>(false)
+  const [bandPct, setBandPct] = useState<number>(10)
+  const [sortKey, setSortKey] = useState<'region' | 'count' | 'avg' | 'min' | 'max'>('region')
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
 
   const endISO = useMemo(() => new Date().toISOString(), [])
   const startISO = useMemo(() => {
@@ -44,8 +49,11 @@ export default function BolsaClient() {
   const paramsWithRange = useMemo(() => {
     const p = new URLSearchParams(params)
     p.set('start', startISO); p.set('end', endISO)
+    if (cleanOutliers) p.set('cleanOutliers', 'true')
+    if (weighted) p.set('weighted', 'true')
+    if (!Number.isNaN(bandPct)) p.set('bandPct', String(bandPct/100))
     return p
-  }, [params, startISO, endISO])
+  }, [params, startISO, endISO, cleanOutliers, weighted, bandPct])
 
   const [summary, setSummary] = useState<SummaryRes["data"] | null>(null)
   const [overall, setOverall] = useState<OverallRes["data"] | null>(null)
@@ -78,10 +86,94 @@ export default function BolsaClient() {
       setHistoryData(h?.data || null)
     } catch {}
     try {
-      const rec: RecordsRes = await (await fetch(`/api/market/records?${params.toString()}&limit=50`, { cache: 'no-store' })).json()
+      const recParams = new URLSearchParams(params)
+      if (cleanOutliers) recParams.set('cleanOutliers', 'true')
+      if (!Number.isNaN(bandPct)) recParams.set('bandPct', String(bandPct/100))
+      const rec: RecordsRes = await (await fetch(`/api/market/records?${recParams.toString()}&limit=200`, { cache: 'no-store' })).json()
       setRecordsData(rec?.data || null)
     } catch {}
-  })() }, [params, paramsWithRange])
+  })() }, [params, paramsWithRange, cleanOutliers, bandPct])
+
+  const sortedRegions = useMemo(() => {
+    const list = [...(regionsData?.regions || [])]
+    list.sort((a, b) => {
+      const va: any = (a as any)[sortKey]
+      const vb: any = (b as any)[sortKey]
+      const cmp = (va ?? 0) < (vb ?? 0) ? -1 : (va ?? 0) > (vb ?? 0) ? 1 : 0
+      return sortDir === 'asc' ? cmp : -cmp
+    })
+    return list
+  }, [regionsData, sortKey, sortDir])
+
+  function downloadCSV() {
+    const rows = (recordsData?.records || []).map(r => ({
+      id: r.id,
+      data: fmtDateISO(r.date),
+      regiao: r.region,
+      forma: r.saleForm || saleForm,
+      unidade: unit,
+      valor: r.value ?? '',
+      fonte: 'amostral',
+      fora_banda: r.outOfBand ? 'sim' : 'não'
+    }))
+    const headers = [
+      { key: 'id', label: 'ID' },
+      { key: 'data', label: 'Data' },
+      { key: 'regiao', label: 'Região' },
+      { key: 'forma', label: 'Forma' },
+      { key: 'unidade', label: 'Unidade' },
+      { key: 'valor', label: 'Valor' },
+      { key: 'fonte', label: 'Fonte' },
+      { key: 'fora_banda', label: 'Fora da banda' }
+    ]
+    const headerLine = headers.map(h => '"' + h.label.replace(/"/g, '""') + '"').join(',')
+    const body = rows.map(r => headers.map(h => {
+      const v = (r as any)[h.key]
+      const s = v == null ? '' : (typeof v === 'number' ? String(v) : String(v))
+      return '"' + s.replace(/"/g, '""') + '"'
+    }).join(',')).join('\n')
+    const csv = headerLine + '\n' + body
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `bolsa-registos-${new Date().toISOString().slice(0,10)}.csv`
+    link.click()
+    setTimeout(() => URL.revokeObjectURL(url), 2000)
+  }
+
+  function exportSVG() {
+    const meta = `Forma=${saleForm}; Região=${region||'todas'}; Período=${periodDays}d; Unidade=${unit}; Outliers=${cleanOutliers?'on':'off'}; Weighted=${weighted?'on':'off'}; Band=${bandPct}%`
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="260"><desc>${meta}</desc><rect x="0" y="0" width="1000" height="260" fill="white"/><text x="20" y="30" font-size="14" fill="#111">Série histórica (${historyData?.series?.length||0} pts)</text></svg>`
+    const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `bolsa-historico-${new Date().toISOString().slice(0,10)}.svg`
+    a.click()
+    setTimeout(()=>URL.revokeObjectURL(url), 2000)
+  }
+
+  async function exportPNG() {
+    const meta = `Forma=${saleForm}; Região=${region||'todas'}; Período=${periodDays}d; Unidade=${unit}; Outliers=${cleanOutliers?'on':'off'}; Weighted=${weighted?'on':'off'}; Band=${bandPct}%`
+    const svg = `<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1000\" height=\"260\"><desc>${meta}</desc><rect x=\"0\" y=\"0\" width=\"1000\" height=\"260\" fill=\"white\"/><text x=\"20\" y=\"30\" font-size=\"14\" fill=\"#111\">Série histórica (${historyData?.series?.length||0} pts)</text></svg>`
+    const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const img = new Image()
+    await new Promise<void>((resolve, reject)=>{ img.onload=()=>resolve(); img.onerror=()=>reject(); img.src=url })
+    const canvas = document.createElement('canvas')
+    canvas.width = 1000; canvas.height = 260
+    const ctx = canvas.getContext(' 2d'.trim())!
+    ctx.fillStyle = '#ffffff'
+    ctx.fillRect(0,0,1000,260)
+    ctx.drawImage(img,0,0)
+    const pngUrl = canvas.toDataURL('image/png')
+    const a = document.createElement('a')
+    a.href = pngUrl
+    a.download = `bolsa-historico-${new Date().toISOString().slice(0,10)}.png`
+    a.click()
+    setTimeout(()=>URL.revokeObjectURL(url), 2000)
+  }
 
   return (
     <div>
@@ -152,8 +244,8 @@ export default function BolsaClient() {
           <h3 className="font-semibold text-gray-800">Série histórica</h3>
           <div className="flex items-center gap-2 text-xs text-gray-500">
             <span>{historyData?.series?.length || 0} pontos</span>
-            <button className="px-2 py-1 border rounded hover:bg-gray-50">Exportar SVG</button>
-            <button className="px-2 py-1 border rounded hover:bg-gray-50">Exportar PNG</button>
+            <button onClick={exportSVG} className="px-2 py-1 border rounded hover:bg-gray-50">Exportar SVG</button>
+            <button onClick={exportPNG} className="px-2 py-1 border rounded hover:bg-gray-50">Exportar PNG</button>
           </div>
         </div>
         <div className="h-12 text-xs text-gray-600 bg-gray-50 border border-dashed border-gray-200 rounded p-2">{historyData?.series?.slice(-5).map(p=>`${p.date}: ${p.avg ?? '—'}`).join(' · ') || 'Sem dados'}</div>
@@ -190,7 +282,10 @@ export default function BolsaClient() {
       <div className="mt-8 bg-white rounded-xl border border-gray-100 p-4 shadow-sm overflow-x-auto">
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-semibold text-gray-800">Registos recentes</h3>
-          <div className="text-xs text-gray-500">Âncora: {formatAOA(recordsData?.anchor?.ref ?? null)} ±{Math.round((recordsData?.anchor?.bandPct || 0)*100)}%</div>
+          <div className="flex items-center gap-2 text-xs text-gray-500">
+            <span>Âncora: {formatAOA(recordsData?.anchor?.ref ?? null)} ±{Math.round((recordsData?.anchor?.bandPct || 0)*100)}%</span>
+            <button onClick={downloadCSV} className="px-2 py-1 border rounded hover:bg-gray-50">Exportar CSV</button>
+          </div>
         </div>
         <table className="min-w-full text-sm">
           <thead>
@@ -212,6 +307,21 @@ export default function BolsaClient() {
             ))}
           </tbody>
         </table>
+      </div>
+
+      <div className="mt-6 grid gap-3 md:grid-cols-3">
+        <label className="inline-flex items-center gap-2 text-sm">
+          <input type="checkbox" checked={cleanOutliers} onChange={e=>setCleanOutliers(e.target.checked)} />
+          Limpar outliers (± banda)
+        </label>
+        <label className="inline-flex items-center gap-2 text-sm">
+          <input type="checkbox" checked={weighted} onChange={e=>setWeighted(e.target.checked)} />
+          Média ponderada por amostra
+        </label>
+        <label className="text-sm text-gray-700">
+          Banda ±%
+          <input type="number" min={1} max={50} value={bandPct} onChange={e=>setBandPct(parseInt(e.target.value||'10'))} className="ml-2 w-20 px-2 py-1 border rounded" />
+        </label>
       </div>
     </div>
   )
