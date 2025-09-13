@@ -61,6 +61,32 @@ export default function BolsaPage() {
           <h3 className="font-semibold text-gray-800 mb-3">Comparação entre regiões</h3>
           <div className="h-64 flex items-center justify-center text-gray-400 text-sm">Gráfico de comparação (2 regiões) será exibido aqui</div>
         </div>
+
+        <div className="mt-8 bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
+          <h3 className="font-semibold text-gray-800 mb-3">Preços por região</h3>
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm">
+              <thead>
+                <tr className="text-left text-gray-500">
+                  <th className="py-2 pr-4">Região</th>
+                  <th className="py-2 pr-4">N</th>
+                  <th className="py-2 pr-4">Média</th>
+                  <th className="py-2 pr-4">Mín</th>
+                  <th className="py-2">Máx</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                <tr>
+                  <td className="py-2 pr-4 text-gray-800">—</td>
+                  <td className="py-2 pr-4">0</td>
+                  <td className="py-2 pr-4">—</td>
+                  <td className="py-2 pr-4">—</td>
+                  <td className="py-2">—</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </section>
   )
