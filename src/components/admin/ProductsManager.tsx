@@ -38,6 +38,8 @@ interface ProductFormData {
   vaccinated: boolean;
   code: string;
   codeType: 'auto' | 'manual';
+  images?: string[];
+  videos?: string[];
 }
 
 export default function ProductsManager() {
@@ -110,6 +112,8 @@ export default function ProductsManager() {
         age: formData.age,
         weight: formData.weight,
         imageUrl: formData.imageUrl,
+        images: (formData.images||[]).filter(Boolean),
+        videos: (formData.videos||[]).filter(Boolean),
         isAvailable: formData.isAvailable,
         location: formData.location,
         healthStatus: formData.healthStatus,
@@ -150,6 +154,8 @@ export default function ProductsManager() {
       age: product.age,
       weight: product.weight,
       imageUrl: (product as any).imageUrl || '',
+      images: Array.isArray((product as any).images) ? (product as any).images : ((product as any).imageUrl ? [(product as any).imageUrl] : []),
+      videos: Array.isArray((product as any).videos) ? (product as any).videos : [],
       isAvailable: product.availability ? product.availability === 'available' : !!product.isAvailable,
       location: (product as any).location || '',
       healthStatus: (product as any).healthStatus || 'good',
@@ -217,7 +223,9 @@ export default function ProductsManager() {
       healthStatus: 'good',
       vaccinated: false,
       code: '',
-      codeType: 'auto'
+      codeType: 'auto',
+      images: [],
+      videos: []
     });
   };
 
@@ -696,6 +704,37 @@ export default function ProductsManager() {
             label="Imagem do Produto (upload local ou cole uma URL acima)"
             className="mb-4"
           />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Imagens (uma por linha)</label>
+              <textarea
+                rows={4}
+                value={(formData.images||[]).join('\n')}
+                onChange={(e)=>setFormData(prev=>({ ...prev, images: e.target.value.split(/\n+/) }))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder={'https://imagem1.jpg\nhttps://imagem2.jpg'}
+              />
+              {(formData.images||[]).filter(Boolean).length>0 && (
+                <div className="mt-2 grid grid-cols-3 gap-2">
+                  {(formData.images||[]).filter(Boolean).slice(0,6).map((url,idx)=>(
+                    <img key={idx} src={url} className="w-full h-20 object-cover rounded" alt="Pré-visualização" />
+                  ))}
+                </div>
+              )}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Vídeos (uma por linha)</label>
+              <textarea
+                rows={4}
+                value={(formData.videos||[]).join('\n')}
+                onChange={(e)=>setFormData(prev=>({ ...prev, videos: e.target.value.split(/\n+/) }))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder={'https://youtu.be/xyz\nhttps://meuservidor.com/video.mp4'}
+              />
+              <p className="text-xs text-gray-500 mt-1">Aceita YouTube/Vimeo ou links diretos (MP4/WEBM).</p>
+            </div>
+          </div>
 
           {formData.imageUrl && (
             <div className="bg-gray-50 rounded-lg p-4">

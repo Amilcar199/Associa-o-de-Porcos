@@ -14,6 +14,7 @@ export default function NewProductClient() {
     weight: 0,
     price: undefined as number | undefined,
     images: [''],
+    videos: [] as string[],
     features: [] as string[],
     healthStatus: 'good' as 'excellent' | 'good' | 'fair',
     vaccinated: false,
@@ -87,7 +88,7 @@ export default function NewProductClient() {
     setLoading(true)
     try {
       // validação simples de imagem
-      const imageList = (form.images || []).filter(Boolean)
+      const imageList = (form.images || []).map(s=>s.trim()).filter(Boolean)
       if (imageList.length === 0) {
         alert('Adicione pelo menos uma imagem (URL ou upload).')
         return
@@ -117,6 +118,7 @@ export default function NewProductClient() {
           ...form,
           breed: allowedBreeds.includes(form.breed) ? form.breed : 'Outro',
           images: imageList,
+          videos: (form.videos || []).map(s=>s.trim()).filter(Boolean),
           isAvailable: true,
           code: form.code,
           location: finalLocation,
@@ -192,10 +194,10 @@ export default function NewProductClient() {
 
         <div className="grid md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm text-gray-700 mb-1">Imagem (URL)</label>
+            <label className="block text-sm text-gray-700 mb-1">Imagens (uma por linha)</label>
             <div className="relative">
               <ImageIcon className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
-              <input value={form.images[0] || ''} onChange={(e)=>setForm(p=>({...p,images:[e.target.value]}))} className="w-full pl-9 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="https://..." />
+              <textarea value={(form.images||[]).join('\n')} onChange={(e)=>setForm(p=>({...p,images:e.target.value.split(/\n+/)}))} rows={4} className="w-full pl-9 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="https://imagem1.jpg\nhttps://imagem2.jpg" />
             </div>
             <div className="mt-2">
               <label className="block text-sm text-gray-700 mb-1">ou Upload local</label>
@@ -207,12 +209,19 @@ export default function NewProductClient() {
                 const res=await fetch('/api/images/upload',{method:'POST',body:fd});
                 if(res.ok){
                   const json=await res.json();
-                  setForm(p=>({...p,images:[json.data.url]}));
+                  setForm(p=>({...p,images:[...(p.images||[]), json.data.url]}));
                 } else {
                   alert('Falha no upload da imagem');
                 }
               }} className="w-full" />
             </div>
+            {(form.images||[]).filter(Boolean).length>0 && (
+              <div className="mt-3 grid grid-cols-3 gap-2">
+                {(form.images||[]).filter(Boolean).slice(0,6).map((url,idx)=>(
+                  <img key={idx} src={url} className="w-full h-20 object-cover rounded" alt="Pré-visualização" />
+                ))}
+              </div>
+            )}
           </div>
           <div>
             <label className="block text-sm text-gray-700 mb-1">Província</label>
@@ -235,6 +244,12 @@ export default function NewProductClient() {
               <p className="text-xs text-gray-500 mt-1">Se informar este campo, ele terá prioridade sobre os seletores.</p>
             </div>
           </div>
+        </div>
+
+        <div>
+          <label className="block text-sm text-gray-700 mb-1">Vídeos (URLs — uma por linha)</label>
+          <textarea value={(form.videos||[]).join('\n')} onChange={(e)=>setForm(p=>({...p,videos:e.target.value.split(/\n+/)}))} rows={3} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="https://youtu.be/xyz\nhttps://meuservidor.com/video.mp4" />
+          <p className="text-xs text-gray-500 mt-1">Aceita YouTube/Vimeo ou links diretos (MP4/WEBM).</p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-4">

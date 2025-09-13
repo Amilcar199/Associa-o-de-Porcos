@@ -71,6 +71,13 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
       return errorResponse('Título e conteúdo são obrigatórios')
     }
 
+    // Normalizar mídias
+    if (!sanitizedData.images && sanitizedData.featuredImage) {
+      sanitizedData.images = [sanitizedData.featuredImage]
+    }
+    if (sanitizedData.videos && !Array.isArray(sanitizedData.videos)) {
+      sanitizedData.videos = []
+    }
     // Atualizar notícia
     Object.assign(news, sanitizedData)
     await news.save()

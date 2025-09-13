@@ -34,6 +34,7 @@ export interface Product extends Document {
   pricePerKg?: number
   saleForm?: 'carcaça' | 'vivo'
   images: string[]
+  videos?: string[]
   features: string[] // características especiais
   healthStatus: 'excellent' | 'good' | 'fair'
   vaccinated: boolean
@@ -56,6 +57,7 @@ export interface News extends Document {
   excerpt: string
   featuredImage: string
   images?: string[]
+  videos?: string[]
   author: User | string
   category: 'news' | 'events' | 'tips' | 'market'
   tags: string[]
@@ -210,6 +212,8 @@ export interface ProductFormData {
   vaccinated: boolean
   location: string
   tags: string[]
+  images?: string[]
+  videos?: string[]
 }
 
 export interface NewsFormData {
@@ -220,6 +224,8 @@ export interface NewsFormData {
   tags: string[]
   published: boolean
   featured: boolean
+  images?: string[]
+  videos?: string[]
 }
 
 export interface CollaboratorFormData {

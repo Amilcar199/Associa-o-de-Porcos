@@ -116,6 +116,12 @@ export async function POST(req: NextRequest) {
     }
 
     // Criar notícia
+    if (!sanitizedData.images && sanitizedData.featuredImage) {
+      sanitizedData.images = [sanitizedData.featuredImage]
+    }
+    if (!Array.isArray(sanitizedData.videos)) {
+      sanitizedData.videos = []
+    }
     const news = new News(sanitizedData)
     await news.save()
 

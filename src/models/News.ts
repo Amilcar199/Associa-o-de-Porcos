@@ -46,6 +46,18 @@ const NewsSchema = new Schema<INews>({
       }
     ]
   },
+  videos: {
+    type: [String],
+    default: [],
+    validate: [
+      {
+        validator: function(videos: string[]) {
+          return videos.length <= 20
+        },
+        message: 'Máximo de 20 vídeos'
+      }
+    ]
+  },
   author: {
     type: Schema.Types.ObjectId,
     ref: 'User',

@@ -92,6 +92,7 @@ export default function ProductModal({
   const images = product.images && product.images.length > 0
     ? product.images
     : (product.imageUrl ? [product.imageUrl] : [String(Placeholder as any)])
+  const videos = Array.isArray(product as any?.videos) ? ((product as any).videos as string[]) : []
 
   const subject = (isEn ? 'Product inquiry: ' : 'Interesse no produto: ') + (product.name || '')
   const intro = isEn
@@ -228,6 +229,30 @@ export default function ProductModal({
             </>
           )}
         </div>
+
+        {/* Galeria de vídeos */}
+        {videos.length > 0 && (
+          <div className="px-6 lg:px-8 pb-4">
+            <h3 className="text-xl font-semibold text-gray-900 mb-3">Vídeos</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {videos.map((url, idx) => (
+                <div key={idx} className="aspect-video bg-black/5 rounded-lg overflow-hidden">
+                  {/^(https?:)?\/\//.test(url) && /youtube\.com|youtu\.be|vimeo\.com/.test(url) ? (
+                    <iframe
+                      src={url.includes('embed') ? url : url.replace('watch?v=', 'embed/')}
+                      className="w-full h-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      title={`video-${idx}`}
+                    />
+                  ) : (
+                    <video src={url} controls className="w-full h-full" />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Footer com ações */}
         <div className="px-6 lg:px-8 py-4 bg-gray-50 border-t border-gray-200">

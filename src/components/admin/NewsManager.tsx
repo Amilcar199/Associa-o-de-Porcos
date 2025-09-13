@@ -30,6 +30,8 @@ interface NewsFormData {
   category: string;
   imageUrl?: string;
   isPublished: boolean;
+  images?: string[];
+  videos?: string[];
 }
 
 export default function NewsManager() {
@@ -47,7 +49,9 @@ export default function NewsManager() {
     excerpt: '',
     category: '',
     imageUrl: '',
-    isPublished: false
+    isPublished: false,
+    images: [],
+    videos: []
   });
  
   const allowedCategories = [
@@ -88,7 +92,8 @@ export default function NewsManager() {
         excerpt: formData.excerpt,
         category: allowedCategories.map(c=>c.value).includes(formData.category as any) ? formData.category : 'news',
         featuredImage: formData.imageUrl,
-        images: formData.imageUrl ? [formData.imageUrl] : [],
+        images: (formData.images && formData.images.length>0) ? formData.images : (formData.imageUrl ? [formData.imageUrl] : []),
+        videos: (formData.videos||[]).filter(Boolean),
         published: formData.isPublished
       }
       
@@ -123,7 +128,9 @@ export default function NewsManager() {
       excerpt: newsItem.excerpt,
       category: newsItem.category,
       imageUrl: (newsItem as any).featuredImage || newsItem.imageUrl || '',
-      isPublished: (newsItem as any).published ?? newsItem.isPublished
+      isPublished: (newsItem as any).published ?? newsItem.isPublished,
+      images: Array.isArray((newsItem as any).images) ? (newsItem as any).images : ((newsItem as any).featuredImage ? [(newsItem as any).featuredImage] : []),
+      videos: Array.isArray((newsItem as any).videos) ? (newsItem as any).videos : []
     });
     setShowModal(true);
   };
@@ -406,6 +413,27 @@ export default function NewsManager() {
               />
             </div>
           )}
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Imagens (uma por linha)</label>
+            <textarea
+              rows={3}
+              value={(formData.images||[]).join('\n')}
+              onChange={(e)=>setFormData(prev=>({...prev, images: e.target.value.split(/\n+/)}))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              placeholder={'https://imagem1.jpg\nhttps://imagem2.jpg'}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Vídeos (uma por linha)</label>
+            <textarea
+              rows={3}
+              value={(formData.videos||[]).join('\n')}
+              onChange={(e)=>setFormData(prev=>({...prev, videos: e.target.value.split(/\n+/)}))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              placeholder={'https://youtu.be/xyz\nhttps://meuservidor.com/video.mp4'}
+            />
+          </div>
 
           <div className="flex justify-end space-x-3">
             <button

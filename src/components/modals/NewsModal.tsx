@@ -57,7 +57,7 @@ export default function NewsModal({
         {/* Header */}
         <div className="relative h-64 lg:h-72 overflow-hidden">
           <Image
-            src={(news.featuredImage as any) || (Placeholder as any)}
+            src={((Array.isArray(news.images) && news.images[0]) || (news.featuredImage as any) || (Placeholder as any))}
             alt={news.title}
             fill
             className="object-cover"
@@ -164,6 +164,39 @@ export default function NewsModal({
                   dangerouslySetInnerHTML={{ __html: news.content || news.excerpt }}
                 />
               </div>
+
+              {/* Galeria de imagens */}
+              {Array.isArray(news.images) && news.images.length > 1 && (
+                <div className="mt-6 grid grid-cols-2 gap-3">
+                  {news.images.slice(1).map((url: string, idx: number) => (
+                    <img key={idx} src={url} className="w-full h-40 object-cover rounded" alt={`Imagem ${idx+2}`} />
+                  ))}
+                </div>
+              )}
+
+              {/* Vídeos */}
+              {Array.isArray(news.videos) && news.videos.length > 0 && (
+                <div className="mt-8">
+                  <h3 className="text-sm font-semibold text-gray-900 mb-3">Vídeos</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {news.videos.map((url: string, idx: number) => (
+                      <div key={idx} className="aspect-video bg-black/5 rounded-lg overflow-hidden">
+                        {/^(https?:)?\/\//.test(url) && /youtube\.com|youtu\.be|vimeo\.com/.test(url) ? (
+                          <iframe
+                            src={url.includes('embed') ? url : url.replace('watch?v=', 'embed/')}
+                            className="w-full h-full"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            title={`video-${idx}`}
+                          />
+                        ) : (
+                          <video src={url} controls className="w-full h-full" />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Tags */}
               {news.tags && news.tags.length > 0 && (
