@@ -130,7 +130,7 @@ export default function NewProductClient() {
       }
       setForm({
         name: '', description: '', breed: '', age: 0, weight: 0, price: undefined,
-        images: [''], features: [], healthStatus: 'good', vaccinated: false, location: '', province: '', municipality: '', customLocation: '', tags: [],
+        images: [''], videos: [], features: [], healthStatus: 'good', vaccinated: false, location: '', province: '', municipality: '', customLocation: '', tags: [],
         code: '', codeType: 'auto'
       })
       alert('Produto criado com sucesso')
