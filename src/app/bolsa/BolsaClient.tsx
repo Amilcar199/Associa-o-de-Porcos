@@ -85,50 +85,64 @@ export default function BolsaClient() {
 
   return (
     <div>
-      <div className="mt-4 grid gap-3 md:grid-cols-4">
-        <select value={saleForm} onChange={e=>setSaleForm(e.target.value as any)} className="px-3 py-2 border rounded-lg">
-          <option value="carcaça">Forma: carcaça (AOA/kg)</option>
-          <option value="vivo">Forma: vivo (AOA/cabeça)</option>
-        </select>
-        <select value={region} onChange={e=>setRegion(e.target.value)} className="px-3 py-2 border rounded-lg">
-          <option value="">Região: todas</option>
-          {regionsList.map(r => <option key={r} value={r}>{r}</option>)}
-        </select>
-        <select value={periodDays} onChange={e=>setPeriodDays(parseInt(e.target.value))} className="px-3 py-2 border rounded-lg">
-          <option value={30}>Período: 30 dias</option>
-          <option value={90}>Período: 90 dias</option>
-          <option value={180}>Período: 180 dias</option>
-          <option value={365}>Período: 365 dias</option>
-        </select>
-        <select disabled className="px-3 py-2 border rounded-lg">
-          <option>Raça (apenas autenticados)</option>
-        </select>
+      <div className="bg-white border border-gray-100 rounded-xl p-4 shadow-sm">
+        <div className="grid gap-3 md:grid-cols-4">
+          <label className="text-xs text-gray-500">
+            Forma de venda
+            <select value={saleForm} onChange={e=>setSaleForm(e.target.value as any)} className="mt-1 w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-200">
+              <option value="carcaça">Carcaça (AOA/kg)</option>
+              <option value="vivo">Vivo (AOA/cabeça)</option>
+            </select>
+          </label>
+          <label className="text-xs text-gray-500">
+            Região
+            <select value={region} onChange={e=>setRegion(e.target.value)} className="mt-1 w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-200">
+              <option value="">Todas</option>
+              {regionsList.map(r => <option key={r} value={r}>{r}</option>)}
+            </select>
+          </label>
+          <label className="text-xs text-gray-500">
+            Período
+            <select value={periodDays} onChange={e=>setPeriodDays(parseInt(e.target.value))} className="mt-1 w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-200">
+              <option value={30}>30 dias</option>
+              <option value={90}>90 dias</option>
+              <option value={180}>180 dias</option>
+              <option value={365}>365 dias</option>
+            </select>
+          </label>
+          <label className="text-xs text-gray-400">
+            Raça (apenas autenticados)
+            <select disabled className="mt-1 w-full px-3 py-2 border rounded-lg bg-gray-50 text-gray-400">
+              <option>—</option>
+            </select>
+          </label>
+        </div>
       </div>
 
       <div className="mt-6 grid md:grid-cols-3 gap-4">
         <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
           <div className="text-xs text-gray-500">Preço médio atual ({unit === 'kg' ? 'AOA/kg' : 'AOA/cabeça'})</div>
-          <div className="text-3xl font-bold mt-1">{formatAOA(summary?.current?.avg ?? null)}</div>
+          <div className="text-3xl font-bold mt-1 text-primary-800">{formatAOA(summary?.current?.avg ?? null)}</div>
           <div className="text-xs text-gray-500 mt-1">Base {summary?.current?.count ?? 0} registos</div>
         </div>
         <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
           <div className="text-xs text-gray-500">Variação diária</div>
-          <div className="mt-1 text-sm">{formatPct(summary?.variation?.daily ?? null)}</div>
+          <div className={`mt-1 inline-flex items-center px-2 py-0.5 rounded-full text-sm ${((summary?.variation?.daily ?? 0) >= 0) ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>{formatPct(summary?.variation?.daily ?? null)}</div>
         </div>
         <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
           <div className="flex justify-between">
             <div>
               <div className="text-xs text-gray-500">Variação semanal</div>
-              <div className="mt-1 text-sm">{formatPct(summary?.variation?.weekly ?? null)}</div>
+              <div className={`mt-1 inline-flex items-center px-2 py-0.5 rounded-full text-sm ${((summary?.variation?.weekly ?? 0) >= 0) ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>{formatPct(summary?.variation?.weekly ?? null)}</div>
             </div>
             <div>
               <div className="text-xs text-gray-500">Variação mensal</div>
-              <div className="mt-1 text-sm">{formatPct(summary?.variation?.monthly ?? null)}</div>
+              <div className={`mt-1 inline-flex items-center px-2 py-0.5 rounded-full text-sm ${((summary?.variation?.monthly ?? 0) >= 0) ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>{formatPct(summary?.variation?.monthly ?? null)}</div>
             </div>
           </div>
           <div className="text-xs text-gray-500 mt-2">
             {summary?.officialRef != null && (<span>Ref. oficial: {formatAOA(summary?.officialRef ?? null)}</span>)}
-            {summary?.usedFallback && (<span className="ml-2">Fallback usado ({fmtDateISO(summary?.effectiveDate)})</span>)}
+            {summary?.usedFallback && (<span className="ml-2 text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded">Usando melhor dia ({fmtDateISO(summary?.effectiveDate)})</span>)}
           </div>
         </div>
       </div>
@@ -136,9 +150,13 @@ export default function BolsaClient() {
       <div className="mt-8 bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-semibold text-gray-800">Série histórica</h3>
-          <div className="text-xs text-gray-500">{historyData?.series?.length || 0} pontos</div>
+          <div className="flex items-center gap-2 text-xs text-gray-500">
+            <span>{historyData?.series?.length || 0} pontos</span>
+            <button className="px-2 py-1 border rounded hover:bg-gray-50">Exportar SVG</button>
+            <button className="px-2 py-1 border rounded hover:bg-gray-50">Exportar PNG</button>
+          </div>
         </div>
-        <div className="h-12 text-xs text-gray-600">{historyData?.series?.slice(-5).map(p=>`${p.date}:${p.avg ?? '—'}`).join(' · ') || 'Sem dados'}</div>
+        <div className="h-12 text-xs text-gray-600 bg-gray-50 border border-dashed border-gray-200 rounded p-2">{historyData?.series?.slice(-5).map(p=>`${p.date}: ${p.avg ?? '—'}`).join(' · ') || 'Sem dados'}</div>
       </div>
 
       <div className="mt-8 bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
@@ -189,7 +207,7 @@ export default function BolsaClient() {
                 <td className="py-2 pr-4">{fmtDateISO(r.date)}</td>
                 <td className="py-2 pr-4">{r.region}</td>
                 <td className="py-2 pr-4">{formatAOA(r.value)}</td>
-                <td className="py-2">{r.outOfBand ? 'Sim' : 'Não'}</td>
+                <td className="py-2">{r.outOfBand ? <span className="px-2 py-0.5 text-xs rounded-full bg-red-100 text-red-700">Sim</span> : <span className="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-700">Não</span>}</td>
               </tr>
             ))}
           </tbody>
