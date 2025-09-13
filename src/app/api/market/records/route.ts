@@ -13,10 +13,13 @@ export async function GET(req: NextRequest) {
     await connectDB()
 
     const { searchParams } = new URL(req.url)
-    const unit = (searchParams.get('unit') as Unit) || 'kg'
+    const saleFormParam = searchParams.get('saleForm') as ('carcaça' | 'vivo') | null
+    const unit: Unit = (searchParams.get('unit') as Unit) || (saleFormParam === 'vivo' ? 'head' : 'kg')
     const region = searchParams.get('region') || undefined
     const breed = searchParams.get('breed') || undefined
     const limit = Math.min(parseInt(searchParams.get('limit') || '100'), 500)
+    const cleanOutliers = String(searchParams.get('cleanOutliers') || 'false') === 'true'
+    const bandPct = Math.min(Math.max(parseFloat(searchParams.get('bandPct') || '0.1'), 0.01), 0.5)
 
     const matchStage: any = {
       $and: [
@@ -26,6 +29,9 @@ export async function GET(req: NextRequest) {
 
     if (region) {
       matchStage.$and.push({ location: { $regex: new RegExp(region, 'i') } })
+    }
+    if (saleFormParam) {
+      matchStage.$and.push({ saleForm: saleFormParam })
     }
     matchStage.$and.push({ $or: [ { availability: 'available' }, { availability: { $exists: false } } ] })
 
@@ -47,6 +53,19 @@ export async function GET(req: NextRequest) {
       pipeline.push({ $match: { breed } })
     }
 
+    // Optional outlier cleaning based on official anchor for current region
+    if (cleanOutliers && region) {
+      try {
+        const mq = await (MarketQuote as any).findOne({ region: new RegExp(region, 'i'), status: 'approved', ...(saleFormParam ? { saleForm: saleFormParam } : {}) }).sort({ updatedAt: -1 }).lean()
+        const anchorRef = mq ? (unit === 'kg' ? (mq.refPricePerKg ?? null) : (mq.refPricePerHead ?? null)) : null
+        if (anchorRef != null && anchorRef > 0) {
+          const minV = anchorRef * (1 - bandPct)
+          const maxV = anchorRef * (1 + bandPct)
+          pipeline.push({ $match: { $and: [ { value: { $ne: null } }, { value: { $gte: minV, $lte: maxV } } ] } })
+        }
+      } catch {}
+    }
+
     pipeline.push({ $sort: { updatedAt: -1 } })
     pipeline.push({ $limit: limit })
     pipeline.push({
@@ -61,7 +80,8 @@ export async function GET(req: NextRequest) {
         price: 1,
         pricePerKg: 1,
         value: 1,
-        age: 1
+        age: 1,
+        saleForm: '$saleForm'
       }
     })
 
@@ -86,6 +106,7 @@ export async function GET(req: NextRequest) {
       breed: d.breed,
       unit,
       value: d.value ?? null,
+      saleForm: d.saleForm || saleFormParam || null,
       // flag fora da banda se existir âncora
       outOfBand: anchor.ref != null && d.value != null ? (
         (d.value < (anchor.ref * (1 - anchor.bandPct))) || (d.value > (anchor.ref * (1 + anchor.bandPct)))

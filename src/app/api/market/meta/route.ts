@@ -17,8 +17,8 @@ export async function GET(req: NextRequest) {
     const regions = await (Product as any).distinct('location', { $or: [ { isActive: true }, { isActive: { $exists: false } } ] })
     const breeds = await (Product as any).distinct('breed', { $or: [ { isActive: true }, { isActive: { $exists: false } } ] })
 
-    const methodologyPT = 'Os indicadores desta Bolsa usam a média simples do preço por kg (AOA/kg) quando aplicável, e AOA/cabeça para a forma "vivo". As variações (dia/semana/mês) comparam as médias com os períodos imediatamente anteriores. A referência semanal poderá ser complementada por cotações oficiais coletadas com vendedores (MarketQuote), exigindo N mínimo de amostras e documentação de metodologia.'
-    const methodologyEN = 'The board indicators use the simple average of price per kg (AOA/kg) when applicable, and AOA/head for the "live" form. Variations (daily/weekly/monthly) compare averages against prior periods. Weekly reference may be complemented by official quotes collected from vendors (MarketQuote), requiring a minimum number of samples and documented methodology.'
+    const methodologyPT = 'Os indicadores desta Bolsa usam média simples ou ponderada por amostra do preço por kg (AOA/kg) na forma carcaça e AOA/cabeça na forma vivo. Variações (dia/semana/mês) comparam períodos imediatamente anteriores. Outliers podem ser limpos com base em bandas de ±10% em torno da cotação oficial (quando disponível) por região/forma. Referência semanal pode ser complementada por cotações oficiais coletadas com vendedores (MarketQuote), exigindo N mínimo de amostras.'
+    const methodologyEN = 'The board indicators use simple or sample-weighted averages of price per kg (AOA/kg) for carcass and AOA/head for live. Variations (daily/weekly/monthly) compare against immediately prior periods. Outliers may be cleaned using ±10% bands around official quotes (when available) by region/form. Weekly reference may be complemented by official quotes collected from vendors (MarketQuote), requiring a minimum sample size.'
 
     return NextResponse.json(successResponse({
       lastUpdated: lastDoc?.updatedAt || null,
