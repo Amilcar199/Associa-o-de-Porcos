@@ -12,6 +12,9 @@ interface SummaryResponse {
     unit: Unit
     current: { avg: number | null, count: number }
     variation: { daily: number | null, weekly: number | null, monthly: number | null }
+    officialRef?: number | null
+    usedFallback?: boolean
+    effectiveDate?: string
   }
 }
 
@@ -39,8 +42,10 @@ interface RecordsRow {
   breed: string
   unit: Unit
   value: number | null
+  saleForm?: 'carcaça' | 'vivo' | null
+  outOfBand?: boolean
 }
-interface RecordsResponse { success: boolean, data: { unit: Unit, records: RecordsRow[] } }
+interface RecordsResponse { success: boolean, data: { unit: Unit, records: RecordsRow[], anchor?: { ref: number | null, bandPct: number } } }
 
 interface MetaResponse {
   success: boolean
@@ -115,9 +120,50 @@ function toCSV(rows: any[], headers: { key: string, label: string }[]) {
   return headerLine + '\n' + body
 }
 
+function downloadSVGElement(svg: SVGSVGElement, filename: string) {
+  const serializer = new XMLSerializer()
+  const source = serializer.serializeToString(svg)
+  const blob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  a.click()
+  setTimeout(() => URL.revokeObjectURL(url), 2000)
+}
+
+async function downloadPNGFromSVG(svg: SVGSVGElement, filename: string, scale = 2) {
+  const serializer = new XMLSerializer()
+  const source = serializer.serializeToString(svg)
+  const svgBlob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' })
+  const url = URL.createObjectURL(svgBlob)
+  const img = new Image()
+  const width = (svg.viewBox && svg.viewBox.baseVal && svg.viewBox.baseVal.width) ? svg.viewBox.baseVal.width : 1000
+  const height = (svg.viewBox && svg.viewBox.baseVal && svg.viewBox.baseVal.height) ? svg.viewBox.baseVal.height : 260
+  await new Promise<void>((resolve, reject) => {
+    img.onload = () => resolve()
+    img.onerror = () => reject(new Error('Falha ao carregar SVG'))
+    img.src = url
+  })
+  const canvas = document.createElement('canvas')
+  canvas.width = Math.max(1, Math.floor(width * scale))
+  canvas.height = Math.max(1, Math.floor(height * scale))
+  const ctx = canvas.getContext('2d')!
+  ctx.fillStyle = '#ffffff'
+  ctx.fillRect(0, 0, canvas.width, canvas.height)
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+  const pngUrl = canvas.toDataURL('image/png')
+  const a = document.createElement('a')
+  a.href = pngUrl
+  a.download = filename
+  a.click()
+  setTimeout(() => URL.revokeObjectURL(url), 2000)
+}
+
 export default function BolsaClient() {
   const router = useRouter()
-  const [unit] = useState<Unit>('kg')
+  const [saleForm, setSaleForm] = useState<'carcaça' | 'vivo'>('carcaça')
+  const unit: Unit = saleForm === 'vivo' ? 'head' : 'kg'
   const [region, setRegion] = useState<string>('')
   const [periodDays, setPeriodDays] = useState<number>(180)
   const compareMode: 'region' = 'region'
@@ -134,41 +180,45 @@ export default function BolsaClient() {
   const summaryUrl = useMemo(() => {
     const p = new URLSearchParams()
     p.set('unit', unit)
+    p.set('saleForm', saleForm)
     if (region) p.set('region', region)
     return `/api/market/summary?${p.toString()}`
-  }, [unit, region])
+  }, [unit, saleForm, region])
 
   const regionsUrl = useMemo(() => {
     const p = new URLSearchParams()
     p.set('unit', unit)
+    p.set('saleForm', saleForm)
     if (region) p.set('region', region)
     const end = new Date().toISOString()
     p.set('start', periodStartISO)
     p.set('end', end)
     return `/api/market/regions?${p.toString()}`
-  }, [unit, region, periodStartISO])
+  }, [unit, saleForm, region, periodStartISO])
 
   const historyUrl = useMemo(() => {
     const p = new URLSearchParams()
     p.set('unit', unit)
+    p.set('saleForm', saleForm)
     if (region) p.set('region', region)
     const end = new Date().toISOString()
     p.set('start', periodStartISO)
     p.set('end', end)
     return `/api/market/history?${p.toString()}`
-  }, [unit, region, periodStartISO])
+  }, [unit, saleForm, region, periodStartISO])
 
   const recordsUrl = useMemo(() => {
     const p = new URLSearchParams()
     p.set('unit', unit)
+    p.set('saleForm', saleForm)
     if (region) p.set('region', region)
     p.set('limit', '300')
     return `/api/market/records?${p.toString()}`
-  }, [unit, region])
+  }, [unit, saleForm, region])
 
   const { data: meta } = useFetch<MetaResponse>('/api/market/meta', [])
   const { data: summary } = useFetch<SummaryResponse>(summaryUrl, [summaryUrl])
-  const { data: overall } = useFetch<OverallResponse>('/api/market/overall', [])
+  const { data: overall } = useFetch<OverallResponse>(`/api/market/overall?unit=${unit}&saleForm=${saleForm}${region?`&region=${encodeURIComponent(region)}`:''}`, [unit, saleForm, region])
   const { data: regionsData } = useFetch<RegionsResponse>(regionsUrl, [regionsUrl])
   const { data: historyData } = useFetch<HistoryResponse>(historyUrl, [historyUrl])
   const { data: recordsData } = useFetch<RecordsResponse>(recordsUrl, [recordsUrl])
@@ -195,11 +245,25 @@ export default function BolsaClient() {
     })
   }, [historyPoints])
 
+  const exportHistorySVG = () => {
+    const el = document.getElementById('history-svg') as SVGSVGElement | null
+    if (!el) return
+    const meta = `bolsa-historico_${saleForm}_${region||'todas'}_${periodDays}d_${unit}.svg`
+    downloadSVGElement(el, meta)
+  }
+  const exportHistoryPNG = async () => {
+    const el = document.getElementById('history-svg') as SVGSVGElement | null
+    if (!el) return
+    const meta = `bolsa-historico_${saleForm}_${region||'todas'}_${periodDays}d_${unit}.png`
+    await downloadPNGFromSVG(el, meta)
+  }
+
   const downloadCSV = () => {
     const rows = (recordsData?.data?.records || []).map(r => ({
       id: r.id,
       data: formatDate(r.date),
       regiao: r.region,
+      forma: r.saleForm || (saleForm as any),
       unidade: r.unit,
       valor: r.value ?? ''
     }))
@@ -207,6 +271,7 @@ export default function BolsaClient() {
       { key: 'id', label: 'ID' },
       { key: 'data', label: 'Data' },
       { key: 'regiao', label: 'Região' },
+      { key: 'forma', label: 'Forma' },
       { key: 'unidade', label: 'Unidade' },
       { key: 'valor', label: 'Valor' },
     ])
@@ -255,6 +320,10 @@ export default function BolsaClient() {
 
         <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
           <div className="grid gap-3 md:grid-cols-3">
+            <select value={saleForm} onChange={e => setSaleForm(e.target.value as any)} className="px-3 py-2 border rounded-lg">
+              <option value="carcaça">Carcaça (AOA/kg)</option>
+              <option value="vivo">Vivo (AOA/cabeça)</option>
+            </select>
             <select value={region} onChange={e => setRegion(e.target.value)} className="px-3 py-2 border rounded-lg">
               <option value="">Região (todas)</option>
               {regions.map(r => (<option key={r} value={r}>{r}</option>))}
@@ -305,7 +374,7 @@ export default function BolsaClient() {
 
         <div className="grid md:grid-cols-3 gap-4">
           <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-            <div className="text-xs text-gray-500">Preço médio atual (AOA) — média geral</div>
+            <div className="text-xs text-gray-500">Preço médio atual ({unit === 'kg' ? 'AOA/kg' : 'AOA/cabeça'}) — média geral</div>
             <div className="text-3xl font-bold mt-1">{formatCurrencyAOA(overall?.data?.avg ?? null)}</div>
             <div className="text-xs text-gray-500 mt-1">Base {overall?.data?.count || 0} registos</div>
           </div>
@@ -333,23 +402,36 @@ export default function BolsaClient() {
                 </div>
               </div>
             </div>
+            <div className="text-xs text-gray-500 mt-2">
+              {summary?.data?.officialRef != null && (
+                <span>Ref. oficial: {formatCurrencyAOA(summary?.data?.officialRef || null)} ({unit === 'kg' ? 'AOA/kg' : 'AOA/cabeça'})</span>
+              )}
+              {summary?.data?.usedFallback && (
+                <span className="ml-2">Dados do dia indisponíveis; usando melhor dia da última quinzena ({summary?.data?.effectiveDate?.slice(0,10)})</span>
+              )}
+            </div>
           </div>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-6">
           <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm lg:col-span-2">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="font-semibold text-gray-800">Série histórica</h3>
-              <div className="text-xs text-gray-500">{historyPoints.length} pontos</div>
+              <h3 className="font-semibold text-gray-800">Série histórica ({unit === 'kg' ? 'AOA/kg' : 'AOA/cabeça'})</h3>
+              <div className="flex items-center gap-2">
+                <div className="text-xs text-gray-500">{historyPoints.length} pontos</div>
+                <button onClick={exportHistorySVG} className="text-xs px-2 py-1 border rounded-lg">Exportar SVG</button>
+                <button onClick={exportHistoryPNG} className="text-xs px-2 py-1 border rounded-lg">Exportar PNG</button>
+              </div>
             </div>
             <div className="h-64">
-              <svg viewBox="0 0 1000 260" preserveAspectRatio="none" className="w-full h-full">
+              <svg id="history-svg" viewBox="0 0 1000 260" preserveAspectRatio="none" className="w-full h-full">
                 <defs>
                   <linearGradient id="grad2" x1="0" x2="0" y1="0" y2="1">
                     <stop offset="0%" stopColor="#16a34a" stopOpacity="0.25" />
                     <stop offset="100%" stopColor="#16a34a" stopOpacity="0" />
                   </linearGradient>
                 </defs>
+                <desc>{`Forma=${saleForm}; Região=${region||'todas'}; Período=${periodDays}d; Unidade=${unit}`}</desc>
                 {/* Axes */}
                 <g>
                   <line x1="40" y1="10" x2="40" y2="240" stroke="#e5e7eb" />
@@ -412,7 +494,8 @@ export default function BolsaClient() {
                 <thead>
                   <tr className="text-left text-gray-500">
                     <th className="py-2 pr-4">Região</th>
-                    <th className="py-2 pr-4">Média</th>
+                    <th className="py-2 pr-4">N</th>
+                    <th className="py-2 pr-4">Média ({unit === 'kg' ? 'AOA/kg' : 'AOA/cabeça'})</th>
                     <th className="py-2 pr-4">Mín</th>
                     <th className="py-2">Máx</th>
                   </tr>
@@ -421,6 +504,7 @@ export default function BolsaClient() {
                   {(regionsData?.data?.regions || []).map(r => (
                     <tr key={r.region}>
                       <td className="py-2 pr-4 text-gray-800">{r.region}</td>
+                      <td className="py-2 pr-4">{r.count}</td>
                       <td className="py-2 pr-4">{formatCurrencyAOA(r.avg)}</td>
                       <td className="py-2 pr-4">{formatCurrencyAOA(r.min)}</td>
                       <td className="py-2">{formatCurrencyAOA(r.max)}</td>
@@ -451,20 +535,25 @@ export default function BolsaClient() {
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Região</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Preço</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Preço ({unit === 'kg' ? 'AOA/kg' : 'AOA/cabeça'})</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fora da banda</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {(recordsData?.data?.records || []).map((r) => (
-                  <tr key={r.id}>
+                  <tr key={r.id} className={r.outOfBand ? 'bg-red-50' : ''}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatDate(r.date)}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{r.region}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatCurrencyAOA(r.value)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">{r.outOfBand ? <span className="inline-flex px-2 py-0.5 rounded-full bg-red-100 text-red-700">Sim</span> : 'Não'}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+          {recordsData?.data?.anchor && recordsData.data.anchor.ref != null && (
+            <div className="px-4 pb-4 text-xs text-gray-500">Âncora: {formatCurrencyAOA(recordsData.data.anchor.ref)} ±{Math.round((recordsData.data.anchor.bandPct||0)*100)}%</div>
+          )}
         </div>
 
         <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
