@@ -8,7 +8,17 @@ export default function ConstitutionDocsClient() {
     // Look for images specifically under assets/Conteudos Suinos/pdf_paginas_png
     // Use relative path from this file to ensure webpack resolves correctly
     const req = (require as any).context('../../components/assets', true, /Conteudos Suinos\/pdf_paginas_png\/(.*)\.(png|jpe?g|webp)$/i)
-    imageUrls = req.keys().map((key: string) => req(key))
+    imageUrls = req
+      .keys()
+      .map((key: string) => {
+        const mod = req(key)
+        if (typeof mod === 'string') return mod
+        if (mod && typeof mod === 'object') {
+          return mod.default || mod.src || ''
+        }
+        return ''
+      })
+      .filter((u: string) => typeof u === 'string' && u.length > 0)
   } catch {
     imageUrls = []
   }
