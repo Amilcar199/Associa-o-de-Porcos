@@ -100,17 +100,47 @@ export default async function NewsPage({ params }: RouteParams) {
           </div>
         </header>
 
-        {/* Imagem de destaque */}
-        {news.featuredImage && (
+        {/* Galeria de imagens */}
+        {(news.images && news.images.length > 0) ? (
+          <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+            {(news.images as string[]).map((url: string, idx: number) => (
+              <img key={idx} src={url} alt={`${news.title} ${idx+1}`} className="w-full h-64 object-cover rounded-lg" />
+            ))}
+          </div>
+        ) : (news.featuredImage && (
           <div className="mb-8">
             <img src={news.featuredImage} alt={news.title} className="w-full h-64 md:h-96 object-cover rounded-lg" />
           </div>
-        )}
+        ))}
 
         {/* Conteúdo da notícia */}
         <div className="prose prose-lg max-w-none">
           <div dangerouslySetInnerHTML={{ __html: news.content }} />
         </div>
+
+        {/* Vídeos */}
+        {Array.isArray((news as any).videos) && (news as any).videos.length > 0 && (
+          <div className="mt-8">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Vídeos</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {((news as any).videos as string[]).map((url: string, idx: number) => (
+                <div key={idx} className="aspect-video bg-black/5 rounded-lg overflow-hidden">
+                  {/^(https?:)?\/\//.test(url) && /youtube\.com|youtu\.be|vimeo\.com/.test(url) ? (
+                    <iframe
+                      src={url.includes('embed') ? url : url.replace('watch?v=', 'embed/')}
+                      className="w-full h-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      title={`video-${idx}`}
+                    />
+                  ) : (
+                    <video src={url} controls className="w-full h-full" />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Tags */}
         {news.tags && news.tags.length > 0 && (

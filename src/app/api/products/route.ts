@@ -89,6 +89,7 @@ export async function POST(req: NextRequest) {
       images: Array.isArray(sanitizedData.images) && sanitizedData.images.length
         ? sanitizedData.images
         : (sanitizedData.imageUrl ? [sanitizedData.imageUrl] : []),
+      videos: Array.isArray(sanitizedData.videos) ? sanitizedData.videos : [],
       features: sanitizedData.features || [],
       healthStatus: sanitizedData.healthStatus || 'good',
       vaccinated: !!sanitizedData.vaccinated,

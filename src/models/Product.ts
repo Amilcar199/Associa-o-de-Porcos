@@ -79,6 +79,18 @@ const ProductSchema = new Schema<IProduct>({
       }
     ]
   },
+  videos: {
+    type: [String],
+    default: [],
+    validate: [
+      {
+        validator: function(videos: string[]) {
+          return videos.length <= 10
+        },
+        message: 'Máximo de 10 vídeos'
+      }
+    ]
+  },
   features: {
     type: [String],
     default: [],

@@ -91,6 +91,9 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
         ? sanitizedData.images
         : (sanitizedData.imageUrl ? [sanitizedData.imageUrl] : [])
     }
+    if (sanitizedData.videos) {
+      updateData.videos = Array.isArray(sanitizedData.videos) ? sanitizedData.videos : []
+    }
     if (typeof sanitizedData.isAvailable === 'boolean') {
       updateData.availability = sanitizedData.isAvailable ? 'available' : 'reserved'
     } else if (sanitizedData.availability) {

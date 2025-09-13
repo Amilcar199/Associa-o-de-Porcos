@@ -18,7 +18,9 @@ export default function NewNewsClient(){
     excerpt: '',
     content: '',
     imageUrl: '' as string,
-    published: false
+    published: false,
+    images: [] as string[],
+    videos: [] as string[]
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -35,7 +37,8 @@ export default function NewNewsClient(){
         excerpt: form.excerpt,
         content: form.content,
         featuredImage: form.imageUrl,
-        images: [form.imageUrl],
+        images: (form.images && form.images.length>0) ? form.images : [form.imageUrl],
+        videos: (form.videos||[]).map(s=>s.trim()).filter(Boolean),
         published: form.published
       }
       const res = await fetch('/api/news', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
@@ -43,7 +46,7 @@ export default function NewNewsClient(){
         try { const j = await res.json(); alert(j?.error || 'Falha ao salvar') } catch { alert('Falha ao salvar') }
         return
       }
-      setForm({ title: '', category: '', excerpt: '', content: '', imageUrl: '', published: false })
+      setForm({ title: '', category: '', excerpt: '', content: '', imageUrl: '', published: false, images: [], videos: [] })
       alert('Notícia criada com sucesso')
     } catch {
       alert('Erro ao salvar notícia')
@@ -93,7 +96,7 @@ export default function NewNewsClient(){
               if(!file) return
               const fd=new FormData(); fd.append('file',file)
               const res=await fetch('/api/images/upload',{method:'POST',body:fd})
-              if(res.ok){ const json=await res.json(); setForm(p=>({...p,imageUrl:json.data.url})) } else { alert('Falha no upload da imagem') }
+              if(res.ok){ const json=await res.json(); setForm(p=>({...p,imageUrl:json.data.url, images: Array.from(new Set([...(p.images||[]), json.data.url]))})) } else { alert('Falha no upload da imagem') }
             }} className="w-full" />
           </div>
         </div>
@@ -104,6 +107,17 @@ export default function NewNewsClient(){
             <option value="true">Publicado</option>
           </select>
         </div>
+      </div>
+
+      <div>
+        <label className="block text-sm text-gray-700 mb-1">Imagens adicionais (uma por linha)</label>
+        <textarea value={(form.images||[]).join('\n')} onChange={(e)=>setForm(p=>({...p, images: e.target.value.split(/\n+/)}))} rows={3} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder={'https://imagem1.jpg\nhttps://imagem2.jpg'} />
+      </div>
+
+      <div>
+        <label className="block text-sm text-gray-700 mb-1">Vídeos (URLs — uma por linha)</label>
+        <textarea value={(form.videos||[]).join('\n')} onChange={(e)=>setForm(p=>({...p, videos: e.target.value.split(/\n+/)}))} rows={3} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder={'https://youtu.be/xyz\nhttps://meuservidor.com/video.mp4'} />
+        <p className="text-xs text-gray-500 mt-1">Aceita YouTube/Vimeo ou links diretos (MP4/WEBM).</p>
       </div>
 
       <div className="pt-2">
