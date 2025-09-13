@@ -24,8 +24,8 @@ const AboutPreview = () => {
   const features = locale.startsWith('en') ? [
     {
       icon: Users,
-      title: 'Growing community',
-      description: 'Over 100 farmers united to boost the emerging pig sector'
+      title: 'Expanding network',
+      description: 'Over 100 farmers working together to boost the pig sector'
     },
     {
       icon: Award,
@@ -45,8 +45,8 @@ const AboutPreview = () => {
   ] : [
     {
       icon: Users,
-      title: 'Comunidade em expansão',
-      description: 'Mais de 100 criadores unidos para impulsionar a suinocultura recente'
+      title: 'Rede em expansão',
+      description: 'Mais de 100 criadores trabalhando juntos para impulsionar a suinocultura'
     },
     {
       icon: Award,

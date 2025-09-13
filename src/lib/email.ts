@@ -66,15 +66,14 @@ export const getWelcomeEmailTemplate = (userName: string): EmailTemplate => {
         
         <div style="padding: 20px;">
           <h2>Olá, ${userName}!</h2>
-          <p>Seja bem-vindo à ${BRAND_NAME}! Estamos muito felizes em tê-lo como membro da nossa comunidade.</p>
+          <p>Seja bem-vindo à ${BRAND_NAME}! Estamos muito felizes em tê-lo conosco.</p>
           
           <div style="background-color: #f3f4f6; padding: 15px; border-radius: 8px; margin: 20px 0;">
             <h3 style="margin-top: 0;">O que você pode fazer agora:</h3>
             <ul>
-              <li>Acessar conteúdo exclusivo na área de membros</li>
+              <li>Acessar conteúdos e serviços exclusivos</li>
               <li>Participar de eventos e workshops</li>
-              <li>Conectar-se com outros profissionais</li>
-              <li>Receber atualizações sobre o setor</li>
+              <li>Receber atualizações e materiais técnicos</li>
             </ul>
           </div>
           
@@ -95,13 +94,12 @@ export const getWelcomeEmailTemplate = (userName: string): EmailTemplate => {
     text: `
       Olá, ${userName}!
       
-      Seja bem-vindo à ${BRAND_NAME}! Estamos muito felizes em tê-lo como membro da nossa comunidade.
+      Seja bem-vindo à ${BRAND_NAME}! Estamos muito felizes em tê-lo conosco.
       
       O que você pode fazer agora:
-      - Acessar conteúdo exclusivo na área de membros
+      - Acessar conteúdos e serviços exclusivos
       - Participar de eventos e workshops
-      - Conectar-se com outros profissionais
-      - Receber atualizações sobre o setor
+      - Receber atualizações e materiais técnicos
       
       Se você tiver alguma dúvida, não hesite em entrar em contato conosco.
       

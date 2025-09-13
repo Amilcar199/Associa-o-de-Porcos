@@ -251,10 +251,10 @@ const Hero = () => {
                 <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-6">
                   <Users className="text-primary-300 mb-4" size={40} />
                   <h3 className="text-xl font-semibold text-white mb-2">
-                    {isEn ? 'Strong Community' : 'Comunidade Forte'}
+                    {isEn ? 'Collaborative Network' : 'Rede Colaborativa'}
                   </h3>
                   <p className="text-gray-200 text-sm">
-                    {isEn ? 'Over 500 associated farmers sharing knowledge and experiences.' : 'Mais de 500 criadores associados compartilhando conhecimento e experiências.'}
+                    {isEn ? 'Experienced farmers sharing knowledge and results.' : 'Criadores experientes compartilhando conhecimento e resultados.'}
                   </p>
                 </div>
                 

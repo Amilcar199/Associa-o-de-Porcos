@@ -22,12 +22,12 @@ const CallToAction = () => {
   useEffect(()=>{ (async()=>{ try { const r = await fetch('/api/admin/config',{ cache:'no-store' }); if(r.ok){ const j = await r.json(); setSiteConfig(j?.data || null) } } catch {} })() },[])
 
   const benefits = isEn ? [
-    { icon: Users, title: 'Active Community', description: 'Connect with over 500 experienced farmers' },
+    { icon: Users, title: 'Trusted Network', description: 'Connect with experienced farmers and specialists' },
     { icon: Star, title: 'Guaranteed Quality', description: 'Certified products with top standards' },
     { icon: Shield, title: 'Technical Support', description: 'Specialized assistance always available' },
     { icon: Heart, title: 'Animal Welfare', description: 'Proven sustainable and ethical practices' }
   ] : [
-    { icon: Users, title: 'Comunidade Ativa', description: 'Conecte-se com mais de 500 criadores experientes' },
+    { icon: Users, title: 'Rede Confiável', description: 'Conecte-se com criadores e especialistas experientes' },
     { icon: Star, title: 'Qualidade Garantida', description: 'Produtos certificados com os melhores padrões' },
     { icon: Shield, title: 'Suporte Técnico', description: 'Assistência especializada sempre disponível' },
     { icon: Heart, title: 'Bem-estar Animal', description: 'Práticas sustentáveis e éticas comprovadas' }
@@ -69,7 +69,7 @@ const CallToAction = () => {
             <span className="text-primary-200">{isEn ? 'Best Association?' : 'Melhor Associação?'}</span>
           </h2>
           <p className="text-xl text-primary-100 max-w-3xl mx-auto leading-relaxed mb-8">
-            {isEn ? 'Join Angola’s most respected community of farmers. Access premium products, specialized technical support and a valuable network.' : 'Junte-se à comunidade de criadores mais respeitada de Angola. Tenha acesso a produtos premium, suporte técnico especializado e uma rede de contatos valiosa.'}
+            {isEn ? 'Join Angola’s most respected association of farmers. Access premium products, specialized technical support and a valuable network.' : 'Junte-se à associação de criadores mais respeitada de Angola. Tenha acesso a produtos premium, suporte técnico especializado e uma rede de contatos valiosa.'}
           </p>
 
           {/* CTA Buttons */}
