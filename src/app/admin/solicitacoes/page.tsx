@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Check, X, Mail } from 'lucide-react'
+// Icons removed to avoid lucide-react export issues
 
 type RequestItem = {
   _id: string
@@ -11,7 +11,8 @@ type RequestItem = {
 
 export default function AdminRequestsPage() {
   const [loading, setLoading] = useState(false)
-  const [items, setItems] = useState<RequestItem[]>([])
+  const initialItems: RequestItem[] = []
+  const [items, setItems] = useState(initialItems)
 
   const load = async () => {
     try {
@@ -31,7 +32,7 @@ export default function AdminRequestsPage() {
   const takeAction = async (id: string, action: 'approve' | 'reject') => {
     const res = await fetch(`/api/admin/requests/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action }) })
     if (res.ok) {
-      setItems(prev => prev.filter(x => x._id !== id))
+      setItems((prev: RequestItem[]) => prev.filter((x: RequestItem) => x._id !== id))
     } else {
       const j = await res.json().catch(() => ({}))
       alert(j.error || 'Erro ao processar solicitação')
@@ -60,19 +61,19 @@ export default function AdminRequestsPage() {
             </tr>
           </thead>
           <tbody>
-            {items.map(req => (
+            {items.map((req: RequestItem) => (
               <tr key={req._id} className="border-t border-gray-100">
                 <td className="px-4 py-3">
                   <div className="text-gray-900 font-medium">{req.user?.name}</div>
-                  <div className="text-gray-500 text-xs flex items-center gap-1"><Mail className="w-3 h-3" /> {req.user?.email}</div>
+                  <div className="text-gray-500 text-xs flex items-center gap-1"><span className="w-3 h-3" aria-hidden>✉️</span> {req.user?.email}</div>
                 </td>
                 <td className="px-4 py-3 text-gray-700">{req.user?.company || '-'}</td>
                 <td className="px-4 py-3 text-gray-700 max-w-md truncate" title={req.user?.bio || ''}>{req.user?.bio || '-'}</td>
                 <td className="px-4 py-3 text-gray-700">{new Date(req.createdAt).toLocaleString()}</td>
                 <td className="px-4 py-3 text-right">
                   <div className="inline-flex items-center gap-2">
-                    <button onClick={() => takeAction(req._id, 'approve')} className="inline-flex items-center gap-1 text-green-600 hover:bg-green-50 px-2 py-1 rounded"><Check className="w-4 h-4" /> Aprovar</button>
-                    <button onClick={() => takeAction(req._id, 'reject')} className="inline-flex items-center gap-1 text-red-600 hover:bg-red-50 px-2 py-1 rounded"><X className="w-4 h-4" /> Rejeitar</button>
+                    <button onClick={() => takeAction(req._id, 'approve')} className="inline-flex items-center gap-1 text-green-600 hover:bg-green-50 px-2 py-1 rounded"><span className="w-4 h-4" aria-hidden>✔️</span> Aprovar</button>
+                    <button onClick={() => takeAction(req._id, 'reject')} className="inline-flex items-center gap-1 text-red-600 hover:bg-red-50 px-2 py-1 rounded"><span className="w-4 h-4" aria-hidden>✖️</span> Rejeitar</button>
                   </div>
                 </td>
               </tr>

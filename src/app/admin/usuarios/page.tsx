@@ -1,7 +1,7 @@
 'use client'
 
-import { useMemo, useState, useEffect } from 'react'
-import { Search, UserPlus, Shield, Mail, Edit, Power, PowerOff, Trash2 } from 'lucide-react'
+import React from 'react'
+// Icons removed to avoid lucide-react export issues
 import UserEditModal from '@/components/UserEditModal'
 import UserCreateModal from '@/components/UserCreateModal'
 import ConfirmModal from '@/components/ConfirmModal'
@@ -26,17 +26,17 @@ type AdminUser = {
 }
 
 export default function AdminUsersPage() {
-  const [query, setQuery] = useState('')
-  const [users, setUsers] = useState<AdminUser[]>([])
-  const [loading, setLoading] = useState(false)
-  const [editModalOpen, setEditModalOpen] = useState(false)
-  const [createModalOpen, setCreateModalOpen] = useState(false)
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
-  const [userToDelete, setUserToDelete] = useState<{ id: string; name: string } | null>(null)
+  const [query, setQuery] = React.useState('')
+  const [users, setUsers] = React.useState<AdminUser[]>([])
+  const [loading, setLoading] = React.useState(false)
+  const [editModalOpen, setEditModalOpen] = React.useState(false)
+  const [createModalOpen, setCreateModalOpen] = React.useState(false)
+  const [selectedUserId, setSelectedUserId] = React.useState<string | null>(null)
+  const [deleteModalOpen, setDeleteModalOpen] = React.useState(false)
+  const [userToDelete, setUserToDelete] = React.useState<{ id: string; name: string } | null>(null)
   const { showSuccess, showError } = useToast()
 
-  useEffect(() => {
+  React.useEffect(() => {
     loadUsers()
   }, [])
 
@@ -68,7 +68,7 @@ export default function AdminUsersPage() {
     }
   }
 
-  const filtered = useMemo(() => {
+  const filtered = React.useMemo(() => {
     const q = query.toLowerCase().trim()
     if (!q) return users
     return users.filter(u => 

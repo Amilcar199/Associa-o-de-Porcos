@@ -1,13 +1,34 @@
 "use client"
 
-import React, { useEffect, useMemo, useState } from 'react'
-import { Tag, Weight, Calendar, DollarSign, Image as ImageIcon, Save } from 'lucide-react'
+import React from 'react'
+// Icons removed to avoid lucide-react export issues
 import MediaUploader from '@/components/admin/ui/MediaUploader'
 
+type NewProductForm = {
+  name: string
+  description: string
+  breed: string
+  age: number
+  weight: number
+  price: number | undefined
+  images: string[]
+  videos: string[]
+  features: string[]
+  healthStatus: 'excellent' | 'good' | 'fair'
+  vaccinated: boolean
+  location: string
+  province: string
+  municipality: string
+  customLocation: string
+  tags: string[]
+  code: string
+  codeType: 'auto' | 'manual'
+}
+
 export default function NewProductClient() {
-  const [loading, setLoading] = useState(false)
-  const [currency, setCurrency] = useState('AOA')
-  const [form, setForm] = useState({
+  const [loading, setLoading] = React.useState(false)
+  const [currency, setCurrency] = React.useState('AOA')
+  const initialForm: NewProductForm = {
     name: '',
     description: '',
     breed: '',
@@ -15,18 +36,19 @@ export default function NewProductClient() {
     weight: 0,
     price: undefined as number | undefined,
     images: [''],
-    videos: [] as string[],
-    features: [] as string[],
-    healthStatus: 'good' as 'excellent' | 'good' | 'fair',
+    videos: [],
+    features: [],
+    healthStatus: 'good',
     vaccinated: false,
     location: '',
     province: '',
     municipality: '',
     customLocation: '',
-    tags: [] as string[],
+    tags: [],
     code: '',
-    codeType: 'auto' as 'auto' | 'manual',
-  })
+    codeType: 'auto',
+  }
+  const [form, setForm] = React.useState(initialForm)
 
   const allowedBreeds = [
     'Landrace','Large White','Duroc','Hampshire','Pietrain','Yorkshire','Chester White','Spotted','Tamworth','Gloucester Old Spots','Mangalitsa','Ossabaw Island Hog','Mulefoot','Caipira','Piau','Moura','Canastra','Cruzado','Outro'
@@ -53,13 +75,13 @@ export default function NewProductClient() {
     'Zaire': ['Mbanza Kongo','Cuimba','Noqui','Nzózi','Soyo','Tomboco','Outro']
   }
 
-  const provinceList = useMemo(() => Object.keys(ANGOLA_PROVINCES).sort().concat('Outro'), [])
-  const municipalityList = useMemo(() => {
+  const provinceList = React.useMemo(() => Object.keys(ANGOLA_PROVINCES).sort().concat('Outro'), [])
+  const municipalityList = React.useMemo(() => {
     if (!form.province || !ANGOLA_PROVINCES[form.province]) return [] as string[]
     return ANGOLA_PROVINCES[form.province]
   }, [form.province])
 
-  useEffect(()=>{
+  React.useEffect(()=>{
     ;(async()=>{ try { const r = await fetch('/api/admin/config',{cache:'no-store'}); if(r.ok){ const j = await r.json(); setCurrency(j?.data?.currency || 'AOA') } } catch {} })()
   },[])
 
@@ -76,7 +98,7 @@ export default function NewProductClient() {
         
         if (response.ok) {
           const data = await response.json();
-          setForm(prev => ({ ...prev, code: (data?.data?.code as string) || '' }));
+          setForm((prev: NewProductForm) => ({ ...prev, code: (data?.data?.code as string) || '' }));
         }
       } catch (error) {
         console.error('Erro ao gerar código:', error);
@@ -89,7 +111,7 @@ export default function NewProductClient() {
     setLoading(true)
     try {
       // validação simples de imagem
-      const imageList = (form.images || []).map(s=>s.trim()).filter(Boolean)
+      const imageList = (form.images || []).map((s: string)=>s.trim()).filter(Boolean)
       if (imageList.length === 0) {
         alert('Adicione pelo menos uma imagem (URL ou upload).')
         return
@@ -119,7 +141,7 @@ export default function NewProductClient() {
           ...form,
           breed: allowedBreeds.includes(form.breed) ? form.breed : 'Outro',
           images: imageList,
-          videos: (form.videos || []).map(s=>s.trim()).filter(Boolean),
+          videos: (form.videos || []).map((s: string)=>s.trim()).filter(Boolean),
           isAvailable: true,
           code: form.code,
           location: finalLocation,
@@ -154,15 +176,15 @@ export default function NewProductClient() {
           <div>
             <label className="block text-sm text-gray-700 mb-1">Nome</label>
             <div className="relative">
-              <Tag className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
-              <input value={form.name} onChange={(e)=>setForm(p=>({...p,name:e.target.value}))} className="w-full pl-9 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="Ex.: Suíno Reprodutor Duroc" required />
+              <span className="w-4 h-4 text-gray-400 absolute left-3 top-3" aria-hidden>🏷️</span>
+              <input value={form.name} onChange={(e)=>setForm((p: NewProductForm)=>({...p,name:e.target.value}))} className="w-full pl-9 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="Ex.: Suíno Reprodutor Duroc" required />
             </div>
           </div>
           <div>
             <label className="block text-sm text-gray-700 mb-1">Raça</label>
-            <select value={form.breed} onChange={(e)=>setForm(p=>({...p,breed:e.target.value}))} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" required>
+            <select value={form.breed} onChange={(e)=>setForm((p: NewProductForm)=>({...p,breed:e.target.value}))} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" required>
               <option value="">Selecione...</option>
-              {allowedBreeds.map(b => (
+              {allowedBreeds.map((b: string) => (
                 <option key={b} value={b}>{b}</option>
               ))}
             </select>
@@ -173,22 +195,22 @@ export default function NewProductClient() {
           <div>
             <label className="block text-sm text-gray-700 mb-1">Peso (kg)</label>
             <div className="relative">
-              <Weight className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
-              <input type="number" value={form.weight} onChange={(e)=>setForm(p=>({...p,weight:parseFloat(e.target.value)}))} className="w-full pl-9 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="80" required />
+              <span className="w-4 h-4 text-gray-400 absolute left-3 top-3" aria-hidden>⚖️</span>
+              <input type="number" value={form.weight} onChange={(e)=>setForm((p: NewProductForm)=>({...p,weight:parseFloat(e.target.value)}))} className="w-full pl-9 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="80" required />
             </div>
           </div>
           <div>
             <label className="block text-sm text-gray-700 mb-1">Idade (meses)</label>
             <div className="relative">
-              <Calendar className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
-              <input type="number" value={form.age} onChange={(e)=>setForm(p=>({...p,age:parseInt(e.target.value)}))} className="w-full pl-9 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="6" required />
+              <span className="w-4 h-4 text-gray-400 absolute left-3 top-3" aria-hidden>📅</span>
+              <input type="number" value={form.age} onChange={(e)=>setForm((p: NewProductForm)=>({...p,age:parseInt(e.target.value)}))} className="w-full pl-9 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="6" required />
             </div>
           </div>
           <div>
             <label className="block text-sm text-gray-700 mb-1">Preço ({currency})</label>
             <div className="relative">
-              <DollarSign className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
-              <input type="number" value={form.price ?? ''} onChange={(e)=>setForm(p=>({...p,price:e.target.value===''?undefined:parseFloat(e.target.value)}))} className="w-full pl-9 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="120000" required />
+              <span className="w-4 h-4 text-gray-400 absolute left-3 top-3" aria-hidden>💵</span>
+              <input type="number" value={form.price ?? ''} onChange={(e)=>setForm((p: NewProductForm)=>({...p,price:e.target.value===''?undefined:parseFloat(e.target.value)}))} className="w-full pl-9 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="120000" required />
             </div>
           </div>
         </div>
@@ -201,27 +223,27 @@ export default function NewProductClient() {
               maxSizeBytes={5*1024*1024}
               uploadEndpoint="/api/images/upload"
               values={form.images || []}
-              onChange={(urls)=>setForm(p=>({...p, images: urls}))}
+              onChange={(urls)=>setForm((p: NewProductForm)=>({...p, images: urls}))}
             />
           </div>
           <div>
             <label className="block text-sm text-gray-700 mb-1">Província</label>
-            <select value={form.province} onChange={(e)=>setForm(p=>({...p,province:e.target.value, municipality: ''}))} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+            <select value={form.province} onChange={(e)=>setForm((p: NewProductForm)=>({...p,province:e.target.value, municipality: ''}))} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
               <option value="">Selecione...</option>
-              {provinceList.map(pv => (<option key={pv} value={pv}>{pv}</option>))}
+              {provinceList.map((pv: string) => (<option key={pv} value={pv}>{pv}</option>))}
             </select>
             {form.province && form.province !== 'Outro' && (
               <div className="mt-3">
                 <label className="block text-sm text-gray-700 mb-1">Município</label>
-                <select value={form.municipality} onChange={(e)=>setForm(p=>({...p,municipality:e.target.value}))} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+                <select value={form.municipality} onChange={(e)=>setForm((p: NewProductForm)=>({...p,municipality:e.target.value}))} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
                   <option value="">Selecione...</option>
-                  {municipalityList.map(m => (<option key={m} value={m}>{m}</option>))}
+                  {municipalityList.map((m: string) => (<option key={m} value={m}>{m}</option>))}
                 </select>
               </div>
             )}
             <div className="mt-3">
               <label className="block text-sm text-gray-700 mb-1">Localização personalizada (opcional)</label>
-              <input value={form.customLocation} onChange={(e)=>setForm(p=>({...p,customLocation:e.target.value}))} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="Ex.: Viana, Luanda" />
+              <input value={form.customLocation} onChange={(e)=>setForm((p: NewProductForm)=>({...p,customLocation:e.target.value}))} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="Ex.: Viana, Luanda" />
               <p className="text-xs text-gray-500 mt-1">Se informar este campo, ele terá prioridade sobre os seletores.</p>
             </div>
           </div>
@@ -234,7 +256,7 @@ export default function NewProductClient() {
             maxSizeBytes={100*1024*1024}
             uploadEndpoint="/api/videos/upload"
             values={form.videos || []}
-            onChange={(urls)=>setForm(p=>({...p, videos: urls}))}
+            onChange={(urls)=>setForm((p: NewProductForm)=>({...p, videos: urls}))}
           />
         </div>
 
@@ -245,7 +267,7 @@ export default function NewProductClient() {
               value={form.codeType}
               onChange={(e) => {
                 const newType = e.target.value as 'auto' | 'manual';
-                setForm(prev => ({ 
+                setForm((prev: NewProductForm) => ({ 
                   ...prev, 
                   codeType: newType,
                   code: newType === 'auto' ? '' : prev.code
@@ -268,7 +290,7 @@ export default function NewProductClient() {
               <input
                 type="text"
                 value={form.code}
-                onChange={(e) => setForm(prev => ({ ...prev, code: e.target.value }))}
+                onChange={(e) => setForm((prev: NewProductForm) => ({ ...prev, code: e.target.value }))}
                 className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                 placeholder={form.codeType === 'auto' ? 'Código será gerado automaticamente' : 'Ex.: DUROC-2024-001'}
                 required
@@ -293,7 +315,7 @@ export default function NewProductClient() {
             <label className="block text-sm text-gray-700 mb-1">Status de Saúde *</label>
             <select 
               value={form.healthStatus} 
-              onChange={(e)=>setForm(p=>({...p,healthStatus:e.target.value as 'excellent' | 'good' | 'fair'}))} 
+              onChange={(e)=>setForm((p: NewProductForm)=>({...p,healthStatus:e.target.value as 'excellent' | 'good' | 'fair'}))} 
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" 
               required
             >
@@ -306,7 +328,7 @@ export default function NewProductClient() {
             <label className="block text-sm text-gray-700 mb-1">Status de Vacinação *</label>
             <select 
               value={form.vaccinated.toString()} 
-              onChange={(e)=>setForm(p=>({...p,vaccinated:e.target.value === 'true'}))} 
+              onChange={(e)=>setForm((p: NewProductForm)=>({...p,vaccinated:e.target.value === 'true'}))} 
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" 
               required
             >
@@ -320,7 +342,7 @@ export default function NewProductClient() {
           <label className="block text-sm text-gray-700 mb-1">Descrição</label>
           <textarea
             value={form.description}
-            onChange={(e)=>setForm(p=>({...p,description:e.target.value}))}
+            onChange={(e)=>setForm((p: NewProductForm)=>({...p,description:e.target.value}))}
             rows={4}
             className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
             placeholder="Descreva características, manejo, alimentação, etc."
@@ -330,7 +352,7 @@ export default function NewProductClient() {
 
         <div className="flex items-center gap-3">
           <button type="submit" disabled={loading} className="inline-flex items-center bg-primary-600 hover:bg-primary-700 text-white px-5 py-2.5 rounded-lg font-medium disabled:opacity-60">
-            <Save className="w-4 h-4 mr-2" /> {loading ? 'Salvando...' : 'Salvar'}
+            <span className="w-4 h-4 mr-2" aria-hidden>💾</span> {loading ? 'Salvando...' : 'Salvar'}
           </button>
         </div>
       </form>
