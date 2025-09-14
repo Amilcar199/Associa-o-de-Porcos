@@ -1,5 +1,4 @@
 import { Metadata } from 'next'
-import { notFound } from 'next/navigation'
 import connectDB from '@/lib/mongodb'
 import News from '@/models/News'
 import { formatDate } from '@/lib/utils'
@@ -65,10 +64,20 @@ export default async function NewsPage({ params }: RouteParams) {
     await connectDB()
     const news = await News.findOne({ slug: params.slug, published: true }).populate('author', 'name avatar').lean()
     if (!news) {
-      notFound()
+      return (
+        <article className="max-w-4xl mx-auto px-4 py-8">
+          <h1 className="text-2xl font-bold mb-4">{isEn ? 'News not found' : 'Notícia não encontrada'}</h1>
+          <a href="/noticias" className="text-primary-600 hover:underline">{isEn ? 'Back to News' : 'Voltar para Notícias'}</a>
+        </article>
+      )
     }
     if (Array.isArray(news)) {
-      notFound()
+      return (
+        <article className="max-w-4xl mx-auto px-4 py-8">
+          <h1 className="text-2xl font-bold mb-4">{isEn ? 'News not found' : 'Notícia não encontrada'}</h1>
+          <a href="/noticias" className="text-primary-600 hover:underline">{isEn ? 'Back to News' : 'Voltar para Notícias'}</a>
+        </article>
+      )
     }
 
     return (
@@ -164,6 +173,11 @@ export default async function NewsPage({ params }: RouteParams) {
     )
   } catch (error) {
     console.error('Erro ao carregar notícia:', error)
-    notFound()
+    return (
+      <article className="max-w-4xl mx-auto px-4 py-8">
+        <h1 className="text-2xl font-bold mb-4">Erro</h1>
+        <a href="/noticias" className="text-primary-600 hover:underline">{isEn ? 'Back to News' : 'Voltar para Notícias'}</a>
+      </article>
+    )
   }
 }

@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic'
 import type { Metadata } from 'next'
 import { BRAND_NAME } from '@/lib/brand'
 import { headers } from 'next/headers'
-import { Calendar } from 'lucide-react'
+ 
 import { cookies } from 'next/headers'
 import NewsClient from '@/app/noticias/NewsClient'
 

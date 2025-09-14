@@ -1,22 +1,22 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useSearchParams } from 'next/navigation'
-import { Mail, Phone, Send, MessageSquare, MapPin, Clock } from 'lucide-react'
 import { useLanguage } from '@/components/providers/LanguageProvider'
 
 export default function ContatoPage() {
   const { locale } = useLanguage()
   const isEn = locale.startsWith('en')
-  const [siteConfig, setSiteConfig] = useState<any>(null)
+  type SiteConfig = { contactEmail?: string } | null
+  const [siteConfig, setSiteConfig] = useState(null as SiteConfig)
   const [loading, setLoading] = useState(false)
-  const [success, setSuccess] = useState<string | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const searchParams = useSearchParams()
+  const [success, setSuccess] = useState(null as string | null)
+  const [error, setError] = useState(null as string | null)
+  
 
   useEffect(() => {
-    const subject = searchParams.get('subject')
-    const message = searchParams.get('message')
+    const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null
+    const subject = params?.get('subject') || null
+    const message = params?.get('message') || null
     if (subject || message) {
       const form = document.querySelector('form') as HTMLFormElement | null
       if (form) {
@@ -30,7 +30,7 @@ export default function ContatoPage() {
         }
       }
     }
-  }, [searchParams])
+  }, [])
 
   useEffect(()=>{
     (async()=>{ try { const r = await fetch('/api/admin/config', { cache: 'no-store' }); if (r.ok) { const j = await r.json(); setSiteConfig(j?.data || null) } } catch {} })()
@@ -89,19 +89,19 @@ export default function ContatoPage() {
             <h2 className="text-lg font-semibold text-gray-900 mb-4">{isEn ? 'Contact Channels' : 'Canais de Atendimento'}</h2>
             <div className="space-y-3 text-gray-700">
               <a href={`mailto:${siteConfig?.contactEmail || 'contato@associacaodeporcos.ao'}`} className="flex items-center gap-3 hover:text-primary-700">
-                <Mail size={18} className="text-primary-600" /> {siteConfig?.contactEmail || 'contato@associacaodeporcos.ao'}
+                <span className="text-primary-600" aria-hidden>📧</span> {siteConfig?.contactEmail || 'contato@associacaodeporcos.ao'}
               </a>
               <a href="tel:+244928476427" className="flex items-center gap-3 hover:text-primary-700">
-                <Phone size={18} className="text-primary-600" /> +244 928 476 427
+                <span className="text-primary-600" aria-hidden>📞</span> +244 928 476 427
               </a>
               <a href="https://wa.me/244928476427" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 hover:text-primary-700">
-                <MessageSquare size={18} className="text-primary-600" /> WhatsApp
+                <span className="text-primary-600" aria-hidden>💬</span> WhatsApp
               </a>
               <div className="flex items-center gap-3 text-gray-600">
-                <Clock size={18} className="text-primary-600" /> {isEn ? 'Mon–Fri: 9am to 6pm' : 'Seg–Sex: 9h às 18h'}
+                <span className="text-primary-600" aria-hidden>⏰</span> {isEn ? 'Mon–Fri: 9am to 6pm' : 'Seg–Sex: 9h às 18h'}
               </div>
               <div className="flex items-center gap-3 text-gray-600">
-                <MapPin size={18} className="text-primary-600" /> Luanda, Angola
+                <span className="text-primary-600" aria-hidden>📍</span> Luanda, Angola
               </div>
             </div>
 
@@ -111,7 +111,7 @@ export default function ContatoPage() {
               rel="noopener noreferrer"
               className="mt-5 inline-flex items-center justify-center w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition"
             >
-              <MessageSquare size={18} className="mr-2" /> {isEn ? 'Talk on WhatsApp' : 'Falar no WhatsApp'}
+              <span className="mr-2" aria-hidden>💬</span> {isEn ? 'Talk on WhatsApp' : 'Falar no WhatsApp'}
             </a>
           </div>
 
@@ -156,7 +156,7 @@ export default function ContatoPage() {
 
           <div className="flex items-center gap-3">
             <button disabled={loading} className="inline-flex items-center bg-primary-600 hover:bg-primary-700 text-white px-5 py-2.5 rounded font-medium disabled:opacity-60">
-              <Send size={16} className="mr-2" /> {loading ? (isEn ? 'Sending...' : 'Enviando...') : (isEn ? 'Send Message' : 'Enviar Mensagem')}
+              <span className="mr-2" aria-hidden>📨</span> {loading ? (isEn ? 'Sending...' : 'Enviando...') : (isEn ? 'Send Message' : 'Enviar Mensagem')}
             </button>
             <a href="tel:+244928476427" className="inline-flex items-center text-primary-700 hover:text-primary-800 font-medium">{isEn ? 'Or call now' : 'Ou ligue agora'}</a>
           </div>

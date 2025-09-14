@@ -1,9 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { signIn, getSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
 import { useLanguage } from '@/components/providers/LanguageProvider';
 import pt from '@/lib/i18n/dictionaries/pt';
 import en from '@/lib/i18n/dictionaries/en';
@@ -12,10 +10,8 @@ import Link from 'next/link';
 export default function LoginPage() {
   const { locale } = useLanguage();
   const dict = locale.startsWith('en') ? en : pt;
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
-  });
+  type LoginForm = { email: string; password: string };
+  const [formData, setFormData] = useState({ email: '', password: '' } as LoginForm);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -27,28 +23,20 @@ export default function LoginPage() {
     setError('');
 
     try {
-      const result = await signIn('credentials', {
-        email: formData.email,
-        password: formData.password,
-        redirect: false
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: formData.email, password: formData.password })
       });
-
-      if (result?.error) {
+      if (!res.ok) {
         setError(dict.auth.errorWrongCredentials);
-      } else {
-        // Verificar se o login foi bem-sucedido
-        const session = await getSession();
-        if (session) {
-          // Redirecionar baseado no role do usuário
-          if (session.user?.role === 'admin') {
-            router.push('/admin');
-          } else if (session.user?.role === 'member') {
-            router.push('/membros');
-          } else {
-            router.push('/perfil');
-          }
-        }
+        return;
       }
+      const data = await res.json();
+      const role = data?.user?.role || data?.role || null;
+      if (role === 'admin') router.push('/admin');
+      else if (role === 'member') router.push('/membros');
+      else router.push('/perfil');
     } catch (error) {
       setError(dict.auth.errorLogin);
     } finally {
@@ -75,7 +63,7 @@ export default function LoginPage() {
             {error && (
               <div className="bg-red-50 border border-red-200 rounded-md p-4">
                 <div className="flex">
-                  <AlertCircle className="h-5 w-5 text-red-400" />
+                  <span className="h-5 w-5 text-red-400 mr-2" aria-hidden>⚠️</span>
                   <div className="ml-3">
                     <p className="text-sm text-red-800">{error}</p>
                   </div>
@@ -88,9 +76,7 @@ export default function LoginPage() {
                 {dict.auth.email}
               </label>
               <div className="mt-1 relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-400" />
-                </div>
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" aria-hidden>📧</div>
                 <input
                   id="email"
                   name="email"
@@ -98,7 +84,7 @@ export default function LoginPage() {
                   autoComplete="email"
                   required
                   value={formData.email}
-                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                  onChange={(e) => setFormData((prev: LoginForm) => ({ ...prev, email: e.target.value }))}
                   className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
                   placeholder={dict.auth.placeholderEmail}
                 />
@@ -110,9 +96,7 @@ export default function LoginPage() {
                 {dict.auth.password}
               </label>
               <div className="mt-1 relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400" />
-                </div>
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" aria-hidden>🔒</div>
                 <input
                   id="password"
                   name="password"
@@ -120,7 +104,7 @@ export default function LoginPage() {
                   autoComplete="current-password"
                   required
                   value={formData.password}
-                  onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                  onChange={(e) => setFormData((prev: LoginForm) => ({ ...prev, password: e.target.value }))}
                   className="appearance-none block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
                   placeholder={dict.auth.placeholderPassword}
                 />
@@ -129,11 +113,7 @@ export default function LoginPage() {
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-                  ) : (
-                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-                  )}
+                  <span className="h-5 w-5 text-gray-400 hover:text-gray-600" aria-hidden>{showPassword ? '🙈' : '👁️'}</span>
                 </button>
               </div>
             </div>

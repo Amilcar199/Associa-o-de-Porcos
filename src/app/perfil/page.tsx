@@ -3,13 +3,13 @@
 import { useState, useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { User, Settings, History, Shield, LogOut, Globe } from 'lucide-react';
+ 
 import { useLanguage } from '@/components/providers/LanguageProvider';
 import HeaderLanguageMenu from '@/components/i18n/HeaderLanguageMenu'
 import pt from '@/lib/i18n/dictionaries/pt';
 import en from '@/lib/i18n/dictionaries/en';
 import ImageUpload from '@/components/admin/ui/ImageUpload';
-import { X } from 'lucide-react';
+ 
 
 interface UserProfile {
   _id: string;
@@ -37,15 +37,25 @@ interface UserProfile {
 }
 
 export default function ProfilePage() {
+  type ProfileFormState = {
+    name: string;
+    phone: string;
+    company: string;
+    bio: string;
+    location: string;
+    website: string;
+    socialMedia: { linkedin: string; twitter: string; facebook: string };
+    preferences: { emailNotifications: boolean; smsNotifications: boolean; newsletter: boolean };
+  };
   const { locale } = useLanguage();
   const dict = locale.startsWith('en') ? en : pt;
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [profile, setProfile] = useState(null as UserProfile | null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('profile');
-  const [activity, setActivity] = useState<any[]>([]);
+  const [activity, setActivity] = useState([] as any[]);
   const [activityLoading, setActivityLoading] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showSessionsModal, setShowSessionsModal] = useState(false);
@@ -70,7 +80,7 @@ export default function ProfilePage() {
       smsNotifications: false,
       newsletter: true
     }
-  });
+  } as ProfileFormState);
 
   useEffect(() => {
     if (status === 'loading') return;
@@ -288,7 +298,7 @@ export default function ProfilePage() {
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
-                <User className="inline-block w-4 h-4 mr-2" />
+                <span className="inline-block w-4 h-4 mr-2" aria-hidden>👤</span>
                 {dict.profile.tabs.profile}
               </button>
               <button
@@ -299,7 +309,7 @@ export default function ProfilePage() {
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
-                <Settings className="inline-block w-4 h-4 mr-2" />
+                <span className="inline-block w-4 h-4 mr-2" aria-hidden>⚙️</span>
                 {dict.profile.tabs.settings}
               </button>
               <button
@@ -310,7 +320,7 @@ export default function ProfilePage() {
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
-                <Shield className="inline-block w-4 h-4 mr-2" />
+                <span className="inline-block w-4 h-4 mr-2" aria-hidden>🛡️</span>
                 {dict.profile.tabs.security}
               </button>
               <button
@@ -321,7 +331,7 @@ export default function ProfilePage() {
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
-                <History className="inline-block w-4 h-4 mr-2" />
+                <span className="inline-block w-4 h-4 mr-2" aria-hidden>🕓</span>
                 Atividades
               </button>
             </nav>
@@ -359,7 +369,7 @@ export default function ProfilePage() {
                     <input
                       type="text"
                       value={formData.name}
-                      onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                      onChange={(e) => setFormData((prev: ProfileFormState) => ({ ...prev, name: e.target.value }))}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       required
                     />
@@ -384,7 +394,7 @@ export default function ProfilePage() {
                     <input
                       type="tel"
                       value={formData.phone}
-                      onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                      onChange={(e) => setFormData((prev: ProfileFormState) => ({ ...prev, phone: e.target.value }))}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     />
                   </div>
@@ -396,7 +406,7 @@ export default function ProfilePage() {
                     <input
                       type="text"
                       value={formData.company}
-                      onChange={(e) => setFormData(prev => ({ ...prev, company: e.target.value }))}
+                      onChange={(e) => setFormData((prev: ProfileFormState) => ({ ...prev, company: e.target.value }))}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     />
                   </div>
@@ -408,7 +418,7 @@ export default function ProfilePage() {
                     <input
                       type="text"
                       value={formData.location}
-                      onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
+                      onChange={(e) => setFormData((prev: ProfileFormState) => ({ ...prev, location: e.target.value }))}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       placeholder={dict.profile.locationPlaceholder}
                     />
@@ -421,7 +431,7 @@ export default function ProfilePage() {
                     <input
                       type="url"
                       value={formData.website}
-                      onChange={(e) => setFormData(prev => ({ ...prev, website: e.target.value }))}
+                      onChange={(e) => setFormData((prev: ProfileFormState) => ({ ...prev, website: e.target.value }))}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       placeholder={dict.profile.websitePlaceholder}
                     />
@@ -434,7 +444,7 @@ export default function ProfilePage() {
                   </label>
                   <textarea
                     value={formData.bio}
-                    onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
+                    onChange={(e) => setFormData((prev: ProfileFormState) => ({ ...prev, bio: e.target.value }))}
                     rows={4}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     placeholder={dict.profile.bioPlaceholder}
@@ -452,7 +462,7 @@ export default function ProfilePage() {
                       <input
                         type="url"
                         value={formData.socialMedia.linkedin}
-                        onChange={(e) => setFormData(prev => ({ 
+                        onChange={(e) => setFormData((prev: ProfileFormState) => ({ 
                           ...prev, 
                           socialMedia: { ...prev.socialMedia, linkedin: e.target.value }
                         }))}
@@ -468,7 +478,7 @@ export default function ProfilePage() {
                       <input
                         type="url"
                         value={formData.socialMedia.twitter}
-                        onChange={(e) => setFormData(prev => ({ 
+                        onChange={(e) => setFormData((prev: ProfileFormState) => ({ 
                           ...prev, 
                           socialMedia: { ...prev.socialMedia, twitter: e.target.value }
                         }))}
@@ -484,7 +494,7 @@ export default function ProfilePage() {
                       <input
                         type="url"
                         value={formData.socialMedia.facebook}
-                        onChange={(e) => setFormData(prev => ({ 
+                        onChange={(e) => setFormData((prev: ProfileFormState) => ({ 
                           ...prev, 
                           socialMedia: { ...prev.socialMedia, facebook: e.target.value }
                         }))}
@@ -515,7 +525,7 @@ export default function ProfilePage() {
                   {/* Idioma */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Globe className="w-4 h-4 text-gray-500" />
+                      <span className="w-4 h-4 text-gray-500" aria-hidden>🌐</span>
                       <div>
                         <h4 className="text-sm font-medium text-gray-900">Idioma</h4>
                         <p className="text-sm text-gray-500">Selecione o idioma de navegação</p>
@@ -533,7 +543,7 @@ export default function ProfilePage() {
                       <input
                         type="checkbox"
                         checked={formData.preferences.emailNotifications}
-                        onChange={(e) => setFormData(prev => ({ 
+                        onChange={(e) => setFormData((prev: ProfileFormState) => ({ 
                           ...prev, 
                           preferences: { ...prev.preferences, emailNotifications: e.target.checked }
                         }))}
@@ -552,7 +562,7 @@ export default function ProfilePage() {
                       <input
                         type="checkbox"
                         checked={formData.preferences.smsNotifications}
-                        onChange={(e) => setFormData(prev => ({ 
+                        onChange={(e) => setFormData((prev: ProfileFormState) => ({ 
                           ...prev, 
                           preferences: { ...prev.preferences, smsNotifications: e.target.checked }
                         }))}
@@ -571,7 +581,7 @@ export default function ProfilePage() {
                       <input
                         type="checkbox"
                         checked={formData.preferences.newsletter}
-                        onChange={(e) => setFormData(prev => ({ 
+                        onChange={(e) => setFormData((prev: ProfileFormState) => ({ 
                           ...prev, 
                           preferences: { ...prev.preferences, newsletter: e.target.checked }
                         }))}
@@ -601,7 +611,7 @@ export default function ProfilePage() {
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                   <div className="flex">
                     <div className="flex-shrink-0">
-                      <Shield className="h-5 w-5 text-yellow-400" />
+                      <span className="h-5 w-5 text-yellow-400" aria-hidden>🛡️</span>
                     </div>
                     <div className="ml-3">
                       <h4 className="text-sm font-medium text-yellow-800">{dict.profile.securityTipsTitle}</h4>
@@ -689,7 +699,7 @@ export default function ProfilePage() {
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
-                        {activity.map((log, idx) => (
+                        {activity.map((log: any, idx: number) => (
                           <tr key={log._id || idx}>
                             <td className="px-4 py-2 text-sm text-gray-700">{new Date(log.createdAt).toLocaleString()}</td>
                             <td className="px-4 py-2 text-sm text-gray-700">{log.type}</td>
@@ -750,8 +760,8 @@ function PasswordModal({ open, onClose, onSubmit, loading, error, values, setVal
       <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
         <div className="flex items-center justify-between p-4 border-b">
           <h3 className="text-lg font-semibold text-gray-900">Alterar senha</h3>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded">
-            <X className="w-5 h-5 text-gray-600" />
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded" aria-label="Fechar">
+            <span className="w-5 h-5 text-gray-600" aria-hidden>×</span>
           </button>
         </div>
         <div className="p-4 space-y-4">
@@ -785,8 +795,8 @@ function ConfirmSessionsModal({ open, onClose, onConfirm, loading }: any) {
       <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
         <div className="flex items-center justify-between p-4 border-b">
           <h3 className="text-lg font-semibold text-gray-900">Encerrar outras sessões</h3>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded">
-            <X className="w-5 h-5 text-gray-600" />
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded" aria-label="Fechar">
+            <span className="w-5 h-5 text-gray-600" aria-hidden>×</span>
           </button>
         </div>
         <div className="p-4 text-sm text-gray-700">

@@ -1,15 +1,15 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { Eye, EyeOff, Lock, AlertCircle, CheckCircle, ArrowLeft } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useLanguage } from '@/components/providers/LanguageProvider'
 
 export default function ResetPasswordClient() {
   const { locale } = useLanguage()
   const isEn = locale.startsWith('en')
-  const [formData, setFormData] = useState({ password: '', confirmPassword: '' })
+  type ResetForm = { password: string; confirmPassword: string }
+  const [formData, setFormData] = useState({ password: '', confirmPassword: '' } as ResetForm)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -18,17 +18,18 @@ export default function ResetPasswordClient() {
   const [tokenValid, setTokenValid] = useState(false)
   const [token, setToken] = useState('')
   const router = useRouter()
-  const searchParams = useSearchParams()
+  
 
   useEffect(() => {
-    const tokenParam = searchParams.get('token')
+    const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null
+    const tokenParam = params?.get('token') || ''
     if (tokenParam) {
       setToken(tokenParam)
       validateToken(tokenParam)
     } else {
       setError(isEn ? 'Invalid recovery token' : 'Token de recuperação inválido')
     }
-  }, [searchParams])
+  }, [])
 
   const validateToken = async (token: string) => {
     try {
@@ -85,11 +86,11 @@ export default function ResetPasswordClient() {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
         <div className="text-center">
-          <AlertCircle className="mx-auto h-12 w-12 text-red-400" />
+          <span className="mx-auto h-12 w-12 text-red-400" aria-hidden>⚠️</span>
           <h2 className="mt-4 text-2xl font-bold text-gray-900">{isEn ? 'Invalid Token' : 'Token Inválido'}</h2>
           <p className="mt-2 text-gray-600">{isEn ? 'The recovery link is invalid or has expired.' : 'O link de recuperação é inválido ou expirou.'}</p>
           <Link href="/esqueci-senha" className="mt-4 inline-flex items-center text-green-600 hover:text-green-500">
-            <ArrowLeft className="w-4 h-4 mr-1" />
+            <span className="w-4 h-4 mr-1" aria-hidden>←</span>
             {isEn ? 'Request new link' : 'Solicitar novo link'}
           </Link>
         </div>
@@ -118,7 +119,7 @@ export default function ResetPasswordClient() {
               {error && (
                 <div className="bg-red-50 border border-red-200 rounded-md p-4">
                   <div className="flex">
-                    <AlertCircle className="h-5 w-5 text-red-400" />
+                    <span className="h-5 w-5 text-red-400 mr-2" aria-hidden>⚠️</span>
                     <div className="ml-3">
                       <p className="text-sm text-red-800">{error}</p>
                     </div>
@@ -129,7 +130,7 @@ export default function ResetPasswordClient() {
               {success && (
                 <div className="bg-green-50 border border-green-200 rounded-md p-4">
                   <div className="flex">
-                    <CheckCircle className="h-5 w-5 text-green-400" />
+                    <span className="h-5 w-5 text-green-400 mr-2" aria-hidden>✅</span>
                     <div className="ml-3">
                       <p className="text-sm text-green-800">{success}</p>
                     </div>
@@ -140,9 +141,7 @@ export default function ResetPasswordClient() {
               <div>
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700">{isEn ? 'New Password' : 'Nova Senha'}</label>
                 <div className="mt-1 relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400" />
-                  </div>
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" aria-hidden>🔒</div>
                   <input
                     id="password"
                     name="password"
@@ -150,16 +149,12 @@ export default function ResetPasswordClient() {
                     autoComplete="new-password"
                     required
                     value={formData.password}
-                    onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                    onChange={(e) => setFormData((prev: ResetForm) => ({ ...prev, password: e.target.value }))}
                     className="appearance-none block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
                     placeholder={isEn ? 'Minimum 6 characters' : 'Mínimo 6 caracteres'}
                   />
                   <button type="button" className="absolute inset-y-0 right-0 pr-3 flex items-center" onClick={() => setShowPassword(!showPassword)}>
-                    {showPassword ? (
-                      <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-                    ) : (
-                      <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-                    )}
+                    <span className="h-5 w-5 text-gray-400 hover:text-gray-600" aria-hidden>{showPassword ? '🙈' : '👁️'}</span>
                   </button>
                 </div>
               </div>
@@ -167,9 +162,7 @@ export default function ResetPasswordClient() {
               <div>
                 <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">{isEn ? 'Confirm New Password' : 'Confirmar Nova Senha'}</label>
                 <div className="mt-1 relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400" />
-                  </div>
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" aria-hidden>🔒</div>
                   <input
                     id="confirmPassword"
                     name="confirmPassword"
@@ -177,16 +170,12 @@ export default function ResetPasswordClient() {
                     autoComplete="new-password"
                     required
                     value={formData.confirmPassword}
-                    onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                    onChange={(e) => setFormData((prev: ResetForm) => ({ ...prev, confirmPassword: e.target.value }))}
                     className="appearance-none block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
                     placeholder={isEn ? 'Confirm your new password' : 'Confirme sua nova senha'}
                   />
                   <button type="button" className="absolute inset-y-0 right-0 pr-3 flex items-center" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-                    {showConfirmPassword ? (
-                      <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-                    ) : (
-                      <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-                    )}
+                    <span className="h-5 w-5 text-gray-400 hover:text-gray-600" aria-hidden>{showConfirmPassword ? '🙈' : '👁️'}</span>
                   </button>
                 </div>
               </div>
@@ -201,7 +190,7 @@ export default function ResetPasswordClient() {
 
           <div className="mt-6 text-center">
             <Link href="/login" className="inline-flex items-center text-sm text-green-600 hover:text-green-500">
-              <ArrowLeft className="w-4 h-4 mr-1" />
+              <span className="w-4 h-4 mr-1" aria-hidden>←</span>
               {isEn ? 'Back to login' : 'Voltar para o login'}
             </Link>
           </div>

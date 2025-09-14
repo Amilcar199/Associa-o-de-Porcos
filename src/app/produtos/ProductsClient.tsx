@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { Tag, Weight, Calendar, Eye } from 'lucide-react'
+ 
 import ProductModal from '@/components/modals/ProductModal'
 import { useLanguage } from '@/components/providers/LanguageProvider'
 import { formatPrice, convertAndFormat } from '@/lib/utils'
@@ -31,18 +31,18 @@ interface ProductsClientProps {
 export default function ProductsClient({ products }: ProductsClientProps) {
   const { locale } = useLanguage()
   const isEn = locale.startsWith('en')
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const [selectedProduct, setSelectedProduct] = useState(null as Product | null)
   const [currency, setCurrency] = useState('AOA')
   const [showConverted, setShowConverted] = useState(false)
-  const [convertedCache, setConvertedCache] = useState<Record<string, string>>({})
+  const [convertedCache, setConvertedCache] = useState({} as Record<string, string>)
   const [modalOpen, setModalOpen] = useState(false)
-  const [list, setList] = useState<Product[]>(products || [])
+  const [list, setList] = useState((products || []) as Product[])
   const [query, setQuery] = useState('')
-  const [health, setHealth] = useState<string>('')
-  const [vaccinated, setVaccinated] = useState<string>('')
-  const [maxPrice, setMaxPrice] = useState<string>('')
-  const [minWeight, setMinWeight] = useState<string>('')
-  const [maxAge, setMaxAge] = useState<string>('')
+  const [health, setHealth] = useState('' as string)
+  const [vaccinated, setVaccinated] = useState('' as string)
+  const [maxPrice, setMaxPrice] = useState('' as string)
+  const [minWeight, setMinWeight] = useState('' as string)
+  const [maxAge, setMaxAge] = useState('' as string)
 
   const openProductModal = (product: Product) => {
     setSelectedProduct(product)
@@ -95,7 +95,7 @@ export default function ProductsClient({ products }: ProductsClientProps) {
 
   const goToPreviousProduct = () => {
     if (!selectedProduct) return
-    const currentIndex = list.findIndex(p => p._id === selectedProduct._id)
+    const currentIndex = list.findIndex((p: Product) => p._id === selectedProduct._id)
     if (currentIndex > 0) {
       setSelectedProduct(list[currentIndex - 1])
     }
@@ -103,13 +103,13 @@ export default function ProductsClient({ products }: ProductsClientProps) {
 
   const goToNextProduct = () => {
     if (!selectedProduct) return
-    const currentIndex = list.findIndex(p => p._id === selectedProduct._id)
+    const currentIndex = list.findIndex((p: Product) => p._id === selectedProduct._id)
     if (currentIndex < list.length - 1) {
       setSelectedProduct(list[currentIndex + 1])
     }
   }
 
-  const filtered = list.filter(p => {
+  const filtered = list.filter((p: Product) => {
     if (query && !(`${p.name} ${p.breed} ${p.description || ''}`.toLowerCase().includes(query.toLowerCase()))) return false
     if (health && p.healthStatus !== health) return false
     if (vaccinated && String(!!p.vaccinated) !== vaccinated) return false
@@ -154,7 +154,7 @@ export default function ProductsClient({ products }: ProductsClientProps) {
       </div>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filtered.map((product, idx) => (
+        {filtered.map((product: Product, idx: number) => (
           <div 
             key={product._id || idx} 
             onClick={() => openProductModal(product)}
@@ -175,7 +175,7 @@ export default function ProductsClient({ products }: ProductsClientProps) {
                   {product.priceFormatted || (
                     showConverted
                       ? convertedCache[String(product._id)] || (
-                        (()=>{ convertAndFormat((product.price as number) || 0, currency, 'USD', locale).then(f=>setConvertedCache(prev=>({...prev, [String(product._id)]: f })) ); return formatPrice((product.price as number) || 0, currency, locale) })()
+                        (()=>{ convertAndFormat((product.price as number) || 0, currency, 'USD', locale).then(f=>setConvertedCache((prev: Record<string, string>)=>({...prev, [String(product._id)]: f })) ); return formatPrice((product.price as number) || 0, currency, locale) })()
                       )
                       : formatPrice(product.price as number, currency, locale)
                   )}
@@ -186,7 +186,7 @@ export default function ProductsClient({ products }: ProductsClientProps) {
               {/* Ícone de visualizar */}
               <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <div className="bg-white/90 backdrop-blur px-4 py-2 rounded-full flex items-center gap-2">
-                  <Eye size={16} className="text-primary-600" />
+                  <span className="text-primary-600" aria-hidden>👁️</span>
                   <span className="text-primary-700 font-medium text-sm">{isEn ? 'See details' : 'Ver Detalhes'}</span>
                 </div>
               </div>
@@ -199,15 +199,15 @@ export default function ProductsClient({ products }: ProductsClientProps) {
               </h3>
               <div className="mt-2 grid grid-cols-3 gap-2 text-xs text-gray-600">
                 <div className="flex items-center gap-1">
-                  <Tag size={14} className="text-primary-600" />
+                  <span className="text-primary-600" aria-hidden>🏷️</span>
                   {product.breed || '—'}
                 </div>
                 <div className="flex items-center gap-1">
-                  <Weight size={14} className="text-primary-600" />
+                  <span className="text-primary-600" aria-hidden>⚖️</span>
                   {product.weight ? `${product.weight} kg` : '—'}
                 </div>
                 <div className="flex items-center gap-1">
-                  <Calendar size={14} className="text-primary-600" />
+                  <span className="text-primary-600" aria-hidden>📅</span>
                   {product.age ? `${product.age} ${isEn ? 'months' : 'meses'}` : '—'}
                 </div>
               </div>
@@ -241,8 +241,8 @@ export default function ProductsClient({ products }: ProductsClientProps) {
         product={selectedProduct}
         onPrevious={goToPreviousProduct}
         onNext={goToNextProduct}
-        hasPrevious={selectedProduct ? list.findIndex(p => p._id === selectedProduct._id) > 0 : false}
-        hasNext={selectedProduct ? list.findIndex(p => p._id === selectedProduct._id) < list.length - 1 : false}
+        hasPrevious={selectedProduct ? list.findIndex((p: Product) => p._id === selectedProduct._id) > 0 : false}
+        hasNext={selectedProduct ? list.findIndex((p: Product) => p._id === selectedProduct._id) < list.length - 1 : false}
       />
     </>
   )

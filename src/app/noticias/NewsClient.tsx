@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import { Calendar, Eye } from 'lucide-react'
+ 
 import NewsModal from '@/components/modals/NewsModal'
 
 interface NewsItem {
@@ -21,8 +21,8 @@ interface NewsItem {
 }
 
 export default function NewsClient({ news, isEn }: { news: NewsItem[]; isEn: boolean }) {
-  const [list, setList] = useState<NewsItem[]>(news)
-  const [selected, setSelected] = useState<NewsItem | null>(null)
+  const [list, setList] = useState(news as NewsItem[])
+  const [selected, setSelected] = useState(null as NewsItem | null)
   const [open, setOpen] = useState(false)
 
   const isValidObjectId = (id?: string) => !!id && /^[a-fA-F0-9]{24}$/.test(id)
@@ -54,8 +54,8 @@ export default function NewsClient({ news, isEn }: { news: NewsItem[]; isEn: boo
         }
       }
       if (typeof newViews === 'number') {
-        setList(prev => prev.map(item => (item._id === n._id ? { ...item, views: newViews } : item)))
-        setSelected(prev => (prev ? { ...prev, views: newViews } : prev))
+        setList((prev: NewsItem[]) => prev.map((item: NewsItem) => (item._id === n._id ? { ...item, views: newViews } : item)))
+        setSelected((prev: NewsItem | null) => (prev ? { ...prev, views: newViews } : prev))
       }
     } catch {
       // Silencia falhas de rede sem quebrar a UI
@@ -63,7 +63,7 @@ export default function NewsClient({ news, isEn }: { news: NewsItem[]; isEn: boo
   }
   const goPrev = () => {
     if (!selected) return
-    const idx = list.findIndex(n => n._id === selected._id)
+    const idx = list.findIndex((n: NewsItem) => n._id === selected._id)
     if (idx > 0) {
       const nextNews = list[idx - 1]
       setSelected(nextNews)
@@ -72,7 +72,7 @@ export default function NewsClient({ news, isEn }: { news: NewsItem[]; isEn: boo
   }
   const goNext = () => {
     if (!selected) return
-    const idx = list.findIndex(n => n._id === selected._id)
+    const idx = list.findIndex((n: NewsItem) => n._id === selected._id)
     if (idx < list.length - 1) {
       const nextNews = list[idx + 1]
       setSelected(nextNews)
@@ -83,7 +83,7 @@ export default function NewsClient({ news, isEn }: { news: NewsItem[]; isEn: boo
   return (
     <>
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {list.map((n, idx) => (
+        {list.map((n: NewsItem, idx: number) => (
           <article
             key={n._id || idx}
             onClick={() => openModal(n)}
@@ -102,10 +102,10 @@ export default function NewsClient({ news, isEn }: { news: NewsItem[]; isEn: boo
               <h3 className="font-semibold text-gray-900 text-lg line-clamp-2">{n.title}</h3>
               {(n.publishedAtFormatted || n.publishedAt) && (
                 <div className="mt-2 flex items-center gap-2 text-xs text-gray-500">
-                  <Calendar size={14} className="text-primary-600" />
+                  <span className="text-primary-600" aria-hidden>📅</span>
                   <span>{n.publishedAtFormatted}</span>
                   {typeof n.views === 'number' && (
-                    <span className="ml-3 inline-flex items-center gap-1"><Eye size={14} className="text-primary-600" />{n.views}</span>
+                    <span className="ml-3 inline-flex items-center gap-1"><span className="text-primary-600" aria-hidden>👁️</span>{n.views}</span>
                   )}
                 </div>
               )}
@@ -123,8 +123,8 @@ export default function NewsClient({ news, isEn }: { news: NewsItem[]; isEn: boo
         news={selected}
         onPrevious={goPrev}
         onNext={goNext}
-        hasPrevious={selected ? list.findIndex(n => n._id === selected._id) > 0 : false}
-        hasNext={selected ? list.findIndex(n => n._id === selected._id) < list.length - 1 : false}
+        hasPrevious={selected ? list.findIndex((n: NewsItem) => n._id === selected._id) > 0 : false}
+        hasNext={selected ? list.findIndex((n: NewsItem) => n._id === selected._id) < list.length - 1 : false}
       />
     </>
   )

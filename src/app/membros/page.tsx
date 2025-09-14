@@ -3,18 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { 
-  Users, 
-  FileText, 
-  Calendar, 
-  MessageSquare, 
-  Download, 
-  Video, 
-  BookOpen,
-  Star,
-  TrendingUp,
-  Award
-} from 'lucide-react';
+ 
 import { useLanguage } from '@/components/providers/LanguageProvider';
 
 interface MemberContent {
@@ -36,7 +25,7 @@ export default function MembersArea() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
-  const [content, setContent] = useState<MemberContent[]>([]);
+  const [content, setContent] = useState([] as MemberContent[]);
   const [stats, setStats] = useState({
     totalDocuments: 0,
     totalVideos: 0,
@@ -80,11 +69,11 @@ export default function MembersArea() {
 
   const getContentIcon = (type: string) => {
     switch (type) {
-      case 'document': return <FileText className="w-5 h-5" />;
-      case 'video': return <Video className="w-5 h-5" />;
-      case 'article': return <BookOpen className="w-5 h-5" />;
-      case 'event': return <Calendar className="w-5 h-5" />;
-      default: return <FileText className="w-5 h-5" />;
+      case 'document': return <span aria-hidden>📄</span>;
+      case 'video': return <span aria-hidden>🎬</span>;
+      case 'article': return <span aria-hidden>📚</span>;
+      case 'event': return <span aria-hidden>📅</span>;
+      default: return <span aria-hidden>📄</span>;
     }
   };
 
@@ -98,7 +87,7 @@ export default function MembersArea() {
     }
   };
 
-  const filteredContent = content.filter(item => {
+  const filteredContent = content.filter((item: MemberContent) => {
     if (activeTab === 'overview') return true;
     return item.type === activeTab;
   });
@@ -130,7 +119,7 @@ export default function MembersArea() {
                 <p className="text-lg font-semibold text-green-600">{stats.membershipLevel}</p>
               </div>
               <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                <Users className="w-6 h-6 text-green-600" />
+                <span className="w-6 h-6 text-green-600" aria-hidden>👥</span>
               </div>
             </div>
           </div>
@@ -141,7 +130,7 @@ export default function MembersArea() {
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <FileText className="w-8 h-8 text-blue-600" />
+                <span className="w-8 h-8 text-blue-600" aria-hidden>📄</span>
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-500">{isEn ? 'Documents' : 'Documentos'}</p>
@@ -152,7 +141,7 @@ export default function MembersArea() {
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <Video className="w-8 h-8 text-purple-600" />
+                <span className="w-8 h-8 text-purple-600" aria-hidden>🎬</span>
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-500">{isEn ? 'Videos' : 'Vídeos'}</p>
@@ -163,7 +152,7 @@ export default function MembersArea() {
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <Calendar className="w-8 h-8 text-orange-600" />
+                <span className="w-8 h-8 text-orange-600" aria-hidden>📅</span>
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-500">{isEn ? 'Events' : 'Eventos'}</p>
@@ -174,7 +163,7 @@ export default function MembersArea() {
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <Award className="w-8 h-8 text-green-600" />
+                <span className="w-8 h-8 text-green-600" aria-hidden>🏆</span>
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-500">{isEn ? 'Benefits' : 'Benefícios'}</p>
@@ -190,23 +179,23 @@ export default function MembersArea() {
             <nav className="-mb-px flex overflow-x-auto no-scrollbar px-4 sm:px-6">
               <div className="flex space-x-6 sm:space-x-8 min-w-max">
               <button onClick={() => setActiveTab('overview')} className={`shrink-0 py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'overview' ? 'border-green-500 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
-                <TrendingUp className="inline-block w-4 h-4 mr-2" />
+                <span className="inline-block w-4 h-4 mr-2" aria-hidden>📈</span>
                 {isEn ? 'Overview' : 'Visão Geral'}
               </button>
               <button onClick={() => setActiveTab('document')} className={`shrink-0 py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'document' ? 'border-green-500 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
-                <FileText className="inline-block w-4 h-4 mr-2" />
+                <span className="inline-block w-4 h-4 mr-2" aria-hidden>📄</span>
                 {isEn ? 'Documents' : 'Documentos'}
               </button>
               <button onClick={() => setActiveTab('video')} className={`shrink-0 py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'video' ? 'border-green-500 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
-                <Video className="inline-block w-4 h-4 mr-2" />
+                <span className="inline-block w-4 h-4 mr-2" aria-hidden>🎬</span>
                 {isEn ? 'Videos' : 'Vídeos'}
               </button>
               <button onClick={() => setActiveTab('article')} className={`shrink-0 py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'article' ? 'border-green-500 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
-                <BookOpen className="inline-block w-4 h-4 mr-2" />
+                <span className="inline-block w-4 h-4 mr-2" aria-hidden>📚</span>
                 {isEn ? 'Articles' : 'Artigos'}
               </button>
               <button onClick={() => setActiveTab('event')} className={`shrink-0 py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'event' ? 'border-green-500 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
-                <Calendar className="inline-block w-4 h-4 mr-2" />
+                <span className="inline-block w-4 h-4 mr-2" aria-hidden>📅</span>
                 {isEn ? 'Events' : 'Eventos'}
               </button>
               </div>
@@ -217,14 +206,14 @@ export default function MembersArea() {
             {filteredContent.length === 0 ? (
               <div className="text-center py-12">
                 <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <MessageSquare className="w-8 h-8 text-gray-400" />
+                  <span className="w-8 h-8 text-gray-400" aria-hidden>💬</span>
                 </div>
                 <h3 className="text-lg font-medium text-gray-900 mb-2">{isEn ? 'No content found' : 'Nenhum conteúdo encontrado'}</h3>
                 <p className="text-gray-500">{isEn ? 'We will have exclusive content for you soon!' : 'Em breve teremos conteúdo exclusivo para você!'}</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredContent.map((item) => (
+                {filteredContent.map((item: MemberContent) => (
                   <div key={item.id} className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
                     {item.thumbnail && (
                       <div className="aspect-video bg-gray-200">
@@ -237,7 +226,7 @@ export default function MembersArea() {
                           {getContentIcon(item.type)}
                           <span className="ml-1 capitalize">{item.type}</span>
                         </span>
-                        {item.isFeatured && (<Star className="w-4 h-4 text-yellow-500" />)}
+                        {item.isFeatured && (<span className="w-4 h-4 text-yellow-500" aria-hidden>⭐</span>)}
                       </div>
                       <h3 className="text-lg font-semibold text-gray-900 mb-2">{item.title}</h3>
                       <p className="text-gray-600 text-sm mb-4">{item.description}</p>
@@ -245,7 +234,7 @@ export default function MembersArea() {
                         <span className="text-xs text-gray-500">{new Date(item.createdAt).toLocaleDateString(isEn ? 'en-US' : 'pt-AO')}</span>
                         {item.url && (
                           <a href={item.url} className="inline-flex items-center text-sm text-green-600 hover:text-green-700">
-                            <Download className="w-4 h-4 mr-1" />
+                            <span className="w-4 h-4 mr-1" aria-hidden>📥</span>
                             {isEn ? 'Access' : 'Acessar'}
                           </a>
                         )}
@@ -264,7 +253,7 @@ export default function MembersArea() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="flex items-start space-x-3">
               <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                <Star className="w-4 h-4 text-green-600" />
+                <span className="w-4 h-4 text-green-600" aria-hidden>⭐</span>
               </div>
               <div>
                 <h4 className="text-sm font-medium text-gray-900">{isEn ? 'Exclusive Content' : 'Conteúdo Exclusivo'}</h4>
@@ -273,7 +262,7 @@ export default function MembersArea() {
             </div>
             <div className="flex items-start space-x-3">
               <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                <Calendar className="w-4 h-4 text-green-600" />
+                <span className="w-4 h-4 text-green-600" aria-hidden>📅</span>
               </div>
               <div>
                 <h4 className="text-sm font-medium text-gray-900">{isEn ? 'Priority Events' : 'Eventos Prioritários'}</h4>
@@ -282,7 +271,7 @@ export default function MembersArea() {
             </div>
             <div className="flex items-start space-x-3">
               <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                <MessageSquare className="w-4 h-4 text-green-600" />
+                <span className="w-4 h-4 text-green-600" aria-hidden>💬</span>
               </div>
               <div>
                 <h4 className="text-sm font-medium text-gray-900">{isEn ? 'Specialized Support' : 'Suporte Especializado'}</h4>
@@ -291,7 +280,7 @@ export default function MembersArea() {
             </div>
             <div className="flex items-start space-x-3">
               <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                <Users className="w-4 h-4 text-green-600" />
+                <span className="w-4 h-4 text-green-600" aria-hidden>👥</span>
               </div>
               <div>
                 <h4 className="text-sm font-medium text-gray-900">Networking</h4>
@@ -300,7 +289,7 @@ export default function MembersArea() {
             </div>
             <div className="flex items-start space-x-3">
               <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                <FileText className="w-4 h-4 text-green-600" />
+                <span className="w-4 h-4 text-green-600" aria-hidden>📄</span>
               </div>
               <div>
                 <h4 className="text-sm font-medium text-gray-900">{isEn ? 'Documentation' : 'Documentação'}</h4>
@@ -309,7 +298,7 @@ export default function MembersArea() {
             </div>
             <div className="flex items-start space-x-3">
               <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                <Award className="w-4 h-4 text-green-600" />
+                <span className="w-4 h-4 text-green-600" aria-hidden>🏆</span>
               </div>
               <div>
                 <h4 className="text-sm font-medium text-gray-900">{isEn ? 'Certifications' : 'Certificações'}</h4>
