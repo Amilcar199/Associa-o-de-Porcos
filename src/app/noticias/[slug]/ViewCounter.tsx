@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { Eye } from 'lucide-react'
 
 interface ViewCounterProps {
   newsId: string
@@ -36,7 +37,7 @@ export default function ViewCounter({ newsId, initialViews }: ViewCounterProps) 
 
   return (
     <div className="flex items-center space-x-1">
-      <span>👁️</span>
+      <Eye size={14} />
       <span>{views.toLocaleString()} visualizações</span>
     </div>
   )
