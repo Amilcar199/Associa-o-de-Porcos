@@ -314,7 +314,7 @@ export default function ImageManager() {
           ))}
         </div>
 
-        {images.length === 0 && (
+        {total === 0 && (
           <div className="text-center py-8 text-gray-500">
             <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
             <p>Nenhuma imagem encontrada</p>
