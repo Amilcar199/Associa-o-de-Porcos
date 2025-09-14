@@ -49,7 +49,7 @@ export default function CollaboratorsClient({ initial }: { initial: Collaborator
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {list.map((c) => (
+      {list.map((c: Collaborator) => (
         <div key={c._id} className="bg-white rounded-2xl shadow hover:shadow-xl transition p-6 text-center">
           <div className="mx-auto w-44 h-44 md:w-56 md:h-56 rounded-full ring-4 ring-white shadow overflow-hidden bg-gray-100">
             <div className="relative w-full h-full">
