@@ -11,6 +11,9 @@ interface RegionsRes { success: boolean, data: { unit: Unit, regions: { region: 
 interface HistoryRes { success: boolean, data: { unit: Unit, series: { date: string, avg: number | null, count: number }[] } }
 interface RecordsRes { success: boolean, data: { unit: Unit, records: { id: string, date: string, region: string, value: number | null, saleForm?: string | null, outOfBand?: boolean }[], anchor?: { ref: number | null, bandPct: number } } }
 
+interface LoadingState { summary: boolean, overall: boolean, regions: boolean, history: boolean, records: boolean }
+interface ErrorState { summary: string, overall: string, regions: string, history: string, records: string }
+
 function formatAOA(v: number | null) {
   if (v == null || Number.isNaN(v)) return '—'
   return new Intl.NumberFormat('pt-AO', { style: 'currency', currency: 'AOA', maximumFractionDigits: 0 }).format(v)
@@ -60,6 +63,8 @@ export default function BolsaClient() {
   const [regionsData, setRegionsData] = React.useState(null as RegionsRes["data"] | null)
   const [historyData, setHistoryData] = React.useState(null as HistoryRes["data"] | null)
   const [recordsData, setRecordsData] = React.useState(null as RecordsRes["data"] | null)
+  const [loading, setLoading] = React.useState({ summary: false, overall: false, regions: false, history: false, records: false } as LoadingState)
+  const [error, setError] = React.useState({ summary: '', overall: '', regions: '', history: '', records: '' } as ErrorState)
 
   React.useEffect(() => { (async () => {
     try {
@@ -69,29 +74,53 @@ export default function BolsaClient() {
   })() }, [])
 
   React.useEffect(() => { (async () => {
+    // Summary
+    setLoading(l => ({ ...l, summary: true })); setError(e => ({ ...e, summary: '' }))
     try {
       const s: SummaryRes = await (await fetch(`/api/market/summary?${params.toString()}`, { cache: 'no-store' })).json()
       setSummary(s?.data || null)
-    } catch {}
+    } catch {
+      setError(e => ({ ...e, summary: 'Falha ao carregar resumo' }))
+    } finally { setLoading(l => ({ ...l, summary: false })) }
+
+    // Overall
+    setLoading(l => ({ ...l, overall: true })); setError(e => ({ ...e, overall: '' }))
     try {
       const o: OverallRes = await (await fetch(`/api/market/overall?${params.toString()}`, { cache: 'no-store' })).json()
       setOverall(o?.data || null)
-    } catch {}
+    } catch {
+      setError(e => ({ ...e, overall: 'Falha ao carregar média geral' }))
+    } finally { setLoading(l => ({ ...l, overall: false })) }
+
+    // Regions
+    setLoading(l => ({ ...l, regions: true })); setError(e => ({ ...e, regions: '' }))
     try {
       const r: RegionsRes = await (await fetch(`/api/market/regions?${paramsWithRange.toString()}`, { cache: 'no-store' })).json()
       setRegionsData(r?.data || null)
-    } catch {}
+    } catch {
+      setError(e => ({ ...e, regions: 'Falha ao carregar regiões' }))
+    } finally { setLoading(l => ({ ...l, regions: false })) }
+
+    // History
+    setLoading(l => ({ ...l, history: true })); setError(e => ({ ...e, history: '' }))
     try {
       const h: HistoryRes = await (await fetch(`/api/market/history?${paramsWithRange.toString()}`, { cache: 'no-store' })).json()
       setHistoryData(h?.data || null)
-    } catch {}
+    } catch {
+      setError(e => ({ ...e, history: 'Falha ao carregar histórico' }))
+    } finally { setLoading(l => ({ ...l, history: false })) }
+
+    // Records
+    setLoading(l => ({ ...l, records: true })); setError(e => ({ ...e, records: '' }))
     try {
       const recParams = new URLSearchParams(params)
       if (cleanOutliers) recParams.set('cleanOutliers', 'true')
       if (!Number.isNaN(bandPct)) recParams.set('bandPct', String(bandPct/100))
       const rec: RecordsRes = await (await fetch(`/api/market/records?${recParams.toString()}&limit=200`, { cache: 'no-store' })).json()
       setRecordsData(rec?.data || null)
-    } catch {}
+    } catch {
+      setError(e => ({ ...e, records: 'Falha ao carregar registos' }))
+    } finally { setLoading(l => ({ ...l, records: false })) }
   })() }, [params, paramsWithRange, cleanOutliers, bandPct])
 
   const sortedRegions = React.useMemo(() => {
@@ -244,27 +273,44 @@ export default function BolsaClient() {
       <div className="mt-6 grid md:grid-cols-3 gap-4">
         <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
           <div className="text-xs text-gray-500">Preço médio atual ({unit === 'kg' ? 'AOA/kg' : 'AOA/cabeça'})</div>
-          <div className="text-3xl font-bold mt-1 text-primary-800">{formatAOA(summary?.current?.avg ?? null)}</div>
-          <div className="text-xs text-gray-500 mt-1">Base {summary?.current?.count ?? 0} registos</div>
+          {loading.summary ? (
+            <div className="mt-2 h-8 w-40 bg-gray-100 rounded animate-pulse" />
+          ) : (
+            <div className="text-3xl font-bold mt-1 text-primary-800">{formatAOA(summary?.current?.avg ?? null)}</div>
+          )}
+          <div className="text-xs text-gray-500 mt-1">{loading.summary ? 'A carregar…' : <>Base {summary?.current?.count ?? 0} registos</>}</div>
+          {!!error.summary && <div className="text-xs text-red-600 mt-1">{error.summary}</div>}
         </div>
         <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
           <div className="text-xs text-gray-500">Variação diária</div>
-          <div className={`mt-1 inline-flex items-center px-2 py-0.5 rounded-full text-sm ${((summary?.variation?.daily ?? 0) >= 0) ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>{formatPct(summary?.variation?.daily ?? null)}</div>
+          {loading.summary ? (
+            <div className="mt-2 h-6 w-20 bg-gray-100 rounded animate-pulse" />
+          ) : (
+            <div className={`mt-1 inline-flex items-center px-2 py-0.5 rounded-full text-sm ${((summary?.variation?.daily ?? 0) >= 0) ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>{formatPct(summary?.variation?.daily ?? null)}</div>
+          )}
         </div>
         <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
           <div className="flex justify-between">
             <div>
               <div className="text-xs text-gray-500">Variação semanal</div>
-              <div className={`mt-1 inline-flex items-center px-2 py-0.5 rounded-full text-sm ${((summary?.variation?.weekly ?? 0) >= 0) ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>{formatPct(summary?.variation?.weekly ?? null)}</div>
+              {loading.summary ? (
+                <div className="mt-2 h-6 w-20 bg-gray-100 rounded animate-pulse" />
+              ) : (
+                <div className={`mt-1 inline-flex items-center px-2 py-0.5 rounded-full text-sm ${((summary?.variation?.weekly ?? 0) >= 0) ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>{formatPct(summary?.variation?.weekly ?? null)}</div>
+              )}
             </div>
             <div>
               <div className="text-xs text-gray-500">Variação mensal</div>
-              <div className={`mt-1 inline-flex items-center px-2 py-0.5 rounded-full text-sm ${((summary?.variation?.monthly ?? 0) >= 0) ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>{formatPct(summary?.variation?.monthly ?? null)}</div>
+              {loading.summary ? (
+                <div className="mt-2 h-6 w-20 bg-gray-100 rounded animate-pulse" />
+              ) : (
+                <div className={`mt-1 inline-flex items-center px-2 py-0.5 rounded-full text-sm ${((summary?.variation?.monthly ?? 0) >= 0) ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>{formatPct(summary?.variation?.monthly ?? null)}</div>
+              )}
             </div>
           </div>
           <div className="text-xs text-gray-500 mt-2">
-            {summary?.officialRef != null && (<span>Ref. oficial: {formatAOA(summary?.officialRef ?? null)}</span>)}
-            {summary?.usedFallback && (<span className="ml-2 text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded">Usando melhor dia ({fmtDateISO(summary?.effectiveDate)})</span>)}
+            {!loading.summary && summary?.officialRef != null && (<span>Ref. oficial: {formatAOA(summary?.officialRef ?? null)}</span>)}
+            {!loading.summary && summary?.usedFallback && (<span className="ml-2 text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded">Usando melhor dia ({fmtDateISO(summary?.effectiveDate)})</span>)}
           </div>
         </div>
       </div>
@@ -273,12 +319,16 @@ export default function BolsaClient() {
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-semibold text-gray-800">Série histórica</h3>
           <div className="flex items-center gap-2 text-xs text-gray-500">
-            <span>{historyData?.series?.length || 0} pontos</span>
+            <span>{loading.history ? '…' : (historyData?.series?.length || 0)} pontos</span>
             <button onClick={exportSVG} className="px-2 py-1 border rounded hover:bg-gray-50">Exportar SVG</button>
             <button onClick={exportPNG} className="px-2 py-1 border rounded hover:bg-gray-50">Exportar PNG</button>
           </div>
         </div>
-        {chart.path ? (
+        {loading.history ? (
+          <div className="h-64 bg-gray-50 border border-dashed border-gray-200 rounded animate-pulse" />
+        ) : error.history ? (
+          <div className="h-12 text-xs text-red-600 bg-red-50 border border-red-200 rounded p-2">{error.history}</div>
+        ) : chart.path ? (
           <div className="h-64">
             <svg viewBox="0 0 1000 260" preserveAspectRatio="none" className="w-full h-full">
               <defs>
@@ -323,15 +373,29 @@ export default function BolsaClient() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {sortedRegions.map((r: RegionsRes["data"]["regions"][number]) => (
-                <tr key={r.region}>
-                  <td className="py-2 pr-4 text-gray-800">{r.region}</td>
-                  <td className="py-2 pr-4">{r.count}</td>
-                  <td className="py-2 pr-4">{formatAOA(r.avg)}</td>
-                  <td className="py-2 pr-4">{formatAOA(r.min)}</td>
-                  <td className="py-2">{formatAOA(r.max)}</td>
-                </tr>
-              ))}
+              {loading.regions ? (
+                Array.from({ length: 4 }).map((_, i) => (
+                  <tr key={i}>
+                    <td className="py-2 pr-4"><div className="h-4 w-28 bg-gray-100 rounded animate-pulse" /></td>
+                    <td className="py-2 pr-4"><div className="h-4 w-10 bg-gray-100 rounded animate-pulse" /></td>
+                    <td className="py-2 pr-4"><div className="h-4 w-20 bg-gray-100 rounded animate-pulse" /></td>
+                    <td className="py-2 pr-4"><div className="h-4 w-16 bg-gray-100 rounded animate-pulse" /></td>
+                    <td className="py-2"><div className="h-4 w-16 bg-gray-100 rounded animate-pulse" /></td>
+                  </tr>
+                ))
+              ) : error.regions ? (
+                <tr><td colSpan={5} className="py-3 text-sm text-red-600">{error.regions}</td></tr>
+              ) : (
+                sortedRegions.map((r: RegionsRes["data"]["regions"][number]) => (
+                  <tr key={r.region}>
+                    <td className="py-2 pr-4 text-gray-800">{r.region}</td>
+                    <td className="py-2 pr-4">{r.count}</td>
+                    <td className="py-2 pr-4">{formatAOA(r.avg)}</td>
+                    <td className="py-2 pr-4">{formatAOA(r.min)}</td>
+                    <td className="py-2">{formatAOA(r.max)}</td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
@@ -355,14 +419,27 @@ export default function BolsaClient() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {(recordsData?.records || []).map((r: RecordsRes["data"]["records"][number]) => (
-              <tr key={r.id} className={r.outOfBand ? 'bg-red-50' : ''}>
-                <td className="py-2 pr-4">{fmtDateISO(r.date)}</td>
-                <td className="py-2 pr-4">{r.region}</td>
-                <td className="py-2 pr-4">{formatAOA(r.value)}</td>
-                <td className="py-2">{r.outOfBand ? <span className="px-2 py-0.5 text-xs rounded-full bg-red-100 text-red-700">Fora</span> : <span className="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-700">Dentro</span>}</td>
-              </tr>
-            ))}
+            {loading.records ? (
+              Array.from({ length: 6 }).map((_, i) => (
+                <tr key={i}>
+                  <td className="py-2 pr-4"><div className="h-4 w-24 bg-gray-100 rounded animate-pulse" /></td>
+                  <td className="py-2 pr-4"><div className="h-4 w-28 bg-gray-100 rounded animate-pulse" /></td>
+                  <td className="py-2 pr-4"><div className="h-4 w-20 bg-gray-100 rounded animate-pulse" /></td>
+                  <td className="py-2"><div className="h-4 w-12 bg-gray-100 rounded animate-pulse" /></td>
+                </tr>
+              ))
+            ) : error.records ? (
+              <tr><td colSpan={4} className="py-3 text-sm text-red-600">{error.records}</td></tr>
+            ) : (
+              (recordsData?.records || []).map((r: RecordsRes["data"]["records"][number]) => (
+                <tr key={r.id} className={r.outOfBand ? 'bg-red-50' : ''}>
+                  <td className="py-2 pr-4">{fmtDateISO(r.date)}</td>
+                  <td className="py-2 pr-4">{r.region}</td>
+                  <td className="py-2 pr-4">{formatAOA(r.value)}</td>
+                  <td className="py-2">{r.outOfBand ? <span className="px-2 py-0.5 text-xs rounded-full bg-red-100 text-red-700">Fora</span> : <span className="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-700">Dentro</span>}</td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
