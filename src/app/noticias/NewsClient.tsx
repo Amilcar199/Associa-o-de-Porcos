@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
+import { Eye, Calendar } from 'lucide-react'
  
 import NewsModal from '@/components/modals/NewsModal'
 
@@ -102,10 +103,10 @@ export default function NewsClient({ news, isEn }: { news: NewsItem[]; isEn: boo
               <h3 className="font-semibold text-gray-900 text-lg line-clamp-2">{n.title}</h3>
               {(n.publishedAtFormatted || n.publishedAt) && (
                 <div className="mt-2 flex items-center gap-2 text-xs text-gray-500">
-                  <span className="text-primary-600" aria-hidden>📅</span>
+                  <Calendar size={12} className="text-primary-600" aria-hidden />
                   <span>{n.publishedAtFormatted}</span>
                   {typeof n.views === 'number' && (
-                    <span className="ml-3 inline-flex items-center gap-1"><span className="text-primary-600" aria-hidden>👁️</span>{n.views}</span>
+                    <span className="ml-3 inline-flex items-center gap-1"><Eye className="text-primary-600" size={12} aria-hidden />{n.views}</span>
                   )}
                 </div>
               )}
