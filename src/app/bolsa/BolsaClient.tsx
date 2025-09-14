@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import React from 'react'
 
 type Unit = 'kg' | 'head'
 
@@ -22,23 +22,23 @@ function formatPct(v: number | null) {
 function fmtDateISO(s?: string) { return s ? s.slice(0,10) : '—' }
 
 export default function BolsaClient() {
-  const [saleForm, setSaleForm] = useState<'carcaça' | 'vivo'>('carcaça')
+  const [saleForm, setSaleForm] = React.useState('carcaça' as 'carcaça' | 'vivo')
   const unit: Unit = saleForm === 'vivo' ? 'head' : 'kg'
-  const [region, setRegion] = useState<string>('')
-  const [periodDays, setPeriodDays] = useState<number>(90)
-  const [regionsList, setRegionsList] = useState<string[]>([])
-  const [cleanOutliers, setCleanOutliers] = useState<boolean>(false)
-  const [weighted, setWeighted] = useState<boolean>(false)
-  const [bandPct, setBandPct] = useState<number>(10)
-  const [sortKey, setSortKey] = useState<'region' | 'count' | 'avg' | 'min' | 'max'>('region')
-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
+  const [region, setRegion] = React.useState('' as string)
+  const [periodDays, setPeriodDays] = React.useState(90 as number)
+  const [regionsList, setRegionsList] = React.useState([] as string[])
+  const [cleanOutliers, setCleanOutliers] = React.useState(false as boolean)
+  const [weighted, setWeighted] = React.useState(false as boolean)
+  const [bandPct, setBandPct] = React.useState(10 as number)
+  const [sortKey, setSortKey] = React.useState('region' as 'region' | 'count' | 'avg' | 'min' | 'max')
+  const [sortDir, setSortDir] = React.useState('asc' as 'asc' | 'desc')
 
-  const endISO = useMemo(() => new Date().toISOString(), [])
-  const startISO = useMemo(() => {
+  const endISO = React.useMemo(() => new Date().toISOString(), [])
+  const startISO = React.useMemo(() => {
     const d = new Date(); d.setDate(d.getDate() - periodDays); return d.toISOString()
   }, [periodDays])
 
-  const params = useMemo(() => {
+  const params = React.useMemo(() => {
     const p = new URLSearchParams()
     p.set('unit', unit)
     p.set('saleForm', saleForm)
@@ -46,7 +46,7 @@ export default function BolsaClient() {
     return p
   }, [unit, saleForm, region])
 
-  const paramsWithRange = useMemo(() => {
+  const paramsWithRange = React.useMemo(() => {
     const p = new URLSearchParams(params)
     p.set('start', startISO); p.set('end', endISO)
     if (cleanOutliers) p.set('cleanOutliers', 'true')
@@ -55,20 +55,20 @@ export default function BolsaClient() {
     return p
   }, [params, startISO, endISO, cleanOutliers, weighted, bandPct])
 
-  const [summary, setSummary] = useState<SummaryRes["data"] | null>(null)
-  const [overall, setOverall] = useState<OverallRes["data"] | null>(null)
-  const [regionsData, setRegionsData] = useState<RegionsRes["data"] | null>(null)
-  const [historyData, setHistoryData] = useState<HistoryRes["data"] | null>(null)
-  const [recordsData, setRecordsData] = useState<RecordsRes["data"] | null>(null)
+  const [summary, setSummary] = React.useState(null as SummaryRes["data"] | null)
+  const [overall, setOverall] = React.useState(null as OverallRes["data"] | null)
+  const [regionsData, setRegionsData] = React.useState(null as RegionsRes["data"] | null)
+  const [historyData, setHistoryData] = React.useState(null as HistoryRes["data"] | null)
+  const [recordsData, setRecordsData] = React.useState(null as RecordsRes["data"] | null)
 
-  useEffect(() => { (async () => {
+  React.useEffect(() => { (async () => {
     try {
       const meta: MetaRes = await (await fetch('/api/market/meta', { cache: 'no-store' })).json()
       setRegionsList(meta?.data?.regions || [])
     } catch {}
   })() }, [])
 
-  useEffect(() => { (async () => {
+  React.useEffect(() => { (async () => {
     try {
       const s: SummaryRes = await (await fetch(`/api/market/summary?${params.toString()}`, { cache: 'no-store' })).json()
       setSummary(s?.data || null)
@@ -94,7 +94,7 @@ export default function BolsaClient() {
     } catch {}
   })() }, [params, paramsWithRange, cleanOutliers, bandPct])
 
-  const sortedRegions = useMemo(() => {
+  const sortedRegions = React.useMemo(() => {
     const list = [...(regionsData?.regions || [])]
     list.sort((a, b) => {
       const va: any = (a as any)[sortKey]
@@ -106,7 +106,7 @@ export default function BolsaClient() {
   }, [regionsData, sortKey, sortDir])
 
   function downloadCSV() {
-    const rows = (recordsData?.records || []).map(r => ({
+    const rows = (recordsData?.records || []).map((r: RecordsRes["data"]["records"][number]) => ({
       id: r.id,
       data: fmtDateISO(r.date),
       regiao: r.region,
@@ -248,7 +248,7 @@ export default function BolsaClient() {
             <button onClick={exportPNG} className="px-2 py-1 border rounded hover:bg-gray-50">Exportar PNG</button>
           </div>
         </div>
-        <div className="h-12 text-xs text-gray-600 bg-gray-50 border border-dashed border-gray-200 rounded p-2">{historyData?.series?.slice(-5).map(p=>`${p.date}: ${p.avg ?? '—'}`).join(' · ') || 'Sem dados'}</div>
+        <div className="h-12 text-xs text-gray-600 bg-gray-50 border border-dashed border-gray-200 rounded p-2">{historyData?.series?.slice(-5).map((p: HistoryRes["data"]["series"][number])=>`${p.date}: ${p.avg ?? '—'}`).join(' · ') || 'Sem dados'}</div>
       </div>
 
       <div className="mt-8 bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
@@ -297,7 +297,7 @@ export default function BolsaClient() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {(recordsData?.records || []).map((r) => (
+            {(recordsData?.records || []).map((r: RecordsRes["data"]["records"][number]) => (
               <tr key={r.id} className={r.outOfBand ? 'bg-red-50' : ''}>
                 <td className="py-2 pr-4">{fmtDateISO(r.date)}</td>
                 <td className="py-2 pr-4">{r.region}</td>
