@@ -64,3 +64,30 @@ export async function GET(request: NextRequest) {
   }
 }
 
+export async function DELETE(request: NextRequest) {
+  try {
+    const authResult = await authMiddleware(request)
+    if (!authResult.success) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+    }
+
+    const { searchParams } = new URL(request.url)
+    const relPath = (searchParams.get('path') || '').replace(/^\/+/, '')
+    if (!relPath) return NextResponse.json({ error: 'Caminho inválido' }, { status: 400 })
+
+    const publicDir = path.join(process.cwd(), 'public')
+    const abs = path.normalize(path.join(publicDir, relPath))
+    if (!abs.startsWith(publicDir)) return NextResponse.json({ error: 'Caminho inválido' }, { status: 400 })
+
+    if (!fs.existsSync(abs)) return NextResponse.json({ error: 'Arquivo não encontrado' }, { status: 404 })
+    const stat = fs.statSync(abs)
+    if (!stat.isFile()) return NextResponse.json({ error: 'Não é um arquivo' }, { status: 400 })
+
+    fs.unlinkSync(abs)
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('Erro ao deletar imagem pública:', error)
+    return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
+  }
+}
+

@@ -24,6 +24,7 @@ export default function ImageManager() {
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState<any | null>(null);
   const [imageToDelete, setImageToDelete] = useState<Image | null>(null);
+  const [externalToDelete, setExternalToDelete] = useState<any | null>(null)
   const [confirmBulkDelete, setConfirmBulkDelete] = useState(false)
   const [isBulkDeleting, setIsBulkDeleting] = useState(false)
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
@@ -146,6 +147,41 @@ export default function ImageManager() {
       setImageToDelete(null);
     }
   };
+
+  const handleDeleteExternal = async () => {
+    if (!externalToDelete) return
+    try {
+      const item: any = externalToDelete
+      if (item.source === 'public') {
+        // url like "/path/in/public/..." -> rel path without leading slash
+        const rel = String(item.url || '').replace(/^\/+/, '')
+        const res = await fetch(`/api/public-images?path=${encodeURIComponent(rel)}`, { method: 'DELETE', credentials: 'include' })
+        if (res.ok) {
+          setExternalImages((prev)=>prev.filter((e)=>e.url !== item.url))
+          toast.success('Imagem pública removida')
+        } else {
+          toast.error('Falha ao remover imagem pública')
+        }
+      } else if (item.source === 'assets') {
+        // url like "/api/public-assets/constitution/image?name=..."
+        const u = new URL(String(item.url), window.location.origin)
+        const name = u.searchParams.get('name') || ''
+        if (!name) throw new Error('Nome inválido')
+        const res = await fetch(`/api/public-assets/constitution/image?name=${encodeURIComponent(name)}`, { method: 'DELETE', credentials: 'include' })
+        if (res.ok) {
+          setExternalImages((prev)=>prev.filter((e)=>e.url !== item.url))
+          toast.success('Imagem removida de assets')
+        } else {
+          toast.error('Falha ao remover imagem de assets')
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao deletar imagem externa:', error)
+      toast.error('Erro ao remover imagem')
+    } finally {
+      setExternalToDelete(null)
+    }
+  }
 
   const formatFileSize = (bytes: number) => {
     if (bytes === 0) return '0 Bytes';
@@ -297,9 +333,9 @@ export default function ImageManager() {
                   )}
                   {(image as any).kind === 'external' && (
                     <button
-                      disabled
-                      className="bg-gray-300 text-white p-1 rounded opacity-60 cursor-not-allowed"
-                      title="Imagem somente leitura"
+                      onClick={()=> setExternalToDelete(image)}
+                      className="bg-red-500 text-white p-1 rounded hover:bg-red-600 transition-colors"
+                      title="Deletar"
                     >
                       <Trash2 size={14} />
                     </button>
@@ -430,6 +466,18 @@ export default function ImageManager() {
         onConfirm={handleDeleteImage}
         title="Confirmar Exclusão"
         message={`Tem certeza que deseja deletar a imagem "${imageToDelete?.filename}"? Esta ação não pode ser desfeita.`}
+        confirmText="Deletar"
+        cancelText="Cancelar"
+        type="danger"
+      />
+
+      {/* Delete External Confirmation */}
+      <ConfirmDialog
+        isOpen={!!externalToDelete}
+        onClose={() => setExternalToDelete(null)}
+        onConfirm={handleDeleteExternal}
+        title="Confirmar Exclusão"
+        message={`Tem certeza que deseja deletar a imagem "${(externalToDelete as any)?.filename}"? Esta ação não pode ser desfeita.`}
         confirmText="Deletar"
         cancelText="Cancelar"
         type="danger"

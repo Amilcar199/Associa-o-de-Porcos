@@ -41,3 +41,29 @@ export async function GET(request: NextRequest) {
   }
 }
 
+export async function DELETE(request: NextRequest) {
+  try {
+    const authResult = await authMiddleware(request)
+    if (!authResult.success) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+    }
+    const { searchParams } = new URL(request.url)
+    const name = searchParams.get('name') || ''
+    if (!name) return NextResponse.json({ error: 'Nome inválido' }, { status: 400 })
+
+    const baseDir = path.join(process.cwd(), 'src', 'components', 'assets', 'Conteudos Suinos', 'pdf_paginas_png')
+    const abs = path.normalize(path.join(baseDir, name))
+    if (!abs.startsWith(baseDir)) return NextResponse.json({ error: 'Caminho inválido' }, { status: 400 })
+    if (!fs.existsSync(abs)) return NextResponse.json({ error: 'Arquivo não encontrado' }, { status: 404 })
+
+    const stat = fs.statSync(abs)
+    if (!stat.isFile()) return NextResponse.json({ error: 'Não é um arquivo' }, { status: 400 })
+
+    fs.unlinkSync(abs)
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('Erro ao deletar imagem de assets:', error)
+    return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
+  }
+}
+
