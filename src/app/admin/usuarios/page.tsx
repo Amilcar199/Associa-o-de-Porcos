@@ -101,7 +101,7 @@ export default function AdminUsersPage() {
       })
       
       if (res.ok) {
-        setUsers(prev => prev.map(u => 
+        setUsers((prev: AdminUser[]) => prev.map((u: AdminUser) => 
           u.id === userId ? { ...u, active: newStatus } : u
         ))
       } else {
@@ -128,7 +128,7 @@ export default function AdminUsersPage() {
       })
       
       if (res.ok) {
-        setUsers(prev => prev.filter(u => u.id !== userToDelete.id))
+        setUsers((prev: AdminUser[]) => prev.filter((u: AdminUser) => u.id !== userToDelete.id))
         showSuccess('Usuário excluído com sucesso')
       } else {
         const error = await res.json()
@@ -190,7 +190,7 @@ export default function AdminUsersPage() {
             </tr>
           </thead>
           <tbody>
-            {filtered.map((u) => {
+            {filtered.map((u: AdminUser) => {
               const roleInfo = getRoleDisplay(u.role)
               return (
                 <tr key={u.id} className="border-t border-gray-100 hover:bg-gray-50">
