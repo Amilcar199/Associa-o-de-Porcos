@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { useLanguage } from '@/components/providers/LanguageProvider';
 import pt from '@/lib/i18n/dictionaries/pt';
 import en from '@/lib/i18n/dictionaries/en';
@@ -63,8 +64,8 @@ export default function LoginPage() {
             {error && (
               <div className="bg-red-50 border border-red-200 rounded-md p-4">
                 <div className="flex">
-                  <span className="h-5 w-5 text-red-400 mr-2" aria-hidden>⚠️</span>
-                  <div className="ml-3">
+                  <AlertCircle className="h-5 w-5 text-red-500 mr-2" />
+                  <div className="ml-1">
                     <p className="text-sm text-red-800">{error}</p>
                   </div>
                 </div>
@@ -76,7 +77,9 @@ export default function LoginPage() {
                 {dict.auth.email}
               </label>
               <div className="mt-1 relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" aria-hidden>📧</div>
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Mail className="h-5 w-5 text-gray-400" />
+                </div>
                 <input
                   id="email"
                   name="email"
@@ -96,7 +99,9 @@ export default function LoginPage() {
                 {dict.auth.password}
               </label>
               <div className="mt-1 relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" aria-hidden>🔒</div>
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Lock className="h-5 w-5 text-gray-400" />
+                </div>
                 <input
                   id="password"
                   name="password"
@@ -112,8 +117,13 @@ export default function LoginPage() {
                   type="button"
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
                   onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
                 >
-                  <span className="h-5 w-5 text-gray-400 hover:text-gray-600" aria-hidden>{showPassword ? '🙈' : '👁️'}</span>
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                  ) : (
+                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                  )}
                 </button>
               </div>
             </div>
