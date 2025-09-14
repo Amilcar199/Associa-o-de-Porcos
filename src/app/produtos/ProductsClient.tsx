@@ -14,6 +14,7 @@ interface Product {
   weight: number
   age: number
   price?: number
+  pricePerKg?: number
   priceFormatted?: string
   code?: string
   imageUrl: string
@@ -22,6 +23,7 @@ interface Product {
   vaccinated?: boolean
   location?: string
   features?: string[]
+  saleForm?: 'carcaça' | 'vivo'
 }
 
 interface ProductsClientProps {
@@ -119,6 +121,21 @@ export default function ProductsClient({ products }: ProductsClientProps) {
     return true
   })
 
+  const getCategory = (w?: number) => {
+    if (w === undefined || w === null) return '—'
+    if (w <= 30) return isEn ? 'Piglet' : 'Leitão'
+    if (w < 80) return isEn ? 'Grower/Fattener' : 'Engorda'
+    return isEn ? 'Finished' : 'Terminado'
+  }
+
+  const getPriceDisplay = (p: Product) => {
+    const perKg = typeof p.pricePerKg === 'number' && p.pricePerKg! > 0
+    const value = perKg ? p.pricePerKg! : (p.price || 0)
+    const formatted = formatPrice(value, currency, locale)
+    const unit = perKg ? (isEn ? '/kg' : '/kg') : (isEn ? '/head' : '/cabeça')
+    return `${formatted} ${unit}`
+  }
+
   return (
     <>
       {/* Filters */}
@@ -170,15 +187,9 @@ export default function ProductsClient({ products }: ProductsClientProps) {
                 sizes="(max-width:768px) 100vw, 33vw"
               />
               {/* Badge de preço */}
-              {(product.priceFormatted || typeof product.price === 'number') && (
+              {(product.priceFormatted || typeof product.price === 'number' || typeof product.pricePerKg === 'number') && (
                 <div className="absolute top-3 right-3 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-primary-700 text-sm font-semibold shadow">
-                  {product.priceFormatted || (
-                    showConverted
-                      ? convertedCache[String(product._id)] || (
-                        (()=>{ convertAndFormat((product.price as number) || 0, currency, 'USD', locale).then(f=>setConvertedCache((prev: Record<string, string>)=>({...prev, [String(product._id)]: f })) ); return formatPrice((product.price as number) || 0, currency, locale) })()
-                      )
-                      : formatPrice(product.price as number, currency, locale)
-                  )}
+                  {product.priceFormatted || getPriceDisplay(product)}
                 </div>
               )}
               {/* Overlay de hover */}
@@ -197,18 +208,35 @@ export default function ProductsClient({ products }: ProductsClientProps) {
               <h3 className="font-semibold text-gray-900 text-lg line-clamp-1 group-hover:text-primary-600 transition-colors">
                 {product.name}
               </h3>
-              <div className="mt-2 grid grid-cols-3 gap-2 text-xs text-gray-600">
-                <div className="flex items-center gap-1">
-                  <span className="text-primary-600" aria-hidden>🏷️</span>
-                  {product.breed || '—'}
+              {/* Linha 1: Localização */}
+              <div className="mt-2 text-xs text-gray-600">
+                <span className="text-gray-500">{isEn ? 'Location' : 'Localização'}: </span>
+                <span>{product.location || (isEn ? 'Not informed' : 'Não informado')}</span>
+              </div>
+              {/* Linha 2: Peso, Categoria, Condição */}
+              <div className="mt-2 grid grid-cols-3 gap-2 text-xs text-gray-700">
+                <div>
+                  <span className="text-gray-500">{isEn ? 'Weight' : 'Peso'}: </span>
+                  <span>{product.weight ? `${product.weight} kg` : '—'}</span>
                 </div>
-                <div className="flex items-center gap-1">
-                  <span className="text-primary-600" aria-hidden>⚖️</span>
-                  {product.weight ? `${product.weight} kg` : '—'}
+                <div>
+                  <span className="text-gray-500">{isEn ? 'Category' : 'Categoria'}: </span>
+                  <span>{getCategory(product.weight)}</span>
                 </div>
-                <div className="flex items-center gap-1">
-                  <span className="text-primary-600" aria-hidden>📅</span>
-                  {product.age ? `${product.age} ${isEn ? 'months' : 'meses'}` : '—'}
+                <div>
+                  <span className="text-gray-500">{isEn ? 'Sale' : 'Condição'}: </span>
+                  <span>{product.saleForm ? (product.saleForm === 'vivo' ? (isEn ? 'Live' : 'Vivo') : (isEn ? 'Carcass' : 'Carcaça')) : '—'}</span>
+                </div>
+              </div>
+              {/* Linha 3: Raça e Idade */}
+              <div className="mt-2 grid grid-cols-2 gap-2 text-xs text-gray-700">
+                <div>
+                  <span className="text-gray-500">{isEn ? 'Breed' : 'Raça'}: </span>
+                  <span>{product.breed || '—'}</span>
+                </div>
+                <div>
+                  <span className="text-gray-500">{isEn ? 'Age' : 'Idade'}: </span>
+                  <span>{product.age ? `${product.age} ${isEn ? 'months' : 'meses'}` : '—'}</span>
                 </div>
               </div>
 
