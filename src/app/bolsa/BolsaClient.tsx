@@ -127,7 +127,7 @@ export default function BolsaClient() {
       { key: 'fora_banda', label: 'Fora da banda' }
     ]
     const headerLine = headers.map(h => '"' + h.label.replace(/"/g, '""') + '"').join(',')
-    const body = rows.map(r => headers.map(h => {
+    const body = rows.map((r: any) => headers.map((h: any) => {
       const v = (r as any)[h.key]
       const s = v == null ? '' : (typeof v === 'number' ? String(v) : String(v))
       return '"' + s.replace(/"/g, '""') + '"'
@@ -163,7 +163,8 @@ export default function BolsaClient() {
     await new Promise<void>((resolve, reject)=>{ img.onload=()=>resolve(); img.onerror=()=>reject(); img.src=url })
     const canvas = document.createElement('canvas')
     canvas.width = 1000; canvas.height = 260
-    const ctx = canvas.getContext(' 2d'.trim())!
+    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
+    if (!ctx) return
     ctx.fillStyle = '#ffffff'
     ctx.fillRect(0,0,1000,260)
     ctx.drawImage(img,0,0)
@@ -190,7 +191,7 @@ export default function BolsaClient() {
             Região
             <select value={region} onChange={e=>setRegion(e.target.value)} className="mt-1 w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-200">
               <option value="">Todas</option>
-              {regionsList.map(r => <option key={r} value={r}>{r}</option>)}
+              {regionsList.map((r: string) => <option key={r} value={r}>{r}</option>)}
             </select>
           </label>
           <label className="text-xs text-gray-500">
@@ -265,7 +266,7 @@ export default function BolsaClient() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {(regionsData?.regions || []).map(r => (
+              {(regionsData?.regions || []).map((r: RegionsRes["data"]["regions"][number]) => (
                 <tr key={r.region}>
                   <td className="py-2 pr-4 text-gray-800">{r.region}</td>
                   <td className="py-2 pr-4">{r.count}</td>
