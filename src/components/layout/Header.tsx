@@ -488,14 +488,11 @@ const Header = () => {
                       >
                         {dict.user.signup}
                       </Link>
-                      <div>
-                        <HeaderLanguageMenu />
-                      </div>
                     </div>
                   )}
 
-                  {/* Sempre mostrar seletor de idioma no final para mobile */}
-                  <div className="pt-4 border-t border-gray-200">
+                  {/* Seletor de idioma apenas no mobile (evitar duplicar com Top Bar em md+) */}
+                  <div className="pt-4 border-t border-gray-200 md:hidden">
                     <HeaderLanguageMenu />
                   </div>
                 </nav>
