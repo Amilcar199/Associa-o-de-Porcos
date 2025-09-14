@@ -105,6 +105,35 @@ export default function BolsaClient() {
     return list
   }, [regionsData, sortKey, sortDir])
 
+  const chart = React.useMemo(() => {
+    const series = (historyData?.series || []).filter((p: HistoryRes["data"]["series"][number]) => p.avg != null)
+    if (!series.length) return { path: '', area: '', ticks: [] as { y: number, v: number }[], labels: [] as { x: number, text: string }[] }
+    const width = 1000, height = 260, paddingX = 40, paddingY = 20
+    const ys = series.map((p: any) => p.avg as number)
+    let minY = Math.min(...ys), maxY = Math.max(...ys)
+    if (maxY === minY) { minY -= 1; maxY += 1 }
+    const rangeY = Math.max(1e-6, maxY - minY)
+    const toXY = (val: number, idx: number) => {
+      const x = paddingX + (idx / Math.max(1, series.length - 1)) * (width - paddingX * 2)
+      const y = height - paddingY - ((val - minY) / rangeY) * (height - paddingY * 2)
+      return { x, y }
+    }
+    const pts = series.map((p: any, i: number) => toXY(p.avg as number, i))
+    const path = 'M ' + pts.map((p: any, i: number) => `${i ? 'L' : ''} ${p.x} ${p.y}`).join(' ')
+    const area = `M ${pts[0].x} ${height - paddingY} ` + pts.map((p: any) => `L ${p.x} ${p.y}`).join(' ') + ` L ${pts[pts.length-1].x} ${height - paddingY} Z`
+    const ticks = Array.from({ length: 5 }).map((_, i) => {
+      const v = minY + (i * (maxY - minY) / 4)
+      const y = height - paddingY - ((v - minY) / Math.max(1, maxY - minY)) * (height - paddingY * 2)
+      return { y, v }
+    })
+    const labelsIdx = [0, Math.floor(series.length / 2), series.length - 1]
+    const labels = labelsIdx.map((idx) => {
+      const x = paddingX + (idx / Math.max(1, series.length - 1)) * (width - paddingX * 2)
+      return { x, text: series[idx]?.date || '' }
+    })
+    return { path, area, ticks, labels }
+  }, [historyData])
+
   function downloadCSV() {
     const rows = (recordsData?.records || []).map((r: RecordsRes["data"]["records"][number]) => ({
       id: r.id,
@@ -249,7 +278,35 @@ export default function BolsaClient() {
             <button onClick={exportPNG} className="px-2 py-1 border rounded hover:bg-gray-50">Exportar PNG</button>
           </div>
         </div>
-        <div className="h-12 text-xs text-gray-600 bg-gray-50 border border-dashed border-gray-200 rounded p-2">{historyData?.series?.slice(-5).map((p: HistoryRes["data"]["series"][number])=>`${p.date}: ${p.avg ?? '—'}`).join(' · ') || 'Sem dados'}</div>
+        {chart.path ? (
+          <div className="h-64">
+            <svg viewBox="0 0 1000 260" preserveAspectRatio="none" className="w-full h-full">
+              <defs>
+                <linearGradient id="grad-line" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stopColor="#16a34a" stopOpacity="0.25" />
+                  <stop offset="100%" stopColor="#16a34a" stopOpacity="0" />
+                </linearGradient>
+              </defs>
+              <g>
+                <line x1="40" y1="10" x2="40" y2="240" stroke="#e5e7eb" />
+                <line x1="40" y1="240" x2="980" y2="240" stroke="#e5e7eb" />
+              </g>
+              {chart.ticks.map((t, i) => (
+                <g key={i}>
+                  <line x1="40" x2="980" y1={t.y} y2={t.y} stroke="#f3f4f6" />
+                  <text x="36" y={t.y} textAnchor="end" dominantBaseline="middle" className="fill-gray-400 text-[10px]">{formatAOA(t.v)}</text>
+                </g>
+              ))}
+              {chart.labels.map((l, i) => (
+                <text key={i} x={l.x} y={252} textAnchor="middle" className="fill-gray-400 text-[10px]">{l.text}</text>
+              ))}
+              <path d={chart.path} stroke="#16a34a" strokeWidth="2" fill="none" />
+              <path d={chart.area} fill="url(#grad-line)" />
+            </svg>
+          </div>
+        ) : (
+          <div className="h-12 text-xs text-gray-600 bg-gray-50 border border-dashed border-gray-200 rounded p-2">Sem dados</div>
+        )}
       </div>
 
       <div className="mt-8 bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
@@ -258,15 +315,15 @@ export default function BolsaClient() {
           <table className="min-w-full text-sm">
             <thead>
               <tr className="text-left text-gray-500">
-                <th className="py-2 pr-4">Região</th>
-                <th className="py-2 pr-4">N</th>
-                <th className="py-2 pr-4">Média ({unit === 'kg' ? 'AOA/kg' : 'AOA/cabeça'})</th>
-                <th className="py-2 pr-4">Mín</th>
-                <th className="py-2">Máx</th>
+                <th className="py-2 pr-4"><button onClick={()=>{ setSortKey('region'); setSortDir(sortKey==='region' && sortDir==='asc'?'desc':'asc') }} className="hover:underline">Região {sortKey==='region' ? (sortDir==='asc'?'▲':'▼') : ''}</button></th>
+                <th className="py-2 pr-4"><button onClick={()=>{ setSortKey('count'); setSortDir(sortKey==='count' && sortDir==='asc'?'desc':'asc') }} className="hover:underline">N {sortKey==='count' ? (sortDir==='asc'?'▲':'▼') : ''}</button></th>
+                <th className="py-2 pr-4"><button onClick={()=>{ setSortKey('avg'); setSortDir(sortKey==='avg' && sortDir==='asc'?'desc':'asc') }} className="hover:underline">Média ({unit === 'kg' ? 'AOA/kg' : 'AOA/cabeça'}) {sortKey==='avg' ? (sortDir==='asc'?'▲':'▼') : ''}</button></th>
+                <th className="py-2 pr-4"><button onClick={()=>{ setSortKey('min'); setSortDir(sortKey==='min' && sortDir==='asc'?'desc':'asc') }} className="hover:underline">Mín {sortKey==='min' ? (sortDir==='asc'?'▲':'▼') : ''}</button></th>
+                <th className="py-2"><button onClick={()=>{ setSortKey('max'); setSortDir(sortKey==='max' && sortDir==='asc'?'desc':'asc') }} className="hover:underline">Máx {sortKey==='max' ? (sortDir==='asc'?'▲':'▼') : ''}</button></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {(regionsData?.regions || []).map((r: RegionsRes["data"]["regions"][number]) => (
+              {sortedRegions.map((r: RegionsRes["data"]["regions"][number]) => (
                 <tr key={r.region}>
                   <td className="py-2 pr-4 text-gray-800">{r.region}</td>
                   <td className="py-2 pr-4">{r.count}</td>
