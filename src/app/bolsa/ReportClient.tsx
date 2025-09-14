@@ -47,7 +47,7 @@ export default function ReportClient({ rows, isEn }: { rows: Row[]; isEn: boolea
         <div className="mb-6">
           <div className="text-sm text-gray-600 mb-2">{isEn ? 'Total price by category' : 'Preço total por categoria'}</div>
           <div className="space-y-2">
-            {chartData.entries.map((e, idx) => (
+            {(chartData.entries as { name: string; total: number }[]).map((e: { name: string; total: number }, idx: number) => (
               <div key={e.name} className="flex items-center gap-3">
                 <div className="w-32 text-sm text-gray-700 truncate">{e.name}</div>
                 <div className="flex-1 bg-gray-100 rounded h-3">

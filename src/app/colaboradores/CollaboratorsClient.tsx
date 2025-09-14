@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import React from 'react'
 import Image from 'next/image'
 
 interface Collaborator {
@@ -12,17 +12,17 @@ interface Collaborator {
 }
 
 export default function CollaboratorsClient({ initial }: { initial: Collaborator[] }) {
-  const [list, setList] = useState<Collaborator[]>(initial || [])
-  const [loading, setLoading] = useState(false)
+  const [list, setList] = React.useState((initial || []) as Collaborator[])
+  const [loading, setLoading] = React.useState(false)
 
-  useEffect(() => {
+  React.useEffect(() => {
     if ((initial || []).length > 0) return
     setLoading(true)
     ;(async()=>{
       try {
         const res = await fetch('/api/collaborators?limit=100', { cache: 'no-store' })
         const json = res.ok ? await res.json() : { data: [] }
-        setList(Array.isArray(json?.data) ? json.data : [])
+        setList((Array.isArray(json?.data) ? json.data : []) as Collaborator[])
       } catch {
         setList([])
       } finally {
