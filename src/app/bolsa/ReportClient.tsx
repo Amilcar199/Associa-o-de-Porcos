@@ -1,11 +1,11 @@
 "use client"
 
-import { useMemo, useRef } from 'react'
+import React from 'react'
 
 type Row = { date: string; region: string; category: string; price: number; variation: number }
 
 export default function ReportClient({ rows, isEn }: { rows: Row[]; isEn: boolean }) {
-  const chartData = useMemo(() => {
+  const chartData = React.useMemo(() => {
     const byCategory: Record<string, number> = {}
     rows.forEach(r => { byCategory[r.category] = (byCategory[r.category] || 0) + r.price })
     const entries = Object.entries(byCategory).map(([name, total]) => ({ name, total }))
@@ -13,7 +13,7 @@ export default function ReportClient({ rows, isEn }: { rows: Row[]; isEn: boolea
     return { entries, max }
   }, [rows])
 
-  const exportRef = useRef<HTMLDivElement | null>(null)
+  const exportRef = React.useRef(null as HTMLDivElement | null)
 
   const onExportPdf = async () => {
     try {
