@@ -284,7 +284,7 @@ export default function BolsaClient() {
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-semibold text-gray-800">Registos recentes</h3>
           <div className="flex items-center gap-2 text-xs text-gray-500">
-            <span>Âncora: {formatAOA(recordsData?.anchor?.ref ?? null)} ±{Math.round((recordsData?.anchor?.bandPct || 0)*100)}%</span>
+            <span>Referência oficial: {formatAOA(recordsData?.anchor?.ref ?? null)} ±{Math.round((recordsData?.anchor?.bandPct || 0)*100)}%</span>
             <button onClick={downloadCSV} className="px-2 py-1 border rounded hover:bg-gray-50">Exportar CSV</button>
           </div>
         </div>
@@ -294,7 +294,7 @@ export default function BolsaClient() {
               <th className="py-2 pr-4">Data</th>
               <th className="py-2 pr-4">Região</th>
               <th className="py-2 pr-4">Preço ({unit === 'kg' ? 'AOA/kg' : 'AOA/cabeça'})</th>
-              <th className="py-2">Fora da banda</th>
+              <th className="py-2">Fora da tolerância</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -303,7 +303,7 @@ export default function BolsaClient() {
                 <td className="py-2 pr-4">{fmtDateISO(r.date)}</td>
                 <td className="py-2 pr-4">{r.region}</td>
                 <td className="py-2 pr-4">{formatAOA(r.value)}</td>
-                <td className="py-2">{r.outOfBand ? <span className="px-2 py-0.5 text-xs rounded-full bg-red-100 text-red-700">Sim</span> : <span className="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-700">Não</span>}</td>
+                <td className="py-2">{r.outOfBand ? <span className="px-2 py-0.5 text-xs rounded-full bg-red-100 text-red-700">Fora</span> : <span className="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-700">Dentro</span>}</td>
               </tr>
             ))}
           </tbody>
@@ -311,18 +311,27 @@ export default function BolsaClient() {
       </div>
 
       <div className="mt-6 grid gap-3 md:grid-cols-3">
-        <label className="inline-flex items-center gap-2 text-sm">
-          <input type="checkbox" checked={cleanOutliers} onChange={e=>setCleanOutliers(e.target.checked)} />
-          Limpar outliers (± banda)
-        </label>
-        <label className="inline-flex items-center gap-2 text-sm">
-          <input type="checkbox" checked={weighted} onChange={e=>setWeighted(e.target.checked)} />
-          Média ponderada por amostra
-        </label>
-        <label className="text-sm text-gray-700">
-          Banda ±%
-          <input type="number" min={1} max={50} value={bandPct} onChange={e=>setBandPct(parseInt(e.target.value||'10'))} className="ml-2 w-20 px-2 py-1 border rounded" />
-        </label>
+        <div>
+          <label className="inline-flex items-center gap-2 text-sm">
+            <input type="checkbox" checked={cleanOutliers} onChange={e=>setCleanOutliers(e.target.checked)} />
+            Remover valores atípicos (± tolerância%)
+          </label>
+          <div className="text-xs text-gray-500 mt-1">Descarta preços fora da tolerância em relação à referência oficial (se existir) para a região/forma.</div>
+        </div>
+        <div>
+          <label className="inline-flex items-center gap-2 text-sm">
+            <input type="checkbox" checked={weighted} onChange={e=>setWeighted(e.target.checked)} />
+            Média ponderada pelo peso (kg)
+          </label>
+          <div className="text-xs text-gray-500 mt-1">Dá mais peso a amostras com maior peso vivo/carcaça ao calcular a média.</div>
+        </div>
+        <div>
+          <label className="text-sm text-gray-700">
+            Tolerância ±% (em torno da referência)
+            <input type="number" min={1} max={50} value={bandPct} onChange={e=>setBandPct(parseInt(e.target.value||'10'))} className="ml-2 w-20 px-2 py-1 border rounded" />
+          </label>
+          <div className="text-xs text-gray-500 mt-1">Ex.: 10% mantém preços entre -10% e +10% da referência oficial.</div>
+        </div>
       </div>
     </div>
   )
