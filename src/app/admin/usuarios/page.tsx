@@ -34,8 +34,8 @@ export default function AdminUsersPage() {
   const [createModalOpen, setCreateModalOpen] = React.useState(false)
   const [selectedUserId, setSelectedUserId] = React.useState(null as string | null)
   const [deleteModalOpen, setDeleteModalOpen] = React.useState(false)
-  const initialUserToDelete: { id: string; name: string } | null = null
-  const [userToDelete, setUserToDelete] = React.useState(initialUserToDelete)
+  type UserToDelete = { id: string; name: string } | null
+  const [userToDelete, setUserToDelete] = React.useState<UserToDelete>(null)
   const { showSuccess, showError } = useToast()
 
   React.useEffect(() => {
