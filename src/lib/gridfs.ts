@@ -165,3 +165,24 @@ export async function listImages(): Promise<Array<{ fileId: string; filename: st
     return [];
   }
 }
+
+export async function deleteAllImages(): Promise<{ deletedCount: number; failedCount: number }> {
+  try {
+    await connectDB();
+    const db = (mongoose.connection as any).db as Db;
+    if (!db) return { deletedCount: 0, failedCount: 0 }
+    const bucket = new GridFSBucket(db, { bucketName: 'images' });
+
+    const files = await bucket.find({}).toArray();
+    const ids = files.map(f => f._id as any as ObjectId);
+    if (ids.length === 0) return { deletedCount: 0, failedCount: 0 };
+
+    const results = await Promise.allSettled(ids.map(id => bucket.delete(id)));
+    const deletedCount = results.filter(r => r.status === 'fulfilled').length;
+    const failedCount = results.length - deletedCount;
+    return { deletedCount, failedCount };
+  } catch (error) {
+    console.error('Erro ao deletar todas as imagens:', error);
+    return { deletedCount: 0, failedCount: 0 };
+  }
+}
