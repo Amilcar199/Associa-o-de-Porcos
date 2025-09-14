@@ -18,10 +18,11 @@ interface Image {
 
 export default function ImageManager() {
   const [images, setImages] = useState<Image[]>([]);
+  const [externalImages, setExternalImages] = useState<Array<{ url: string; filename: string; size: number; contentType: string; uploadedAt: string; source: 'public' | 'assets' }>>([])
   const [loading, setLoading] = useState(true);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<Image | null>(null);
+  const [selectedImage, setSelectedImage] = useState<any | null>(null);
   const [imageToDelete, setImageToDelete] = useState<Image | null>(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'all' | 'products' | 'news' | 'logos' | 'collaborators'>('all')
@@ -32,20 +33,55 @@ export default function ImageManager() {
   // Paginação client-side
   const [page, setPage] = useState(1)
   const limit = 12
-  const total = images.length
+  const total = (activeTab === 'all' ? images.length + externalImages.length : images.length)
   const pages = Math.max(1, Math.ceil(total / limit))
   const start = (page - 1) * limit
   const end = start + limit
-  const filteredByTab = images.filter((img:any)=>{
-    if (activeTab === 'all') return true
-    const cat = (img as any).category || (img as any).metadata?.category || ''
-    return cat === activeTab
-  })
-  const paginatedImages = filteredByTab.slice(start, end)
+  const gridfsItems = images.map((img:any)=>({
+    kind: 'gridfs' as const,
+    fileId: img.fileId,
+    filename: img.filename,
+    contentType: img.contentType,
+    size: img.size,
+    uploadedAt: img.uploadedAt,
+    url: `/api/images/${img.fileId}`,
+    category: (img as any).category || (img as any).metadata?.category || ''
+  }))
+  const externalItems = externalImages.map((e)=>({
+    kind: 'external' as const,
+    url: e.url,
+    filename: e.filename,
+    contentType: e.contentType,
+    size: e.size,
+    uploadedAt: e.uploadedAt,
+    source: e.source
+  }))
+  const allItems = activeTab === 'all' ? [...gridfsItems, ...externalItems] : gridfsItems.filter((i)=>i.category === activeTab)
+  const paginatedImages = allItems.slice(start, end)
 
   useEffect(() => {
     fetchImages();
   }, []);
+
+  useEffect(() => {
+    const loadExternal = async () => {
+      try {
+        const [pubRes, assetsRes] = await Promise.all([
+          fetch('/api/public-images', { credentials: 'include' }),
+          fetch('/api/public-assets/constitution', { credentials: 'include' })
+        ])
+        const pubJson = pubRes.ok ? await pubRes.json() : { data: [] }
+        const assetsJson = assetsRes.ok ? await assetsRes.json() : { data: [] }
+        const pub = (pubJson.data || []).map((i:any)=>({ ...i, source: 'public' as const }))
+        const assets = (assetsJson.data || []).map((i:any)=>({ ...i, source: 'assets' as const }))
+        setExternalImages([...pub, ...assets])
+      } catch (e) {
+        console.error('Falha ao carregar imagens externas', e)
+        setExternalImages([])
+      }
+    }
+    loadExternal()
+  }, [])
 
   // Definir aba inicial via query string (?tab=logos|products|news|collaborators|all)
   useEffect(()=>{
@@ -183,69 +219,80 @@ export default function ImageManager() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {paginatedImages.map((image) => (
+          {paginatedImages.map((image: any) => (
             <div
-              key={image.fileId}
+              key={(image as any).fileId || (image as any).url}
               className="bg-gray-50 rounded-lg p-4 border border-gray-200"
             >
               <div className="relative mb-3">
                 <img
-                  src={`/api/images/${image.fileId}`}
+                  src={(image as any).url ? (image as any).url : `/api/images/${(image as any).fileId}`}
                   alt={image.filename}
                   className="w-full h-32 object-cover rounded-lg"
                 />
-                                 <div className="absolute top-2 right-2 flex space-x-1">
-                   <button
-                     onClick={() => {
-                       setSelectedImage(image);
-                       setShowPreviewModal(true);
-                     }}
-                     className="bg-blue-500 text-white p-1 rounded hover:bg-blue-600 transition-colors"
-                     title="Visualizar"
-                   >
-                     <Eye size={14} />
-                   </button>
-                   <button
-                     onClick={async () => {
-                       // Definir como Logo do Site
-                       try {
-                         await fetch('/api/admin/config', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ publicLogoUrl: `/api/images/${image.fileId}` }) })
-                         toast.success('Logo do site atualizada')
-                       } catch {}
-                     }}
-                     className="bg-green-600 text-white p-1 rounded hover:bg-green-700 transition-colors"
-                     title="Definir como logo do site"
-                   >
-                     <Upload size={14} />
-                   </button>
-                   <button
-                     onClick={async () => {
-                       // Definir como Logo do Admin
-                       try {
-                         await fetch('/api/admin/config', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ adminLogoUrl: `/api/images/${image.fileId}` }) })
-                         toast.success('Logo do admin atualizada')
-                       } catch {}
-                     }}
-                     className="bg-blue-600 text-white p-1 rounded hover:bg-blue-700 transition-colors"
-                     title="Definir como logo do admin"
-                   >
-                     <Upload size={14} />
-                   </button>
-                   <button
-                     onClick={() => { setReplaceTarget(image.fileId); setShowUploadModal(true) }}
-                     className="bg-orange-500 text-white p-1 rounded hover:bg-orange-600 transition-colors"
-                     title="Substituir imagem"
-                   >
-                     <Upload size={14} />
-                   </button>
-                   <button
-                     onClick={() => setImageToDelete(image)}
-                     className="bg-red-500 text-white p-1 rounded hover:bg-red-600 transition-colors"
-                     title="Deletar"
-                   >
-                     <Trash2 size={14} />
-                   </button>
-                 </div>
+                <div className="absolute top-2 right-2 flex space-x-1">
+                  <button
+                    onClick={() => {
+                      setSelectedImage(image);
+                      setShowPreviewModal(true);
+                    }}
+                    className="bg-blue-500 text-white p-1 rounded hover:bg-blue-600 transition-colors"
+                    title="Visualizar"
+                  >
+                    <Eye size={14} />
+                  </button>
+                  {!(image as any).url && (
+                    <>
+                      <button
+                        onClick={async () => {
+                          try {
+                            await fetch('/api/admin/config', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ publicLogoUrl: `/api/images/${image.fileId}` }) })
+                            toast.success('Logo do site atualizada')
+                          } catch {}
+                        }}
+                        className="bg-green-600 text-white p-1 rounded hover:bg-green-700 transition-colors"
+                        title="Definir como logo do site"
+                      >
+                        <Upload size={14} />
+                      </button>
+                      <button
+                        onClick={async () => {
+                          try {
+                            await fetch('/api/admin/config', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ adminLogoUrl: `/api/images/${image.fileId}` }) })
+                            toast.success('Logo do admin atualizada')
+                          } catch {}
+                        }}
+                        className="bg-blue-600 text-white p-1 rounded hover:bg-blue-700 transition-colors"
+                        title="Definir como logo do admin"
+                      >
+                        <Upload size={14} />
+                      </button>
+                      <button
+                        onClick={() => { setReplaceTarget(image.fileId); setShowUploadModal(true) }}
+                        className="bg-orange-500 text-white p-1 rounded hover:bg-orange-600 transition-colors"
+                        title="Substituir imagem"
+                      >
+                        <Upload size={14} />
+                      </button>
+                      <button
+                        onClick={() => setImageToDelete(image)}
+                        className="bg-red-500 text-white p-1 rounded hover:bg-red-600 transition-colors"
+                        title="Deletar"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </>
+                  )}
+                  {(image as any).url && (
+                    <button
+                      disabled
+                      className="bg-gray-300 text-white p-1 rounded opacity-60 cursor-not-allowed"
+                      title="Imagem somente leitura"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  )}
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -254,10 +301,10 @@ export default function ImageManager() {
                 </p>
                 <div className="text-xs text-gray-500 space-y-1">
                   <p>Tamanho: {formatFileSize(image.size)}</p>
-                  <p>Upload: {formatDate(image.uploadedAt)}</p>
+                  <p>Upload: {formatDate(new Date((image as any).uploadedAt))}</p>
                 </div>
                 <button
-                  onClick={() => copyImageUrl(`/api/images/${image.fileId}`)}
+                  onClick={() => copyImageUrl((image as any).url ? (image as any).url : `/api/images/${image.fileId}`)}
                   className="w-full text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded hover:bg-gray-300 transition-colors"
                 >
                   Copiar URL
@@ -349,7 +396,7 @@ export default function ImageManager() {
         {selectedImage && (
           <div className="space-y-4">
             <img
-              src={`/api/images/${selectedImage.fileId}`}
+              src={(selectedImage as any).url ? (selectedImage as any).url : `/api/images/${(selectedImage as any).fileId}`}
               alt={selectedImage.filename}
               className="w-full rounded-lg"
             />
@@ -357,8 +404,8 @@ export default function ImageManager() {
               <p><strong>Nome:</strong> {selectedImage.filename}</p>
               <p><strong>Tamanho:</strong> {formatFileSize(selectedImage.size)}</p>
               <p><strong>Tipo:</strong> {selectedImage.contentType}</p>
-              <p><strong>Upload:</strong> {formatDate(selectedImage.uploadedAt)}</p>
-              <p><strong>URL:</strong> {`${window.location.origin}/api/images/${selectedImage.fileId}`}</p>
+              <p><strong>Upload:</strong> {formatDate(new Date((selectedImage as any).uploadedAt))}</p>
+              <p><strong>URL:</strong> {(selectedImage as any).url ? `${window.location.origin}${(selectedImage as any).url}` : `${window.location.origin}/api/images/${selectedImage.fileId}`}</p>
             </div>
           </div>
         )}
