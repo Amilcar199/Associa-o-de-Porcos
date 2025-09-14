@@ -27,13 +27,15 @@ type AdminUser = {
 
 export default function AdminUsersPage() {
   const [query, setQuery] = React.useState('')
-  const [users, setUsers] = React.useState<AdminUser[]>([])
+  const initialUsers: AdminUser[] = []
+  const [users, setUsers] = React.useState(initialUsers)
   const [loading, setLoading] = React.useState(false)
   const [editModalOpen, setEditModalOpen] = React.useState(false)
   const [createModalOpen, setCreateModalOpen] = React.useState(false)
-  const [selectedUserId, setSelectedUserId] = React.useState<string | null>(null)
+  const [selectedUserId, setSelectedUserId] = React.useState(null as string | null)
   const [deleteModalOpen, setDeleteModalOpen] = React.useState(false)
-  const [userToDelete, setUserToDelete] = React.useState<{ id: string; name: string } | null>(null)
+  const initialUserToDelete: { id: string; name: string } | null = null
+  const [userToDelete, setUserToDelete] = React.useState(initialUserToDelete)
   const { showSuccess, showError } = useToast()
 
   React.useEffect(() => {
@@ -71,7 +73,7 @@ export default function AdminUsersPage() {
   const filtered = React.useMemo(() => {
     const q = query.toLowerCase().trim()
     if (!q) return users
-    return users.filter(u => 
+    return users.filter((u: AdminUser) => 
       `${u.name} ${u.email} ${u.role} ${u.company || ''}`.toLowerCase().includes(q)
     )
   }, [query, users])
@@ -158,7 +160,7 @@ export default function AdminUsersPage() {
         </div>
         <div className="flex items-center gap-3">
           <div className="relative">
-            <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <span className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" aria-hidden>🔍</span>
             <input
               placeholder="Buscar usuário..."
               className="pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
@@ -170,7 +172,7 @@ export default function AdminUsersPage() {
             onClick={() => setCreateModalOpen(true)} 
             className="inline-flex items-center bg-primary-600 hover:bg-primary-700 text-white px-3 py-2 rounded-lg text-sm"
           >
-            <UserPlus className="w-4 h-4 mr-2" /> Novo usuário
+            <span className="w-4 h-4 mr-2" aria-hidden>➕</span> Novo usuário
           </button>
         </div>
       </div>
@@ -201,7 +203,7 @@ export default function AdminUsersPage() {
                     </div>
                   </td>
                   <td className="px-4 py-3 text-gray-700 flex items-center gap-2">
-                    <Mail className="w-4 h-4 text-gray-400" /> 
+                    <span className="w-4 h-4 text-gray-400" aria-hidden>✉️</span>
                     {u.email}
                   </td>
                   <td className="px-4 py-3">
@@ -215,7 +217,7 @@ export default function AdminUsersPage() {
                   <td className="px-4 py-3 text-gray-700">
                     {u.company ? (
                       <div className="flex items-center gap-2">
-                        <Shield className="w-4 h-4 text-gray-400" />
+                        <span className="w-4 h-4 text-gray-400" aria-hidden>🛡️</span>
                         {u.company}
                       </div>
                     ) : (
@@ -235,7 +237,7 @@ export default function AdminUsersPage() {
                         onClick={() => handleEditUser(u.id)}
                         className="inline-flex items-center gap-1 text-primary-700 hover:text-primary-800 hover:bg-primary-50 px-2 py-1 rounded transition-colors"
                       >
-                        <Edit className="w-3 h-3" />
+                        <span className="w-3 h-3" aria-hidden>✏️</span>
                         Editar
                       </button>
                       <span className="text-gray-300">|</span>
@@ -249,12 +251,12 @@ export default function AdminUsersPage() {
                       >
                         {u.active ? (
                           <>
-                            <PowerOff className="w-3 h-3" />
+                            <span className="w-3 h-3" aria-hidden>⏻</span>
                             Desativar
                           </>
                         ) : (
                           <>
-                            <Power className="w-3 h-3" />
+                            <span className="w-3 h-3" aria-hidden>⚡</span>
                             Ativar
                           </>
                         )}
@@ -264,7 +266,7 @@ export default function AdminUsersPage() {
                         onClick={() => handleDeleteUser(u.id, u.name)}
                         className="inline-flex items-center gap-1 text-red-600 hover:text-red-700 hover:bg-red-50 px-2 py-1 rounded transition-colors"
                       >
-                        <Trash2 className="w-3 h-3" />
+                        <span className="w-3 h-3" aria-hidden>🗑️</span>
                         Excluir
                       </button>
                     </div>
