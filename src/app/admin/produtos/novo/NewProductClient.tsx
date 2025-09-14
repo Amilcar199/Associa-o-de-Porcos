@@ -11,6 +11,8 @@ type NewProductForm = {
   age: number
   weight: number
   price: number | undefined
+  pricePerKg?: number
+  saleForm?: 'carcaça' | 'vivo'
   images: string[]
   videos: string[]
   features: string[]
@@ -35,6 +37,8 @@ export default function NewProductClient() {
     age: 0,
     weight: 0,
     price: undefined as number | undefined,
+    pricePerKg: undefined,
+    saleForm: undefined,
     images: [''],
     videos: [],
     features: [],
@@ -153,6 +157,7 @@ export default function NewProductClient() {
       }
       setForm({
         name: '', description: '', breed: '', age: 0, weight: 0, price: undefined,
+        pricePerKg: undefined, saleForm: undefined,
         images: [''], videos: [], features: [], healthStatus: 'good', vaccinated: false, location: '', province: '', municipality: '', customLocation: '', tags: [],
         code: '', codeType: 'auto'
       })
@@ -212,6 +217,24 @@ export default function NewProductClient() {
               <span className="w-4 h-4 text-gray-400 absolute left-3 top-3" aria-hidden>💵</span>
               <input type="number" value={form.price ?? ''} onChange={(e)=>setForm((p: NewProductForm)=>({...p,price:e.target.value===''?undefined:parseFloat(e.target.value)}))} className="w-full pl-9 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="120000" required />
             </div>
+          </div>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm text-gray-700 mb-1">Preço por kg ({currency})</label>
+            <div className="relative">
+              <span className="w-4 h-4 text-gray-400 absolute left-3 top-3" aria-hidden>⚖️</span>
+              <input type="number" step="0.01" value={form.pricePerKg ?? ''} onChange={(e)=>setForm((p: NewProductForm)=>({...p,pricePerKg:e.target.value===''?undefined:parseFloat(e.target.value)}))} className="w-full pl-9 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="Opcional" />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm text-gray-700 mb-1">Condição de venda</label>
+            <select value={form.saleForm || ''} onChange={(e)=>setForm((p: NewProductForm)=>({...p, saleForm: (e.target.value || undefined) as any}))} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+              <option value="">Selecione...</option>
+              <option value="vivo">Vivo</option>
+              <option value="carcaça">Carcaça</option>
+            </select>
           </div>
         </div>
 

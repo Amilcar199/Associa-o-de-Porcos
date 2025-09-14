@@ -47,9 +47,12 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     const sanitizedData = sanitizeInput(body)
 
-    // Validar dados obrigatórios
-    if (!sanitizedData.name || !sanitizedData.breed || sanitizedData.price === undefined) {
-      return errorResponse('Nome, raça e preço são obrigatórios')
+    // Validar dados obrigatórios (exigir pelo menos um modelo de preço)
+    if (!sanitizedData.name || !sanitizedData.breed) {
+      return errorResponse('Nome e raça são obrigatórios')
+    }
+    if (sanitizedData.price === undefined && sanitizedData.pricePerKg === undefined) {
+      return errorResponse('Informe preço por cabeça (price) ou preço por kg (pricePerKg)')
     }
 
     // Validar campos obrigatórios do modelo
@@ -86,6 +89,8 @@ export async function POST(req: NextRequest) {
       age: sanitizedData.age,
       weight: sanitizedData.weight,
       price: sanitizedData.price,
+      pricePerKg: sanitizedData.pricePerKg,
+      saleForm: sanitizedData.saleForm,
       images: Array.isArray(sanitizedData.images) && sanitizedData.images.length
         ? sanitizedData.images
         : (sanitizedData.imageUrl ? [sanitizedData.imageUrl] : []),

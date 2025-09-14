@@ -28,6 +28,7 @@ interface ProductFormData {
   name: string;
   description: string;
   price: number;
+  pricePerKg?: number;
   breed: string;
   age: number;
   weight: number;
@@ -40,6 +41,7 @@ interface ProductFormData {
   codeType: 'auto' | 'manual';
   images?: string[];
   videos?: string[];
+  saleForm?: 'carcaça' | 'vivo';
 }
 
 export default function ProductsManager() {
@@ -66,6 +68,7 @@ export default function ProductsManager() {
     name: '',
     description: '',
     price: 0,
+    pricePerKg: undefined,
     breed: '',
     age: 0,
     weight: 0,
@@ -75,7 +78,8 @@ export default function ProductsManager() {
     healthStatus: 'good',
     vaccinated: false,
     code: '',
-    codeType: 'auto'
+    codeType: 'auto',
+    saleForm: undefined,
   });
 
   useEffect(() => {
@@ -108,6 +112,7 @@ export default function ProductsManager() {
         name: formData.name,
         description: formData.description,
         price: formData.price,
+        pricePerKg: formData.pricePerKg,
         breed: allowedBreeds.includes(formData.breed) ? formData.breed : 'Outro',
         age: formData.age,
         weight: formData.weight,
@@ -118,7 +123,8 @@ export default function ProductsManager() {
         location: formData.location,
         healthStatus: formData.healthStatus,
         vaccinated: formData.vaccinated,
-        code: formData.code
+        code: formData.code,
+        saleForm: formData.saleForm,
       }
       
       const response = await fetch(url, {
@@ -214,6 +220,7 @@ export default function ProductsManager() {
       name: '',
       description: '',
       price: 0,
+      pricePerKg: undefined,
       breed: '',
       age: 0,
       weight: 0,
@@ -225,7 +232,8 @@ export default function ProductsManager() {
       code: '',
       codeType: 'auto',
       images: [],
-      videos: []
+      videos: [],
+      saleForm: undefined,
     });
   };
 
@@ -273,6 +281,8 @@ export default function ProductsManager() {
     { key: 'age', title: 'Idade (meses)', sortable: true },
     { key: 'weight', title: 'Peso (kg)', sortable: true },
     { key: 'price', title: `Preço (${currency})` },
+    { key: 'pricePerKg', title: `Preço/kg (${currency})` },
+    { key: 'saleForm', title: 'Condição' },
     { key: 'availability', title: 'Disponibilidade' }
   ];
 
@@ -318,7 +328,9 @@ export default function ProductsManager() {
 
   const tableData = sortedProducts.map(product => ({
     ...product,
-    price: formatPrice(product.price),
+    price: typeof product.price === 'number' ? formatPrice(product.price) : '—',
+    pricePerKg: typeof (product as any).pricePerKg === 'number' ? formatPrice((product as any).pricePerKg) : '—',
+    saleForm: (product as any).saleForm || '—',
     availability: formatAvailability(product.availability ?? (product as any).isAvailable)
   }));
 
@@ -564,6 +576,35 @@ export default function ProductsManager() {
               />
             </div>
             
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Preço por kg ({currency})
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                value={formData.pricePerKg ?? ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, pricePerKg: e.target.value === '' ? undefined : parseFloat(e.target.value) }))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="Opcional"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Condição de venda
+              </label>
+              <select
+                value={formData.saleForm || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, saleForm: (e.target.value || undefined) as any }))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              >
+                <option value="">Selecione...</option>
+                <option value="vivo">Vivo</option>
+                <option value="carcaça">Carcaça</option>
+              </select>
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Disponível

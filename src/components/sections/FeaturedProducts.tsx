@@ -26,6 +26,8 @@ interface FeaturedProduct {
   age: number
   weight: number
   price?: number
+  pricePerKg?: number
+  saleForm?: 'carcaça' | 'vivo'
   images?: string[]
   healthStatus?: 'excellent' | 'good' | 'fair'
   vaccinated?: boolean
@@ -182,15 +184,17 @@ const FeaturedProducts = () => {
                   </button>
                   <div className="absolute bottom-3 left-3">
                     <span className="bg-primary-600 text-white px-3 py-1 text-sm font-bold rounded-full">
-                      {product.price !== undefined ? (
+                      {typeof product.pricePerKg === 'number' ? (
+                        `${formatPrice(product.pricePerKg, currency, locale)} /kg`
+                      ) : product.price !== undefined ? (
                         showConverted ? (
                           convertedCache[String(product._id)] || (
                             (()=>{ convertAndFormat(product.price || 0, currency, 'USD', locale).then(f=>setConvertedCache(prev=>({...prev, [String(product._id)]: f })) ); return formatPrice(product.price || 0, currency, locale) })()
                           )
                         ) : (
-                          formatPrice(product.price, currency, locale)
+                          `${formatPrice(product.price, currency, locale)} ${locale.startsWith('en') ? '/head' : '/cabeça'}`
                         )
-                      ) : 'Preço sob consulta'}
+                      ) : (locale.startsWith('en') ? 'Price on request' : 'Preço sob consulta')}
                     </span>
                   </div>
                 </div>
@@ -215,6 +219,10 @@ const FeaturedProducts = () => {
                     <div className="flex items-center space-x-1 col-span-2">
                       <MapPin size={12} />
                       <span>{product.location || '—'}</span>
+                    </div>
+                    <div className="flex items-center space-x-1 col-span-2">
+                      <span className="text-gray-500">{locale.startsWith('en') ? 'Sale' : 'Condição'}:</span>
+                      <span>{product.saleForm ? (product.saleForm === 'vivo' ? (locale.startsWith('en') ? 'Live' : 'Vivo') : (locale.startsWith('en') ? 'Carcass' : 'Carcaça')) : '—'}</span>
                     </div>
                   </div>
 

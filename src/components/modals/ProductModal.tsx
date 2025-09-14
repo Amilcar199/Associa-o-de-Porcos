@@ -18,6 +18,8 @@ interface ProductModalProps {
     age?: number
     weight: number
     price?: number
+    pricePerKg?: number
+    saleForm?: 'carcaça' | 'vivo'
     images?: string[]
     imageUrl?: string
     healthStatus?: 'excellent' | 'good' | 'fair'
@@ -133,8 +135,10 @@ export default function ProductModal({
           </div>
           <div className="absolute bottom-4 right-4">
             <span className="bg-primary-600 text-white px-4 py-2 text-lg font-bold rounded-full shadow-lg">
-              {product.price ? (
-                showConverted ? (converted || formatPrice(product.price, 'AOA', locale)) : formatPrice(product.price, currency, locale)
+              {typeof product.pricePerKg === 'number' ? (
+                `${formatPrice(product.pricePerKg, currency, locale)} /kg`
+              ) : product.price ? (
+                showConverted ? (converted || formatPrice(product.price, 'AOA', locale)) : `${formatPrice(product.price, currency, locale)} ${isEn ? '/head' : '/cabeça'}`
               ) : (isEn ? 'Price on request' : 'Preço sob consulta')}
             </span>
           </div>
@@ -201,6 +205,10 @@ export default function ProductModal({
                       </span>
                     </div>
                   </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="text-primary-600 font-semibold">{isEn ? 'Sale' : 'Condição'}:</div>
+                  <div className="text-gray-900 font-medium">{product.saleForm ? (product.saleForm === 'vivo' ? (isEn ? 'Live' : 'Vivo') : (isEn ? 'Carcass' : 'Carcaça')) : '—'}</div>
                 </div>
               </div>
               {product.description && (
