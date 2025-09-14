@@ -25,7 +25,7 @@ export default async function AdminLayout({
 
   return (
     <AdminWrapper>
-      <div className="min-h-screen bg-gray-100 overflow-x-hidden">
+      <div className="min-h-screen bg-gray-100 overflow-x-hidden pt-16">
         {/* Header do Admin */}
         <AdminHeader user={user} />
         
