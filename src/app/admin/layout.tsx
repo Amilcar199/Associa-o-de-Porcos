@@ -25,7 +25,7 @@ export default async function AdminLayout({
 
   return (
     <AdminWrapper>
-      <div className="min-h-screen bg-gray-100">
+      <div className="min-h-screen bg-gray-100 overflow-x-hidden">
         {/* Header do Admin */}
         <AdminHeader user={user} />
         
@@ -34,7 +34,7 @@ export default async function AdminLayout({
           <AdminSidebar />
           
           {/* Conteúdo Principal */}
-          <main className="flex-1 p-6 lg:p-8 ml-0 lg:ml-64">
+          <main className="flex-1 p-6 lg:p-8 ml-0 lg:ml-64 overflow-x-hidden">
             <div className="max-w-7xl mx-auto">
               {children}
             </div>
