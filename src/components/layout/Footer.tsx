@@ -268,14 +268,14 @@ const Footer = () => {
             </div>
             
             <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-6">
-              <div className="flex items-center space-x-4 text-sm">
+              <div className="flex items-center text-xs md:text-sm space-x-2 md:space-x-4 flex-wrap">
                 {legalLinks.map((link, index) => (
                   <span key={link.name} className="flex items-center">
                     <Link href={link.href} className="text-gray-400 hover:text-primary-400 transition-colors">
                       {link.name}
                     </Link>
                     {index < legalLinks.length - 1 && (
-                      <span className="text-gray-600 ml-4">•</span>
+                      <span className="text-gray-600 ml-2 md:ml-4">•</span>
                     )}
                   </span>
                 ))}
