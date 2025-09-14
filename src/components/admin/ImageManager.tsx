@@ -24,6 +24,8 @@ export default function ImageManager() {
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState<any | null>(null);
   const [imageToDelete, setImageToDelete] = useState<Image | null>(null);
+  const [confirmBulkDelete, setConfirmBulkDelete] = useState(false)
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false)
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'all' | 'products' | 'news' | 'logos' | 'collaborators'>('all')
   const [uploadCategory, setUploadCategory] = useState<'products' | 'news' | 'logos' | 'collaborators'>('products')
@@ -209,13 +211,23 @@ export default function ImageManager() {
         </div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-900">Upload de Imagens</h2>
-          <button
-            onClick={() => setShowUploadModal(true)}
-            className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
-          >
-            <Upload size={16} />
-            <span>Upload de Imagem</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowUploadModal(true)}
+              className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+            >
+              <Upload size={16} />
+              <span>Upload de Imagem</span>
+            </button>
+            <button
+              onClick={() => setConfirmBulkDelete(true)}
+              className="flex items-center space-x-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+              disabled={images.length === 0}
+            >
+              <Trash2 size={16} />
+              <span>Excluir todas</span>
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -241,7 +253,7 @@ export default function ImageManager() {
                   >
                     <Eye size={14} />
                   </button>
-                  {!(image as any).url && (
+                  {(image as any).kind === 'gridfs' && (
                     <>
                       <button
                         onClick={async () => {
@@ -283,7 +295,7 @@ export default function ImageManager() {
                       </button>
                     </>
                   )}
-                  {(image as any).url && (
+                  {(image as any).kind === 'external' && (
                     <button
                       disabled
                       className="bg-gray-300 text-white p-1 rounded opacity-60 cursor-not-allowed"
@@ -421,6 +433,36 @@ export default function ImageManager() {
         confirmText="Deletar"
         cancelText="Cancelar"
         type="danger"
+      />
+
+      {/* Bulk Delete Confirmation */}
+      <ConfirmDialog
+        isOpen={confirmBulkDelete}
+        onClose={() => setConfirmBulkDelete(false)}
+        onConfirm={async ()=>{
+          try {
+            setIsBulkDeleting(true)
+            const res = await fetch('/api/images', { method: 'DELETE', credentials: 'include' })
+            if (res.ok) {
+              const j = await res.json()
+              toast.success(`Excluídas ${j?.data?.deletedCount || 0} imagens`)
+              await fetchImages()
+            } else {
+              toast.error('Falha ao excluir imagens')
+            }
+          } catch (e) {
+            toast.error('Erro ao excluir imagens')
+          } finally {
+            setIsBulkDeleting(false)
+            setConfirmBulkDelete(false)
+          }
+        }}
+        title="Excluir todas as imagens?"
+        message="Isso irá remover permanentemente todas as imagens do armazenamento (exceto itens externos somente leitura). Esta ação não pode ser desfeita."
+        confirmText="Excluir todas"
+        cancelText="Cancelar"
+        type="danger"
+        loading={isBulkDeleting}
       />
     </div>
   );
