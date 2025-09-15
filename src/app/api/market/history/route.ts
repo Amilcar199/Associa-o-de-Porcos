@@ -22,6 +22,8 @@ export async function GET(req: NextRequest) {
     const cleanOutliers = String(searchParams.get('cleanOutliers') || 'false') === 'true'
     const weighted = String(searchParams.get('weighted') || 'false') === 'true'
     const bandPct = Math.min(Math.max(parseFloat(searchParams.get('bandPct') || '0.1'), 0.01), 0.5)
+    const granularityParam = (searchParams.get('granularity') || 'day').toLowerCase()
+    const granularity = ['hour','day','month','year'].includes(granularityParam) ? granularityParam : 'day'
 
     const now = new Date()
     const defaultStart = new Date(now)
@@ -76,11 +78,19 @@ export async function GET(req: NextRequest) {
       } catch {}
     }
 
+    const formatMap: Record<string, string> = {
+      hour: '%Y-%m-%d %H:00',
+      day: '%Y-%m-%d',
+      month: '%Y-%m',
+      year: '%Y'
+    }
+    const groupFormat = formatMap[granularity]
+
     pipeline.push(
-      { $addFields: { day: { $dateToString: { format: '%Y-%m-%d', date: '$ts' } } } },
+      { $addFields: { bucket: { $dateToString: { format: groupFormat, date: '$ts' } } } },
       {
         $group: {
-          _id: '$day',
+          _id: '$bucket',
           count: { $sum: 1 },
           avgSimple: { $avg: '$value' },
           sumWeightedValue: { $sum: { $multiply: ['$value', '$weightForWeighting'] } },
@@ -102,7 +112,7 @@ export async function GET(req: NextRequest) {
     )
 
     const result = await (Product as any).aggregate(pipeline)
-    return NextResponse.json(successResponse({ unit, series: (result as any[]).map((r: any) => ({ date: r._id as string, avg: r.avg as number | null, count: r.count as number })) }))
+    return NextResponse.json(successResponse({ unit, granularity, series: (result as any[]).map((r: any) => ({ date: r._id as string, avg: r.avg as number | null, count: r.count as number })) }))
   } catch (error) {
     console.error('Erro em /api/market/history:', error)
     return errorResponse('Erro interno do servidor', 500)

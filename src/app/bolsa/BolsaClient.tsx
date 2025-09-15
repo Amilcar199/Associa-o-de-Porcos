@@ -8,7 +8,7 @@ interface MetaRes { success: boolean, data: { regions: string[], breeds: string[
 interface SummaryRes { success: boolean, data: { unit: Unit, current: { avg: number | null, count: number }, variation: { daily: number | null, weekly: number | null, monthly: number | null }, officialRef?: number | null, usedFallback?: boolean, effectiveDate?: string } }
 interface OverallRes { success: boolean, data: { unit?: Unit, avg: number | null, count: number } }
 interface RegionsRes { success: boolean, data: { unit: Unit, regions: { region: string, count: number, avg: number | null, min: number | null, max: number | null }[] } }
-interface HistoryRes { success: boolean, data: { unit: Unit, series: { date: string, avg: number | null, count: number }[] } }
+interface HistoryRes { success: boolean, data: { unit: Unit, granularity?: 'hour' | 'day' | 'month' | 'year', series: { date: string, avg: number | null, count: number }[] } }
 interface RecordsRes { success: boolean, data: { unit: Unit, records: { id: string, date: string, region: string, value: number | null, saleForm?: string | null, outOfBand?: boolean }[], anchor?: { ref: number | null, bandPct: number } } }
 
 interface LoadingState { summary: boolean, overall: boolean, regions: boolean, history: boolean, records: boolean }
@@ -33,6 +33,7 @@ export default function BolsaClient() {
   const [cleanOutliers, setCleanOutliers] = React.useState(false as boolean)
   const [weighted, setWeighted] = React.useState(false as boolean)
   const [bandPct, setBandPct] = React.useState(10 as number)
+  const [granularity, setGranularity] = React.useState('day' as 'hour' | 'day' | 'month' | 'year')
   const [sortKey, setSortKey] = React.useState('region' as 'region' | 'count' | 'avg' | 'min' | 'max')
   const [sortDir, setSortDir] = React.useState('asc' as 'asc' | 'desc')
 
@@ -55,8 +56,9 @@ export default function BolsaClient() {
     if (cleanOutliers) p.set('cleanOutliers', 'true')
     if (weighted) p.set('weighted', 'true')
     if (!Number.isNaN(bandPct)) p.set('bandPct', String(bandPct/100))
+    p.set('granularity', granularity)
     return p
-  }, [params, startISO, endISO, cleanOutliers, weighted, bandPct])
+  }, [params, startISO, endISO, cleanOutliers, weighted, bandPct, granularity])
 
   const [summary, setSummary] = React.useState(null as SummaryRes["data"] | null)
   const [overall, setOverall] = React.useState(null as OverallRes["data"] | null)
@@ -355,6 +357,15 @@ export default function BolsaClient() {
               <button onClick={()=>setChartType('line')} className={`px-2 py-1 ${chartType==='line'?'bg-gray-100 text-gray-800':'text-gray-500'}`}>Linha</button>
               <button onClick={()=>setChartType('area')} className={`px-2 py-1 ${chartType==='area'?'bg-gray-100 text-gray-800':'text-gray-500'}`}>Área</button>
             </div>
+            <label className="inline-flex items-center gap-1">
+              <span>Escala</span>
+              <select value={granularity} onChange={e=>setGranularity(e.target.value as any)} className="border rounded px-1 py-0.5">
+                <option value="hour">Hora</option>
+                <option value="day">Dia</option>
+                <option value="month">Mês</option>
+                <option value="year">Ano</option>
+              </select>
+            </label>
             <button onClick={exportSVG} className="px-2 py-1 border rounded hover:bg-gray-50">Exportar SVG</button>
             <button onClick={exportPNG} className="px-2 py-1 border rounded hover:bg-gray-50">Exportar PNG</button>
           </div>
