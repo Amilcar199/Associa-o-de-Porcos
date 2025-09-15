@@ -65,6 +65,7 @@ export default function BolsaClient() {
   const [recordsData, setRecordsData] = React.useState(null as RecordsRes["data"] | null)
   const [loading, setLoading] = React.useState({ summary: false, overall: false, regions: false, history: false, records: false } as LoadingState)
   const [error, setError] = React.useState({ summary: '', overall: '', regions: '', history: '', records: '' } as ErrorState)
+  const autoSwitchedRef = React.useRef(false)
 
   React.useEffect(() => { (async () => {
     try {
@@ -162,6 +163,34 @@ export default function BolsaClient() {
     })
     return { path, area, ticks, labels }
   }, [historyData])
+
+  const chartPointCount = React.useMemo(() => (historyData?.series || []).filter((p: HistoryRes["data"]["series"][number]) => p.avg != null).length, [historyData])
+
+  // Auto-switch saleForm if current selection has no usable points but the other has
+  React.useEffect(() => { (async () => {
+    if (loading.history) return
+    if (autoSwitchedRef.current) return
+    const used = (historyData?.series || []).some((p: any) => p?.avg != null)
+    if (used) return
+    const altForm = saleForm === 'carcaça' ? 'vivo' : 'carcaça'
+    const altUnit: Unit = altForm === 'vivo' ? 'head' : 'kg'
+    const altParams = new URLSearchParams()
+    altParams.set('unit', altUnit)
+    altParams.set('saleForm', altForm)
+    if (region) altParams.set('region', region)
+    altParams.set('start', startISO); altParams.set('end', endISO)
+    if (cleanOutliers) altParams.set('cleanOutliers', 'true')
+    if (weighted) altParams.set('weighted', 'true')
+    if (!Number.isNaN(bandPct)) altParams.set('bandPct', String(bandPct/100))
+    try {
+      const h: HistoryRes = await (await fetch(`/api/market/history?${altParams.toString()}`, { cache: 'no-store' })).json()
+      const hasAlt = (h?.data?.series || []).some((p: any) => p?.avg != null)
+      if (hasAlt) {
+        autoSwitchedRef.current = true
+        setSaleForm(altForm as any)
+      }
+    } catch {}
+  })() }, [historyData, loading.history, saleForm, region, startISO, endISO, cleanOutliers, weighted, bandPct])
 
   function downloadCSV() {
     const rows = (recordsData?.records || []).map((r: RecordsRes["data"]["records"][number]) => ({
@@ -319,7 +348,7 @@ export default function BolsaClient() {
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-semibold text-gray-800">Série histórica</h3>
           <div className="flex items-center gap-2 text-xs text-gray-500">
-            <span>{loading.history ? '…' : (historyData?.series?.length || 0)} pontos</span>
+            <span>{loading.history ? '…' : chartPointCount} pontos úteis</span>
             <button onClick={exportSVG} className="px-2 py-1 border rounded hover:bg-gray-50">Exportar SVG</button>
             <button onClick={exportPNG} className="px-2 py-1 border rounded hover:bg-gray-50">Exportar PNG</button>
           </div>
