@@ -91,25 +91,29 @@ export default function ContatoPage() {
               <a href={`mailto:${siteConfig?.contactEmail || 'contato@associacaodeporcos.ao'}`} className="flex items-center gap-3 hover:text-primary-700">
                 <span className="text-primary-600" aria-hidden>📧</span> {siteConfig?.contactEmail || 'contato@associacaodeporcos.ao'}
               </a>
-              <a href="tel:+244928476427" className="flex items-center gap-3 hover:text-primary-700">
-                <span className="text-primary-600" aria-hidden>📞</span> +244 928 476 427
+              <a href="tel:+244930675044" className="flex items-center gap-3 hover:text-primary-700">
+                <span className="text-primary-600" aria-hidden>📞</span> +244 930 675 044
               </a>
-              <a href="https://wa.me/244928476427" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 hover:text-primary-700">
+              <a href="https://wa.me/244930675044" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 hover:text-primary-700">
                 <span className="text-primary-600" aria-hidden>💬</span> WhatsApp
               </a>
               <div className="flex items-center gap-3 text-gray-600">
                 <span className="text-primary-600" aria-hidden>⏰</span> {isEn ? 'Mon–Fri: 9am to 6pm' : 'Seg–Sex: 9h às 18h'}
               </div>
-              <div className="flex items-center gap-3 text-gray-600">
-                <span className="text-primary-600" aria-hidden>📍</span>
-                <a href="https://maps.app.goo.gl/PUczChGSKeG7QjVU9" target="_blank" rel="noopener noreferrer" className="hover:text-primary-700 transition-colors">
-                  Ver no Google Maps
-                </a>
+              <div className="flex items-start gap-3 text-gray-600">
+                <span className="text-primary-600 mt-0.5" aria-hidden>📍</span>
+                <div>
+                  <p>Rua Manuel Caldeira nº 6, Luanda</p>
+                  <p className="text-xs text-gray-500">Plus Code: 56QG+92 Luanda</p>
+                  <a href="https://maps.app.goo.gl/PUczChGSKeG7QjVU9" target="_blank" rel="noopener noreferrer" className="hover:text-primary-700 transition-colors">
+                    Ver no Google Maps
+                  </a>
+                </div>
               </div>
             </div>
 
             <a
-              href="https://wa.me/244928476427"
+              href="https://wa.me/244930675044"
               target="_blank"
               rel="noopener noreferrer"
               className="mt-5 inline-flex items-center justify-center w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition"
@@ -161,7 +165,7 @@ export default function ContatoPage() {
             <button disabled={loading} className="inline-flex items-center bg-primary-600 hover:bg-primary-700 text-white px-5 py-2.5 rounded font-medium disabled:opacity-60">
               <span className="mr-2" aria-hidden>📨</span> {loading ? (isEn ? 'Sending...' : 'Enviando...') : (isEn ? 'Send Message' : 'Enviar Mensagem')}
             </button>
-            <a href="tel:+244928476427" className="inline-flex items-center text-primary-700 hover:text-primary-800 font-medium">{isEn ? 'Or call now' : 'Ou ligue agora'}</a>
+            <a href="tel:+244930675044" className="inline-flex items-center text-primary-700 hover:text-primary-800 font-medium">{isEn ? 'Or call now' : 'Ou ligue agora'}</a>
           </div>
         </form>
       </div>

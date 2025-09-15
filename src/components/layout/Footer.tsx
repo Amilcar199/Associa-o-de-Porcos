@@ -225,6 +225,8 @@ const Footer = () => {
               <div className="flex items-start space-x-3">
                 <MapPin size={16} className="text-primary-400 mt-1 flex-shrink-0" />
                 <div className="text-sm text-gray-300">
+                  <p>Rua Manuel Caldeira nº 6, Luanda</p>
+                  <p className="text-gray-400">Plus Code: 56QG+92 Luanda</p>
                   <a href="https://maps.app.goo.gl/PUczChGSKeG7QjVU9" target="_blank" rel="noopener noreferrer" className="hover:text-primary-400 transition-colors">
                     Ver no Google Maps
                   </a>
@@ -233,8 +235,8 @@ const Footer = () => {
               
               <div className="flex items-center space-x-3">
                 <Phone size={16} className="text-primary-400 flex-shrink-0" />
-                <a href={`tel:${siteConfig?.contactPhone || '+244928476427'}`} className="text-sm text-gray-300 hover:text-primary-400 transition-colors">
-                  {siteConfig?.contactPhone || '+244 928 476 427'}
+                <a href={`tel:${siteConfig?.contactPhone || '+244930675044'}`} className="text-sm text-gray-300 hover:text-primary-400 transition-colors">
+                  {siteConfig?.contactPhone || '+244 930 675 044'}
                 </a>
               </div>
               

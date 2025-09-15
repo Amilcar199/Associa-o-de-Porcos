@@ -96,7 +96,7 @@ const Header = () => {
             <div className="flex items-center space-x-6">
               <div className="flex items-center space-x-2">
                 <Phone size={14} />
-                <span>+244 928 476 427</span>
+                <span>{siteConfig?.contactPhone || '+244 930 675 044'}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Mail size={14} />
