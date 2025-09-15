@@ -113,7 +113,26 @@ export default function LegalManager() {
                     <input value={item.title || ''} onChange={(e)=>updateCurrent(s=>{ const next=[...s.items]; next[idx]={...next[idx], title: e.target.value}; return { ...s, items: next } })} className="w-full px-3 py-2 border rounded" placeholder={isEn ? 'Title (optional)' : 'Título (opcional)'} />
                     <input value={item.description || ''} onChange={(e)=>updateCurrent(s=>{ const next=[...s.items]; next[idx]={...next[idx], description: e.target.value}; return { ...s, items: next } })} className="w-full px-3 py-2 border rounded" placeholder={isEn ? 'Description (optional)' : 'Descrição (opcional)'} />
                   </div>
-                  <button onClick={()=>updateCurrent(s=>({ ...s, items: s.items.filter((_,i)=>i!==idx) }))} className="self-start bg-red-600 text-white rounded p-2 hover:bg-red-700"><Trash2 size={16} /></button>
+                  <button
+                    onClick={async()=>{
+                      const toRemove = current.items[idx]
+                      try {
+                        // Se a URL for do GridFS, chamar DELETE direto nele; caso contrário, tentar nas rotas públicas
+                        if (/^\/api\/images\//.test(toRemove.url)) {
+                          await fetch(toRemove.url, { method: 'DELETE', credentials: 'include' })
+                        } else if (/^\/api\/public-assets\/constitution\/image\?/.test(toRemove.url)) {
+                          const u = new URL(toRemove.url, window.location.origin)
+                          const name = u.searchParams.get('name') || ''
+                          if (name) await fetch(`/api/public-assets/constitution/image?name=${encodeURIComponent(name)}`, { method: 'DELETE', credentials: 'include' })
+                        } else if (/^\//.test(toRemove.url)) {
+                          const rel = toRemove.url.replace(/^\/+/, '')
+                          await fetch(`/api/public-images?path=${encodeURIComponent(rel)}`, { method: 'DELETE', credentials: 'include' })
+                        }
+                      } catch {}
+                      updateCurrent(s=>({ ...s, items: s.items.filter((_,i)=>i!==idx) }))
+                    }}
+                    className="self-start bg-red-600 text-white rounded p-2 hover:bg-red-700"
+                  ><Trash2 size={16} /></button>
                 </div>
               ))}
             </div>

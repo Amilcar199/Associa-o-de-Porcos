@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import fs from 'fs'
 import path from 'path'
 import { authMiddleware } from '@/lib/api-utils'
+import connectDB from '@/lib/mongodb'
+import LegalSection from '@/models/LegalContent'
 
 export const dynamic = 'force-dynamic'
 
@@ -84,6 +86,14 @@ export async function DELETE(request: NextRequest) {
     if (!stat.isFile()) return NextResponse.json({ error: 'Não é um arquivo' }, { status: 400 })
 
     fs.unlinkSync(abs)
+    // Remover referências no modelo LegalSection
+    try {
+      await connectDB()
+      const url = `/${relPath}`
+      await (LegalSection as any).updateMany({}, { $pull: { items: { url } } })
+    } catch (e) {
+      console.error('Falha ao limpar referências em LegalSection:', e)
+    }
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Erro ao deletar imagem pública:', error)

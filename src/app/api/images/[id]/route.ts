@@ -2,6 +2,8 @@ export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getImage, deleteImage } from '@/lib/gridfs';
+import connectDB from '@/lib/mongodb';
+import LegalSection from '@/models/LegalContent';
 import { authMiddleware } from '@/lib/api-utils';
 
 export async function GET(
@@ -54,6 +56,15 @@ export async function DELETE(
         { error: 'Erro ao deletar imagem' },
         { status: 500 }
       );
+    }
+
+    // Remover referências no modelo LegalSection (itens com url igual ao arquivo removido)
+    try {
+      await connectDB();
+      const url = `/api/images/${id}`;
+      await (LegalSection as any).updateMany({}, { $pull: { items: { url } } });
+    } catch (e) {
+      console.error('Falha ao limpar referências em LegalSection:', e);
     }
 
     return NextResponse.json({
