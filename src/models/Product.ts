@@ -277,9 +277,13 @@ ProductSchema.pre('save', async function (next) {
     const self: any = this as any
     const hasValidWeight = typeof self.weight === 'number' && self.weight > 0
     const hasPrice = typeof self.price === 'number' && self.price >= 0
+    const hasPricePerKg = typeof self.pricePerKg === 'number' && self.pricePerKg >= 0
     if (hasValidWeight) {
       if (hasPrice) {
         self.pricePerKg = self.price / self.weight
+      } else if (!hasPrice && hasPricePerKg) {
+        // Se veio apenas preço/kg e temos peso, calcula preço por cabeça
+        self.price = self.weight * self.pricePerKg
       } else if (typeof self.pricePerKg !== 'number' && self.pricePerKg != null) {
         // noop: já tem pricePerKg definido
       }
@@ -313,7 +317,11 @@ ProductSchema.pre('findOneAndUpdate', function (next) {
       const computed = price / weight
       if (update.$set) update.$set.pricePerKg = computed; else update.pricePerKg = computed
     } else if (typeof weight === 'number' && weight > 0 && typeof pricePerKg === 'number' && pricePerKg >= 0) {
-      // Se veio pricePerKg e weight, não força price
+      // Se veio pricePerKg e weight, calcula preço/cabeça se não informado
+      if (typeof price !== 'number') {
+        const computedHead = pricePerKg * weight
+        if (update.$set) update.$set.price = computedHead; else update.price = computedHead
+      }
     }
   } catch (e) {
     // ignora erros de computação
