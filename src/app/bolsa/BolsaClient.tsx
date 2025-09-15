@@ -66,6 +66,8 @@ export default function BolsaClient() {
   const [loading, setLoading] = React.useState({ summary: false, overall: false, regions: false, history: false, records: false } as LoadingState)
   const [error, setError] = React.useState({ summary: '', overall: '', regions: '', history: '', records: '' } as ErrorState)
   const autoSwitchedRef = React.useRef(false)
+  const [chartType, setChartType] = React.useState('area' as 'area' | 'line')
+  const [hoverIdx, setHoverIdx] = React.useState(null as number | null)
 
   React.useEffect(() => { (async () => {
     try {
@@ -137,7 +139,7 @@ export default function BolsaClient() {
 
   const chart = React.useMemo(() => {
     const series = (historyData?.series || []).filter((p: HistoryRes["data"]["series"][number]) => p.avg != null)
-    if (!series.length) return { path: '', area: '', ticks: [] as { y: number, v: number }[], labels: [] as { x: number, text: string }[] }
+    if (!series.length) return { path: '', area: '', ticks: [] as { y: number, v: number }[], labels: [] as { x: number, text: string }[], pts: [] as { x:number,y:number }[], series }
     const width = 1000, height = 260, paddingX = 40, paddingY = 20
     const ys = series.map((p: any) => p.avg as number)
     let minY = Math.min(...ys), maxY = Math.max(...ys)
@@ -161,7 +163,7 @@ export default function BolsaClient() {
       const x = paddingX + (idx / Math.max(1, series.length - 1)) * (width - paddingX * 2)
       return { x, text: series[idx]?.date || '' }
     })
-    return { path, area, ticks, labels }
+    return { path, area, ticks, labels, pts, series }
   }, [historyData])
 
   const chartPointCount = React.useMemo(() => (historyData?.series || []).filter((p: HistoryRes["data"]["series"][number]) => p.avg != null).length, [historyData])
@@ -349,6 +351,10 @@ export default function BolsaClient() {
           <h3 className="font-semibold text-gray-800">Série histórica</h3>
           <div className="flex items-center gap-2 text-xs text-gray-500">
             <span>{loading.history ? '…' : chartPointCount} pontos úteis</span>
+            <div className="flex items-center border rounded overflow-hidden">
+              <button onClick={()=>setChartType('line')} className={`px-2 py-1 ${chartType==='line'?'bg-gray-100 text-gray-800':'text-gray-500'}`}>Linha</button>
+              <button onClick={()=>setChartType('area')} className={`px-2 py-1 ${chartType==='area'?'bg-gray-100 text-gray-800':'text-gray-500'}`}>Área</button>
+            </div>
             <button onClick={exportSVG} className="px-2 py-1 border rounded hover:bg-gray-50">Exportar SVG</button>
             <button onClick={exportPNG} className="px-2 py-1 border rounded hover:bg-gray-50">Exportar PNG</button>
           </div>
@@ -359,7 +365,17 @@ export default function BolsaClient() {
           <div className="h-12 text-xs text-red-600 bg-red-50 border border-red-200 rounded p-2">{error.history}</div>
         ) : chart.path ? (
           <div className="h-64">
-            <svg viewBox="0 0 1000 260" preserveAspectRatio="none" className="w-full h-full">
+            <svg viewBox="0 0 1000 260" preserveAspectRatio="none" className="w-full h-full"
+              onMouseMove={(e)=>{
+                const rect = (e.currentTarget as SVGSVGElement).getBoundingClientRect()
+                const x = ((e.clientX - rect.left) / rect.width) * 1000
+                const pts = chart.pts as {x:number,y:number}[]
+                if (!pts.length) { setHoverIdx(null); return }
+                let best = 0, bestDist = Math.abs(x - pts[0].x)
+                for (let i=1;i<pts.length;i++){ const d = Math.abs(x - pts[i].x); if (d < bestDist){ best=i; bestDist=d } }
+                setHoverIdx(best)
+              }}
+              onMouseLeave={()=>setHoverIdx(null)}>
               <defs>
                 <linearGradient id="grad-line" x1="0" x2="0" y1="0" y2="1">
                   <stop offset="0%" stopColor="#16a34a" stopOpacity="0.25" />
@@ -379,8 +395,20 @@ export default function BolsaClient() {
               {chart.labels.map((l, i) => (
                 <text key={i} x={l.x} y={252} textAnchor="middle" className="fill-gray-400 text-[10px]">{l.text}</text>
               ))}
-              <path d={chart.path} stroke="#16a34a" strokeWidth="2" fill="none" />
-              <path d={chart.area} fill="url(#grad-line)" />
+              <path d={chart.path} stroke="#16a34a" strokeWidth="2.5" fill="none" />
+              {chartType==='area' && (<path d={chart.area} fill="url(#grad-line)" />)}
+              {chart.pts.map((p,i)=> (
+                <circle key={i} cx={p.x} cy={p.y} r={2} fill="#16a34a" />
+              ))}
+              {hoverIdx != null && chart.pts[hoverIdx] && (
+                <g>
+                  <line x1={chart.pts[hoverIdx].x} x2={chart.pts[hoverIdx].x} y1={20} y2={240} stroke="#9ca3af" strokeDasharray="4 4" />
+                  <circle cx={chart.pts[hoverIdx].x} cy={chart.pts[hoverIdx].y} r={4} fill="#16a34a" stroke="#ffffff" strokeWidth="1.5" />
+                  <rect x={Math.min(880, Math.max(50, chart.pts[hoverIdx].x - 40))} y={30} width="140" height="40" rx="6" ry="6" fill="#111827" opacity="0.9" />
+                  <text x={Math.min(950, Math.max(60, chart.pts[hoverIdx].x - 30))} y={48} className="fill-white text-[10px]">{(chart.series[hoverIdx] as any)?.date}</text>
+                  <text x={Math.min(950, Math.max(60, chart.pts[hoverIdx].x - 30))} y={62} className="fill-white text-[12px] font-semibold">{formatAOA((chart.series[hoverIdx] as any)?.avg ?? null)}</text>
+                </g>
+              )}
             </svg>
           </div>
         ) : (
