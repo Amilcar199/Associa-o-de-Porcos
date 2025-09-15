@@ -3,6 +3,7 @@ import React from 'react'
 import { cookies } from 'next/headers'
 import fs from 'fs'
 import path from 'path'
+import { headers } from 'next/headers'
 import dynamic from 'next/dynamic'
 
 export function generateMetadata() {
@@ -20,17 +21,33 @@ export default async function ConstitutionDocsPage() {
   const locale = cookies().get('locale')?.value || 'pt-AO'
   const isEn = String(locale).startsWith('en')
 
-  // Prefer public folder if available (served as static files)
-  const docsDir = path.join(process.cwd(), 'public', 'Conteudos Suinos', 'pdf_paginas_png')
-  let fileNames: string[] = []
+  // Try DB-driven content first
+  let urls: string[] = []
   try {
-    fileNames = fs
-      .readdirSync(docsDir)
-      .filter((name) => /(\.png|jpe?g|webp)$/i.test(name))
-      .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+    const h = headers()
+    const protocol = h.get('x-forwarded-proto') || 'http'
+    const host = h.get('host') || 'localhost:3000'
+    const baseUrl = `${protocol}://${host}`
+    const res = await fetch(`${baseUrl}/api/legal-content`, { cache: 'no-store' })
+    const j = res.ok ? await res.json() : { data: [] }
+    const section = (j?.data || []).find((s:any)=>s.key==='constitution')
+    if (section && Array.isArray(section.items)) {
+      urls = section.items.map((it:any)=>it.url).filter(Boolean)
+    }
   } catch {}
-  const baseUrl = '/Conteudos%20Suinos/pdf_paginas_png'
-  const urls = fileNames.map((n) => `${baseUrl}/${encodeURIComponent(n)}`)
+
+  // Fallback to public folder if DB empty
+  if (!urls.length) {
+    const docsDir = path.join(process.cwd(), 'public', 'Conteudos Suinos', 'pdf_paginas_png')
+    try {
+      const fileNames: string[] = fs
+        .readdirSync(docsDir)
+        .filter((name) => /(\.png|jpe?g|webp)$/i.test(name))
+        .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+      const baseUrl = '/Conteudos%20Suinos/pdf_paginas_png'
+      urls = fileNames.map((n) => `${baseUrl}/${encodeURIComponent(n)}`)
+    } catch {}
+  }
 
   return (
     <section className="container-custom section-padding">

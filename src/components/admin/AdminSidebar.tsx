@@ -76,7 +76,8 @@ const AdminSidebar = () => {
         { name: 'Colaboradores', href: '/admin/colaboradores', icon: UsersRound },
         { name: 'Conteúdo de Membros', href: '/admin/conteudo-membros', icon: Users },
         { name: 'Novo Conteúdo', href: '/admin/conteudo-membros/novo', icon: FileText },
-        { name: 'Bolsa', href: '/admin/bolsa', icon: BarChart3 }
+        { name: 'Bolsa', href: '/admin/bolsa', icon: BarChart3 },
+        { name: 'Jurídico & Legal', href: '/admin/juridico-legal', icon: FileText }
       ]
     },
     {

@@ -54,6 +54,13 @@ export default async function LegalCompliancePage() {
           >
             {isEn ? 'Constitution Documentation' : 'Documentação de constituição'}
           </Link>
+          <Link
+            href="/juridico-legal/corpo-administrativo"
+            role="tab"
+            className="px-4 py-2 -mb-px border-b-2 border-transparent text-gray-600 hover:text-primary-700 hover:border-primary-300"
+          >
+            {isEn ? 'Administrative Body' : 'Corpo administrativo'}
+          </Link>
         </div>
       </div>
 
