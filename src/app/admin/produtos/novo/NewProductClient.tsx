@@ -59,24 +59,27 @@ export default function NewProductClient() {
   ]
 
   const ANGOLA_PROVINCES: Record<string, string[]> = {
-    'Bengo': ['Ambriz','Dande','Dembos','Nambuangongo','Pango Aluquém','Outro'],
-    'Benguela': ['Benguela','Baía Farta','Balombo','Bocoio','Caimbambo','Catumbela','Chongorói','Cubal','Ganda','Lobito','Outro'],
-    'Bié': ['Kuito','Andulo','Camacupa','Catabola','Chinguar','Chitembo','Cuemba','Cunhinga','Nharea','Outro'],
-    'Cabinda': ['Cabinda','Belize','Buco-Zau','Cacongo','Outro'],
-    'Cuando Cubango': ['Menongue','Calai','Cuangar','Cuchi','Cuito Cuanavale','Dirico','Mavinga','Nancova','Rivungo','Outro'],
-    'Cuanza Norte': ['Ndalatando','Ambaca','Banga','Bolongongo','Cambambe','Cazengo','Golungo Alto','Gonguembo','Lucala','Quiculungo','Samba Cajú','Outro'],
-    'Cuanza Sul': ['Sumbe','Amboim (Gabela)','Cassongue','Cela (Waku-Kungo)','Conda','Ebo','Libolo','Mussende','Porto Amboim','Quibala','Quilenda','Seles','Outro'],
-    'Cunene': ['Ondjiva','Cahama','Cuanhama','Curoca','Cuvelai','Namacunde','Ombadja','Outro'],
-    'Huambo': ['Huambo','Bailundo','Cachiungo','Caála','Ekunha','Londuimbali','Longonjo','Mungo','Catchiungo','Tchicala-Tcholoanga','Ucuma','Outro'],
-    'Huíla': ['Lubango','Caluquembe','Caconda','Chiange','Chibia','Chicomba','Chipindo','Cuvango','Humpata','Jamba','Matala','Quilengues','Quipungo','Outros'],
-    'Luanda': ['Luanda','Belas','Cacuaco','Cazenga','Ícolo e Bengo','Kissama','Quilamba Quiaxi','Talatona','Viana','Outro'],
-    'Lunda Norte': ['Dundo','Cambulo','Capenda-Camulemba','Caungula','Chitato','Cuango','Cuilo','Lóvua','Lubalo','Lucapa','Xá-Muteba','Outro'],
-    'Lunda Sul': ['Saurimo','Cacolo','Dala','Muconda','Outro'],
-    'Malanje': ['Malanje','Cacuso','Calandula','Cambundi-Catembo','Cangandala','Caombo','Cuaba Nzoji','Cunda-Dia-Baze','Kiwaba Nzoji','Luquembo','Marimba','Massango','Mucari','Quela','Quirima','Outro'],
-    'Moxico': ['Luena','Alto Zambeze','Bundas','Camanongue','Léua','Luchazes','Cameia','Luau','Moxico','Outro'],
-    'Namibe': ['Moçâmedes','Bibala','Camucuio','Tômbwa','Virei','Outro'],
-    'Uíge': ['Uíge','Alto Cauale','Ambuíla','Bembe','Buengas','Bungo','Damba','Milunga','Mucaba','Negage','Puri','Quimbele','Quitexe','Sanza Pombo','Songo','Zombo','Outro'],
-    'Zaire': ['Mbanza Kongo','Cuimba','Noqui','Nzózi','Soyo','Tomboco','Outro']
+    'Ícolo e Bengo': ['Catete','Quiçama','Calumbo','Cabiri','Cabo Ledo','Bom Jesus','Sequele','Outro'],
+    'Luanda': ['Belas','Cacuaco','Cazenga','Luanda','Quilamba-Quiaxi','Talatona','Viana','Outro'],
+    'Bengo': ['Ambriz','Bula-Atumba','Dande','Dembos','Nambuangongo','Pango Aluquém','Outro'],
+    'Benguela': ['Balombo','Baía Farta','Benguela','Bocoio','Caimbambo','Catumbela','Chongorói','Cubal','Ganda','Lobito','Outro'],
+    'Bié': ['Andulo','Camacupa','Catabola','Chinguar','Chitembo','Cuemba','Cunhinga','Cuíto','Nharea','Outro'],
+    'Cabinda': ['Belize','Buco-Zau','Cabinda','Cacongo','Outro'],
+    'Cuando': ['Calai','Cuangar','Cuchi','Cuito Cuanavale','Dirico','Mavinga','Nancova','Rivungo','Outro'],
+    'Cubango': ['Menongue','Outros municípios anteriormente do Cuando-Cubango','Outro'],
+    'Cuanza Norte': ['Ambaca','Banga','Bolongongo','Cambambe','Cazengo','Golungo Alto','Gonguembo','Lucala','Quiculungo','Samba Caju','Outro'],
+    'Cuanza Sul': ['Amboim','Cassongue','Cela','Conda','Ebo','Libolo','Mussende','Porto Amboim','Quibala','Quilenda','Seles','Sumbe','Outro'],
+    'Cunene': ['Cahama','Cuanhama','Curoca','Cuvelai','Namacunde','Ombadja','Outro'],
+    'Huambo': ['Bailundo','Caála','Cachiungo','Ecunha','Huambo','Londuimbale','Longonjo','Mungo','Chicala-Choloanga','Chinjenje','Ucuma','Outro'],
+    'Huíla': ['Lubango','Cacula','Caluquembe','Chiange','Chibia','Chicomba','Chipindo','Cuvango','Humpata','Jamba','Kuvango','Matala','Quilengues','Quipungo','Outro'],
+    'Lunda Norte': ['Cambulo','Capenda-Camulemba','Caungula','Chitato','Cuango','Cuilo','Lóvua','Lubalo','Lucapa','Xá-Muteba','Outro'],
+    'Lunda Sul': ['Cacolo','Dala','Muconda','Saurimo','Outro'],
+    'Malanje': ['Cacuso','Calandula','Cambundi-Catembo','Cangandala','Caombo','Cunda-Dia-Baze','Luquembo','Malanje','Marimba','Massango','Mucari','Quela','Quirima','Outro'],
+    'Moxico': ['Alto Cuito','Camanongue','Cangamba','Cangumbe','Chiúme','Léua','Lucusse','Luena','Lumbala-Nguimbo','Lutembo','Lutuai','Ninda','Outro'],
+    'Moxico Oriental': ['Cazombo','Outros municípios que pertenciam ao Moxico','Outro'],
+    'Namibe': ['Bibala','Camucuio','Moçâmedes','Tômbua','Virei','Outro'],
+    'Uíge': ['Alto Zaza','Ambuíla','Bembe','Buengas','Bungo','Damba','Milunga','Mucaba','Negage','Puri','Quimbele','Quitexe','Sanza Pombo','Songo','Zombo','Outro'],
+    'Zaire': ['Cuimba','Mbanza Congo','Nóqui','Nzeto','Soyo','Tomboco','Outro']
   }
 
   const provinceList = React.useMemo(() => Object.keys(ANGOLA_PROVINCES).sort().concat('Outro'), [])
