@@ -225,9 +225,9 @@ const Footer = () => {
               <div className="flex items-start space-x-3">
                 <MapPin size={16} className="text-primary-400 mt-1 flex-shrink-0" />
                 <div className="text-sm text-gray-300">
-                  <p>Rua da Associação, 123</p>
-                  <p>Centro - Luanda, Angola</p>
-                  <p>CEP: 1000</p>
+                  <a href="https://maps.app.goo.gl/PUczChGSKeG7QjVU9" target="_blank" rel="noopener noreferrer" className="hover:text-primary-400 transition-colors">
+                    Ver no Google Maps
+                  </a>
                 </div>
               </div>
               

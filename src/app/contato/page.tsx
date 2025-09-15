@@ -101,7 +101,10 @@ export default function ContatoPage() {
                 <span className="text-primary-600" aria-hidden>⏰</span> {isEn ? 'Mon–Fri: 9am to 6pm' : 'Seg–Sex: 9h às 18h'}
               </div>
               <div className="flex items-center gap-3 text-gray-600">
-                <span className="text-primary-600" aria-hidden>📍</span> Luanda, Angola
+                <span className="text-primary-600" aria-hidden>📍</span>
+                <a href="https://maps.app.goo.gl/PUczChGSKeG7QjVU9" target="_blank" rel="noopener noreferrer" className="hover:text-primary-700 transition-colors">
+                  Ver no Google Maps
+                </a>
               </div>
             </div>
 

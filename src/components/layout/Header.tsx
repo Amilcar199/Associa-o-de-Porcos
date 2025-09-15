@@ -104,7 +104,9 @@ const Header = () => {
               </div>
               <div className="flex items-center space-x-2">
                 <MapPin size={14} />
-                <span>Luanda, Angola</span>
+                <a href="https://maps.app.goo.gl/PUczChGSKeG7QjVU9" target="_blank" rel="noopener noreferrer" className="text-primary-200 hover:text-white transition-colors">
+                  Ver no mapa
+                </a>
               </div>
             </div>
             
