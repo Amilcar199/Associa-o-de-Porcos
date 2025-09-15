@@ -44,6 +44,7 @@ export default function ProductModal({
   const isEn = locale.startsWith('en')
   const [isLoading, setIsLoading] = useState(false)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [isZoomOpen, setIsZoomOpen] = useState(false)
 
   useEffect(() => {
     if (isOpen && product) {
@@ -115,7 +116,7 @@ export default function ProductModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={onClose} onKeyDown={handleKeyDown} tabIndex={0}>
       <div className="relative w-full max-w-5xl max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
         {/* Header com imagem */}
-        <div className="relative h-64 lg:h-72 overflow-hidden">
+        <div className="relative h-64 lg:h-72 overflow-hidden cursor-zoom-in" onClick={() => setIsZoomOpen(true)}>
           <Image src={(images[currentImageIndex] as any) || (Placeholder as any)} alt={(product.name ?? '') as string} fill className="object-cover" priority />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
           <button onClick={onClose} className="absolute top-4 right-4 w-10 h-10 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110">
@@ -297,6 +298,14 @@ export default function ProductModal({
           </div>
         </div>
       </div>
+      {/* Zoom Overlay */}
+      {isZoomOpen && (
+        <div className="fixed inset-0 z-[60] bg-black/80 flex items-center justify-center" onClick={() => setIsZoomOpen(false)}>
+          <div className="relative max-w-[95vw] max-h-[95vh] w-auto h-auto cursor-zoom-out">
+            <Image src={(images[currentImageIndex] as any) || (Placeholder as any)} alt={(product.name ?? '') as string} width={1600} height={1200} className="object-contain w-auto h-auto max-w-[95vw] max-h-[95vh]" />
+          </div>
+        </div>
+      )}
     </div>
   )
 }
