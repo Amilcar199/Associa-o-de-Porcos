@@ -27,7 +27,7 @@ interface Product {
 interface ProductFormData {
   name: string;
   description: string;
-  price: number;
+  price: number | undefined;
   pricePerKg?: number;
   breed: string;
   age: number;
@@ -67,7 +67,7 @@ export default function ProductsManager() {
   const [formData, setFormData] = useState<ProductFormData>({
     name: '',
     description: '',
-    price: 0,
+    price: undefined,
     pricePerKg: undefined,
     breed: '',
     age: 0,
@@ -108,6 +108,12 @@ export default function ProductsManager() {
       const url = editingProduct ? `/api/products/${editingProduct._id}` : '/api/products';
       const method = editingProduct ? 'PUT' : 'POST';
       
+      // Validação: exigir ao menos um dos preços
+      if ((formData.price === undefined || Number.isNaN(formData.price)) && (formData.pricePerKg === undefined || Number.isNaN(formData.pricePerKg as number))) {
+        toast.error('Informe Preço (cabeça) ou Preço por kg')
+        return
+      }
+
       const payload: any = {
         name: formData.name,
         description: formData.description,
@@ -219,7 +225,7 @@ export default function ProductsManager() {
     setFormData({
       name: '',
       description: '',
-      price: 0,
+      price: undefined,
       pricePerKg: undefined,
       breed: '',
       age: 0,
@@ -569,10 +575,10 @@ export default function ProductsManager() {
               <input
                 type="number"
                 step="0.01"
-                value={formData.price}
-                onChange={(e) => setFormData(prev => ({ ...prev, price: parseFloat(e.target.value) }))}
+                value={formData.price ?? ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, price: e.target.value === '' ? undefined : parseFloat(e.target.value) }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                required
+                placeholder="Opcional se informar preço/kg"
               />
             </div>
             
