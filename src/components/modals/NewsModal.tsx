@@ -241,7 +241,7 @@ export default function NewsModal({
       </div>
       {/* Zoom Overlay */}
       {isZoomOpen && (
-        <div className="fixed inset-0 z-[60] bg-black/80 flex items-center justify-center" onClick={() => setIsZoomOpen(false)}>
+        <div className="fixed inset-0 z-[60] bg-black/80 flex items-center justify-center" onClick={() => { setIsZoomOpen(false); onClose(); }}>
           <div className="relative max-w-[95vw] max-h-[95vh] w-auto h-auto cursor-zoom-out">
             <Image src={((Array.isArray(news.images) && news.images[0]) || (news.featuredImage as any) || (Placeholder as any))} alt={news.title} width={1600} height={1200} className="object-contain w-auto h-auto max-w-[95vw] max-h-[95vh]" />
           </div>
