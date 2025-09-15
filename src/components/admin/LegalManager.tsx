@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Save, Trash2 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import MediaUploader from './ui/MediaUploader'
+import { useLanguage } from '@/components/providers/LanguageProvider'
 
 type SectionKey = 'constitution' | 'admin-body'
 
@@ -16,6 +17,8 @@ const DEFAULT_SECTIONS: LegalSection[] = [
 ]
 
 export default function LegalManager() {
+  const { locale } = useLanguage()
+  const isEn = String(locale || '').startsWith('en')
   const [sections, setSections] = useState<LegalSection[]>(DEFAULT_SECTIONS)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -70,29 +73,29 @@ export default function LegalManager() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="inline-flex bg-gray-100 rounded-lg p-1">
-          {[{key:'constitution',label:'Documentação de constituição'},{key:'admin-body',label:'Corpo administrativo'}].map(tab => (
+          {[{key:'constitution',label: isEn ? 'Constitution Documentation' : 'Documentação de constituição'},{key:'admin-body',label: isEn ? 'Administrative Body' : 'Corpo administrativo'}].map(tab => (
             <button key={tab.key} onClick={()=>setActive(tab.key as SectionKey)} className={`px-3 py-1 rounded ${active===tab.key ? 'bg-white shadow text-gray-900' : 'text-gray-600'}`}>{tab.label}</button>
           ))}
         </div>
-        <button onClick={saveAll} disabled={saving} className="inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 disabled:opacity-50"><Save size={16} />Salvar</button>
+        <button onClick={saveAll} disabled={saving} className="inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 disabled:opacity-50"><Save size={16} />{isEn ? 'Save' : 'Salvar'}</button>
       </div>
 
       <div className="bg-white rounded-lg shadow p-6 space-y-6">
         <div className="grid md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm text-gray-700 mb-1">Título (opcional)</label>
-            <input value={current.title || ''} onChange={(e)=>updateCurrent(s=>({ ...s, title: e.target.value }))} className="w-full px-3 py-2 border rounded-lg" placeholder="Ex.: Constituição da Associação" />
+            <label className="block text-sm text-gray-700 mb-1">{isEn ? 'Title (optional)' : 'Título (opcional)'}</label>
+            <input value={current.title || ''} onChange={(e)=>updateCurrent(s=>({ ...s, title: e.target.value }))} className="w-full px-3 py-2 border rounded-lg" placeholder={isEn ? 'E.g.: Association Constitution' : 'Ex.: Constituição da Associação'} />
           </div>
           <div>
-            <label className="block text-sm text-gray-700 mb-1">Descrição (opcional)</label>
-            <input value={current.description || ''} onChange={(e)=>updateCurrent(s=>({ ...s, description: e.target.value }))} className="w-full px-3 py-2 border rounded-lg" placeholder="Breve descrição" />
+            <label className="block text-sm text-gray-700 mb-1">{isEn ? 'Description (optional)' : 'Descrição (opcional)'}</label>
+            <input value={current.description || ''} onChange={(e)=>updateCurrent(s=>({ ...s, description: e.target.value }))} className="w-full px-3 py-2 border rounded-lg" placeholder={isEn ? 'Short description' : 'Breve descrição'} />
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-900 mb-2">Imagens/Documentos</label>
+          <label className="block text-sm font-medium text-gray-900 mb-2">{isEn ? 'Images/Documents' : 'Imagens/Documentos'}</label>
           <MediaUploader
-            label="Uploads"
+            label={isEn ? 'Uploads' : 'Uploads'}
             accept="image/*"
             maxSizeBytes={5*1024*1024}
             uploadEndpoint="/api/images/upload"
@@ -107,8 +110,8 @@ export default function LegalManager() {
                 <div key={item.url} className="border rounded-lg p-3 flex gap-3">
                   <img src={item.url} alt={item.title || `item-${idx+1}`} className="w-24 h-24 object-cover rounded" />
                   <div className="flex-1 space-y-2">
-                    <input value={item.title || ''} onChange={(e)=>updateCurrent(s=>{ const next=[...s.items]; next[idx]={...next[idx], title: e.target.value}; return { ...s, items: next } })} className="w-full px-3 py-2 border rounded" placeholder="Título (opcional)" />
-                    <input value={item.description || ''} onChange={(e)=>updateCurrent(s=>{ const next=[...s.items]; next[idx]={...next[idx], description: e.target.value}; return { ...s, items: next } })} className="w-full px-3 py-2 border rounded" placeholder="Descrição (opcional)" />
+                    <input value={item.title || ''} onChange={(e)=>updateCurrent(s=>{ const next=[...s.items]; next[idx]={...next[idx], title: e.target.value}; return { ...s, items: next } })} className="w-full px-3 py-2 border rounded" placeholder={isEn ? 'Title (optional)' : 'Título (opcional)'} />
+                    <input value={item.description || ''} onChange={(e)=>updateCurrent(s=>{ const next=[...s.items]; next[idx]={...next[idx], description: e.target.value}; return { ...s, items: next } })} className="w-full px-3 py-2 border rounded" placeholder={isEn ? 'Description (optional)' : 'Descrição (opcional)'} />
                   </div>
                   <button onClick={()=>updateCurrent(s=>({ ...s, items: s.items.filter((_,i)=>i!==idx) }))} className="self-start bg-red-600 text-white rounded p-2 hover:bg-red-700"><Trash2 size={16} /></button>
                 </div>
