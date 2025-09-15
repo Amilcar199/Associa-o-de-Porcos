@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { Mail, Phone, MessageCircle, Clock, MapPin, Send, ArrowLeft } from 'lucide-react'
 import { useLanguage } from '@/components/providers/LanguageProvider'
 
 export default function ContatoPage() {
@@ -89,19 +90,19 @@ export default function ContatoPage() {
             <h2 className="text-lg font-semibold text-gray-900 mb-4">{isEn ? 'Contact Channels' : 'Canais de Atendimento'}</h2>
             <div className="space-y-3 text-gray-700">
               <a href={`mailto:${siteConfig?.contactEmail || 'contato@associacaodeporcos.ao'}`} className="flex items-center gap-3 hover:text-primary-700">
-                <span className="text-primary-600" aria-hidden>📧</span> {siteConfig?.contactEmail || 'contato@associacaodeporcos.ao'}
+                <Mail size={18} className="text-primary-600" aria-hidden /> {siteConfig?.contactEmail || 'contato@associacaodeporcos.ao'}
               </a>
               <a href="tel:+244930675044" className="flex items-center gap-3 hover:text-primary-700">
-                <span className="text-primary-600" aria-hidden>📞</span> +244 930 675 044
+                <Phone size={18} className="text-primary-600" aria-hidden /> +244 930 675 044
               </a>
               <a href="https://wa.me/244930675044" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 hover:text-primary-700">
-                <span className="text-primary-600" aria-hidden>💬</span> WhatsApp
+                <MessageCircle size={18} className="text-primary-600" aria-hidden /> WhatsApp
               </a>
               <div className="flex items-center gap-3 text-gray-600">
-                <span className="text-primary-600" aria-hidden>⏰</span> {isEn ? 'Mon–Fri: 9am to 6pm' : 'Seg–Sex: 9h às 18h'}
+                <Clock size={18} className="text-primary-600" aria-hidden /> {isEn ? 'Mon–Fri: 9am to 6pm' : 'Seg–Sex: 9h às 18h'}
               </div>
               <div className="flex items-start gap-3 text-gray-600">
-                <span className="text-primary-600 mt-0.5" aria-hidden>📍</span>
+                <MapPin size={18} className="text-primary-600 mt-0.5" aria-hidden />
                 <div>
                   <p>Rua Manuel Caldeira nº 6, Luanda</p>
                   <p className="text-xs text-gray-500">Plus Code: 56QG+92 Luanda</p>
@@ -118,7 +119,7 @@ export default function ContatoPage() {
               rel="noopener noreferrer"
               className="mt-5 inline-flex items-center justify-center w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition"
             >
-              <span className="mr-2" aria-hidden>💬</span> {isEn ? 'Talk on WhatsApp' : 'Falar no WhatsApp'}
+              <MessageCircle size={18} className="mr-2" aria-hidden /> {isEn ? 'Talk on WhatsApp' : 'Falar no WhatsApp'}
             </a>
           </div>
 
@@ -163,7 +164,7 @@ export default function ContatoPage() {
 
           <div className="flex items-center gap-3">
             <button disabled={loading} className="inline-flex items-center bg-primary-600 hover:bg-primary-700 text-white px-5 py-2.5 rounded font-medium disabled:opacity-60">
-              <span className="mr-2" aria-hidden>📨</span> {loading ? (isEn ? 'Sending...' : 'Enviando...') : (isEn ? 'Send Message' : 'Enviar Mensagem')}
+              <Send size={18} className="mr-2" aria-hidden /> {loading ? (isEn ? 'Sending...' : 'Enviando...') : (isEn ? 'Send Message' : 'Enviar Mensagem')}
             </button>
             <a href="tel:+244930675044" className="inline-flex items-center text-primary-700 hover:text-primary-800 font-medium">{isEn ? 'Or call now' : 'Ou ligue agora'}</a>
           </div>
