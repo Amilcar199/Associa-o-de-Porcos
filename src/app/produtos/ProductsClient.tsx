@@ -194,10 +194,13 @@ export default function ProductsClient({ products }: ProductsClientProps) {
               )}
               {/* Overlay de hover */}
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
-              {/* Ícone de visualizar */}
+              {/* Indicador de ação profissional */}
               <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <div className="bg-white/90 backdrop-blur px-4 py-2 rounded-full flex items-center gap-2">
-                  <span className="text-primary-600" aria-hidden>👁️</span>
+                <div className="bg-white/95 backdrop-blur px-4 py-2 rounded-full flex items-center gap-2 shadow">
+                  <svg viewBox="0 0 24 24" className="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"></path>
+                  </svg>
                   <span className="text-primary-700 font-medium text-sm">{isEn ? 'See details' : 'Ver Detalhes'}</span>
                 </div>
               </div>

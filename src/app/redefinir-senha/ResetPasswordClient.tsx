@@ -153,8 +153,18 @@ export default function ResetPasswordClient() {
                     className="appearance-none block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
                     placeholder={isEn ? 'Minimum 6 characters' : 'Mínimo 6 caracteres'}
                   />
-                  <button type="button" className="absolute inset-y-0 right-0 pr-3 flex items-center" onClick={() => setShowPassword(!showPassword)}>
-                    <span className="h-5 w-5 text-gray-400 hover:text-gray-600" aria-hidden>{showPassword ? '🙈' : '👁️'}</span>
+                  <button type="button" className="absolute inset-y-0 right-0 pr-3 flex items-center" onClick={() => setShowPassword(!showPassword)} aria-label={isEn ? (showPassword ? 'Hide password' : 'Show password') : (showPassword ? 'Ocultar senha' : 'Mostrar senha')}>
+                    {showPassword ? (
+                      <svg viewBox="0 0 24 24" className="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                        <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-6 0-10-8-10-8a21.8 21.8 0 0 1 5.06-6.94"></path>
+                        <path d="M1 1l22 22"></path>
+                      </svg>
+                    ) : (
+                      <svg viewBox="0 0 24 24" className="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"></path>
+                      </svg>
+                    )}
                   </button>
                 </div>
               </div>
@@ -174,8 +184,18 @@ export default function ResetPasswordClient() {
                     className="appearance-none block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
                     placeholder={isEn ? 'Confirm your new password' : 'Confirme sua nova senha'}
                   />
-                  <button type="button" className="absolute inset-y-0 right-0 pr-3 flex items-center" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-                    <span className="h-5 w-5 text-gray-400 hover:text-gray-600" aria-hidden>{showConfirmPassword ? '🙈' : '👁️'}</span>
+                  <button type="button" className="absolute inset-y-0 right-0 pr-3 flex items-center" onClick={() => setShowConfirmPassword(!showConfirmPassword)} aria-label={isEn ? (showConfirmPassword ? 'Hide confirm password' : 'Show confirm password') : (showConfirmPassword ? 'Ocultar confirmação' : 'Mostrar confirmação')}>
+                    {showConfirmPassword ? (
+                      <svg viewBox="0 0 24 24" className="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                        <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-6 0-10-8-10-8a21.8 21.8 0 0 1 5.06-6.94"></path>
+                        <path d="M1 1l22 22"></path>
+                      </svg>
+                    ) : (
+                      <svg viewBox="0 0 24 24" className="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"></path>
+                      </svg>
+                    )}
                   </button>
                 </div>
               </div>
