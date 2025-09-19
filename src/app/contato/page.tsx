@@ -78,7 +78,7 @@ export default function ContatoPage() {
       {/* Hero */}
       <div className="bg-gradient-to-r from-primary-50 to-white border-b border-gray-100">
         <div className="container-custom py-10">
-          <h1 className="text-3xl font-heading font-bold text-primary-800">{isEn ? 'Contact' : 'Contato'}</h1>
+          <h1 className="text-3xl font-heading font-bold text-primary-800">{isEn ? 'Contact' : 'Contacto'}</h1>
           <p className="text-gray-600 mt-2 max-w-2xl">{isEn ? 'Contact us for partnerships, questions and information. We will respond as soon as possible.' : 'Fale connosco para parcerias, dúvidas e informações. Responderemos o mais breve possível.'}</p>
         </div>
       </div>
