@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: RouteParams): Promise<Metadat
         images: news.featuredImage ? [news.featuredImage] : [],
         type: 'article',
         publishedTime: news.publishedAt?.toISOString(),
-        authors: news.author ? [news.author.name] : []
+        authors: []
       }
     }
   } catch (error) {
@@ -62,7 +62,7 @@ export default async function NewsPage({ params }: RouteParams) {
   const isEn = String(locale).startsWith('en')
   try {
     await connectDB()
-    const news = await News.findOne({ slug: params.slug, published: true }).populate('author', 'name avatar').lean()
+    const news = await News.findOne({ slug: params.slug, published: true }).lean()
     if (!news) {
       return (
         <article className="max-w-4xl mx-auto px-4 py-8">
@@ -94,14 +94,6 @@ export default async function NewsPage({ params }: RouteParams) {
           </div>
           <h1 className="text-4xl font-bold text-gray-900 mb-4">{news.title}</h1>
           <div className="flex items-center space-x-4 text-gray-600 mb-6">
-            {news.author && (
-              <div className="flex items-center space-x-2">
-                {news.author.avatar && (
-                  <img src={news.author.avatar} alt={news.author.name} className="w-8 h-8 rounded-full" />
-                )}
-                <span>{news.author.name}</span>
-              </div>
-            )}
             {news.publishedAt && (
               <time dateTime={news.publishedAt.toISOString()}>{formatDate(news.publishedAt)}</time>
             )}

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { X, Calendar, User, Eye, Tag, ArrowLeft, ArrowRight } from 'lucide-react'
+import { X, Calendar, Eye, Tag, ArrowLeft, ArrowRight } from 'lucide-react'
 import Image from 'next/image'
 import Placeholder from '@/components/assets/Foto Suino.webp'
 import { formatDate, calculateReadTime } from '@/lib/utils'
@@ -127,12 +127,6 @@ export default function NewsModal({
 
               {/* Meta informações */}
               <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-6 pb-6 border-b border-gray-200">
-                {news.author?.name && (
-                  <div className="flex items-center gap-2">
-                    <User size={16} className="text-primary-600" />
-                    <span>{news.author.name}</span>
-                  </div>
-                )}
                 <div className="flex items-center gap-2">
                   <Calendar size={16} className="text-primary-600" />
                   <span>{formatDate(news.publishedAt)}</span>

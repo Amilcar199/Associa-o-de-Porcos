@@ -186,9 +186,6 @@ const LatestNews = () => {
                         {news[0]?.excerpt}
                       </p>
                       <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-4">
-                        {news[0]?.author?.name && (
-                          <span>{news[0].author.name}</span>
-                        )}
                         <div className="flex items-center space-x-1">
                           <Calendar size={14} />
                           <span>{formatDate(news[0].publishedAt)}</span>
