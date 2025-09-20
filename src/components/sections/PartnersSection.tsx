@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
+import { useLanguage } from '@/components/providers/LanguageProvider'
 import { 
   ArrowRight,
   Users,
@@ -25,6 +26,8 @@ interface PartnerItem {
 const PartnersSection = () => {
   const [collaborators, setCollaborators] = useState<PartnerItem[]>([])
   const [loading, setLoading] = useState(false)
+  const { locale } = useLanguage()
+  const isEn = String(locale).startsWith('en')
 
   const fetchCollaborators = async () => {
     setLoading(true)
@@ -54,13 +57,13 @@ const PartnersSection = () => {
       <div className="container-custom">
         <div className="text-center mb-12">
           <span className="inline-block bg-primary-100 text-primary-800 px-3 py-1 rounded-full text-sm font-medium mb-4">
-            Parceiros e Colaboradores
+            {isEn ? 'Partners & Collaborators' : 'Parceiros e Colaboradores'}
           </span>
           <h2 className="text-3xl lg:text-4xl font-heading font-bold text-gray-900 mb-6">
-            Nossa Rede de <span className="text-gradient">Especialistas</span>
+            {isEn ? 'Our Network of ' : 'Nossa Rede de '}<span className="text-gradient">{isEn ? 'Experts' : 'Especialistas'}</span>
           </h2>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Profissionais que apoiam nossa missão com conhecimento e experiência.
+            {isEn ? 'Professionals who support our mission with knowledge and experience.' : 'Profissionais que apoiam nossa missão com conhecimento e experiência.'}
           </p>
         </div>
 
@@ -98,7 +101,7 @@ const PartnersSection = () => {
         {collaborators.length > 0 && (
         <div className="text-center">
           <Link href="/colaboradores" className="inline-flex items-center bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300">
-            Ver Todos os Colaboradores
+            {isEn ? 'See All Collaborators' : 'Ver Todos os Colaboradores'}
             <ArrowRight size={20} className="ml-2" />
           </Link>
         </div>
