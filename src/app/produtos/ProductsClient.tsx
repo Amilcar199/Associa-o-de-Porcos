@@ -146,7 +146,7 @@ export default function ProductsClient({ products }: ProductsClientProps) {
     if (w === undefined || w === null) return '—'
     if (w <= 30) return isEn ? 'Piglet' : 'Leitão'
     if (w < 80) return isEn ? 'Grower/Fattener' : 'Engorda'
-    return isEn ? 'Finished' : 'Terminado'
+    return isEn ? 'Finished' : 'Pronto para Abate'
   }
 
   const getPriceDisplay = (p: Product) => {
