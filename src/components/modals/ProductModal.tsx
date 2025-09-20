@@ -181,7 +181,7 @@ export default function ProductModal({
                     <Calendar size={20} className="text-primary-600" />
                     <div>
                       <p className="text-sm text-gray-500">{isEn ? 'Age' : 'Idade'}</p>
-                      <p className="font-semibold text-gray-900">{product.age ? (isEn ? (product.age >= 12 ? `${Math.floor(product.age/12)} ${Math.floor(product.age/12) === 1 ? 'year' : 'years'}` : `${product.age} months`) : formatAge(product.age)) : (isEn ? 'Not informed' : 'Não informado')}</p>
+                      <p className="font-semibold text-gray-900">{product.age ? formatAge(product.age, locale) : (isEn ? 'Not informed' : 'Não informado')}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">

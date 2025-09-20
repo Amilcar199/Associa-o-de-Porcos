@@ -206,7 +206,7 @@ const FeaturedProducts = () => {
                   <div className="grid grid-cols-2 gap-3 text-xs text-gray-600 mb-4">
                     <div className="flex items-center space-x-1">
                       <Clock size={12} />
-                      <span>{formatAge(product.age)}</span>
+                      <span>{formatAge(product.age, locale)}</span>
                     </div>
                     <div className="flex items-center space-x-1">
                       <Weight size={12} />

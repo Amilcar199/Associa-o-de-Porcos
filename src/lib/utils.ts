@@ -108,7 +108,16 @@ export async function convertAndFormat(
 /**
  * Formata a idade de um animal
  */
-export function formatAge(age: number): string {
+export function formatAge(age: number, locale: string = 'pt-AO'): string {
+  const isEn = String(locale).startsWith('en')
+  if (isEn) {
+    if (age === 1) return '1 month'
+    if (age < 12) return `${age} months`
+    const years = Math.floor(age / 12)
+    const months = age % 12
+    if (months === 0) return years === 1 ? '1 year' : `${years} years`
+    return `${years} year${years > 1 ? 's' : ''} and ${months} month${months > 1 ? 's' : ''}`
+  }
   if (age === 1) return '1 mês'
   if (age < 12) return `${age} meses`
   const years = Math.floor(age / 12)
