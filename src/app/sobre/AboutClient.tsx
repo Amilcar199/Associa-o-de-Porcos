@@ -87,7 +87,7 @@ export default function AboutClient() {
             },
             {
               title: isEn ? 'Vision' : 'Visão',
-              desc: isEn ? 'Be a reference in sustainable pig farming with high productivity and animal welfare.' : 'Ser referência em suinocultura sustentável, com alto padrão de produtividade e bem-estar.',
+              desc: isEn ? 'Be a national reference in sustainable pig farming in Angola, with high productivity and animal welfare.' : 'Ser referência nacional em suinocultura sustentável em Angola, com alto padrão de produtividade e bem-estar.',
               icon: Sparkles
             },
             {
@@ -128,17 +128,17 @@ export default function AboutClient() {
             {[
               {
                 title: isEn ? 'Producer Support' : 'Apoio ao Produtor',
-                desc: isEn ? 'Training, technical assistance and sharing best practices to raise productivity and profitability.' : 'Capacitação, assistência técnica e partilha de boas práticas para elevar produtividade e rentabilidade.',
+                desc: isEn ? 'Training, technical assistance and best practices tailored to Angolan producers to raise productivity and profitability.' : 'Capacitação, assistência técnica e boas práticas adaptadas à realidade dos produtores angolanos para elevar produtividade e rentabilidade.',
                 icon: Users
               },
               {
                 title: isEn ? 'Sustainability' : 'Sustentabilidade',
-                desc: isEn ? 'Responsible management, animal welfare and practices that preserve the environment and system efficiency.' : 'Gestão responsável, bem-estar animal e práticas que preservam o meio ambiente e a eficiência do sistema.',
+                desc: isEn ? 'Responsible management and animal welfare aligned with Angola’s context, preserving the environment and system efficiency.' : 'Gestão responsável e bem-estar animal alinhados ao contexto de Angola, preservando o meio ambiente e a eficiência do sistema.',
                 icon: Recycle
               },
               {
                 title: isEn ? 'Market and Quality' : 'Mercado e Qualidade',
-                desc: isEn ? 'Standards, traceability and market links to strengthen confidence and competitiveness.' : 'Padrões, rastreabilidade e ligações com o mercado para fortalecer a confiança e a competitividade.',
+                desc: isEn ? 'Standards, traceability and market links focused on the Angolan market to strengthen confidence and competitiveness across the local chain.' : 'Padrões, rastreabilidade e ligações com o mercado angolano para fortalecer a confiança e a competitividade em toda a cadeia local.',
                 icon: Award
               }
             ].map((item, idx) => (
