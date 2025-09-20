@@ -281,33 +281,33 @@ export default function BolsaClient() {
       <div className="bg-white border border-gray-100 rounded-xl p-4 shadow-sm">
         <div className="grid gap-3 md:grid-cols-4">
           <label className="text-xs text-gray-500">
-            Forma de venda
+            {isEn ? 'Sale form' : 'Forma de venda'}
             <select value={saleForm} onChange={e=>setSaleForm(e.target.value as any)} className="mt-1 w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-200">
-              <option value="carcaça">Carcaça (AOA/kg)</option>
-              <option value="vivo">Vivo (AOA/cabeça)</option>
+              <option value="carcaça">{isEn ? 'Carcass (AOA/kg)' : 'Carcaça (AOA/kg)'}</option>
+              <option value="vivo">{isEn ? 'Live (AOA/head)' : 'Vivo (AOA/cabeça)'}</option>
             </select>
           </label>
           <label className="text-xs text-gray-500">
-            Região
+            {isEn ? 'Region' : 'Região'}
             <select value={region} onChange={e=>setRegion(e.target.value)} className="mt-1 w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-200">
-              <option value="">Todas</option>
+              <option value="">{isEn ? 'All' : 'Todas'}</option>
               {regionsList.map((r: string) => <option key={r} value={r}>{r}</option>)}
             </select>
           </label>
           <label className="text-xs text-gray-500">
-            Período
+            {isEn ? 'Period' : 'Período'}
             <select value={periodDays} onChange={e=>setPeriodDays(parseInt(e.target.value))} className="mt-1 w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-200">
-              <option value={30}>30 dias</option>
-              <option value={90}>90 dias</option>
-              <option value={180}>180 dias</option>
-              <option value={365}>365 dias</option>
+              <option value={30}>{isEn ? '30 days' : '30 dias'}</option>
+              <option value={90}>{isEn ? '90 days' : '90 dias'}</option>
+              <option value={180}>{isEn ? '180 days' : '180 dias'}</option>
+              <option value={365}>{isEn ? '365 days' : '365 dias'}</option>
             </select>
           </label>
           {session ? (
             <label className="text-xs text-gray-500">
-              Raça
+              {isEn ? 'Breed' : 'Raça'}
               <select value={breed} onChange={e=>setBreed(e.target.value)} className="mt-1 w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-200">
-                <option value="">Todas</option>
+                <option value="">{isEn ? 'All' : 'Todas'}</option>
                 {breedsList.map((b: string) => <option key={b} value={b}>{b}</option>)}
               </select>
             </label>
