@@ -123,10 +123,10 @@ export default function ProductModal({
             <X size={20} className="text-white" />
           </button>
           <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
-            <button onClick={onPrevious} disabled={!hasPrevious} className={`p-2 rounded-full backdrop-blur-sm transition-all duration-200 ${hasPrevious ? 'bg-white/20 hover:bg-white/30 text-white hover:scale-110' : 'bg-white/10 text_white/50 cursor-not-allowed'}`}>
+            <button onClick={onPrevious} disabled={!hasPrevious} className={`p-2 rounded-full backdrop-blur-sm transition-all duration-200 ${hasPrevious ? 'bg-white/20 hover:bg-white/30 text-white hover:scale-110' : 'bg-white/10 text-white/50 cursor-not-allowed'}`}>
               <ArrowLeft size={20} />
             </button>
-            <button onClick={onNext} disabled={!hasNext} className={`p-2 rounded-full backdrop-blur-sm transition-all duration-200 ${hasNext ? 'bg_white/20 hover:bg_white/30 text-white hover:scale-110' : 'bg-white/10 text-white/50 cursor-not-allowed'}`}>
+            <button onClick={onNext} disabled={!hasNext} className={`p-2 rounded-full backdrop-blur-sm transition-all duration-200 ${hasNext ? 'bg-white/20 hover:bg-white/30 text-white hover:scale-110' : 'bg-white/10 text-white/50 cursor-not-allowed'}`}>
               <ArrowRight size={20} />
             </button>
           </div>
