@@ -357,7 +357,7 @@ export default function BolsaClient() {
           </div>
           <div className="text-xs text-gray-500 mt-2">
             {!loading.summary && summary?.officialRef != null && (<span>Ref. oficial: {formatAOA(summary?.officialRef ?? null)}</span>)}
-            {!loading.summary && summary?.usedFallback && (<span className="ml-2 text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded">Usando melhor dia ({fmtDateISO(summary?.effectiveDate)})</span>)}
+            {!loading.summary && summary?.usedFallback && (<span className="ml-2 text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded">{isEn ? 'Using best day' : 'Usando melhor dia'} ({fmtDateISO(summary?.effectiveDate)})</span>)}
           </div>
         </div>
       </div>
@@ -366,22 +366,22 @@ export default function BolsaClient() {
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-semibold text-gray-800">{isEn ? 'Historical series' : 'Série histórica'}</h3>
           <div className="flex items-center gap-2 text-xs text-gray-500">
-            <span>{loading.history ? '…' : chartPointCount} pontos úteis</span>
+            <span>{loading.history ? '…' : chartPointCount} {isEn ? 'useful points' : 'pontos úteis'}</span>
             <div className="flex items-center border rounded overflow-hidden">
-              <button onClick={()=>setChartType('line')} className={`px-2 py-1 ${chartType==='line'?'bg-gray-100 text-gray-800':'text-gray-500'}`}>Linha</button>
-              <button onClick={()=>setChartType('area')} className={`px-2 py-1 ${chartType==='area'?'bg-gray-100 text-gray-800':'text-gray-500'}`}>Área</button>
+              <button onClick={()=>setChartType('line')} className={`px-2 py-1 ${chartType==='line'?'bg-gray-100 text-gray-800':'text-gray-500'}`}>{isEn ? 'Line' : 'Linha'}</button>
+              <button onClick={()=>setChartType('area')} className={`px-2 py-1 ${chartType==='area'?'bg-gray-100 text-gray-800':'text-gray-500'}`}>{isEn ? 'Area' : 'Área'}</button>
             </div>
             <label className="inline-flex items-center gap-1">
-              <span>Escala</span>
+              <span>{isEn ? 'Scale' : 'Escala'}</span>
               <select value={granularity} onChange={e=>setGranularity(e.target.value as any)} className="border rounded px-1 py-0.5">
-                <option value="hour">Hora</option>
-                <option value="day">Dia</option>
-                <option value="month">Mês</option>
-                <option value="year">Ano</option>
+                <option value="hour">{isEn ? 'Hour' : 'Hora'}</option>
+                <option value="day">{isEn ? 'Day' : 'Dia'}</option>
+                <option value="month">{isEn ? 'Month' : 'Mês'}</option>
+                <option value="year">{isEn ? 'Year' : 'Ano'}</option>
               </select>
             </label>
-            <button onClick={exportSVG} className="px-2 py-1 border rounded hover:bg-gray-50">Exportar SVG</button>
-            <button onClick={exportPNG} className="px-2 py-1 border rounded hover:bg-gray-50">Exportar PNG</button>
+            <button onClick={exportSVG} className="px-2 py-1 border rounded hover:bg-gray-50">{isEn ? 'Export SVG' : 'Exportar SVG'}</button>
+            <button onClick={exportPNG} className="px-2 py-1 border rounded hover:bg-gray-50">{isEn ? 'Export PNG' : 'Exportar PNG'}</button>
           </div>
         </div>
         {loading.history ? (
