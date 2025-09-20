@@ -112,7 +112,14 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    const prevDay = await computeAverage(unit, addDays(effectiveDayStart, -1), effectiveDayStart, region, breed)
+    // Find nearest previous valid day (not necessarily consecutive)
+    let prevValid: { avg: number | null, count: number } = { avg: null, count: 0 }
+    for (let i = 1; i <= 30; i++) {
+      const s = addDays(effectiveDayStart, -i)
+      const e = addDays(effectiveDayStart, -(i - 1))
+      const tmp = await computeAverage(unit, s, e, region, breed)
+      if (tmp.avg != null) { prevValid = tmp; break }
+    }
 
     const last7 = await computeAverage(unit, addDays(effectiveDayEnd, -7), effectiveDayEnd, region, breed)
     const prev7 = await computeAverage(unit, addDays(effectiveDayEnd, -14), addDays(effectiveDayEnd, -7), region, breed)
@@ -138,7 +145,7 @@ export async function GET(req: NextRequest) {
       unit,
       current: effectiveCurrent,
       variation: {
-        daily: changePct(effectiveCurrent.avg, prevDay.avg),
+        daily: changePct(effectiveCurrent.avg, prevValid.avg),
         weekly: changePct(last7.avg, prev7.avg),
         monthly: changePct(last30.avg, prev30.avg)
       },
