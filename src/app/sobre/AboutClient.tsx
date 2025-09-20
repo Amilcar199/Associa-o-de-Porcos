@@ -10,6 +10,7 @@ import { motion } from 'framer-motion'
 import { Award, Leaf, Users, Target, ShieldCheck, Sparkles, ArrowRight, Recycle, LineChart, Flag, Milestone, TrendingUp } from 'lucide-react'
 import MapaAngola from '@/components/assets/Mapa de Angola.png'
 import { useLanguage } from '@/components/providers/LanguageProvider'
+import { useSession } from 'next-auth/react'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -19,6 +20,7 @@ const fadeUp = {
 export default function AboutClient() {
   const { locale } = useLanguage()
   const isEn = locale.startsWith('en')
+  const { data: session } = useSession()
   return (
     <section className="space-y-0">
       {/* Hero Section */}
@@ -275,9 +277,29 @@ export default function AboutClient() {
             <Link href="/contato" className="inline-flex items-center bg-white text-primary-700 hover:bg-primary-50 font-semibold py-3 px-6 rounded-lg transition-all">
               {isEn ? 'Get in Touch' : 'Entrar em Contato'} <ArrowRight size={18} className="ml-2" />
             </Link>
-            <Link href="/registro" className="inline-flex items-center border-2 border-white text-white hover:bg-white/10 font-semibold py-3 px-6 rounded-lg transition-all">
-              {isEn ? 'Become a Member' : 'Tornar-se Membro'}
-            </Link>
+            {(() => {
+              const role = (session as any)?.user?.role as string | undefined
+              const isLoggedIn = !!role
+              const href = !isLoggedIn
+                ? '/registro'
+                : role === 'admin'
+                  ? '/admin'
+                  : role === 'member'
+                    ? '/membros'
+                    : '/perfil'
+              const label = !isLoggedIn
+                ? (isEn ? 'Become a Member' : 'Tornar-se Membro')
+                : role === 'admin'
+                  ? (isEn ? 'Go to Admin' : 'Ir ao Painel')
+                  : role === 'member'
+                    ? (isEn ? 'Members Area' : 'Área de Membros')
+                    : (isEn ? 'Request Membership' : 'Solicitar Associação')
+              return (
+                <Link href={href} className="inline-flex items-center border-2 border-white text-white hover:bg-white/10 font-semibold py-3 px-6 rounded-lg transition-all">
+                  {label}
+                </Link>
+              )
+            })()}
           </div>
         </div>
       </div>
