@@ -92,7 +92,7 @@ const CallToAction = () => {
                   ? (isEn ? 'Go to Admin' : 'Ir ao Painel')
                   : role === 'member'
                     ? (isEn ? 'Members Area' : 'Área de Membros')
-                    : (isEn ? 'Your Profile' : 'Seu Perfil')
+                    : (isEn ? 'Request Membership' : 'Solicitar Associação')
               return (
                 <Link
                   href={href}
