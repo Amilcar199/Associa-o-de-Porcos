@@ -42,6 +42,7 @@ export default function ProductsClient({ products }: ProductsClientProps) {
   const [query, setQuery] = useState('')
   const [health, setHealth] = useState('' as string)
   const [vaccinated, setVaccinated] = useState('' as string)
+  const [minPrice, setMinPrice] = useState('' as string)
   const [maxPrice, setMaxPrice] = useState('' as string)
   const [minWeight, setMinWeight] = useState('' as string)
   const [maxAge, setMaxAge] = useState('' as string)
@@ -116,17 +117,24 @@ export default function ProductsClient({ products }: ProductsClientProps) {
     if (query && !(`${p.name} ${p.breed} ${p.description || ''}`.toLowerCase().includes(query.toLowerCase()))) return false
     if (health && p.healthStatus !== health) return false
     if (vaccinated && String(!!p.vaccinated) !== vaccinated) return false
-    if (maxPrice) {
+    if (minPrice || maxPrice) {
       const limit = Number(maxPrice)
+      const lower = Number(minPrice)
       if (priceType === 'kg') {
         const perKg = typeof p.pricePerKg === 'number' && p.pricePerKg > 0
           ? p.pricePerKg
           : (typeof p.price === 'number' && typeof p.weight === 'number' && p.weight > 0
               ? p.price / p.weight
               : null)
-        if (perKg != null && perKg > limit) return false
+        if (perKg != null) {
+          if (minPrice && perKg < lower) return false
+          if (maxPrice && perKg > limit) return false
+        }
       } else {
-        if (typeof p.price === 'number' && p.price > limit) return false
+        if (typeof p.price === 'number') {
+          if (minPrice && p.price < lower) return false
+          if (maxPrice && p.price > limit) return false
+        }
       }
     }
     if (minWeight && typeof p.weight === 'number' && p.weight < Number(minWeight)) return false
@@ -153,7 +161,7 @@ export default function ProductsClient({ products }: ProductsClientProps) {
     <>
       {/* Filters */}
       <div className="mb-6 bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-7">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-8">
           <input
             value={query}
             onChange={e=>setQuery(e.target.value)}
@@ -175,13 +183,14 @@ export default function ProductsClient({ products }: ProductsClientProps) {
             <option value="head">{isEn ? 'Price /head' : 'Preço /cabeça'}</option>
             <option value="kg">{isEn ? 'Price /kg' : 'Preço /kg'}</option>
           </select>
+          <input type="number" min="0" value={minPrice} onChange={e=>setMinPrice(e.target.value)} placeholder={(isEn ? 'Min price' : 'Preço mín.') + (priceType === 'kg' ? ' /kg' : ` ${isEn ? '/head' : '/cabeça'}`)} className="px-3 py-2 border rounded-lg" />
           <input type="number" min="0" value={maxPrice} onChange={e=>setMaxPrice(e.target.value)} placeholder={(isEn ? 'Max price' : 'Preço máx.') + (priceType === 'kg' ? ' /kg' : ` ${isEn ? '/head' : '/cabeça'}`)} className="px-3 py-2 border rounded-lg" />
           <input type="number" min="0" value={minWeight} onChange={e=>setMinWeight(e.target.value)} placeholder={isEn ? 'Min weight (kg)' : 'Peso mín. (kg)'} className="px-3 py-2 border rounded-lg" />
           <input type="number" min="0" value={maxAge} onChange={e=>setMaxAge(e.target.value)} placeholder={isEn ? 'Max age (months)' : 'Idade máx. (meses)'} className="px-3 py-2 border rounded-lg" />
         </div>
         <div className="mt-3 flex flex-wrap gap-2">
-          {(query || health || vaccinated || maxPrice || minWeight || maxAge) && (
-            <button onClick={()=>{ setQuery(''); setHealth(''); setVaccinated(''); setMaxPrice(''); setMinWeight(''); setMaxAge('') }} className="text-sm px-3 py-1.5 rounded border text-gray-700 hover:bg-gray-50">{isEn ? 'Clear filters' : 'Limpar filtros'}</button>
+          {(query || health || vaccinated || minPrice || maxPrice || minWeight || maxAge) && (
+            <button onClick={()=>{ setQuery(''); setHealth(''); setVaccinated(''); setMinPrice(''); setMaxPrice(''); setMinWeight(''); setMaxAge('') }} className="text-sm px-3 py-1.5 rounded border text-gray-700 hover:bg-gray-50">{isEn ? 'Clear filters' : 'Limpar filtros'}</button>
           )}
           <span className="text-sm text-gray-500 ml-auto">{isEn ? 'Results' : 'Resultados'}: {filtered.length}</span>
         </div>
