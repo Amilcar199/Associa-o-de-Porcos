@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
-    "setup": "node scripts/setup.js"
+    "setup": "node scripts/setup.js",
+    "seed:admin": "node scripts/create-admin.js"
   },
   "dependencies": {
     "@auth/mongodb-adapter": "^3.10.0",

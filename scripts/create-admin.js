@@ -1,15 +1,14 @@
-// scripts/create-admin.js
-import dotenv from 'dotenv';
-import fs from 'fs';
-import path from 'path';
-import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs';
+// scripts/create-admin.js (CommonJS)
+const dotenv = require('dotenv');
+const fs = require('fs');
+const path = require('path');
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 // 1) Carrega .env.local OU .env (o que existir primeiro)
 const root = process.cwd();
 const candidates = [path.join(root, '.env.local'), path.join(root, '.env')];
 let loaded = false;
-0
 for (const p of candidates) {
   if (fs.existsSync(p)) {
     dotenv.config({ path: p });
@@ -45,7 +44,7 @@ async function main() {
       name: { type: String, required: true },
       email: { type: String, required: true, unique: true, index: true },
       password: { type: String, required: true },
-      role: { type: String, enum: ['member', 'admin'], default: 'member' },
+      role: { type: String, enum: ['visitor', 'member', 'admin'], default: 'admin' },
       isActive: { type: Boolean, default: true },
       preferences: {
         newsletter: { type: Boolean, default: true },
@@ -57,7 +56,7 @@ async function main() {
 
   const User = mongoose.models.User || mongoose.model('User', userSchema);
 
-  const exists = await User.findOne({ email });
+  const exists = await User.findOne({ email: String(email).toLowerCase() });
   if (exists) {
     console.log('⚠️ Já existe usuário com esse email:', email);
     await mongoose.connection.close();
@@ -68,7 +67,7 @@ async function main() {
 
   await User.create({
     name,
-    email,
+    email: String(email).toLowerCase(),
     password: hashed,
     role: 'admin',
     isActive: true,
