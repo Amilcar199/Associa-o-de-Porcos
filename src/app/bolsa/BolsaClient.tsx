@@ -170,12 +170,12 @@ export default function BolsaClient() {
 
   const chartPointCount = React.useMemo(() => (historyData?.series || []).filter((p: HistoryRes["data"]["series"][number]) => p.avg != null).length, [historyData])
 
-  // Auto-switch saleForm if current selection has no usable points but the other has
+  // Auto-switch saleForm if current selection has too few usable points but the other has more
   React.useEffect(() => { (async () => {
     if (loading.history) return
     if (autoSwitchedRef.current) return
-    const used = (historyData?.series || []).some((p: any) => p?.avg != null)
-    if (used) return
+    const currentCount = (historyData?.series || []).filter((p: any) => p?.avg != null).length
+    if (currentCount >= 2) return
     const altForm = saleForm === 'carcaça' ? 'vivo' : 'carcaça'
     const altUnit: Unit = altForm === 'vivo' ? 'head' : 'kg'
     const altParams = new URLSearchParams()
@@ -188,8 +188,8 @@ export default function BolsaClient() {
     if (!Number.isNaN(bandPct)) altParams.set('bandPct', String(bandPct/100))
     try {
       const h: HistoryRes = await (await fetch(`/api/market/history?${altParams.toString()}`, { cache: 'no-store' })).json()
-      const hasAlt = (h?.data?.series || []).some((p: any) => p?.avg != null)
-      if (hasAlt) {
+      const altCount = (h?.data?.series || []).filter((p: any) => p?.avg != null).length
+      if (altCount > currentCount) {
         autoSwitchedRef.current = true
         setSaleForm(altForm as any)
       }
