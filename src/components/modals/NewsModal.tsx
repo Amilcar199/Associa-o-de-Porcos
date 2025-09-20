@@ -77,7 +77,7 @@ export default function NewsModal({
           {/* Navegação */}
           <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
             <button
-              onClick={onPrevious}
+              onClick={(e)=>{ e.stopPropagation(); onPrevious?.() }}
               disabled={!hasPrevious}
               className={`p-2 rounded-full backdrop-blur-sm transition-all duration-200 ${
                 hasPrevious 
@@ -89,7 +89,7 @@ export default function NewsModal({
             </button>
             
             <button
-              onClick={onNext}
+              onClick={(e)=>{ e.stopPropagation(); onNext?.() }}
               disabled={!hasNext}
               className={`p-2 rounded-full backdrop-blur-sm transition-all duration-200 ${
                 hasNext 
