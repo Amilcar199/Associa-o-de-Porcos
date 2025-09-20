@@ -6,8 +6,6 @@ import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { 
   ArrowRight, 
-  Heart,
-  ShoppingCart,
   MapPin,
   Clock,
   Weight
@@ -179,9 +177,7 @@ const FeaturedProducts = () => {
                       </span>
                     )}
                   </div>
-                  <button className="absolute top-3 right-3 w-8 h-8 bg-white/80 hover:bg-white rounded-full flex items-center justify-center transition-colors">
-                    <Heart size={16} className="text-gray-600 hover:text-red-500" />
-                  </button>
+                  
                   <div className="absolute bottom-3 left-3">
                     <span className="bg-primary-600 text-white px-3 py-1 text-sm font-bold rounded-full">
                       {typeof product.pricePerKg === 'number' ? (
