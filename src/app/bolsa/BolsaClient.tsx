@@ -449,11 +449,11 @@ export default function BolsaClient() {
           <table className="min-w-full text-sm">
             <thead>
               <tr className="text-left text-gray-500">
-                <th className="py-2 pr-4"><button onClick={()=>{ setSortKey('region'); setSortDir(sortKey==='region' && sortDir==='asc'?'desc':'asc') }} className="hover:underline">Região {sortKey==='region' ? (sortDir==='asc'?'▲':'▼') : ''}</button></th>
+                <th className="py-2 pr-4"><button onClick={()=>{ setSortKey('region'); setSortDir(sortKey==='region' && sortDir==='asc'?'desc':'asc') }} className="hover:underline">{isEn ? 'Region' : 'Região'} {sortKey==='region' ? (sortDir==='asc'?'▲':'▼') : ''}</button></th>
                 <th className="py-2 pr-4"><button onClick={()=>{ setSortKey('count'); setSortDir(sortKey==='count' && sortDir==='asc'?'desc':'asc') }} className="hover:underline">N {sortKey==='count' ? (sortDir==='asc'?'▲':'▼') : ''}</button></th>
-                <th className="py-2 pr-4"><button onClick={()=>{ setSortKey('avg'); setSortDir(sortKey==='avg' && sortDir==='asc'?'desc':'asc') }} className="hover:underline">Média ({unit === 'kg' ? 'AOA/kg' : 'AOA/cabeça'}) {sortKey==='avg' ? (sortDir==='asc'?'▲':'▼') : ''}</button></th>
-                <th className="py-2 pr-4"><button onClick={()=>{ setSortKey('min'); setSortDir(sortKey==='min' && sortDir==='asc'?'desc':'asc') }} className="hover:underline">Mín {sortKey==='min' ? (sortDir==='asc'?'▲':'▼') : ''}</button></th>
-                <th className="py-2"><button onClick={()=>{ setSortKey('max'); setSortDir(sortKey==='max' && sortDir==='asc'?'desc':'asc') }} className="hover:underline">Máx {sortKey==='max' ? (sortDir==='asc'?'▲':'▼') : ''}</button></th>
+                <th className="py-2 pr-4"><button onClick={()=>{ setSortKey('avg'); setSortDir(sortKey==='avg' && sortDir==='asc'?'desc':'asc') }} className="hover:underline">{isEn ? 'Average' : 'Média'} ({unit === 'kg' ? (isEn ? 'AOA/kg' : 'AOA/kg') : (isEn ? 'AOA/head' : 'AOA/cabeça')}) {sortKey==='avg' ? (sortDir==='asc'?'▲':'▼') : ''}</button></th>
+                <th className="py-2 pr-4"><button onClick={()=>{ setSortKey('min'); setSortDir(sortKey==='min' && sortDir==='asc'?'desc':'asc') }} className="hover:underline">{isEn ? 'Min' : 'Mín'} {sortKey==='min' ? (sortDir==='asc'?'▲':'▼') : ''}</button></th>
+                <th className="py-2"><button onClick={()=>{ setSortKey('max'); setSortDir(sortKey==='max' && sortDir==='asc'?'desc':'asc') }} className="hover:underline">{isEn ? 'Max' : 'Máx'} {sortKey==='max' ? (sortDir==='asc'?'▲':'▼') : ''}</button></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -483,17 +483,17 @@ export default function BolsaClient() {
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-semibold text-gray-800">{isEn ? 'Recent records' : 'Registos recentes'}</h3>
           <div className="flex items-center gap-2 text-xs text-gray-500">
-            <span>Referência oficial: {formatAOA(recordsData?.anchor?.ref ?? null)} ±{Math.round((recordsData?.anchor?.bandPct || 0)*100)}%</span>
-            <button onClick={downloadCSV} className="px-2 py-1 border rounded hover:bg-gray-50">Exportar CSV</button>
+            <span>{isEn ? 'Official reference' : 'Referência oficial'}: {formatAOA(recordsData?.anchor?.ref ?? null)} ±{Math.round((recordsData?.anchor?.bandPct || 0)*100)}%</span>
+            <button onClick={downloadCSV} className="px-2 py-1 border rounded hover:bg-gray-50">{isEn ? 'Export CSV' : 'Exportar CSV'}</button>
           </div>
         </div>
         <table className="min-w-full text-sm">
           <thead>
             <tr className="text-left text-gray-500">
-              <th className="py-2 pr-4">Data</th>
-              <th className="py-2 pr-4">Região</th>
-              <th className="py-2 pr-4">Preço ({unit === 'kg' ? 'AOA/kg' : 'AOA/cabeça'})</th>
-              <th className="py-2">Fora da tolerância</th>
+              <th className="py-2 pr-4">{isEn ? 'Date' : 'Data'}</th>
+              <th className="py-2 pr-4">{isEn ? 'Region' : 'Região'}</th>
+              <th className="py-2 pr-4">{isEn ? 'Price' : 'Preço'} ({unit === 'kg' ? (isEn ? 'AOA/kg' : 'AOA/kg') : (isEn ? 'AOA/head' : 'AOA/cabeça')})</th>
+              <th className="py-2">{isEn ? 'Out of tolerance' : 'Fora da tolerância'}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -509,7 +509,7 @@ export default function BolsaClient() {
                   <td className="py-2 pr-4">{fmtDateISO(r.date)}</td>
                   <td className="py-2 pr-4">{r.region}</td>
                   <td className="py-2 pr-4">{formatAOA(r.value)}</td>
-                  <td className="py-2">{r.outOfBand ? <span className="px-2 py-0.5 text-xs rounded-full bg-red-100 text-red-700">Fora</span> : <span className="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-700">Dentro</span>}</td>
+                  <td className="py-2">{r.outOfBand ? <span className="px-2 py-0.5 text-xs rounded-full bg-red-100 text-red-700">{isEn ? 'Out' : 'Fora'}</span> : <span className="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-700">{isEn ? 'Within' : 'Dentro'}</span>}</td>
                 </tr>
               ))
             )}
