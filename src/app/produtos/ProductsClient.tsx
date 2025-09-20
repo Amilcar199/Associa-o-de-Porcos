@@ -189,9 +189,18 @@ export default function ProductsClient({ products }: ProductsClientProps) {
           <input type="number" min="0" value={maxAge} onChange={e=>setMaxAge(e.target.value)} placeholder={isEn ? 'Max age (months)' : 'Idade máx. (meses)'} className="px-3 py-2 border rounded-lg" />
         </div>
         <div className="mt-3 flex flex-wrap gap-2">
-          {(query || health || vaccinated || minPrice || maxPrice || minWeight || maxAge) && (
-            <button onClick={()=>{ setQuery(''); setHealth(''); setVaccinated(''); setMinPrice(''); setMaxPrice(''); setMinWeight(''); setMaxAge('') }} className="text-sm px-3 py-1.5 rounded border text-gray-700 hover:bg-gray-50">{isEn ? 'Clear filters' : 'Limpar filtros'}</button>
-          )}
+          {(() => {
+            const hasActiveFilters = !!(query || health || vaccinated || minPrice || maxPrice || minWeight || maxAge || priceType !== 'head')
+            return (
+              <button
+                onClick={()=>{ setQuery(''); setHealth(''); setVaccinated(''); setMinPrice(''); setMaxPrice(''); setMinWeight(''); setMaxAge(''); setPriceType('head') }}
+                disabled={!hasActiveFilters}
+                className={`text-sm px-3 py-1.5 rounded border ${hasActiveFilters ? 'text-gray-700 hover:bg-gray-50' : 'text-gray-400 cursor-not-allowed bg-gray-50'}`}
+              >
+                {isEn ? 'Clear filters' : 'Limpar filtros'}
+              </button>
+            )
+          })()}
           <span className="text-sm text-gray-500 ml-auto">{isEn ? 'Results' : 'Resultados'}: {filtered.length}</span>
         </div>
       </div>
