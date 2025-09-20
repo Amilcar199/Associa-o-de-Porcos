@@ -53,7 +53,7 @@ export default function AboutClient() {
           {[
             { label: isEn ? 'Supported Producers' : 'Produtores Apoiados', value: '100+', icon: Users },
             { label: isEn ? 'Trainings' : 'Capacitações', value: '20+', icon: Award },
-            { label: isEn ? 'Active Projects' : 'Projetos Ativos', value: '8', icon: LineChart },
+            { label: isEn ? 'Active Projects' : 'Projetos Ativos', value: '8+', icon: LineChart },
             { label: isEn ? 'Best Practices' : 'Boas Práticas', value: '100%', icon: ShieldCheck }
           ].map((item, idx) => (
             <motion.div
