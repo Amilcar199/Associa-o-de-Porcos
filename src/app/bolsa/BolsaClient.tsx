@@ -364,7 +364,7 @@ export default function BolsaClient() {
 
       <div className="mt-8 bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-semibold text-gray-800">Série histórica</h3>
+          <h3 className="font-semibold text-gray-800">{isEn ? 'Historical series' : 'Série histórica'}</h3>
           <div className="flex items-center gap-2 text-xs text-gray-500">
             <span>{loading.history ? '…' : chartPointCount} pontos úteis</span>
             <div className="flex items-center border rounded overflow-hidden">
@@ -444,7 +444,7 @@ export default function BolsaClient() {
       </div>
 
       <div className="mt-8 bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-        <h3 className="font-semibold text-gray-800 mb-3">Preços por região</h3>
+        <h3 className="font-semibold text-gray-800 mb-3">{isEn ? 'Prices by region' : 'Preços por região'}</h3>
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm">
             <thead>
@@ -481,7 +481,7 @@ export default function BolsaClient() {
 
       <div className="mt-8 bg-white rounded-xl border border-gray-100 p-4 shadow-sm overflow-x-auto">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-semibold text-gray-800">Registos recentes</h3>
+          <h3 className="font-semibold text-gray-800">{isEn ? 'Recent records' : 'Registos recentes'}</h3>
           <div className="flex items-center gap-2 text-xs text-gray-500">
             <span>Referência oficial: {formatAOA(recordsData?.anchor?.ref ?? null)} ±{Math.round((recordsData?.anchor?.bandPct || 0)*100)}%</span>
             <button onClick={downloadCSV} className="px-2 py-1 border rounded hover:bg-gray-50">Exportar CSV</button>
@@ -521,23 +521,23 @@ export default function BolsaClient() {
         <div>
           <label className="inline-flex items-center gap-2 text-sm">
             <input type="checkbox" checked={cleanOutliers} onChange={e=>setCleanOutliers(e.target.checked)} />
-            Remover valores atípicos (± tolerância%)
+            {isEn ? 'Remove outliers (± tolerance%)' : 'Remover valores atípicos (± tolerância%)'}
           </label>
-          <div className="text-xs text-gray-500 mt-1">Descarta preços fora da tolerância em relação à referência oficial (se existir) para a região/forma.</div>
+          <div className="text-xs text-gray-500 mt-1">{isEn ? 'Discards prices outside the tolerance relative to the official reference (if any) for the region/form.' : 'Descarta preços fora da tolerância em relação à referência oficial (se existir) para a região/forma.'}</div>
         </div>
         <div>
           <label className="inline-flex items-center gap-2 text-sm">
             <input type="checkbox" checked={weighted} onChange={e=>setWeighted(e.target.checked)} />
-            Média ponderada pelo peso (kg)
+            {isEn ? 'Weighted average by weight (kg)' : 'Média ponderada pelo peso (kg)'}
           </label>
-          <div className="text-xs text-gray-500 mt-1">Dá mais peso a amostras com maior peso vivo/carcaça ao calcular a média.</div>
+          <div className="text-xs text-gray-500 mt-1">{isEn ? 'Gives more weight to samples with higher live/carcass weight when calculating the average.' : 'Dá mais peso a amostras com maior peso vivo/carcaça ao calcular a média.'}</div>
         </div>
         <div>
           <label className="text-sm text-gray-700">
-            Tolerância ±% (em torno da referência)
+            {isEn ? 'Tolerance ±% (around the reference)' : 'Tolerância ±% (em torno da referência)'}
             <input type="number" min={1} max={50} value={bandPct} onChange={e=>setBandPct(parseInt(e.target.value||'10'))} className="ml-2 w-20 px-2 py-1 border rounded" />
           </label>
-          <div className="text-xs text-gray-500 mt-1">Ex.: 10% mantém preços entre -10% e +10% da referência oficial.</div>
+          <div className="text-xs text-gray-500 mt-1">{isEn ? 'E.g.: 10% keeps prices between -10% and +10% of the official reference.' : 'Ex.: 10% mantém preços entre -10% e +10% da referência oficial.'}</div>
         </div>
       </div>
     </div>
