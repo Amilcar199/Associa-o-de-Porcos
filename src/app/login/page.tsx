@@ -7,6 +7,7 @@ import { useLanguage } from '@/components/providers/LanguageProvider';
 import pt from '@/lib/i18n/dictionaries/pt';
 import en from '@/lib/i18n/dictionaries/en';
 import Link from 'next/link';
+import { signIn, getSession } from 'next-auth/react';
 
 export default function LoginPage() {
   const { locale } = useLanguage();
@@ -24,17 +25,17 @@ export default function LoginPage() {
     setError('');
 
     try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: formData.email, password: formData.password })
+      const result = await signIn('credentials', {
+        redirect: false,
+        email: formData.email,
+        password: formData.password
       });
-      if (!res.ok) {
+      if (!result || result.error) {
         setError(dict.auth.errorWrongCredentials);
         return;
       }
-      const data = await res.json();
-      const role = data?.user?.role || data?.role || null;
+      const session = await getSession();
+      const role = session?.user?.role as string | undefined;
       if (role === 'admin') router.push('/admin');
       else if (role === 'member') router.push('/membros');
       else router.push('/perfil');
