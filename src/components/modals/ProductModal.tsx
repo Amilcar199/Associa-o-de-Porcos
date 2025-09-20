@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { X, Calendar, Weight, MapPin, Heart, Phone, Mail, ArrowLeft, ArrowRight } from 'lucide-react'
+import { X, Calendar, Weight, MapPin, Phone, Mail, ArrowLeft, ArrowRight } from 'lucide-react'
 import Image from 'next/image'
 import Placeholder from '@/components/assets/Foto Suino.webp'
 import { formatPrice, formatAge, convertAndFormat } from '@/lib/utils'
@@ -266,11 +266,7 @@ export default function ProductModal({
         {/* Footer com ações */}
         <div className="px-6 lg:px-8 py-4 bg-gray-50 border-t border-gray-200">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <button className="w-10 h-10 bg-gray-100 hover:bg-red-100 rounded-lg flex items-center justify-center transition-colors">
-                <Heart size={20} className="text-gray-600 hover:text-red-500" />
-              </button>
-            </div>
+            <div className="flex items-center gap-3" />
             <div className="flex items-center gap-3">
               <a href={contactHref} className="btn-secondary flex items-center gap-2">
                 <Mail size={16} />
