@@ -265,7 +265,7 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row items-center justify-between">
             <div className="text-sm text-gray-400 mb-4 md:mb-0">
               <p>
-                © {currentYear} {BRAND_NAME}. Todos os direitos reservados.
+                © {currentYear} {BRAND_NAME}. {isEn ? 'All rights reserved.' : 'Todos os direitos reservados.'}
               </p>
             </div>
             
