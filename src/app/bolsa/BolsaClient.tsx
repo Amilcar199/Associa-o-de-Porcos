@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { useSession } from 'next-auth/react'
 
 type Unit = 'kg' | 'head'
 
@@ -25,11 +26,14 @@ function formatPct(v: number | null) {
 function fmtDateISO(s?: string) { return s ? s.slice(0,10) : '—' }
 
 export default function BolsaClient() {
+  const { data: session } = useSession()
   const [saleForm, setSaleForm] = React.useState('carcaça' as 'carcaça' | 'vivo')
   const unit: Unit = saleForm === 'vivo' ? 'head' : 'kg'
   const [region, setRegion] = React.useState('' as string)
+  const [breed, setBreed] = React.useState('' as string)
   const [periodDays, setPeriodDays] = React.useState(90 as number)
   const [regionsList, setRegionsList] = React.useState([] as string[])
+  const [breedsList, setBreedsList] = React.useState([] as string[])
   const [cleanOutliers, setCleanOutliers] = React.useState(false as boolean)
   const [weighted, setWeighted] = React.useState(false as boolean)
   const [bandPct, setBandPct] = React.useState(10 as number)
@@ -47,8 +51,9 @@ export default function BolsaClient() {
     p.set('unit', unit)
     p.set('saleForm', saleForm)
     if (region) p.set('region', region)
+    if (breed) p.set('breed', breed)
     return p
-  }, [unit, saleForm, region])
+  }, [unit, saleForm, region, breed])
 
   const paramsWithRange = React.useMemo(() => {
     const p = new URLSearchParams(params)
@@ -75,6 +80,7 @@ export default function BolsaClient() {
     try {
       const meta: MetaRes = await (await fetch('/api/market/meta', { cache: 'no-store' })).json()
       setRegionsList(meta?.data?.regions || [])
+      setBreedsList(meta?.data?.breeds || [])
     } catch {}
   })() }, [])
 
@@ -294,12 +300,17 @@ export default function BolsaClient() {
               <option value={365}>365 dias</option>
             </select>
           </label>
-          <label className="text-xs text-gray-400">
-            Raça (apenas autenticados)
-            <select disabled className="mt-1 w-full px-3 py-2 border rounded-lg bg-gray-50 text-gray-400">
-              <option>—</option>
-            </select>
-          </label>
+          {session ? (
+            <label className="text-xs text-gray-500">
+              Raça
+              <select value={breed} onChange={e=>setBreed(e.target.value)} className="mt-1 w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-200">
+                <option value="">Todas</option>
+                {breedsList.map((b: string) => <option key={b} value={b}>{b}</option>)}
+              </select>
+            </label>
+          ) : (
+            <div />
+          )}
         </div>
       </div>
 
