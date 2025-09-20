@@ -105,7 +105,7 @@ const Header = () => {
               <div className="flex items-center space-x-2">
                 <MapPin size={14} />
                 <a href="https://maps.app.goo.gl/PUczChGSKeG7QjVU9" target="_blank" rel="noopener noreferrer" className="text-primary-200 hover:text-white transition-colors">
-                  Ver no mapa
+                  {locale.startsWith('en') ? 'View on map' : 'Ver no mapa'}
                 </a>
               </div>
             </div>
