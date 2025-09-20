@@ -141,6 +141,14 @@ export default function NewProductClient() {
         return
       }
 
+      // validação: exigir pelo menos um preço (cabeça OU kg)
+      const hasHeadPrice = typeof form.price === 'number' && form.price > 0
+      const hasKgPrice = typeof form.pricePerKg === 'number' && form.pricePerKg > 0
+      if (!hasHeadPrice && !hasKgPrice) {
+        alert('Informe ao menos um preço: por cabeça ou por kg.')
+        return
+      }
+
       const res = await fetch('/api/products', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -218,7 +226,7 @@ export default function NewProductClient() {
             <label className="block text-sm text-gray-700 mb-1">Preço ({currency})</label>
             <div className="relative">
               <span className="w-4 h-4 text-gray-400 absolute left-3 top-3" aria-hidden>💵</span>
-              <input type="number" value={form.price ?? ''} onChange={(e)=>setForm((p: NewProductForm)=>({...p,price:e.target.value===''?undefined:parseFloat(e.target.value)}))} className="w-full pl-9 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="120000" required />
+              <input type="number" value={form.price ?? ''} onChange={(e)=>setForm((p: NewProductForm)=>({...p,price:e.target.value===''?undefined:parseFloat(e.target.value)}))} className="w-full pl-9 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="Opcional" />
             </div>
           </div>
         </div>
