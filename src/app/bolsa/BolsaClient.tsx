@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { useLanguage } from '@/components/providers/LanguageProvider'
 import { useSession } from 'next-auth/react'
 
 type Unit = 'kg' | 'head'
@@ -26,6 +27,8 @@ function formatPct(v: number | null) {
 function fmtDateISO(s?: string) { return s ? s.slice(0,10) : '—' }
 
 export default function BolsaClient() {
+  const { locale } = useLanguage()
+  const isEn = String(locale).startsWith('en')
   const { data: session } = useSession()
   const [saleForm, setSaleForm] = React.useState('carcaça' as 'carcaça' | 'vivo')
   const unit: Unit = saleForm === 'vivo' ? 'head' : 'kg'
@@ -322,7 +325,7 @@ export default function BolsaClient() {
           ) : (
             <div className="text-3xl font-bold mt-1 text-primary-800">{formatAOA(summary?.current?.avg ?? null)}</div>
           )}
-          <div className="text-xs text-gray-500 mt-1">{loading.summary ? 'A carregar…' : <>Base {summary?.current?.count ?? 0} registos</>}</div>
+          <div className="text-xs text-gray-500 mt-1">{loading.summary ? (isEn ? 'Loading…' : 'A carregar…') : <>Base {summary?.current?.count ?? 0} registos</>}</div>
           {!!error.summary && <div className="text-xs text-red-600 mt-1">{error.summary}</div>}
         </div>
         <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
@@ -382,7 +385,9 @@ export default function BolsaClient() {
           </div>
         </div>
         {loading.history ? (
-          <div className="h-64 bg-gray-50 border border-dashed border-gray-200 rounded animate-pulse" />
+          <div className="h-64 bg-gray-50 border border-dashed border-gray-200 rounded animate-pulse flex items-center justify-center text-sm text-gray-500">
+            {isEn ? 'Loading…' : 'A carregar…'}
+          </div>
         ) : error.history ? (
           <div className="h-12 text-xs text-red-600 bg-red-50 border border-red-200 rounded p-2">{error.history}</div>
         ) : chart.path ? (
@@ -453,15 +458,9 @@ export default function BolsaClient() {
             </thead>
             <tbody className="divide-y divide-gray-100">
               {loading.regions ? (
-                Array.from({ length: 4 }).map((_, i) => (
-                  <tr key={i}>
-                    <td className="py-2 pr-4"><div className="h-4 w-28 bg-gray-100 rounded animate-pulse" /></td>
-                    <td className="py-2 pr-4"><div className="h-4 w-10 bg-gray-100 rounded animate-pulse" /></td>
-                    <td className="py-2 pr-4"><div className="h-4 w-20 bg-gray-100 rounded animate-pulse" /></td>
-                    <td className="py-2 pr-4"><div className="h-4 w-16 bg-gray-100 rounded animate-pulse" /></td>
-                    <td className="py-2"><div className="h-4 w-16 bg-gray-100 rounded animate-pulse" /></td>
-                  </tr>
-                ))
+                <tr>
+                  <td colSpan={5} className="py-3 text-xs text-gray-500">{isEn ? 'Loading…' : 'A carregar…'}</td>
+                </tr>
               ) : error.regions ? (
                 <tr><td colSpan={5} className="py-3 text-sm text-red-600">{error.regions}</td></tr>
               ) : (
@@ -499,14 +498,9 @@ export default function BolsaClient() {
           </thead>
           <tbody className="divide-y divide-gray-100">
             {loading.records ? (
-              Array.from({ length: 6 }).map((_, i) => (
-                <tr key={i}>
-                  <td className="py-2 pr-4"><div className="h-4 w-24 bg-gray-100 rounded animate-pulse" /></td>
-                  <td className="py-2 pr-4"><div className="h-4 w-28 bg-gray-100 rounded animate-pulse" /></td>
-                  <td className="py-2 pr-4"><div className="h-4 w-20 bg-gray-100 rounded animate-pulse" /></td>
-                  <td className="py-2"><div className="h-4 w-12 bg-gray-100 rounded animate-pulse" /></td>
-                </tr>
-              ))
+              <tr>
+                <td colSpan={4} className="py-3 text-xs text-gray-500">{isEn ? 'Loading…' : 'A carregar…'}</td>
+              </tr>
             ) : error.records ? (
               <tr><td colSpan={4} className="py-3 text-sm text-red-600">{error.records}</td></tr>
             ) : (
