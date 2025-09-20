@@ -58,7 +58,19 @@ async function main() {
 
   const exists = await User.findOne({ email: String(email).toLowerCase() });
   if (exists) {
-    console.log('⚠️ Já existe usuário com esse email:', email);
+    if (String(process.env.SEED_OVERWRITE).toLowerCase() === 'true') {
+      console.log('♻️ Atualizando usuário existente:', email);
+      const hashedOverwrite = await bcrypt.hash(password, 12);
+      exists.name = name;
+      exists.password = hashedOverwrite;
+      exists.role = 'admin';
+      exists.isActive = true;
+      await exists.save();
+      console.log('✅ Senha e dados atualizados com sucesso.');
+      await mongoose.connection.close();
+      return;
+    }
+    console.log('⚠️ Já existe usuário com esse email:', email, '\n   → Dica: use SEED_OVERWRITE=true para atualizar a senha.');
     await mongoose.connection.close();
     return;
   }
