@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react'
 import { X, Calendar, Eye, Tag, ArrowLeft, ArrowRight } from 'lucide-react'
 import Image from 'next/image'
 import Placeholder from '@/components/assets/Foto Suino.webp'
-import { formatDate, calculateReadTime } from '@/lib/utils'
+import { calculateReadTime } from '@/lib/utils'
+import { useLanguage } from '@/components/providers/LanguageProvider'
 
 interface NewsModalProps {
   isOpen: boolean
@@ -25,6 +26,8 @@ export default function NewsModal({
   hasPrevious = false, 
   hasNext = false 
 }: NewsModalProps) {
+  const { locale } = useLanguage()
+  const isEn = String(locale).startsWith('en')
   const [isLoading, setIsLoading] = useState(false)
   const [isZoomOpen, setIsZoomOpen] = useState(false)
 
@@ -129,17 +132,17 @@ export default function NewsModal({
               <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-6 pb-6 border-b border-gray-200">
                 <div className="flex items-center gap-2">
                   <Calendar size={16} className="text-primary-600" />
-                  <span>{formatDate(news.publishedAt)}</span>
+                  <span>{new Intl.DateTimeFormat(isEn ? 'en-US' : 'pt-AO', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(news.publishedAt))}</span>
                 </div>
                 {news.views != null && (
                   <div className="flex items-center gap-2">
                     <Eye size={16} className="text-primary-600" />
-                    <span>{news.views} visualizações</span>
+                    <span>{news.views} {isEn ? 'views' : 'visualizações'}</span>
                   </div>
                 )}
                 <div className="flex items-center gap-2">
                   <Tag size={16} className="text-primary-600" />
-                  <span>{calculateReadTime(news.excerpt)} de leitura</span>
+                  <span>{(() => { const words = String(news.excerpt || '').split(' ').length; const minutes = Math.ceil(words / 200); return isEn ? `${minutes} min read` : `${minutes} min de leitura`; })()}</span>
                 </div>
               </div>
 
@@ -172,7 +175,7 @@ export default function NewsModal({
               {/* Vídeos */}
               {Array.isArray(news.videos) && news.videos.length > 0 && (
                 <div className="mt-8">
-                  <h3 className="text-sm font-semibold text-gray-900 mb-3">Vídeos</h3>
+                  <h3 className="text-sm font-semibold text-gray-900 mb-3">{isEn ? 'Videos' : 'Vídeos'}</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {news.videos.map((url: string, idx: number) => (
                       <div key={idx} className="aspect-video bg-black/5 rounded-lg overflow-hidden">
@@ -196,7 +199,7 @@ export default function NewsModal({
               {/* Tags */}
               {news.tags && news.tags.length > 0 && (
                 <div className="mt-8 pt-6 border-t border-gray-200">
-                  <h3 className="text-sm font-semibold text-gray-900 mb-3">Tags:</h3>
+                  <h3 className="text-sm font-semibold text-gray-900 mb-3">{isEn ? 'Tags:' : 'Tags:'}</h3>
                   <div className="flex flex-wrap gap-2">
                     {news.tags.map((tag: string, idx: number) => (
                       <span 
@@ -220,11 +223,11 @@ export default function NewsModal({
               onClick={onClose}
               className="text-gray-600 hover:text-gray-800 font-medium transition-colors"
             >
-              Fechar
+              {isEn ? 'Close' : 'Fechar'}
             </button>
             
             <div className="flex items-center gap-2 text-sm text-gray-500">
-              <span>Use as setas para navegar</span>
+              <span>{isEn ? 'Use arrows to navigate' : 'Use as setas para navegar'}</span>
               <div className="flex gap-1">
                 <kbd className="px-2 py-1 bg-gray-200 rounded text-xs">←</kbd>
                 <kbd className="px-2 py-1 bg-gray-200 rounded text-xs">→</kbd>
