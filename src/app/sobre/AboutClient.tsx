@@ -82,7 +82,7 @@ export default function AboutClient() {
           {[
             {
               title: isEn ? 'Mission' : 'Missão',
-              desc: isEn ? 'Drive the pig sector through training, quality and producer support.' : 'Impulsionar o desenvolvimento do setor suíno com capacitação, qualidade e apoio ao produtor.',
+              desc: isEn ? 'Drive the pig sector in Angola through training, quality and producer support.' : 'Impulsionar o desenvolvimento do sector da Suinocultura em Angola, com capacitação, qualidade e apoio ao produtor.',
               icon: Target
             },
             {
