@@ -319,17 +319,17 @@ export default function BolsaClient() {
 
       <div className="mt-6 grid md:grid-cols-3 gap-4">
         <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-          <div className="text-xs text-gray-500">Preço médio atual ({unit === 'kg' ? 'AOA/kg' : 'AOA/cabeça'})</div>
+          <div className="text-xs text-gray-500">{isEn ? 'Current average price' : 'Preço médio atual'} ({unit === 'kg' ? (isEn ? 'AOA/kg' : 'AOA/kg') : (isEn ? 'AOA/head' : 'AOA/cabeça')})</div>
           {loading.summary ? (
             <div className="mt-2 h-8 w-40 bg-gray-100 rounded animate-pulse" />
           ) : (
             <div className="text-3xl font-bold mt-1 text-primary-800">{formatAOA(summary?.current?.avg ?? null)}</div>
           )}
-          <div className="text-xs text-gray-500 mt-1">{loading.summary ? (isEn ? 'Loading…' : 'A carregar…') : <>Base {summary?.current?.count ?? 0} registos</>}</div>
+          <div className="text-xs text-gray-500 mt-1">{loading.summary ? (isEn ? 'Loading…' : 'A carregar…') : <>{isEn ? 'Base' : 'Base'} {summary?.current?.count ?? 0} {isEn ? 'records' : 'registos'}</>}</div>
           {!!error.summary && <div className="text-xs text-red-600 mt-1">{error.summary}</div>}
         </div>
         <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-          <div className="text-xs text-gray-500">Variação diária</div>
+          <div className="text-xs text-gray-500">{isEn ? 'Daily variation' : 'Variação diária'}</div>
           {loading.summary ? (
             <div className="mt-2 h-6 w-20 bg-gray-100 rounded animate-pulse" />
           ) : (
@@ -339,7 +339,7 @@ export default function BolsaClient() {
         <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
           <div className="flex justify-between">
             <div>
-              <div className="text-xs text-gray-500">Variação semanal</div>
+              <div className="text-xs text-gray-500">{isEn ? 'Weekly variation' : 'Variação semanal'}</div>
               {loading.summary ? (
                 <div className="mt-2 h-6 w-20 bg-gray-100 rounded animate-pulse" />
               ) : (
@@ -347,7 +347,7 @@ export default function BolsaClient() {
               )}
             </div>
             <div>
-              <div className="text-xs text-gray-500">Variação mensal</div>
+              <div className="text-xs text-gray-500">{isEn ? 'Monthly variation' : 'Variação mensal'}</div>
               {loading.summary ? (
                 <div className="mt-2 h-6 w-20 bg-gray-100 rounded animate-pulse" />
               ) : (
