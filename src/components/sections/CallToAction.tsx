@@ -13,11 +13,13 @@ import {
 } from 'lucide-react'
 import { useLanguage } from '@/components/providers/LanguageProvider'
 import { useEffect, useState } from 'react'
+import { useSession } from 'next-auth/react'
 
 const CallToAction = () => {
   const { locale } = useLanguage()
   const isEn = locale.startsWith('en')
   const [siteConfig, setSiteConfig] = useState<any>(null)
+  const { data: session } = useSession()
 
   useEffect(()=>{ (async()=>{ try { const r = await fetch('/api/admin/config',{ cache:'no-store' }); if(r.ok){ const j = await r.json(); setSiteConfig(j?.data || null) } } catch {} })() },[])
 
@@ -74,13 +76,33 @@ const CallToAction = () => {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <Link
-              href="/auth/register"
-              className="inline-flex items-center bg-white text-primary-700 hover:bg-primary-50 font-bold py-4 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg"
-            >
-              {isEn ? 'Sign up for free' : 'Cadastre-se Gratuitamente'}
-              <ArrowRight size={20} className="ml-2" />
-            </Link>
+            {(() => {
+              const role = (session as any)?.user?.role as string | undefined
+              const isLoggedIn = !!role
+              const href = !isLoggedIn
+                ? '/registro'
+                : role === 'admin'
+                  ? '/admin'
+                  : role === 'member'
+                    ? '/membros'
+                    : '/perfil'
+              const label = !isLoggedIn
+                ? (isEn ? 'Sign up for free' : 'Cadastre-se Gratuitamente')
+                : role === 'admin'
+                  ? (isEn ? 'Go to Admin' : 'Ir ao Painel')
+                  : role === 'member'
+                    ? (isEn ? 'Members Area' : 'Área de Membros')
+                    : (isEn ? 'Your Profile' : 'Seu Perfil')
+              return (
+                <Link
+                  href={href}
+                  className="inline-flex items-center bg-white text-primary-700 hover:bg-primary-50 font-bold py-4 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg"
+                >
+                  {label}
+                  <ArrowRight size={20} className="ml-2" />
+                </Link>
+              )
+            })()}
             
             <Link
               href="/produtos"
