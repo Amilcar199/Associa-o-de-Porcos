@@ -407,8 +407,8 @@ const Header = () => {
                       </Link>
                       {item.name === dict.nav.about && (
                         <div className="ml-4 border-l border-gray-200 pl-4 space-y-1">
-                          <Link href="/sobre" className="block py-1 text-sm text-gray-600 hover:text-primary-600">Sobre a Associação</Link>
-                          <Link href="/colaboradores" className="block py-1 text-sm text-gray-600 hover:text-primary-600">Colaboradores</Link>
+                          <Link href="/sobre" className="block py-1 text-sm text-gray-600 hover:text-primary-600">{dict.nav.about}</Link>
+                          <Link href="/colaboradores" className="block py-1 text-sm text-gray-600 hover:text-primary-600">{dict.nav.team}</Link>
                           <Link href="/juridico-legal" className="block py-1 text-sm text-gray-600 hover:text-primary-600">{dict.footer.legal}</Link>
                         </div>
                       )}
