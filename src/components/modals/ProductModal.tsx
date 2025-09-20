@@ -134,14 +134,22 @@ export default function ProductModal({
             <span className={`px-3 py-1 text-sm font-medium rounded-full ${getHealthStatusColor(product.healthStatus)}`}>{getHealthStatusText(product.healthStatus)}</span>
             {product.vaccinated && (<span className="bg-blue-100 text-blue-800 px-3 py-1 text-sm font-medium rounded-full block">{isEn ? 'Vaccinated' : 'Vacinado'}</span>)}
           </div>
-          <div className="absolute bottom-4 right-4">
-            <span className="bg-primary-600 text-white px-4 py-2 text-lg font-bold rounded-full shadow-lg">
-              {typeof product.pricePerKg === 'number' ? (
-                `${formatPrice(product.pricePerKg, currency, locale)} /kg`
-              ) : product.price ? (
-                showConverted ? (converted || formatPrice(product.price, 'AOA', locale)) : `${formatPrice(product.price, currency, locale)} ${isEn ? '/head' : '/cabeça'}`
-              ) : (isEn ? 'Price on request' : 'Preço sob consulta')}
-            </span>
+          <div className="absolute bottom-4 right-4 flex flex-col items-end gap-2">
+            {typeof product.pricePerKg === 'number' && product.pricePerKg > 0 && (
+              <span className="bg-primary-600 text-white px-4 py-2 text-lg font-bold rounded-full shadow-lg">
+                {`${formatPrice(product.pricePerKg, currency, locale)} /kg`}
+              </span>
+            )}
+            {typeof product.price === 'number' && product.price > 0 && (
+              <span className="bg-primary-600 text-white px-4 py-2 text-lg font-bold rounded-full shadow-lg">
+                {showConverted ? (converted || formatPrice(product.price, 'AOA', locale)) : `${formatPrice(product.price, currency, locale)} ${isEn ? '/head' : '/cabeça'}`}
+              </span>
+            )}
+            {(!(typeof product.pricePerKg === 'number' && product.pricePerKg > 0) && !(typeof product.price === 'number' && product.price > 0)) && (
+              <span className="bg-primary-600 text-white px-4 py-2 text-lg font-bold rounded-full shadow-lg">
+                {isEn ? 'Price on request' : 'Preço sob consulta'}
+              </span>
+            )}
           </div>
           {images.length > 1 && (
             <div className="absolute top-4 right-16 flex gap-2">

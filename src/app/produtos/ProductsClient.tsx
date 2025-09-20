@@ -222,11 +222,20 @@ export default function ProductsClient({ products }: ProductsClientProps) {
                 sizes="(max-width:768px) 100vw, 33vw"
               />
               {/* Badge de preço */}
-              {(product.priceFormatted || typeof product.price === 'number' || typeof product.pricePerKg === 'number') && (
-                <div className="absolute top-3 right-3 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-primary-700 text-sm font-semibold shadow">
-                  {product.priceFormatted || getPriceDisplay(product)}
+              {(typeof product.price === 'number' && product.price > 0) || (typeof product.pricePerKg === 'number' && product.pricePerKg > 0) ? (
+                <div className="absolute top-3 right-3 flex flex-col items-end gap-1">
+                  {typeof product.pricePerKg === 'number' && product.pricePerKg > 0 && (
+                    <div className="bg-white/90 backdrop-blur px-3 py-1 rounded-full text-primary-700 text-sm font-semibold shadow">
+                      {`${formatPrice(product.pricePerKg, currency, locale)} ${isEn ? '/kg' : '/kg'}`}
+                    </div>
+                  )}
+                  {typeof product.price === 'number' && product.price > 0 && (
+                    <div className="bg-white/90 backdrop-blur px-3 py-1 rounded-full text-primary-700 text-sm font-semibold shadow">
+                      {`${product.priceFormatted || formatPrice(product.price, currency, locale)} ${isEn ? '/head' : '/cabeça'}`}
+                    </div>
+                  )}
                 </div>
-              )}
+              ) : null}
               {/* Overlay de hover */}
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
               {/* Indicador de ação profissional */}
