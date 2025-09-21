@@ -11,7 +11,7 @@ export default function AdminLegalManagementPage() {
         <p className="text-gray-600">{isEn ? 'Add, edit and organize legal sections and documents.' : 'Adicione, edite e organize seções e documentos legais.'}</p>
       </div>
 
-      <LegalManager showUploader={false} />
+      <LegalManager showUploader={false} showList clearAfterSave={false} />
     </div>
   )
 }

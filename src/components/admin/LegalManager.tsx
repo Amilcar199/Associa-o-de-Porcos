@@ -16,7 +16,7 @@ const DEFAULT_SECTIONS: LegalSection[] = [
   { key: 'admin-body', title: '', description: '', items: [] }
 ]
 
-export default function LegalManager({ showUploader = true }: { showUploader?: boolean } = {}) {
+export default function LegalManager({ showUploader = true, showList = true, clearAfterSave = false }: { showUploader?: boolean; showList?: boolean; clearAfterSave?: boolean } = {}) {
   const { locale } = useLanguage()
   const isEn = String(locale || '').startsWith('en')
   const [sections, setSections] = useState<LegalSection[]>(DEFAULT_SECTIONS)
@@ -54,16 +54,20 @@ export default function LegalManager({ showUploader = true }: { showUploader?: b
       const res = await fetch('/api/legal-content', { method:'PUT', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ sections }), credentials:'include' })
       if (res.ok){
         toast.success('Conteúdo salvo')
-        // Recarregar para refletir estado persistido e resetar inputs
-        try {
-          const fresh = await fetch('/api/legal-content', { cache: 'no-store', credentials: 'include' })
-          if (fresh.ok){
-            const j = await fresh.json()
-            const map: Record<string, LegalSection> = {}
-            for (const s of (j?.data || [])) map[s.key] = { key: s.key, title: s.title || '', description: s.description || '', items: Array.isArray(s.items)? s.items : [] }
-            setSections(DEFAULT_SECTIONS.map(d => map[d.key] || d))
-          }
-        } catch {}
+        if (clearAfterSave) {
+          setSections(DEFAULT_SECTIONS)
+        } else {
+          // Recarregar para refletir estado persistido e resetar inputs
+          try {
+            const fresh = await fetch('/api/legal-content', { cache: 'no-store', credentials: 'include' })
+            if (fresh.ok){
+              const j = await fresh.json()
+              const map: Record<string, LegalSection> = {}
+              for (const s of (j?.data || [])) map[s.key] = { key: s.key, title: s.title || '', description: s.description || '', items: Array.isArray(s.items)? s.items : [] }
+              setSections(DEFAULT_SECTIONS.map(d => map[d.key] || d))
+            }
+          } catch {}
+        }
       }
       else { toast.error('Falha ao salvar') }
     } catch (e) {
@@ -128,7 +132,7 @@ export default function LegalManager({ showUploader = true }: { showUploader?: b
               />
             </>
           )}
-          {(current.items||[]).length>0 && (
+          {showList && (current.items||[]).length>0 && (
             <div className="mt-4 grid md:grid-cols-2 gap-3">
               {current.items.map((item, idx)=> (
                 <div key={item.url} className="border rounded-lg p-3 flex gap-3">
@@ -162,7 +166,7 @@ export default function LegalManager({ showUploader = true }: { showUploader?: b
             </div>
           )}
 
-          {(current.items||[]).length>0 && (
+          {showList && (current.items||[]).length>0 && (
             <div className="mt-6">
               <h3 className="text-sm font-semibold text-gray-900 mb-2">{isEn ? 'Items list' : 'Lista de itens'}</h3>
               <div className="overflow-x-auto">

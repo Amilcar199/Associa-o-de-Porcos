@@ -11,7 +11,7 @@ export default function AdminLegalPage() {
         <p className="text-gray-600">{isEn ? 'Manage Legal & Compliance sections and documents' : 'Gerencie documentos e sessões do Jurídico & Legal'}</p>
       </div>
 
-      <LegalManager />
+      <LegalManager clearAfterSave showList={false} />
     </div>
   )
 }
