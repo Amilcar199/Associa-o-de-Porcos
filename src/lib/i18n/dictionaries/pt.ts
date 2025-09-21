@@ -1,12 +1,12 @@
 export default {
-	nav: {
+		nav: {
 		home: 'Início',
 		about: 'Quem Somos',
 		services: 'Serviços',
 		products: 'Produtos',
 		news: 'Notícias',
 		contact: 'Contactos',
-		team: 'Colaboradores',
+			team: 'Conselho Administrativo',
 			market: 'Bolsa',
 		report: 'Relatório',
 	},
