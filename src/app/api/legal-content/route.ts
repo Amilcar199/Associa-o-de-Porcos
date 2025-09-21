@@ -29,8 +29,8 @@ export async function PUT(request: NextRequest) {
     for (const s of sections) {
       if (!s?.key) continue
       const incomingItems = Array.isArray(s.items) ? s.items : []
-      const existing = await LegalSection.findOne({ key: s.key }).lean()
-      const existingItems = Array.isArray(existing?.items) ? existing!.items as any[] : []
+      const existingDoc: any = await LegalSection.findOne({ key: s.key }).lean()
+      const existingItems = Array.isArray(existingDoc?.items) ? (existingDoc.items as any[]) : []
       // Mapear por URL para mesclar (atualiza título/descrição dos que vierem no payload)
       const byUrl: Record<string, { url: string; title?: string; description?: string }> = {}
       for (const it of existingItems) {
