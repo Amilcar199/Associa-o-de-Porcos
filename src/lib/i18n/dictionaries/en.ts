@@ -134,7 +134,7 @@ export default {
 		name: 'Full Name',
 		phoneOptional: 'Phone (optional)',
 		companyOptional: 'Company (optional)',
-		description: 'Description (about you)',
+		description: 'Description (about you or your business)',
 		accountType: 'Account type',
 		accountTypeClient: 'Client',
 		accountTypeMember: 'Association Member',
