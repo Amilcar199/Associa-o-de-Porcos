@@ -52,7 +52,19 @@ export default function LegalManager() {
     try {
       setSaving(true)
       const res = await fetch('/api/legal-content', { method:'PUT', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ sections }), credentials:'include' })
-      if (res.ok){ toast.success('Conteúdo salvo'); }
+      if (res.ok){
+        toast.success('Conteúdo salvo')
+        // Recarregar para refletir estado persistido e resetar inputs
+        try {
+          const fresh = await fetch('/api/legal-content', { cache: 'no-store', credentials: 'include' })
+          if (fresh.ok){
+            const j = await fresh.json()
+            const map: Record<string, LegalSection> = {}
+            for (const s of (j?.data || [])) map[s.key] = { key: s.key, title: s.title || '', description: s.description || '', items: Array.isArray(s.items)? s.items : [] }
+            setSections(DEFAULT_SECTIONS.map(d => map[d.key] || d))
+          }
+        } catch {}
+      }
       else { toast.error('Falha ao salvar') }
     } catch (e) {
       toast.error('Erro ao salvar')
@@ -101,7 +113,15 @@ export default function LegalManager() {
             uploadEndpoint="/api/images/upload"
             values={(current.items||[]).map(i=>i.url)}
             onChange={(urls)=>{
-              updateCurrent(s=>({ ...s, items: urls.map((u, idx)=> ({ url: u, title: s.items?.[idx]?.title || '', description: s.items?.[idx]?.description || '' })) }))
+              // Acrescentar ao invés de substituir
+              updateCurrent(s=>{
+                const existing = Array.isArray(s.items) ? s.items : []
+                const existingUrls = new Set(existing.map(i=>i.url))
+                const additions = urls
+                  .filter(u => !existingUrls.has(u))
+                  .map(u => ({ url: u, title: '', description: '' }))
+                return { ...s, items: [...existing, ...additions] }
+              })
             }}
           />
           {(current.items||[]).length>0 && (
