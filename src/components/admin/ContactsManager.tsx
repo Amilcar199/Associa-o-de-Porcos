@@ -205,10 +205,15 @@ const ContactsManager = () => {
       key: 'subject',
       title: 'Assunto',
       sortable: true,
-      render: (value) => (
-        <div className="max-w-xs">
+      render: (value, row) => (
+        <button
+          type="button"
+          onClick={() => handleView(row as Contact)}
+          className="max-w-xs text-left hover:underline"
+          title="Abrir mensagem"
+        >
           <div className="font-medium text-gray-900 truncate">{value}</div>
-        </div>
+        </button>
       )
     },
     {
