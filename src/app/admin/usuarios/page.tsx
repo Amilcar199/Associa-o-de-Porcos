@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-// Icons removed to avoid lucide-react export issues
+import { Search, Plus, Mail, Shield, Pencil, Power, Zap, Trash2, User, AtSign, Briefcase, MapPin, Phone as PhoneIcon, Globe2 } from 'lucide-react'
 import UserEditModal from '@/components/UserEditModal'
 import UserCreateModal from '@/components/UserCreateModal'
 import ConfirmModal from '@/components/ConfirmModal'
@@ -160,7 +160,7 @@ export default function AdminUsersPage() {
         </div>
         <div className="flex items-center gap-3">
           <div className="relative">
-            <span className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" aria-hidden>🔍</span>
+            <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" aria-hidden />
             <input
               placeholder="Buscar usuário..."
               className="pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
@@ -172,7 +172,7 @@ export default function AdminUsersPage() {
             onClick={() => setCreateModalOpen(true)} 
             className="inline-flex items-center bg-primary-600 hover:bg-primary-700 text-white px-3 py-2 rounded-lg text-sm"
           >
-            <span className="w-4 h-4 mr-2" aria-hidden>➕</span> Novo usuário
+            <Plus className="w-4 h-4 mr-2" aria-hidden /> Novo usuário
           </button>
         </div>
       </div>
@@ -203,7 +203,7 @@ export default function AdminUsersPage() {
                     </div>
                   </td>
                   <td className="px-4 py-3 text-gray-700 flex items-center gap-2">
-                    <span className="w-4 h-4 text-gray-400" aria-hidden>✉️</span>
+                    <Mail className="w-4 h-4 text-gray-400" aria-hidden />
                     {u.email}
                   </td>
                   <td className="px-4 py-3">
@@ -217,7 +217,7 @@ export default function AdminUsersPage() {
                   <td className="px-4 py-3 text-gray-700">
                     {u.company ? (
                       <div className="flex items-center gap-2">
-                        <span className="w-4 h-4 text-gray-400" aria-hidden>🛡️</span>
+                        <Briefcase className="w-4 h-4 text-gray-400" aria-hidden />
                         {u.company}
                       </div>
                     ) : (
@@ -237,7 +237,7 @@ export default function AdminUsersPage() {
                         onClick={() => handleEditUser(u.id)}
                         className="inline-flex items-center gap-1 text-primary-700 hover:text-primary-800 hover:bg-primary-50 px-2 py-1 rounded transition-colors"
                       >
-                        <span className="w-3 h-3" aria-hidden>✏️</span>
+                        <Pencil className="w-3 h-3" aria-hidden />
                         Editar
                       </button>
                       <span className="text-gray-300">|</span>
@@ -251,12 +251,12 @@ export default function AdminUsersPage() {
                       >
                         {u.active ? (
                           <>
-                            <span className="w-3 h-3" aria-hidden>⏻</span>
+                            <Power className="w-3 h-3" aria-hidden />
                             Desativar
                           </>
                         ) : (
                           <>
-                            <span className="w-3 h-3" aria-hidden>⚡</span>
+                            <Zap className="w-3 h-3" aria-hidden />
                             Ativar
                           </>
                         )}
@@ -266,7 +266,7 @@ export default function AdminUsersPage() {
                         onClick={() => handleDeleteUser(u.id, u.name)}
                         className="inline-flex items-center gap-1 text-red-600 hover:text-red-700 hover:bg-red-50 px-2 py-1 rounded transition-colors"
                       >
-                        <span className="w-3 h-3" aria-hidden>🗑️</span>
+                        <Trash2 className="w-3 h-3" aria-hidden />
                         Excluir
                       </button>
                     </div>
