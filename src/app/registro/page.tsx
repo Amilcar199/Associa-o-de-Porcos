@@ -142,7 +142,7 @@ export default function RegisterPage() {
               <div className="mt-1 grid grid-cols-2 gap-3">
                 <button
                   type="button"
-                  onClick={() => setFormData(prev => ({ ...prev, accountType: 'cliente' }))}
+                  onClick={() => setFormData(prev => ({ ...prev, accountType: 'cliente', company: '' }))}
                   className={`border rounded-md p-2 text-sm ${formData.accountType === 'cliente' ? 'border-green-600 text-green-700' : 'border-gray-300 text-gray-700'}`}
                 >
                   {dict.auth.accountTypeClient}
@@ -223,6 +223,7 @@ export default function RegisterPage() {
               </div>
             </div>
 
+            {formData.accountType === 'membro' && (
             <div>
               <label htmlFor="company" className="block text-sm font-medium text-gray-700">
                 {dict.auth.companyOptional}
@@ -242,6 +243,7 @@ export default function RegisterPage() {
                 />
               </div>
             </div>
+            )}
 
             {formData.accountType === 'membro' && (
             <div>
