@@ -95,7 +95,7 @@ export default function RegisterPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.message || dict.auth.errorRegister);
+        setError(data.error || data.message || dict.auth.errorRegister);
       } else {
         setSuccess(dict.auth.successRegister);
         await signIn('credentials', { email: formData.email, password: formData.password, redirect: false });
