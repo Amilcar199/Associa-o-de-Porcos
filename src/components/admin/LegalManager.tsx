@@ -16,7 +16,7 @@ const DEFAULT_SECTIONS: LegalSection[] = [
   { key: 'admin-body', title: '', description: '', items: [] }
 ]
 
-export default function LegalManager() {
+export default function LegalManager({ showUploader = true }: { showUploader?: boolean } = {}) {
   const { locale } = useLanguage()
   const isEn = String(locale || '').startsWith('en')
   const [sections, setSections] = useState<LegalSection[]>(DEFAULT_SECTIONS)
@@ -105,25 +105,29 @@ export default function LegalManager() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-900 mb-2">{isEn ? 'Images/Documents' : 'Imagens/Documentos'}</label>
-          <MediaUploader
-            label={isEn ? 'Uploads' : 'Uploads'}
-            accept="image/*"
-            maxSizeBytes={5*1024*1024}
-            uploadEndpoint="/api/images/upload"
-            values={(current.items||[]).map(i=>i.url)}
-            onChange={(urls)=>{
-              // Acrescentar ao invés de substituir
-              updateCurrent(s=>{
-                const existing = Array.isArray(s.items) ? s.items : []
-                const existingUrls = new Set(existing.map(i=>i.url))
-                const additions = urls
-                  .filter(u => !existingUrls.has(u))
-                  .map(u => ({ url: u, title: '', description: '' }))
-                return { ...s, items: [...existing, ...additions] }
-              })
-            }}
-          />
+          {showUploader && (
+            <>
+              <label className="block text-sm font-medium text-gray-900 mb-2">{isEn ? 'Images/Documents' : 'Imagens/Documentos'}</label>
+              <MediaUploader
+                label={isEn ? 'Uploads' : 'Uploads'}
+                accept="image/*"
+                maxSizeBytes={5*1024*1024}
+                uploadEndpoint="/api/images/upload"
+                values={(current.items||[]).map(i=>i.url)}
+                onChange={(urls)=>{
+                  // Acrescentar ao invés de substituir
+                  updateCurrent(s=>{
+                    const existing = Array.isArray(s.items) ? s.items : []
+                    const existingUrls = new Set(existing.map(i=>i.url))
+                    const additions = urls
+                      .filter(u => !existingUrls.has(u))
+                      .map(u => ({ url: u, title: '', description: '' }))
+                    return { ...s, items: [...existing, ...additions] }
+                  })
+                }}
+              />
+            </>
+          )}
           {(current.items||[]).length>0 && (
             <div className="mt-4 grid md:grid-cols-2 gap-3">
               {current.items.map((item, idx)=> (
