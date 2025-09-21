@@ -5,7 +5,7 @@ import { cookies } from 'next/headers'
 import fs from 'fs'
 import path from 'path'
 import { headers } from 'next/headers'
-import dynamic from 'next/dynamic'
+import dynamicImport from 'next/dynamic'
 
 export function generateMetadata() {
   const locale = cookies().get('locale')?.value || 'pt-AO'
@@ -98,5 +98,5 @@ function DocsGrid({ urls }: { urls: string[] }) {
   )
 }
 
-const ConstitutionDocsFromAssets = dynamic(() => import('../ConstitutionDocsClient'), { ssr: false })
+const ConstitutionDocsFromAssets = dynamicImport(() => import('../ConstitutionDocsClient'), { ssr: false })
 
