@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import LogoPng from '@/components/assets/Logo.png'
@@ -33,16 +33,35 @@ const AdminHeader = ({ user }: AdminHeaderProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isNotifOpen, setIsNotifOpen] = useState(false)
   const [notifs, setNotifs] = useState<any[]>([])
+  const [unreadCount, setUnreadCount] = useState(0)
+  const [lastOpenedTs, setLastOpenedTs] = useState<number>(0)
 
-  const loadNotifs = async () => {
+  const refreshNotifs = async () => {
     try {
       const res = await fetch('/api/admin/stats')
       if (res.ok) {
         const json = await res.json()
-        setNotifs(json.data?.recentActivity?.slice(0, 5) || [])
+        const items = json.data?.recentActivity?.slice(0, 5) || []
+        setNotifs(items)
+        const lastTs = lastOpenedTs || Number(localStorage.getItem('adminNotifLastOpened') || '0')
+        const unseen = items.filter((n: any) => {
+          const t = new Date(n.date).getTime()
+          return isFinite(t) && t > lastTs
+        }).length
+        setUnreadCount(unseen)
       }
     } catch {}
   }
+
+  useEffect(() => {
+    try {
+      const fromStorage = Number(localStorage.getItem('adminNotifLastOpened') || '0')
+      if (fromStorage) setLastOpenedTs(fromStorage)
+    } catch {}
+    refreshNotifs()
+    const id = setInterval(() => { refreshNotifs() }, 30000)
+    return () => clearInterval(id)
+  }, [])
 
   const handleSignOut = async () => {
     await signOut({ callbackUrl: '/' })
@@ -107,11 +126,23 @@ const AdminHeader = ({ user }: AdminHeaderProps) => {
             {/* Notifications */}
             <div className="relative">
               <button
-                onClick={async ()=>{ if(!isNotifOpen) await loadNotifs(); setIsNotifOpen(!isNotifOpen) }}
+                onClick={async ()=>{ 
+                  const willOpen = !isNotifOpen
+                  if (willOpen) {
+                    await refreshNotifs()
+                  }
+                  setIsNotifOpen(willOpen)
+                  if (willOpen) {
+                    const now = Date.now()
+                    setLastOpenedTs(now)
+                    try { localStorage.setItem('adminNotifLastOpened', String(now)) } catch {}
+                    setUnreadCount(0)
+                  }
+                }}
                 className="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-full relative"
               >
                 <Bell size={20} />
-                {notifs.length > 0 && (
+                {unreadCount > 0 && (
                   <span className="absolute -top-0.5 -right-0.5 block h-2 w-2 rounded-full bg-red-500"></span>
                 )}
               </button>
