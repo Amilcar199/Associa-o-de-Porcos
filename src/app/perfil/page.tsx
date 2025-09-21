@@ -725,6 +725,8 @@ export default function ProfilePage() {
         error={pwError}
         values={pwForm}
         setValues={setPwForm}
+        dict={dict}
+        locale={locale}
       />
       <ConfirmSessionsModal
         open={showSessionsModal}
@@ -743,6 +745,8 @@ export default function ProfilePage() {
             setPwLoading(false)
           }
         }}
+        dict={dict}
+        locale={locale}
       />
     </div>
   );
@@ -753,7 +757,7 @@ export default function ProfilePage() {
 (function ModalsHost(){return null})
 
 // Modals
-function PasswordModal({ open, onClose, onSubmit, loading, error, values, setValues }: any) {
+function PasswordModal({ open, onClose, onSubmit, loading, error, values, setValues, dict, locale }: any) {
   if (!open) return null;
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
@@ -788,7 +792,7 @@ function PasswordModal({ open, onClose, onSubmit, loading, error, values, setVal
   )
 }
 
-function ConfirmSessionsModal({ open, onClose, onConfirm, loading }: any) {
+function ConfirmSessionsModal({ open, onClose, onConfirm, loading, dict, locale }: any) {
   if (!open) return null;
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
