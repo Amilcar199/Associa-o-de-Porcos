@@ -62,6 +62,7 @@ export default function ProfilePage() {
   const [pwForm, setPwForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
   const [pwError, setPwError] = useState('');
   const [pwLoading, setPwLoading] = useState(false);
+  const [showVisitorBanner, setShowVisitorBanner] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -91,6 +92,14 @@ export default function ProfilePage() {
     }
 
     fetchProfile();
+    try {
+      if (session?.user?.role === 'visitor') {
+        const hidden = typeof window !== 'undefined' ? localStorage.getItem('hideVisitorUpgradeBanner') === '1' : false
+        setShowVisitorBanner(!hidden)
+      } else {
+        setShowVisitorBanner(false)
+      }
+    } catch {}
   }, [session, status]);
 
   const fetchProfile = async () => {
@@ -262,7 +271,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Upgrade Banner for Visitors */}
-        {session.user?.role === 'visitor' && (
+        {showVisitorBanner && (
           <div className="mb-6 rounded-md border border-yellow-200 bg-yellow-50 p-4">
             <div className="flex items-start">
               <div className="ml-0 w-full">
@@ -296,6 +305,13 @@ export default function ProfilePage() {
                   >
                     {locale.startsWith('en') ? 'Learn more' : 'Saiba mais'}
                   </a>
+                  <button
+                    type="button"
+                    onClick={() => { try { localStorage.setItem('hideVisitorUpgradeBanner','1') } catch {}; setShowVisitorBanner(false) }}
+                    className="ml-auto text-xs text-yellow-800 hover:underline"
+                  >
+                    {locale.startsWith('en') ? "Don't show again" : 'Não mostrar novamente'}
+                  </button>
                 </div>
               </div>
             </div>
@@ -538,6 +554,47 @@ export default function ProfilePage() {
                 <h3 className="text-lg font-medium text-gray-900">{dict.profile.preferencesTitle}</h3>
                 
                 <div className="space-y-4">
+                  {session.user?.role === 'visitor' && (
+                    <div className="border border-green-200 rounded-lg p-4 bg-green-50">
+                      <div className="flex items-start gap-3">
+                        <span className="h-5 w-5 text-green-600" aria-hidden>🌟</span>
+                        <div className="flex-1">
+                          <h4 className="text-sm font-medium text-gray-900">{locale.startsWith('en') ? 'Become a Member' : 'Torne-se Membro'}</h4>
+                          <p className="text-sm text-gray-600 mt-1">
+                            {locale.startsWith('en')
+                              ? 'Access exclusive content and member benefits at any time from here.'
+                              : 'Acesse a qualquer momento conteúdos e benefícios exclusivos por aqui.'}
+                          </p>
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            <button
+                              onClick={async () => {
+                                try {
+                                  const res = await fetch('/api/user/membership-request', { method: 'POST', credentials: 'include' })
+                                  if (res.ok) {
+                                    alert(locale.startsWith('en') ? 'Request sent successfully!' : 'Solicitação enviada com sucesso!')
+                                  } else {
+                                    const j = await res.json().catch(() => ({}))
+                                    alert(j.error || (locale.startsWith('en') ? 'Error sending request' : 'Erro ao enviar solicitação'))
+                                  }
+                                } catch (e) {
+                                  alert(locale.startsWith('en') ? 'Error sending request' : 'Erro ao enviar solicitação')
+                                }
+                              }}
+                              className="inline-flex items-center justify-center px-3 py-2 rounded-md bg-green-600 text-white text-sm hover:bg-green-700"
+                            >
+                              {locale.startsWith('en') ? 'Request Membership' : 'Solicitar Associação'}
+                            </button>
+                            <a
+                              href="/membros"
+                              className="inline-flex items-center justify-center px-3 py-2 rounded-md border text-sm text-green-700 border-green-200 hover:bg-green-50"
+                            >
+                              {locale.startsWith('en') ? 'Learn more' : 'Saiba mais'}
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   {/* Idioma */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
