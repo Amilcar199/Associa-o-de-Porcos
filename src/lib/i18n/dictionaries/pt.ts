@@ -7,7 +7,7 @@ export default {
 		news: 'Notícias',
 		contact: 'Contactos',
 		team: 'Colaboradores',
-		market: 'Bolsa de Suínos',
+			market: 'Bolsa',
 		report: 'Relatório',
 	},
 	marketPage: {
