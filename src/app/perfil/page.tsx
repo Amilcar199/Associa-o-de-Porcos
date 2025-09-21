@@ -332,7 +332,7 @@ export default function ProfilePage() {
                 }`}
               >
                 <span className="inline-block w-4 h-4 mr-2" aria-hidden>🕓</span>
-                Atividades
+                {locale.startsWith('en') ? 'Activity' : 'Atividades'}
               </button>
             </nav>
           </div>
@@ -527,8 +527,8 @@ export default function ProfilePage() {
                     <div className="flex items-center gap-2">
                       <span className="w-4 h-4 text-gray-500" aria-hidden>🌐</span>
                       <div>
-                        <h4 className="text-sm font-medium text-gray-900">Idioma</h4>
-                        <p className="text-sm text-gray-500">Selecione o idioma de navegação</p>
+                        <h4 className="text-sm font-medium text-gray-900">{locale.startsWith('en') ? 'Language' : 'Idioma'}</h4>
+                        <p className="text-sm text-gray-500">{locale.startsWith('en') ? 'Select navigation language' : 'Selecione o idioma de navegação'}</p>
                       </div>
                     </div>
                     <HeaderLanguageMenu />
@@ -682,20 +682,20 @@ export default function ProfilePage() {
             )}
             {activeTab === 'activity' && (
               <div className="space-y-4">
-                <h3 className="text-lg font-medium text-gray-900">Atividade da conta</h3>
+                <h3 className="text-lg font-medium text-gray-900">{locale.startsWith('en') ? 'Account activity' : 'Atividade da conta'}</h3>
                 {activityLoading ? (
-                  <div className="text-sm text-gray-500">Carregando...</div>
+                  <div className="text-sm text-gray-500">{dict.user.loading}</div>
                 ) : activity.length === 0 ? (
-                  <div className="text-sm text-gray-500">Sem registros.</div>
+                  <div className="text-sm text-gray-500">{locale.startsWith('en') ? 'No records.' : 'Sem registros.'}</div>
                 ) : (
                   <div className="overflow-hidden rounded-lg border border-gray-200">
                     <table className="min-w-full divide-y divide-gray-200">
                       <thead className="bg-gray-50">
                         <tr>
-                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
-                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{locale.startsWith('en') ? 'Date' : 'Data'}</th>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{locale.startsWith('en') ? 'Type' : 'Tipo'}</th>
                           <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IP</th>
-                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User-Agent</th>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{locale.startsWith('en') ? 'User-Agent' : 'User-Agent'}</th>
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
@@ -759,7 +759,7 @@ function PasswordModal({ open, onClose, onSubmit, loading, error, values, setVal
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
         <div className="flex items-center justify-between p-4 border-b">
-          <h3 className="text-lg font-semibold text-gray-900">Alterar senha</h3>
+          <h3 className="text-lg font-semibold text-gray-900">{dict.profile.changePasswordTitle}</h3>
           <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded" aria-label="Fechar">
             <span className="w-5 h-5 text-gray-600" aria-hidden>×</span>
           </button>
@@ -767,21 +767,21 @@ function PasswordModal({ open, onClose, onSubmit, loading, error, values, setVal
         <div className="p-4 space-y-4">
           {error && <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded p-2">{error}</div>}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Senha atual</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{locale.startsWith('en') ? 'Current password' : 'Senha atual'}</label>
             <input type="password" value={values.currentPassword} onChange={(e)=>setValues((v:any)=>({...v,currentPassword:e.target.value}))} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Nova senha</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{locale.startsWith('en') ? 'New password' : 'Nova senha'}</label>
             <input type="password" value={values.newPassword} onChange={(e)=>setValues((v:any)=>({...v,newPassword:e.target.value}))} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Confirmar nova senha</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{locale.startsWith('en') ? 'Confirm new password' : 'Confirmar nova senha'}</label>
             <input type="password" value={values.confirmPassword} onChange={(e)=>setValues((v:any)=>({...v,confirmPassword:e.target.value}))} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" />
           </div>
         </div>
         <div className="p-4 border-t flex justify-end gap-2">
-          <button onClick={onClose} className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">Cancelar</button>
-          <button onClick={onSubmit} disabled={loading} className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50">{loading ? 'Salvando...' : 'Salvar'}</button>
+          <button onClick={onClose} className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">{dict.cookies.cancel}</button>
+          <button onClick={onSubmit} disabled={loading} className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50">{loading ? (locale.startsWith('en') ? 'Saving...' : 'Salvando...') : (locale.startsWith('en') ? 'Save' : 'Salvar')}</button>
         </div>
       </div>
     </div>
@@ -794,17 +794,17 @@ function ConfirmSessionsModal({ open, onClose, onConfirm, loading }: any) {
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
         <div className="flex items-center justify-between p-4 border-b">
-          <h3 className="text-lg font-semibold text-gray-900">Encerrar outras sessões</h3>
+          <h3 className="text-lg font-semibold text-gray-900">{dict.profile.sessionsTitle}</h3>
           <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded" aria-label="Fechar">
             <span className="w-5 h-5 text-gray-600" aria-hidden>×</span>
           </button>
         </div>
         <div className="p-4 text-sm text-gray-700">
-          Isso irá encerrar sessões ativas em outros dispositivos e navegadores. Você permanecerá logado neste dispositivo.
+          {locale.startsWith('en') ? 'This will end active sessions on other devices and browsers. You will remain logged in on this device.' : 'Isso irá encerrar sessões ativas em outros dispositivos e navegadores. Você permanecerá logado neste dispositivo.'}
         </div>
         <div className="p-4 border-t flex justify-end gap-2">
-          <button onClick={onClose} className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">Cancelar</button>
-          <button onClick={onConfirm} disabled={loading} className="px-4 py-2 rounded-lg bg-gray-700 text-white hover:bg-gray-800 disabled:opacity-50">{loading ? 'Processando...' : 'Encerrar sessões'}</button>
+          <button onClick={onClose} className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">{dict.cookies.cancel}</button>
+          <button onClick={onConfirm} disabled={loading} className="px-4 py-2 rounded-lg bg-gray-700 text-white hover:bg-gray-800 disabled:opacity-50">{loading ? (locale.startsWith('en') ? 'Processing...' : 'Processando...') : (locale.startsWith('en') ? 'End sessions' : 'Encerrar sessões')}</button>
         </div>
       </div>
     </div>

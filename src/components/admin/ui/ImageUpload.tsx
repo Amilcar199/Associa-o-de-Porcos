@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import { useLanguage } from '@/components/providers/LanguageProvider'
 import { Upload, X, Image as ImageIcon } from 'lucide-react';
 
 interface ImageUploadProps {
@@ -18,6 +19,8 @@ export default function ImageUpload({
   accept = 'image/*',
   maxSize = 5 * 1024 * 1024 // 5MB
 }: ImageUploadProps) {
+  const { locale } = useLanguage()
+  const isEn = String(locale).startsWith('en')
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -29,13 +32,13 @@ export default function ImageUpload({
 
     // Validar tipo de arquivo
     if (!file.type.startsWith('image/')) {
-      setError('Por favor, selecione apenas arquivos de imagem.');
+      setError(isEn ? 'Please select image files only.' : 'Por favor, selecione apenas arquivos de imagem.');
       return;
     }
 
     // Validar tamanho
     if (file.size > maxSize) {
-      setError(`Arquivo muito grande. Tamanho máximo: ${Math.round(maxSize / 1024 / 1024)}MB`);
+      setError(isEn ? `File too large. Max size: ${Math.round(maxSize / 1024 / 1024)}MB` : `Arquivo muito grande. Tamanho máximo: ${Math.round(maxSize / 1024 / 1024)}MB`);
       return;
     }
 
@@ -62,13 +65,13 @@ export default function ImageUpload({
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Erro no upload');
+        throw new Error(errorData.error || (isEn ? 'Upload error' : 'Erro no upload'));
       }
 
       const result = await response.json();
       onImageUploaded(result.data.url);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro no upload da imagem');
+      setError(err instanceof Error ? err.message : (isEn ? 'Image upload error' : 'Erro no upload da imagem'));
       setPreview(null);
     } finally {
       setIsUploading(false);
@@ -143,23 +146,23 @@ export default function ImageUpload({
             {isUploading ? (
               <div className="flex items-center justify-center space-x-2">
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-600"></div>
-                <span className="text-green-600">Fazendo upload...</span>
+                <span className="text-green-600">{isEn ? 'Uploading...' : 'Fazendo upload...'}</span>
               </div>
             ) : (
               <>
                 <ImageIcon className="mx-auto h-12 w-12 text-gray-400" />
                 <div className="text-sm text-gray-600">
-                  <p>Arraste uma imagem aqui ou</p>
+                  <p>{isEn ? 'Drag an image here or' : 'Arraste uma imagem aqui ou'}</p>
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     className="text-green-600 hover:text-green-500 font-medium"
                   >
-                    clique para selecionar
+                    {isEn ? 'click to select' : 'clique para selecionar'}
                   </button>
                 </div>
                 <p className="text-xs text-gray-500">
-                  PNG, JPG, GIF até {Math.round(maxSize / 1024 / 1024)}MB
+                  {isEn ? 'PNG, JPG, GIF up to' : 'PNG, JPG, GIF até'} {Math.round(maxSize / 1024 / 1024)}MB
                 </p>
               </>
             )}
