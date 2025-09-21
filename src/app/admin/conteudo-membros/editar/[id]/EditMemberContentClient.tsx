@@ -357,15 +357,17 @@ export default function EditMemberContentClient({ contentId }: EditMemberContent
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              URL da Thumbnail
+              Thumbnail
             </label>
-            <input
-              type="url"
-              value={formData.thumbnail}
-              onChange={(e) => setFormData((prev: MemberContentFormData) => ({ ...prev, thumbnail: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              placeholder="https://exemplo.com/imagem.jpg"
-            />
+            {!formData.thumbnail && (
+              <input
+                type="url"
+                value={formData.thumbnail}
+                onChange={(e) => setFormData((prev: MemberContentFormData) => ({ ...prev, thumbnail: e.target.value }))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                placeholder="URL da thumbnail (opcional)"
+              />
+            )}
             <div className="mt-2">
               <MediaUploader
                 label="Ou faça upload da thumbnail"
