@@ -108,6 +108,24 @@ const LatestNews = () => {
     }
   }
 
+  // Increment views whenever a news is shown in the modal (open or navigation)
+  useEffect(() => {
+    if (!modalOpen || !selectedNews?._id) return
+    const id = selectedNews._id
+    ;(async () => {
+      try {
+        const res = await fetch(`/api/news/${id}/views`, { method: 'POST', credentials: 'include' })
+        if (!res.ok) return
+        const j = await res.json().catch(() => ({}))
+        const v = j?.data?.views
+        if (typeof v === 'number') {
+          setNews((prev) => prev.map((n) => (n._id === id ? { ...n, views: v } : n)))
+          setSelectedNews((prev) => (prev ? { ...prev, views: v } as any : prev))
+        }
+      } catch {}
+    })()
+  }, [modalOpen, selectedNews?._id])
+
   return (
     <section className="section-padding bg-gray-50">
       <div className="container-custom">
