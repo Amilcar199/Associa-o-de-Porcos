@@ -193,9 +193,25 @@ export default function ProfilePage() {
       setPwError('Preencha todos os campos');
       return;
     }
-    if (pwForm.newPassword.length < 6) {
-      setPwError('A nova senha deve ter pelo menos 6 caracteres');
-      return;
+    const hasNumber = /\d/.test(pwForm.newPassword)
+    const hasSeq = (() => {
+      let inc = 1, dec = 1
+      for (let i = 1; i < pwForm.newPassword.length; i++) {
+        const a = pwForm.newPassword.charCodeAt(i - 1)
+        const b = pwForm.newPassword.charCodeAt(i)
+        const ad = a >= 48 && a <= 57
+        const bd = b >= 48 && b <= 57
+        if (ad && bd && b - a === 1) inc++; else inc = 1
+        if (ad && bd && a - b === 1) dec++; else dec = 1
+        if (inc >= 3 || dec >= 3) return true
+      }
+      return false
+    })()
+    if (pwForm.newPassword.length < 6 || !hasNumber || hasSeq) {
+      setPwError(locale.startsWith('en')
+        ? 'Weak password: minimum 6 characters, at least one number, and no numeric sequences (e.g., 123, 321)'
+        : 'Senha fraca: mínimo 6 caracteres, ao menos um número e sem sequências numéricas (ex.: 123, 321)')
+      return
     }
     if (pwForm.newPassword !== pwForm.confirmPassword) {
       setPwError('As senhas não coincidem');

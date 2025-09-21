@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import { successResponse, errorResponse, sanitizeInput } from '@/lib/api-utils';
+import { isPasswordStrong } from '@/lib/password'
 
 // POST /api/auth/reset-password - Redefinir senha
 export async function POST(req: NextRequest) {
@@ -17,8 +18,8 @@ export async function POST(req: NextRequest) {
       return errorResponse('Token e nova senha são obrigatórios');
     }
 
-    if (sanitizedData.password.length < 6) {
-      return errorResponse('Senha deve ter pelo menos 6 caracteres');
+    if (!isPasswordStrong(sanitizedData.password)) {
+      return errorResponse('Senha fraca: mínimo 6 caracteres, ao menos um número e sem sequências numéricas (ex.: 123, 321)');
     }
 
     // Buscar usuário com o token

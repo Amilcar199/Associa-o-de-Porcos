@@ -57,8 +57,24 @@ export default function ResetPasswordClient() {
       return
     }
 
-    if (formData.password.length < 6) {
-      setError(isEn ? 'Password must be at least 6 characters' : 'A senha deve ter pelo menos 6 caracteres')
+    const hasNumber = /\d/.test(formData.password)
+    const hasSeq = (() => {
+      let inc = 1, dec = 1
+      for (let i = 1; i < formData.password.length; i++) {
+        const a = formData.password.charCodeAt(i - 1)
+        const b = formData.password.charCodeAt(i)
+        const ad = a >= 48 && a <= 57
+        const bd = b >= 48 && b <= 57
+        if (ad && bd && b - a === 1) inc++; else inc = 1
+        if (ad && bd && a - b === 1) dec++; else dec = 1
+        if (inc >= 3 || dec >= 3) return true
+      }
+      return false
+    })()
+    if (formData.password.length < 6 || !hasNumber || hasSeq) {
+      setError(isEn
+        ? 'Weak password: minimum 6 characters, at least one number, and no numeric sequences (e.g., 123, 321)'
+        : 'Senha fraca: mínimo 6 caracteres, ao menos um número e sem sequências numéricas (ex.: 123, 321)')
       setLoading(false)
       return
     }
