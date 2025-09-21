@@ -25,12 +25,24 @@ export async function PUT(request: NextRequest) {
     const body = await request.json()
     const sections = Array.isArray(body?.sections) ? body.sections : []
 
-    // Upsert por key
+    // Upsert por key, preservando itens existentes e acrescentando novos
     for (const s of sections) {
       if (!s?.key) continue
+      const incomingItems = Array.isArray(s.items) ? s.items : []
+      const existing = await LegalSection.findOne({ key: s.key }).lean()
+      const existingItems = Array.isArray(existing?.items) ? existing!.items as any[] : []
+      // Mapear por URL para mesclar (atualiza título/descrição dos que vierem no payload)
+      const byUrl: Record<string, { url: string; title?: string; description?: string }> = {}
+      for (const it of existingItems) {
+        if (it?.url) byUrl[it.url] = { url: it.url, title: it.title || '', description: it.description || '' }
+      }
+      for (const it of incomingItems) {
+        if (it?.url) byUrl[it.url] = { url: it.url, title: it.title || '', description: it.description || '' }
+      }
+      const mergedItems = Object.values(byUrl)
       await LegalSection.updateOne(
         { key: s.key },
-        { $set: { title: s.title || '', description: s.description || '', items: Array.isArray(s.items) ? s.items : [], updatedBy: String((auth as any)?.user?.email || '') } },
+        { $set: { title: s.title || '', description: s.description || '', items: mergedItems, updatedBy: String((auth as any)?.user?.email || '') } },
         { upsert: true }
       )
     }
