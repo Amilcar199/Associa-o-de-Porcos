@@ -1,4 +1,5 @@
 // @ts-nocheck
+export const dynamic = 'force-dynamic'
 import React from 'react'
 import { cookies, headers } from 'next/headers'
 
