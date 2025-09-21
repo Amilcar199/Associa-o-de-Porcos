@@ -22,8 +22,23 @@ export default async function ConstitutionDocsPage() {
   const locale = cookies().get('locale')?.value || 'pt-AO'
   const isEn = String(locale).startsWith('en')
 
-  // Try DB-driven content first
-  let urls: string[] = []
+  // Load public folder images
+  const publicUrls = (() => {
+    try {
+      const docsDir = path.join(process.cwd(), 'public', 'Conteudos Suinos', 'pdf_paginas_png')
+      const fileNames: string[] = fs
+        .readdirSync(docsDir)
+        .filter((name) => /(\.png|jpe?g|webp)$/i.test(name))
+        .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+      const baseUrl = '/Conteudos%20Suinos/pdf_paginas_png'
+      return fileNames.map((n) => `${baseUrl}/${encodeURIComponent(n)}`)
+    } catch {
+      return [] as string[]
+    }
+  })()
+
+  // Load DB-driven content and append to public
+  let dbUrls: string[] = []
   try {
     const h = headers()
     const protocol = h.get('x-forwarded-proto') || 'http'
@@ -33,22 +48,17 @@ export default async function ConstitutionDocsPage() {
     const j = res.ok ? await res.json() : { data: [] }
     const section = (j?.data || []).find((s:any)=>s.key==='constitution')
     if (section && Array.isArray(section.items)) {
-      urls = section.items.map((it:any)=>it.url).filter(Boolean)
+      dbUrls = section.items.map((it:any)=>it.url).filter(Boolean)
     }
   } catch {}
 
-  // Fallback to public folder if DB empty
-  if (!urls.length) {
-    const docsDir = path.join(process.cwd(), 'public', 'Conteudos Suinos', 'pdf_paginas_png')
-    try {
-      const fileNames: string[] = fs
-        .readdirSync(docsDir)
-        .filter((name) => /(\.png|jpe?g|webp)$/i.test(name))
-        .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
-      const baseUrl = '/Conteudos%20Suinos/pdf_paginas_png'
-      urls = fileNames.map((n) => `${baseUrl}/${encodeURIComponent(n)}`)
-    } catch {}
-  }
+  // Merge public + db (keep order, dedupe by URL)
+  const seen = new Set<string>()
+  const urls = [...publicUrls, ...dbUrls].filter(u => {
+    if (!u || seen.has(u)) return false
+    seen.add(u)
+    return true
+  })
 
   return (
     <section className="container-custom section-padding">
