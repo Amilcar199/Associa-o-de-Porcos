@@ -157,6 +157,64 @@ export default function LegalManager() {
               ))}
             </div>
           )}
+
+          {(current.items||[]).length>0 && (
+            <div className="mt-6">
+              <h3 className="text-sm font-semibold text-gray-900 mb-2">{isEn ? 'Items list' : 'Lista de itens'}</h3>
+              <div className="overflow-x-auto">
+                <table className="min-w-full text-sm border border-gray-200 rounded-lg overflow-hidden">
+                  <thead className="bg-gray-50 text-gray-600">
+                    <tr>
+                      <th className="px-3 py-2 text-left">{isEn ? 'Preview' : 'Prévia'}</th>
+                      <th className="px-3 py-2 text-left">URL</th>
+                      <th className="px-3 py-2 text-left">{isEn ? 'Title' : 'Título'}</th>
+                      <th className="px-3 py-2 text-left">{isEn ? 'Description' : 'Descrição'}</th>
+                      <th className="px-3 py-2 text-right">{isEn ? 'Actions' : 'Ações'}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {current.items.map((item, idx)=> (
+                      <tr key={`row-${item.url}`} className="border-t">
+                        <td className="px-3 py-2">
+                          <img src={item.url} alt={item.title || `item-${idx+1}`} className="w-12 h-12 rounded object-cover" />
+                        </td>
+                        <td className="px-3 py-2 text-gray-600 truncate max-w-[260px]" title={item.url}>{item.url}</td>
+                        <td className="px-3 py-2">
+                          <input value={item.title || ''} onChange={(e)=>updateCurrent(s=>{ const next=[...s.items]; next[idx]={...next[idx], title: e.target.value}; return { ...s, items: next } })} className="w-full px-2 py-1 border rounded" />
+                        </td>
+                        <td className="px-3 py-2">
+                          <input value={item.description || ''} onChange={(e)=>updateCurrent(s=>{ const next=[...s.items]; next[idx]={...next[idx], description: e.target.value}; return { ...s, items: next } })} className="w-full px-2 py-1 border rounded" />
+                        </td>
+                        <td className="px-3 py-2 text-right">
+                          <button
+                            onClick={async()=>{
+                              const toRemove = current.items[idx]
+                              try {
+                                if (/^\/api\/images\//.test(toRemove.url)) {
+                                  await fetch(toRemove.url, { method: 'DELETE', credentials: 'include' })
+                                } else if (/^\/api\/public-assets\/constitution\/image\?/.test(toRemove.url)) {
+                                  const u = new URL(toRemove.url, window.location.origin)
+                                  const name = u.searchParams.get('name') || ''
+                                  if (name) await fetch(`/api/public-assets/constitution/image?name=${encodeURIComponent(name)}`, { method: 'DELETE', credentials: 'include' })
+                                } else if (/^\//.test(toRemove.url)) {
+                                  const rel = toRemove.url.replace(/^\/+/, '')
+                                  await fetch(`/api/public-images?path=${encodeURIComponent(rel)}`, { method: 'DELETE', credentials: 'include' })
+                                }
+                              } catch {}
+                              updateCurrent(s=>({ ...s, items: s.items.filter((_,i)=>i!==idx) }))
+                            }}
+                            className="inline-flex items-center gap-1 text-red-600 hover:text-red-700 hover:bg-red-50 px-2 py-1 rounded"
+                          >
+                            <Trash2 size={16} /> {isEn ? 'Delete' : 'Eliminar'}
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
