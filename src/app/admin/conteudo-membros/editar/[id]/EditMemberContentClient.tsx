@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 // Icons removed to avoid lucide-react export mismatches
 import { useToast } from '@/components/Toast'
+import MediaUploader from '@/components/admin/ui/MediaUploader'
 
 interface MemberContentFormData {
   title: string
@@ -273,6 +274,17 @@ export default function EditMemberContentClient({ contentId }: EditMemberContent
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 placeholder="https://exemplo.com/arquivo.pdf"
               />
+              <div className="mt-2">
+                <MediaUploader
+                  label="Ou faça upload do arquivo (PDF/Imagem)"
+                  accept=".pdf,image/*"
+                  maxSizeBytes={10*1024*1024}
+                  multiple={false}
+                  uploadEndpoint="/api/images/upload"
+                  values={formData.fileUrl ? [formData.fileUrl] : []}
+                  onChange={(urls)=> setFormData((prev: MemberContentFormData)=>({ ...prev, fileUrl: urls[0] || '' }))}
+                />
+              </div>
             </div>
           )}
 
@@ -288,6 +300,17 @@ export default function EditMemberContentClient({ contentId }: EditMemberContent
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 placeholder="https://youtube.com/watch?v=..."
               />
+              <div className="mt-2">
+                <MediaUploader
+                  label="Ou faça upload do vídeo (MP4)"
+                  accept="video/mp4"
+                  maxSizeBytes={100*1024*1024}
+                  multiple={false}
+                  uploadEndpoint="/api/videos/upload"
+                  values={formData.videoUrl ? [formData.videoUrl] : []}
+                  onChange={(urls)=> setFormData((prev: MemberContentFormData)=>({ ...prev, videoUrl: urls[0] || '' }))}
+                />
+              </div>
             </div>
           )}
 
@@ -343,6 +366,17 @@ export default function EditMemberContentClient({ contentId }: EditMemberContent
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               placeholder="https://exemplo.com/imagem.jpg"
             />
+            <div className="mt-2">
+              <MediaUploader
+                label="Ou faça upload da thumbnail"
+                accept="image/*"
+                maxSizeBytes={5*1024*1024}
+                multiple={false}
+                uploadEndpoint="/api/images/upload"
+                values={formData.thumbnail ? [formData.thumbnail] : []}
+                onChange={(urls)=> setFormData((prev: MemberContentFormData)=>({ ...prev, thumbnail: urls[0] || '' }))}
+              />
+            </div>
           </div>
         </div>
 
