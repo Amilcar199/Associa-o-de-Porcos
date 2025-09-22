@@ -270,7 +270,7 @@ const Footer = () => {
             </div>
             
             <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-6">
-              <div className="flex items-center text-xs md:text-sm space-x-2 md:space-x-4 flex-wrap">
+              <div className="flex items-center text-xs md:text-sm space-x-2 md:space-x-4 flex-wrap pl-2 md:pl-3">
                 {legalLinks.map((link, index) => (
                   <span key={link.name} className="flex items-center">
                     <Link href={link.href} className="text-gray-400 hover:text-primary-400 transition-colors">
