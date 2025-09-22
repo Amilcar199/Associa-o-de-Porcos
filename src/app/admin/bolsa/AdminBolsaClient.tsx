@@ -221,7 +221,11 @@ export default function AdminBolsaClient(){
                           type="number"
                           className="w-32 px-2 py-1 border rounded"
                           value={editing[r.id] as any}
-                          onChange={e=>setEditing(prev=>({ ...prev, [r.id]: e.target.value }))}
+                          onChange={e=>{
+                            const raw = e.target.value
+                            const next: number | '' = raw === '' ? '' : Number(raw)
+                            setEditing((prev: Record<string, number | ''>) => ({ ...prev, [r.id]: next }))
+                          }}
                         />
                       ) : (
                         <span className={r.outOfBand ? 'text-red-600 font-semibold' : ''}>{fmt(r.value)}</span>
