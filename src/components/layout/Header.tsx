@@ -61,6 +61,25 @@ const Header = () => {
     })
   }, [router])
 
+  // Prevent background scroll when mobile menu is open
+  useEffect(() => {
+    try {
+      if (isMenuOpen) {
+        document.documentElement.style.overflow = 'hidden'
+        document.body.style.overflow = 'hidden'
+      } else {
+        document.documentElement.style.overflow = ''
+        document.body.style.overflow = ''
+      }
+    } catch {}
+    return () => {
+      try {
+        document.documentElement.style.overflow = ''
+        document.body.style.overflow = ''
+      } catch {}
+    }
+  }, [isMenuOpen])
+
   // Fechar menus ao mudar de rota
   useEffect(() => {
     setIsMenuOpen(false)
@@ -383,6 +402,19 @@ const Header = () => {
         </div>
 
         {/* Menu Mobile */}
+        {/* Backdrop overlay */}
+        <AnimatePresence>
+          {isMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="lg:hidden fixed inset-0 z-40 bg-black/40"
+              onClick={() => setIsMenuOpen(false)}
+            />
+          )}
+        </AnimatePresence>
+
         <AnimatePresence>
           {isMenuOpen && (
             <motion.div
