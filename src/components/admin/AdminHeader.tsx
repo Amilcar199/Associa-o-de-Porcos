@@ -36,6 +36,32 @@ const AdminHeader = ({ user }: AdminHeaderProps) => {
   const [unreadCount, setUnreadCount] = useState(0)
   const [lastOpenedTs, setLastOpenedTs] = useState<number>(0)
 
+  // Mobile menu items
+  const mobileMenuItems: Array<{ name: string; href: string; children?: Array<{ name: string; href: string }> }> = [
+    { name: 'Dashboard', href: '/admin' },
+    { name: 'Solicitações', href: '/admin/solicitacoes' },
+    { name: 'Usuários', href: '/admin/usuarios' },
+    { name: 'Produtos', href: '#', children: [
+      { name: 'Todos os Produtos', href: '/admin/produtos' },
+      { name: 'Adicionar Produto', href: '/admin/produtos/novo' },
+      { name: 'Categorias', href: '/admin/produtos/categorias' }
+    ]},
+    { name: 'Conteúdo', href: '#', children: [
+      { name: 'Notícias', href: '/admin/noticias' },
+      { name: 'Nova Notícia', href: '/admin/noticias/nova' },
+      { name: 'Colaboradores', href: '/admin/colaboradores' },
+      { name: 'Conteúdo de Membros', href: '/admin/conteudo-membros' },
+      { name: 'Novo Conteúdo', href: '/admin/conteudo-membros/novo' },
+      { name: 'Bolsa', href: '/admin/bolsa' },
+      { name: 'Jurídico & Legal', href: '/admin/juridico-legal' },
+      { name: 'Gestão Jurídico & Legal', href: '/admin/juridico-legal/gestao' }
+    ]},
+    { name: 'Contatos', href: '/admin/contatos' },
+    { name: 'Mídia', href: '/admin/imagens' },
+    { name: 'Relatórios', href: '/admin/relatorios' },
+    { name: 'Configurações', href: '/admin/configuracoes' }
+  ]
+
   const refreshNotifs = async () => {
     try {
       const res = await fetch('/api/admin/stats')
@@ -270,6 +296,51 @@ const AdminHeader = ({ user }: AdminHeaderProps) => {
             className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
             onClick={() => setIsMobileMenuOpen(false)}
           />
+        )}
+      </AnimatePresence>
+
+      {/* Mobile drawer */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.aside
+            initial={{ x: -320, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -320, opacity: 0 }}
+            transition={{ type: 'tween', duration: 0.2 }}
+            className="lg:hidden fixed top-16 bottom-0 left-0 w-72 bg-white border-r border-gray-200 z-50 overflow-y-auto"
+          >
+            <nav className="p-4 space-y-2">
+              {mobileMenuItems.map((item) => (
+                <div key={item.name}>
+                  {item.children ? (
+                    <div className="mb-2">
+                      <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide">{item.name}</div>
+                      <div className="ml-2 space-y-1">
+                        {item.children.map((child) => (
+                          <Link
+                            key={child.name}
+                            href={child.href}
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="block px-3 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                          >
+                            {child.name}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <Link
+                      href={item.href}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block px-3 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                    >
+                      {item.name}
+                    </Link>
+                  )}
+                </div>
+              ))}
+            </nav>
+          </motion.aside>
         )}
       </AnimatePresence>
     </header>
