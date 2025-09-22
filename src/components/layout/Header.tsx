@@ -154,7 +154,7 @@ const Header = () => {
 
       {/* Header Principal */}
       <header 
-        className={`sticky top-0 z-50 bg-primary-800 transition-all duration-300 ${
+        className={`sticky top-0 z-[60] bg-primary-800 transition-all duration-300 ${
           isScrolled ? 'shadow-md' : 'shadow-sm'
         }`}
       >
@@ -386,10 +386,10 @@ const Header = () => {
         <AnimatePresence>
           {isMenuOpen && (
             <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="lg:hidden bg-white border-t border-gray-200 max-h-[calc(100dvh-6rem)] md:max-h-[calc(100dvh-7rem)] overflow-y-auto overscroll-contain"
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              className="lg:hidden fixed top-24 left-0 right-0 z-50 bg-white border-t border-gray-200 max-h-[calc(100dvh-6rem)] overflow-y-auto overscroll-contain shadow-lg"
             >
               <div className="container-custom py-4">
                 <nav className="space-y-4">
