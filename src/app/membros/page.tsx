@@ -5,9 +5,11 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
  
 import { useLanguage } from '@/components/providers/LanguageProvider';
+import MemberContentModal from '@/components/modals/MemberContentModal'
 
 interface MemberContent {
-  id: string;
+  id?: string;
+  _id?: string;
   title: string;
   description: string;
   type: 'document' | 'video' | 'article' | 'event';
@@ -16,6 +18,11 @@ interface MemberContent {
   thumbnail?: string;
   createdAt: string;
   isFeatured: boolean;
+  content?: string;
+  fileUrl?: string;
+  videoUrl?: string;
+  eventDate?: string;
+  eventLocation?: string;
 }
 
 export default function MembersArea() {
@@ -26,6 +33,8 @@ export default function MembersArea() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
   const [content, setContent] = useState([] as MemberContent[]);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedContent, setSelectedContent] = useState<MemberContent | null>(null);
   const [stats, setStats] = useState({
     totalDocuments: 0,
     totalVideos: 0,
@@ -91,6 +100,16 @@ export default function MembersArea() {
     if (activeTab === 'overview') return true;
     return item.type === activeTab;
   });
+
+  const openModal = (item: MemberContent) => {
+    setSelectedContent(item);
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+    setSelectedContent(null);
+  };
 
   if (status === 'loading' || loading) {
     return (
@@ -213,8 +232,14 @@ export default function MembersArea() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredContent.map((item: MemberContent) => (
-                  <div key={item.id} className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
+                {filteredContent.map((item: MemberContent) => {
+                  const itemId = (item as any).id || (item as any)._id || item.title;
+                  return (
+                  <div
+                    key={itemId}
+                    className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+                    onClick={() => openModal(item)}
+                  >
                     {item.thumbnail && (
                       <div className="aspect-video bg-gray-200">
                         <img src={item.thumbnail} alt={item.title} className="w-full h-full object-cover" />
@@ -233,7 +258,24 @@ export default function MembersArea() {
                       <div className="flex items-center justify-between">
                         <span className="text-xs text-gray-500">{new Date(item.createdAt).toLocaleDateString(isEn ? 'en-US' : 'pt-AO')}</span>
                         {item.url && (
-                          <a href={item.url} className="inline-flex items-center text-sm text-green-600 hover:text-green-700">
+                          <a
+                            href={item.url}
+                            onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
+                              e.stopPropagation();
+                              const idVal = (item as any).id || (item as any)._id;
+                              try {
+                                const beaconUrl = idVal ? `/api/members/content/${idVal}/download` : '';
+                                if (beaconUrl) {
+                                  if (navigator.sendBeacon) {
+                                    navigator.sendBeacon(beaconUrl);
+                                  } else {
+                                    fetch(beaconUrl, { method: 'POST', keepalive: true });
+                                  }
+                                }
+                              } catch {}
+                            }}
+                            className="inline-flex items-center text-sm text-green-600 hover:text-green-700"
+                          >
                             <span className="w-4 h-4 mr-1" aria-hidden>📥</span>
                             {isEn ? 'Access' : 'Acessar'}
                           </a>
@@ -241,7 +283,7 @@ export default function MembersArea() {
                       </div>
                     </div>
                   </div>
-                ))}
+                )})}
               </div>
             )}
           </div>
@@ -308,6 +350,8 @@ export default function MembersArea() {
           </div>
         </div>
       </div>
+      {/* Modal de Conteúdo */}
+      <MemberContentModal isOpen={modalOpen} onClose={closeModal} data={selectedContent} isEn={isEn} />
     </div>
   );
 }
