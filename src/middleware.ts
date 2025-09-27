@@ -39,7 +39,13 @@ export default withAuth(
     }
 
     // Allow public read-only API endpoints
-    if (pathname.startsWith('/api/products') || pathname.startsWith('/api/news') || pathname.startsWith('/api/collaborators')) {
+    if (
+      pathname.startsWith('/api/products') ||
+      pathname.startsWith('/api/news') ||
+      pathname.startsWith('/api/collaborators') ||
+      pathname.startsWith('/api/push/public-key') ||
+      pathname.startsWith('/api/push/subscribe')
+    ) {
       return NextResponse.next()
     }
 
