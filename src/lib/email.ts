@@ -16,10 +16,13 @@ interface EmailTemplate {
 
 // Configurar transporter do Nodemailer
 const createTransporter = () => {
+  const host = process.env.EMAIL_SERVER_HOST || process.env.SMTP_HOST || 'smtp.gmail.com'
+  const port = parseInt(process.env.EMAIL_SERVER_PORT || process.env.SMTP_PORT || '587', 10)
+  const secure = port === 465
   return nodemailer.createTransport({
-    host: process.env.EMAIL_SERVER_HOST || process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: parseInt(process.env.EMAIL_SERVER_PORT || process.env.SMTP_PORT || '587', 10),
-    secure: false, // true para 465, false para outras portas
+    host,
+    port,
+    secure, // 465 = SSL, 587 = STARTTLS
     auth: {
       user: process.env.EMAIL_SERVER_USER || process.env.SMTP_USER,
       pass: process.env.EMAIL_SERVER_PASSWORD || process.env.SMTP_PASS,
