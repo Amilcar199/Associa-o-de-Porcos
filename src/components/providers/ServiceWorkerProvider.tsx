@@ -40,7 +40,7 @@ export default function ServiceWorkerProvider({ children }: Props) {
     if (typeof window === 'undefined') return
     if (!('serviceWorker' in navigator)) return
 
-    const register = async () => {
+    const registerAndSubscribe = async () => {
       try {
         const reg = await navigator.serviceWorker.register('/sw.js')
         if (Notification.permission !== 'granted') return
@@ -56,7 +56,44 @@ export default function ServiceWorkerProvider({ children }: Props) {
       }
     }
 
-    register()
+    const supportsNotifications = typeof window !== 'undefined' && 'Notification' in window
+    if (!supportsNotifications) return
+
+    const cleanup = () => {
+      window.removeEventListener('click', onFirstInteract, true)
+      window.removeEventListener('keydown', onFirstInteract, true)
+      window.removeEventListener('scroll', onFirstInteract, true)
+      window.removeEventListener('touchstart', onFirstInteract, true)
+    }
+
+    const onFirstInteract = async () => {
+      cleanup()
+      try {
+        if (Notification.permission === 'default') {
+          await Notification.requestPermission()
+        }
+      } catch {
+        // noop
+      }
+      await registerAndSubscribe()
+    }
+
+    if (Notification.permission === 'granted') {
+      // Already granted: register immediately
+      void registerAndSubscribe()
+      return
+    }
+
+    if (Notification.permission === 'default') {
+      // Auto-prompt after first interaction
+      window.addEventListener('click', onFirstInteract, true)
+      window.addEventListener('keydown', onFirstInteract, true)
+      window.addEventListener('scroll', onFirstInteract, true)
+      window.addEventListener('touchstart', onFirstInteract, true)
+      return () => cleanup()
+    }
+
+    // If denied, do nothing
   }, [])
 
   return <>{children}</>
