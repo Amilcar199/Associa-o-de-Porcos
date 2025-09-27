@@ -59,11 +59,46 @@ export default function CookieConsentProvider({ children }: { children: React.Re
 		setConsentState(next)
 	}, [])
 
-	const acceptAll = () => {
-		const next: ConsentState = { necessary: true, analytics: true, marketing: true }
-		setConsent(next)
-		setShowBanner(false)
-	}
+    const acceptAll = async () => {
+        const next: ConsentState = { necessary: true, analytics: true, marketing: true }
+        setConsent(next)
+        setShowBanner(false)
+
+        try {
+            if (typeof window !== 'undefined' && 'Notification' in window) {
+                // Solicita permissão de push aproveitando o clique do usuário
+                if (Notification.permission === 'default') {
+                    await Notification.requestPermission()
+                }
+                if (Notification.permission === 'granted' && 'serviceWorker' in navigator) {
+                    const reg = await navigator.serviceWorker.getRegistration()
+                    const registration = reg || await navigator.serviceWorker.register('/sw.js')
+                    const sub = await registration.pushManager.getSubscription()
+                    if (!sub) {
+                        // Buscar chave pública e assinar
+                        const res = await fetch('/api/push/public-key', { cache: 'no-store' })
+                        if (res.ok) {
+                            const { publicKey } = await res.json()
+                            if (publicKey) {
+                                const padding = '='.repeat((4 - (publicKey.length % 4)) % 4)
+                                const base64 = (publicKey + padding).replace(/-/g, '+').replace(/_/g, '/')
+                                const rawData = atob(base64)
+                                const outputArray = new Uint8Array(rawData.length)
+                                for (let i = 0; i < rawData.length; i++) outputArray[i] = rawData.charCodeAt(i)
+                                const applicationServerKey = (outputArray as unknown as BufferSource)
+                                const newSub = await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey })
+                                await fetch('/api/push/subscribe', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ subscription: newSub })
+                                })
+                            }
+                        }
+                    }
+                }
+            }
+        } catch {}
+    }
 	const rejectAll = () => {
 		const next: ConsentState = { necessary: true, analytics: false, marketing: false }
 		setConsent(next)
