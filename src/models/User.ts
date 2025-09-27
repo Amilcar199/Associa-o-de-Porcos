@@ -94,6 +94,16 @@ const userSchema = new mongoose.Schema({
     default: null
   },
   
+  // OTP para fluxos como recuperação de senha
+  otpCode: {
+    type: String,
+    default: undefined
+  },
+  otpExpires: {
+    type: Date,
+    default: undefined
+  },
+  
   passwordResetToken: String,
   passwordResetExpires: Date,
   loginAttempts: {

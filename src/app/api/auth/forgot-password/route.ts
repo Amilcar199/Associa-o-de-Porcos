@@ -7,6 +7,8 @@ import User from '@/models/User';
 import { successResponse, errorResponse, sanitizeInput, isValidEmail } from '@/lib/api-utils';
 import { sendEmail } from '@/lib/email';
 import { BRAND_NAME } from '@/lib/brand'
+import PushSubscription from '@/models/PushSubscription'
+import webpush from '@/lib/webpush'
 
 // POST /api/auth/forgot-password - Solicitar recuperação de senha
 export async function POST(req: NextRequest) {
@@ -38,13 +40,17 @@ export async function POST(req: NextRequest) {
       return errorResponse('Conta desativada. Entre em contato com o suporte.');
     }
 
-    // Gerar token de recuperação
+    // Gerar token de recuperação e OTP (6 dígitos)
     const resetToken = crypto.randomBytes(32).toString('hex');
     const resetTokenExpiry = new Date(Date.now() + 3600000); // 1 hora
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutos
 
     // Salvar token no usuário
     user.passwordResetToken = resetToken;
     user.passwordResetExpires = resetTokenExpiry;
+    user.otpCode = otpCode;
+    user.otpExpires = otpExpires;
     await user.save();
 
     // Enviar email de recuperação
@@ -59,6 +65,7 @@ export async function POST(req: NextRequest) {
         <div style="padding: 20px;">
           <h2>Olá, ${user.name}!</h2>
           <p>Você solicitou a recuperação de sua senha na ${BRAND_NAME}.</p>
+          <p style="margin-top:8px">Seu código (OTP): <strong style="font-size:18px">${otpCode}</strong> (expira em 10 minutos)</p>
           
           <div style="text-align: center; margin: 30px 0;">
             <a href="${resetUrl}" style="background-color: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
@@ -89,6 +96,7 @@ export async function POST(req: NextRequest) {
       Olá, ${user.name}!
       
       Você solicitou a recuperação de sua senha na ${BRAND_NAME}.
+      Código (OTP): ${otpCode} (expira em 10 minutos)
       
       Para redefinir sua senha, acesse: ${resetUrl}
       
@@ -110,6 +118,23 @@ export async function POST(req: NextRequest) {
     } catch (error) {
       console.error('Erro ao enviar email de recuperação:', error);
       return errorResponse('Erro ao enviar email de recuperação');
+    }
+
+    // Tentar enviar push opcional com aviso e deep link
+    try {
+      if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
+        const subs = await PushSubscription.find({ userId: user._id }).lean()
+        if (subs.length > 0) {
+          const payload = JSON.stringify({
+            title: 'Recuperação de senha',
+            body: `Seu código: ${otpCode} (10 min)`,
+            data: { url: `/redefinir-senha?token=${resetToken}` }
+          })
+          await Promise.allSettled(subs.map(s => webpush.sendNotification({ endpoint: s.endpoint, keys: s.keys } as any, payload)))
+        }
+      }
+    } catch (err) {
+      // silencioso
     }
 
     return NextResponse.json(
