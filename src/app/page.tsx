@@ -3,6 +3,7 @@ import { BRAND_NAME } from '@/lib/brand'
 import Hero from '@/components/sections/Hero'
 import FeaturedProducts from '@/components/sections/FeaturedProducts'
 import AboutPreview from '@/components/sections/AboutPreview'
+import BolsaPreview from '@/components/sections/BolsaPreview'
 import LatestNews from '@/components/sections/LatestNews'
 import CallToAction from '@/components/sections/CallToAction'
 import PartnersSection from '@/components/sections/PartnersSection'
@@ -29,6 +30,9 @@ export default function HomePage() {
       {/* Featured Products */}
       <FeaturedProducts />
       
+      {/* Bolsa Preview */}
+      <BolsaPreview />
+
       {/* Latest News */}
       <LatestNews />
       
