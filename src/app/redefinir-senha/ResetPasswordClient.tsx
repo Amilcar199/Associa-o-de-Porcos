@@ -15,41 +15,17 @@ export default function ResetPasswordClient() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
-  const [tokenValid, setTokenValid] = useState(false)
-  const [token, setToken] = useState('')
+  const [email, setEmail] = useState('')
   const [questions, setQuestions] = useState<{ id: string; label: string }[]>([])
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const router = useRouter()
   
 
   useEffect(() => {
-    const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null
-    const tokenParam = params?.get('token') || ''
-    if (tokenParam) {
-      setToken(tokenParam)
-      validateToken(tokenParam)
-      fetch(`/api/auth/reset-security-questions?token=${encodeURIComponent(tokenParam)}`)
-        .then((r) => r.json())
-        .then((d) => Array.isArray(d.questions) ? setQuestions(d.questions) : setQuestions([]))
-        .catch(() => setQuestions([]))
-    } else {
-      setError(isEn ? 'Invalid recovery token' : 'Token de recuperação inválido')
-    }
+    setQuestions([])
   }, [])
 
-  const validateToken = async (token: string) => {
-    try {
-      const response = await fetch('/api/auth/validate-reset-token', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token }),
-      })
-      if (response.ok) setTokenValid(true)
-      else setError(isEn ? 'Invalid or expired token' : 'Token inválido ou expirado')
-    } catch (error) {
-      setError(isEn ? 'Error validating token' : 'Erro ao validar token')
-    }
-  }
+  // token-based validation removed
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -85,31 +61,18 @@ export default function ResetPasswordClient() {
       return
     }
 
-    // Verificar respostas simples (se houver)
-    if (questions.length > 0) {
-      try {
-        const res = await fetch('/api/auth/verify-security-answers', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token, answers }),
-        })
-        if (!res.ok) {
-          setError(isEn ? 'Incorrect answers. Please try again.' : 'Respostas incorretas. Tente novamente.')
-          setLoading(false)
-          return
-        }
-      } catch {
-        setError(isEn ? 'Error validating answers' : 'Erro ao validar respostas')
-        setLoading(false)
-        return
-      }
+    // Email é obrigatório no novo fluxo
+    if (!email) {
+      setError(isEn ? 'Email is required' : 'Email é obrigatório')
+      setLoading(false)
+      return
     }
 
     try {
       const response = await fetch('/api/auth/reset-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, password: formData.password }),
+        body: JSON.stringify({ email, password: formData.password, answers }),
       })
       const data = await response.json()
       if (!response.ok) setError(data.message || (isEn ? 'Error resetting password' : 'Erro ao redefinir senha'))
@@ -124,57 +87,55 @@ export default function ResetPasswordClient() {
     }
   }
 
-  if (!token) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-        <div className="text-center">
-          <span className="mx-auto h-12 w-12 text-red-400" aria-hidden>⚠️</span>
-          <h2 className="mt-4 text-2xl font-bold text-gray-900">{isEn ? 'Invalid Token' : 'Token Inválido'}</h2>
-          <p className="mt-2 text-gray-600">{isEn ? 'The recovery link is invalid or has expired.' : 'O link de recuperação é inválido ou expirou.'}</p>
-          <Link href="/esqueci-senha" className="mt-4 inline-flex items-center text-green-600 hover:text-green-500">
-            <span className="w-4 h-4 mr-1" aria-hidden>←</span>
-            {isEn ? 'Request new link' : 'Solicitar novo link'}
-          </Link>
-        </div>
-      </div>
-    )
-  }
+  // Novo fluxo: exibe formulário completo
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="text-center">
           <h2 className="text-3xl font-bold text-gray-900">{isEn ? 'Reset Password' : 'Redefinir Senha'}</h2>
-          <p className="mt-2 text-sm text-gray-600">{isEn ? 'Enter your new password' : 'Digite sua nova senha'}</p>
+          <p className="mt-2 text-sm text-gray-600">{isEn ? 'Confirm your identity and set a new password' : 'Confirme sua identidade e defina uma nova senha'}</p>
         </div>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          {!tokenValid ? (
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto" />
-              <p className="mt-2 text-sm text-gray-600">{isEn ? 'Validating token...' : 'Validando token...'}</p>
-            </div>
-          ) : (
+          {
             <form className="space-y-6" onSubmit={handleSubmit}>
-              {questions.length > 0 && (
-                <div className="space-y-4">
-                  <p className="text-sm text-gray-700">{isEn ? 'Answer a few questions to continue:' : 'Responda a algumas perguntas para continuar:'}</p>
-                  {questions.map((q) => (
-                    <div key={q.id}>
-                      <label className="block text-sm font-medium text-gray-700">{q.label}</label>
-                      <input
-                        type="text"
-                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-                        value={answers[q.id] || ''}
-                        onChange={(e) => setAnswers((prev) => ({ ...prev, [q.id]: e.target.value }))}
-                        required
-                      />
-                    </div>
-                  ))}
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Email</label>
+                <input
+                  type="email"
+                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-4">
+                <p className="text-sm text-gray-700">{isEn ? 'Answer a few questions to continue:' : 'Responda a algumas perguntas para continuar:'}</p>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">{isEn ? 'Last 2 digits of your phone' : 'Últimos 2 dígitos do seu telefone'}</label>
+                  <input
+                    type="text"
+                    maxLength={2}
+                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                    value={answers['phone_last2'] || ''}
+                    onChange={(e) => setAnswers((prev) => ({ ...prev, phone_last2: e.target.value.replace(/[^0-9]/g, '') }))}
+                    required
+                  />
                 </div>
-              )}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">{isEn ? 'Your company name' : 'Nome da sua empresa'}</label>
+                  <input
+                    type="text"
+                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                    value={answers['company_exact'] || ''}
+                    onChange={(e) => setAnswers((prev) => ({ ...prev, company_exact: e.target.value }))}
+                    required
+                  />
+                </div>
+              </div>
 
               {error && (
                 <div className="bg-red-50 border border-red-200 rounded-md p-4">
@@ -266,7 +227,7 @@ export default function ResetPasswordClient() {
                 </button>
               </div>
             </form>
-          )}
+          }
 
           <div className="mt-6 text-center">
             <Link href="/login" className="inline-flex items-center text-sm text-green-600 hover:text-green-500">

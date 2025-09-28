@@ -14,27 +14,38 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const sanitizedData = sanitizeInput(body);
 
-    if (!sanitizedData.token || !sanitizedData.password) {
-      return errorResponse('Token e nova senha são obrigatórios');
+    // Novo fluxo: email + respostas de segurança, sem token
+    if (!sanitizedData.email || !sanitizedData.password) {
+      return errorResponse('Email e nova senha são obrigatórios')
     }
 
     if (!isPasswordStrong(sanitizedData.password)) {
       return errorResponse('Senha fraca: mínimo 6 caracteres, ao menos um número e sem sequências numéricas (ex.: 123, 321)');
     }
 
-    const user = await User.findOne({
-      passwordResetToken: sanitizedData.token,
-      passwordResetExpires: { $gt: new Date() }
-    })
+    const user = await User.findOne({ email: sanitizedData.email.toLowerCase(), isActive: true })
 
     if (!user) {
-      return errorResponse('Token inválido ou expirado');
+      return errorResponse('Conta não encontrada ou inativa')
+    }
+
+    // Valida respostas simples, se enviadas
+    const answers = sanitizedData.answers || {}
+    let score = 0
+    if (answers.phone_last2) {
+      const digits = (user.phone || '').toString().replace(/\D/g, '')
+      if (digits && answers.phone_last2 === digits.slice(-2)) score++
+    }
+    if (answers.company_exact) {
+      const company = (user.company || '').toString().trim().toLowerCase()
+      if (company && company === String(answers.company_exact).trim().toLowerCase()) score++
+    }
+    if (score === 0) {
+      return errorResponse('Respostas incorretas')
     }
 
     // Atualizar senha (hash será aplicado no pre-save do modelo)
     user.password = sanitizedData.password;
-    user.passwordResetToken = undefined;
-    user.passwordResetExpires = undefined;
     await user.save();
 
     return NextResponse.json(

@@ -9,35 +9,10 @@ export default function ForgotPasswordPage() {
   const { locale } = useLanguage();
   const isEn = locale.startsWith('en');
   const [email, setEmail] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setError('');
-    setSuccess('');
-
-    try {
-      const response = await fetch('/api/auth/forgot-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.message || (isEn ? 'Error sending recovery email' : 'Erro ao enviar email de recuperação'));
-      } else {
-        setSuccess(isEn ? 'Recovery email sent! Check your inbox.' : 'Email de recuperação enviado! Verifique sua caixa de entrada.');
-      }
-    } catch (error) {
-      setError(isEn ? 'Error sending recovery email. Please try again.' : 'Erro ao enviar email de recuperação. Tente novamente.');
-    } finally {
-      setLoading(false);
-    }
+    window.location.href = '/redefinir-senha';
   };
 
   return (
@@ -52,27 +27,7 @@ export default function ForgotPasswordPage() {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           <form className="space-y-6" onSubmit={handleSubmit}>
-            {error && (
-              <div className="bg-red-50 border border-red-200 rounded-md p-4">
-                <div className="flex">
-                  <span className="h-5 w-5 text-red-400 mr-2" aria-hidden>⚠️</span>
-                  <div className="ml-3">
-                    <p className="text-sm text-red-800">{error}</p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {success && (
-              <div className="bg-green-50 border border-green-200 rounded-md p-4">
-                <div className="flex">
-                  <span className="h-5 w-5 text-green-400 mr-2" aria-hidden>✅</span>
-                  <div className="ml-3">
-                    <p className="text-sm text-green-800">{success}</p>
-                  </div>
-                </div>
-              </div>
-            )}
+          
 
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
@@ -93,8 +48,8 @@ export default function ForgotPasswordPage() {
             </div>
 
             <div>
-              <button type="submit" disabled={loading} className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed">
-                {loading ? (isEn ? 'Sending...' : 'Enviando...') : (isEn ? 'Send recovery email' : 'Enviar email de recuperação')}
+              <button type="submit" className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                {isEn ? 'Continue' : 'Continuar'}
               </button>
             </div>
           </form>
