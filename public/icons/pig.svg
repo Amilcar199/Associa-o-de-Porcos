@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <!-- Simple pig face icon - original work -->
+  <!-- Ears -->
+  <path d="M64 72 L96 88 L88 48 Z" fill="#ffffff"/>
+  <path d="M192 72 L160 88 L168 48 Z" fill="#ffffff"/>
+  <!-- Head -->
+  <circle cx="128" cy="136" r="80" fill="#ffffff"/>
+  <!-- Snout -->
+  <ellipse cx="128" cy="156" rx="36" ry="26" fill="#ffffff"/>
+  <!-- Nostrils (use brand green to create contrast on green bg) -->
+  <circle cx="116" cy="156" r="5" fill="#16a34a"/>
+  <circle cx="140" cy="156" r="5" fill="#16a34a"/>
+  <!-- Eyes -->
+  <circle cx="104" cy="124" r="6" fill="#16a34a"/>
+  <circle cx="152" cy="124" r="6" fill="#16a34a"/>
+</svg>
+
