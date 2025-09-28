@@ -18,6 +18,10 @@ async function main() {
   await createSolidPng(16, path.join(pub, 'favicon-16x16.png'))
   await createSolidPng(32, path.join(pub, 'favicon-32x32.png'))
   await createSolidPng(180, path.join(pub, 'apple-touch-icon.png'))
+  await createSolidPng(192, path.join(pub, 'icon-192x192.png'))
+  await createSolidPng(512, path.join(pub, 'icon-512x512.png'))
+  await createSolidPng(192, path.join(pub, 'maskable-icon-192x192.png'))
+  await createSolidPng(512, path.join(pub, 'maskable-icon-512x512.png'))
   console.log('Icons generated in public/: favicon-16x16.png, favicon-32x32.png, apple-touch-icon.png')
 }
 
