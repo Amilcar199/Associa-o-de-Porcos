@@ -14,27 +14,18 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const sanitizedData = sanitizeInput(body);
 
-    if ((!sanitizedData.token && !sanitizedData.otp) || !sanitizedData.password) {
-      return errorResponse('Token/OTP e nova senha são obrigatórios');
+    if (!sanitizedData.token || !sanitizedData.password) {
+      return errorResponse('Token e nova senha são obrigatórios');
     }
 
     if (!isPasswordStrong(sanitizedData.password)) {
       return errorResponse('Senha fraca: mínimo 6 caracteres, ao menos um número e sem sequências numéricas (ex.: 123, 321)');
     }
 
-    let user = null as any
-    if (sanitizedData.token) {
-      user = await User.findOne({
-        passwordResetToken: sanitizedData.token,
-        passwordResetExpires: { $gt: new Date() }
-      })
-    } else if (sanitizedData.otp && sanitizedData.email) {
-      user = await User.findOne({
-        email: sanitizedData.email.toLowerCase(),
-        otpCode: sanitizedData.otp,
-        otpExpires: { $gt: new Date() }
-      })
-    }
+    const user = await User.findOne({
+      passwordResetToken: sanitizedData.token,
+      passwordResetExpires: { $gt: new Date() }
+    })
 
     if (!user) {
       return errorResponse('Token inválido ou expirado');
@@ -44,8 +35,6 @@ export async function POST(req: NextRequest) {
     user.password = sanitizedData.password;
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
-    user.otpCode = undefined;
-    user.otpExpires = undefined;
     await user.save();
 
     return NextResponse.json(
