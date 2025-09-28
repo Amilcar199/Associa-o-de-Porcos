@@ -17,6 +17,8 @@ export default function ResetPasswordClient() {
   const [success, setSuccess] = useState('')
   const [tokenValid, setTokenValid] = useState(false)
   const [token, setToken] = useState('')
+  const [questions, setQuestions] = useState<{ id: string; label: string }[]>([])
+  const [answers, setAnswers] = useState<Record<string, string>>({})
   const router = useRouter()
   
 
@@ -26,6 +28,10 @@ export default function ResetPasswordClient() {
     if (tokenParam) {
       setToken(tokenParam)
       validateToken(tokenParam)
+      fetch(`/api/auth/reset-security-questions?token=${encodeURIComponent(tokenParam)}`)
+        .then((r) => r.json())
+        .then((d) => Array.isArray(d.questions) ? setQuestions(d.questions) : setQuestions([]))
+        .catch(() => setQuestions([]))
     } else {
       setError(isEn ? 'Invalid recovery token' : 'Token de recuperação inválido')
     }
@@ -77,6 +83,26 @@ export default function ResetPasswordClient() {
         : 'Senha fraca: mínimo 6 caracteres, ao menos um número e sem sequências numéricas (ex.: 123, 321)')
       setLoading(false)
       return
+    }
+
+    // Verificar respostas simples (se houver)
+    if (questions.length > 0) {
+      try {
+        const res = await fetch('/api/auth/verify-security-answers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token, answers }),
+        })
+        if (!res.ok) {
+          setError(isEn ? 'Incorrect answers. Please try again.' : 'Respostas incorretas. Tente novamente.')
+          setLoading(false)
+          return
+        }
+      } catch {
+        setError(isEn ? 'Error validating answers' : 'Erro ao validar respostas')
+        setLoading(false)
+        return
+      }
     }
 
     try {
@@ -132,6 +158,24 @@ export default function ResetPasswordClient() {
             </div>
           ) : (
             <form className="space-y-6" onSubmit={handleSubmit}>
+              {questions.length > 0 && (
+                <div className="space-y-4">
+                  <p className="text-sm text-gray-700">{isEn ? 'Answer a few questions to continue:' : 'Responda a algumas perguntas para continuar:'}</p>
+                  {questions.map((q) => (
+                    <div key={q.id}>
+                      <label className="block text-sm font-medium text-gray-700">{q.label}</label>
+                      <input
+                        type="text"
+                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                        value={answers[q.id] || ''}
+                        onChange={(e) => setAnswers((prev) => ({ ...prev, [q.id]: e.target.value }))}
+                        required
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+
               {error && (
                 <div className="bg-red-50 border border-red-200 rounded-md p-4">
                   <div className="flex">
