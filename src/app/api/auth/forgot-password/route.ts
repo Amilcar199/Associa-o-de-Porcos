@@ -2,19 +2,15 @@ export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
-import connectDB from '@/lib/mongodb';
-import User from '@/models/User';
 import { successResponse, errorResponse, sanitizeInput, isValidEmail } from '@/lib/api-utils';
 import { sendEmail } from '@/lib/email';
 import { BRAND_NAME } from '@/lib/brand'
-import PushSubscription from '@/models/PushSubscription'
+import prisma from '@/lib/prisma'
 import webpush from '@/lib/webpush'
 
 // POST /api/auth/forgot-password - Solicitar recuperação de senha
 export async function POST(req: NextRequest) {
   try {
-    await connectDB();
-
     const body = await req.json();
     const sanitizedData = sanitizeInput(body);
 
@@ -28,7 +24,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Buscar usuário
-    const user = await User.findOne({ email: sanitizedData.email });
+    const user = await prisma.user.findUnique({ where: { email: sanitizedData.email.toLowerCase() } });
     if (!user) {
       // Por segurança, não revelar se o email existe ou não
       return NextResponse.json(
@@ -36,7 +32,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!user.isActive) {
+    if (user.isActive === false) {
       return errorResponse('Conta desativada. Entre em contato com o suporte.');
     }
 
@@ -45,9 +41,10 @@ export async function POST(req: NextRequest) {
     const resetTokenExpiry = new Date(Date.now() + 3600000); // 1 hora
 
     // Salvar token no usuário
-    user.passwordResetToken = resetToken;
-    user.passwordResetExpires = resetTokenExpiry;
-    await user.save();
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { passwordResetToken: resetToken, passwordResetExpires: resetTokenExpiry }
+    })
 
     // Enviar email de recuperação
     const resetUrl = `${process.env.NEXTAUTH_URL}/redefinir-senha?token=${resetToken}`;
@@ -118,14 +115,14 @@ export async function POST(req: NextRequest) {
     // Tentar enviar push opcional com aviso e deep link (sem exibir OTP/token)
     try {
       if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
-        const subs = await PushSubscription.find({ userId: user._id }).lean()
+        const subs = await prisma.pushSubscription.findMany({ where: { userId: user.id } })
         if (subs.length > 0) {
           const payload = JSON.stringify({
             title: 'Recuperação de senha',
             body: `Solicitação de recuperação recebida. Toque para continuar.`,
             data: { url: `/redefinir-senha?token=${resetToken}` }
           })
-          await Promise.allSettled(subs.map(s => webpush.sendNotification({ endpoint: s.endpoint, keys: s.keys } as any, payload)))
+          await Promise.allSettled(subs.map(s => webpush.sendNotification({ endpoint: s.endpoint, keys: s.keys as any } as any, payload)))
         }
       }
     } catch (err) {

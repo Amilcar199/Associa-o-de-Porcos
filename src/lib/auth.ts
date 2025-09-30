@@ -1,23 +1,15 @@
 import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { MongoDBAdapter } from '@auth/mongodb-adapter'
-import { MongoClient } from 'mongodb'
-import connectDB from './mongodb'
-import User from '@/models/User'
+import { PrismaAdapter } from '@next-auth/prisma-adapter'
+import prisma from '@/lib/prisma'
+import bcrypt from 'bcryptjs'
 import { AuthUser } from '@/types'
 import GoogleProvider from 'next-auth/providers/google'
 
-const hasMongoUri = !!process.env.MONGODB_URI
 const hasNextAuthSecret = !!process.env.NEXTAUTH_SECRET
 
-// Nota: não falhar no build. Validar em runtime quando a rota de auth for usada.
-
-// Só cria o client quando a variável existir
-const client = hasMongoUri ? new MongoClient(process.env.MONGODB_URI as string) : null
-const clientPromise = hasMongoUri ? client!.connect() : Promise.reject(new Error('MONGODB_URI não configurada'))
-
 export const authOptions: NextAuthOptions = {
-  adapter: hasMongoUri ? (MongoDBAdapter(clientPromise) as any) : undefined,
+  adapter: PrismaAdapter(prisma) as any,
   providers: [
     CredentialsProvider({
       id: 'credentials',
@@ -40,32 +32,30 @@ export const authOptions: NextAuthOptions = {
         }
 
         try {
-          await connectDB()
-          
-          // Buscar usuário por email
-          const user = await User.findOne({ 
-            email: credentials.email.toLowerCase(),
-            isActive: true 
-          }).select('+password')
+          const user = await prisma.user.findUnique({
+            where: { email: credentials.email.toLowerCase() }
+          })
 
           if (!user) {
             throw new Error('Usuário não encontrado ou inativo')
           }
 
-          // Permitir login independentemente do status de verificação de email
-          // Verificar senha
-          const isPasswordValid = await user.comparePassword(credentials.password)
+          if (user.isActive === false) {
+            throw new Error('Usuário não encontrado ou inativo')
+          }
+
+          const isPasswordValid = await bcrypt.compare(credentials.password, user.password)
           
           if (!isPasswordValid) {
             throw new Error('Senha incorreta')
           }
 
           return {
-            id: user._id.toString(),
+            id: user.id,
             name: user.name,
             email: user.email,
             role: user.role,
-            avatar: user.avatar,
+            avatar: user.avatar || undefined,
           }
         } catch (error) {
           console.error('Erro na autenticação:', error)
@@ -108,16 +98,12 @@ export const authOptions: NextAuthOptions = {
       // Atualizar dados do usuário a cada request se necessário
       if (token.email) {
         try {
-          await connectDB()
-          const dbUser = await User.findOne({ 
-            email: token.email,
-            isActive: true 
-          })
+          const dbUser = await prisma.user.findUnique({ where: { email: token.email } })
           
-          if (dbUser) {
+          if (dbUser && dbUser.isActive !== false) {
             token.name = dbUser.name
-            token.role = dbUser.role
-            token.avatar = dbUser.avatar
+            token.role = dbUser.role as any
+            token.avatar = dbUser.avatar || undefined
           }
         } catch (error) {
           console.error('Erro ao atualizar token:', error)
