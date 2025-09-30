@@ -1,7 +1,7 @@
 /**
  * Utilitários gerais da aplicação
  */
-import mongoose from 'mongoose'
+// Removed direct mongoose dependency; keep ObjectId validation util simple
 
 /**
  * Formata uma data para o formato português de Angola
@@ -139,5 +139,5 @@ export function calculateReadTime(text: string): string {
  * Valida se um ID é um ObjectId do MongoDB válido
  */
 export function isValidObjectId(id: string): boolean {
-  return mongoose.Types.ObjectId.isValid(id)
+  return /^[0-9a-fA-F]{24}$/.test(String(id))
 }

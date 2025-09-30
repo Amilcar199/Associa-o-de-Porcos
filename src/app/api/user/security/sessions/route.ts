@@ -4,7 +4,7 @@ import { NextRequest } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { errorResponse, successResponse } from '@/lib/api-utils'
-import ActivityLog from '@/models/ActivityLog'
+import prisma from '@/lib/prisma'
 
 // Nota: Com strategy JWT, invalidar outras sessões exige rotation/blacklist externa.
 // Aqui, como paliativo, mudamos a secret per-user (salt lógico) armazenando em tokenVersion.
@@ -17,11 +17,13 @@ export async function POST(req: NextRequest) {
 
     // TODO(opcional): implementar tokenVersion no User e incrementar aqui.
     try {
-      await ActivityLog.create({
-        user: (session.user as any).id,
-        type: 'session_revoked',
-        ip: req.headers.get('x-forwarded-for') || undefined,
-        userAgent: req.headers.get('user-agent') || undefined,
+      await prisma.activityLog.create({
+        data: {
+          userId: session.user.id,
+          type: 'session_revoked',
+          ip: req.headers.get('x-forwarded-for') || undefined || null,
+          userAgent: req.headers.get('user-agent') || undefined || null,
+        }
       })
     } catch {}
     return Response.json(successResponse({}, 'Sessões encerradas em outros dispositivos'))

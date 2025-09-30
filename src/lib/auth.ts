@@ -32,9 +32,47 @@ export const authOptions: NextAuthOptions = {
         }
 
         try {
-          const user = await prisma.user.findUnique({
+          let user = await prisma.user.findUnique({
             where: { email: credentials.email.toLowerCase() }
           })
+
+          // Fallback: migrar usuário do Mongo para Prisma no primeiro login
+          if (!user) {
+            try {
+              const { default: connectDB } = await import('@/lib/mongodb')
+              await connectDB()
+              const { default: MongoUser } = await import('@/models/User')
+              const mongoUser: any = await (MongoUser as any).findOne({ email: credentials.email.toLowerCase(), isActive: true }).select('+password')
+              if (mongoUser) {
+                const ok = await (mongoUser as any).comparePassword(credentials.password)
+                if (!ok) {
+                  throw new Error('Senha incorreta')
+                }
+                // Upsert no Prisma para não quebrar login
+                user = await prisma.user.upsert({
+                  where: { email: mongoUser.email.toLowerCase() },
+                  update: {},
+                  create: {
+                    name: mongoUser.name,
+                    email: mongoUser.email.toLowerCase(),
+                    password: mongoUser.password,
+                    role: mongoUser.role || 'visitor',
+                    avatar: mongoUser.avatar || null,
+                    phone: mongoUser.phone || null,
+                    company: mongoUser.company || null,
+                    bio: mongoUser.bio || null,
+                    location: mongoUser.location || null,
+                    website: mongoUser.website || null,
+                    socialMedia: mongoUser.socialMedia || null,
+                    preferences: mongoUser.preferences || null,
+                    isActive: mongoUser.isActive !== false,
+                  }
+                })
+              }
+            } catch (e) {
+              // Se fallback falhar, continua como não encontrado
+            }
+          }
 
           if (!user) {
             throw new Error('Usuário não encontrado ou inativo')
