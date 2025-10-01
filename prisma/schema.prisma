@@ -74,6 +74,7 @@ model User {
   pushSubscriptions      PushSubscription[]
   accounts               Account[]
   sessions               Session[]
+  imagesUploaded         Image[]
 }
 
 model News {
@@ -292,6 +293,26 @@ model SiteConfig {
   tiktokUrl      String   @default("")
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+}
+
+// New media model for disk-based storage replacing GridFS
+model Image {
+  id          String   @id @default(cuid()) @db.VarChar(191)
+  filename    String
+  contentType String
+  size        Int
+  category    String?  @db.VarChar(100)
+  url         String   @db.VarChar(500) // public URL (e.g., /uploads/images/xyz.png)
+  path        String   @db.VarChar(1000) // absolute or project-relative path on disk
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  uploadedById String?
+  uploadedBy   User?    @relation(fields: [uploadedById], references: [id])
+
+  @@index([category])
+  @@index([uploadedById])
 }
 
 // NextAuth models
