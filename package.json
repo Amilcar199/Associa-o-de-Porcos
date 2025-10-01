@@ -10,7 +10,10 @@
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "setup": "node scripts/setup.js",
-    "seed:admin": "node scripts/create-admin.js"
+    "seed:admin": "node scripts/create-admin.js",
+    "migrate:users": "node scripts/migrate-users.js",
+    "migrate:images": "node scripts/migrate-gridfs-images.js",
+    "migrate:collections": "node scripts/migrate-collections.js"
   },
   "dependencies": {
     "@auth/mongodb-adapter": "^3.10.0",
