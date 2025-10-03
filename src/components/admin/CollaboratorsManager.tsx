@@ -12,6 +12,7 @@ interface Collaborator {
   name: string;
   role: string;
   company: string;
+  order?: number;
   avatar?: string;
   description: string;
   contact: {
@@ -32,6 +33,7 @@ interface CollaboratorFormData {
   name: string;
   role: string;
   company: string;
+  order?: number;
   avatar?: string;
   description: string;
   contact: {
@@ -59,6 +61,7 @@ export default function CollaboratorsManager() {
     name: '',
     role: '',
     company: '',
+    order: undefined,
     avatar: '',
     description: '',
     contact: {
@@ -125,6 +128,7 @@ export default function CollaboratorsManager() {
       name: collaborator.name,
       role: collaborator.role,
       company: collaborator.company,
+      order: collaborator.order,
       avatar: collaborator.avatar || '',
       description: collaborator.description,
       contact: collaborator.contact,
@@ -187,12 +191,53 @@ export default function CollaboratorsManager() {
   const companies = Array.from(new Map(collaborators.map(c => [c.company, c.company])).values());
 
   const columns = [
-    { key: 'name', title: 'Nome' },
-    { key: 'role', title: 'Cargo' },
-    { key: 'company', title: 'Empresa' },
+    { key: 'order', title: 'Ordem', sortable: true, render: (value: any, row: any) => (
+      <div className="flex items-center gap-2">
+        <span className="inline-block w-8 text-right">{value ?? '-'}</span>
+        <div className="flex flex-col">
+          <button
+            type="button"
+            className="text-gray-500 hover:text-gray-800 leading-none"
+            title="Mover para cima"
+            onClick={async () => {
+              try {
+                await fetch(`/api/collaborators/${row._id}`, {
+                  method: 'PUT',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ order: Math.max(0, (row.order || 0) - 1) })
+                })
+                fetchCollaborators()
+              } catch {}
+            }}
+          >
+            ↑
+          </button>
+          <button
+            type="button"
+            className="text-gray-500 hover:text-gray-800 leading-none"
+            title="Mover para baixo"
+            onClick={async () => {
+              try {
+                await fetch(`/api/collaborators/${row._id}`, {
+                  method: 'PUT',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ order: (row.order || 0) + 1 })
+                })
+                fetchCollaborators()
+              } catch {}
+            }}
+          >
+            ↓
+          </button>
+        </div>
+      </div>
+    ) },
+    { key: 'name', title: 'Nome', sortable: true },
+    { key: 'role', title: 'Cargo', sortable: true },
+    { key: 'company', title: 'Empresa', sortable: true },
     { key: 'contact', title: 'Contato' },
-    { key: 'isFeatured', title: 'Destaque' },
-    { key: 'createdAt', title: 'Data' }
+    { key: 'isFeatured', title: 'Destaque', sortable: true },
+    { key: 'createdAt', title: 'Data', sortable: true }
   ];
 
   const formatDate = (dateString: string) => {
@@ -226,7 +271,10 @@ export default function CollaboratorsManager() {
     );
   };
 
-  const tableData = filteredCollaborators.map(collaborator => ({
+  const tableData = filteredCollaborators
+    .slice()
+    .sort((a, b) => (a.order || 0) - (b.order || 0))
+    .map(collaborator => ({
     ...collaborator,
     contact: formatContact(collaborator.contact),
     isFeatured: formatFeatured(collaborator.isFeatured),
@@ -328,6 +376,20 @@ export default function CollaboratorsManager() {
               />
             </div>
             
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Ordem (prioridade)
+              </label>
+              <input
+                type="number"
+                min={0}
+                value={formData.order ?? ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, order: e.target.value === '' ? undefined : Number(e.target.value) }))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="Deixe em branco para próxima posição"
+              />
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Cargo

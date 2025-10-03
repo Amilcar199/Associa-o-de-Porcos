@@ -15,7 +15,8 @@ export function generateMetadata(): Metadata {
 
 async function getCollaborators() {
   try {
-    const res = await fetch(`/api/collaborators`, { cache: 'no-store', headers: { Accept: 'application/json' } })
+    // Ensure ordering by importance (order asc)
+    const res = await fetch(`/api/collaborators?sort=order&order=asc`, { cache: 'no-store', headers: { Accept: 'application/json' } })
     if (!res.ok) return []
     const contentType = res.headers.get('content-type') || ''
     if (!contentType.includes('application/json')) return []

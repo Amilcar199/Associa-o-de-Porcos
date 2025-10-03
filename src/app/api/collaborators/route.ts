@@ -22,6 +22,11 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url)
     const pagination = getPaginationParams(searchParams)
+    // Default ordering: most important positions first (by 'order' ascending)
+    if (!searchParams.get('sort')) {
+      pagination.sort = 'order'
+      pagination.order = 'asc'
+    }
     const filters = getSearchFilters(searchParams)
 
     // Construir query final
