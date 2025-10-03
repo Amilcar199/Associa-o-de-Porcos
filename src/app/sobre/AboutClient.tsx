@@ -255,7 +255,7 @@ export default function AboutClient() {
                 <li className="text-3xl font-heading font-extrabold text-primary-700">Luanda</li>
                 <li className="text-xl text-gray-800">Benguela</li>
                 <li className="text-xl text-gray-800">Bengo</li>
-                <li className="text-xl text-gray-800">Icole Bengo</li>
+                <li className="text-xl text-gray-800">Icolo e Bengo</li>
                 <li className="text-xl text-gray-800">Malanje</li>
                 <li className="text-xl text-gray-800">Huambo</li>
                 <li className="text-xl text-gray-800">Kuanza Norte</li>
