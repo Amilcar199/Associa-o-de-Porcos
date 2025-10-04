@@ -235,22 +235,22 @@ const Footer = () => {
               
               <div className="flex items-center space-x-3">
                 <Phone size={16} className="text-primary-400 flex-shrink-0" />
-                <a href={`tel:${siteConfig?.contactPhone || '+244930675044'}`} className="text-sm text-gray-300 hover:text-primary-400 transition-colors">
-                  {siteConfig?.contactPhone || '+244 930 675 044'}
+                <a href={`tel:${siteConfig?.contactPhone || '+244923221950'}`} className="text-sm text-gray-300 hover:text-primary-400 transition-colors">
+                  {siteConfig?.contactPhone || '+244 923 221 950'}
                 </a>
               </div>
               
               <div className="flex items-center space-x-3">
                 <Mail size={16} className="text-primary-400 flex-shrink-0" />
-                <a href={`mailto:${siteConfig?.contactEmail || 'contato@associacaodeporcos.ao'}`} className="text-sm text-gray-300 hover:text-primary-400 transition-colors">
-                  {siteConfig?.contactEmail || 'contato@associacaodeporcos.ao'}
+                <a href={`mailto:${siteConfig?.contactEmail || 'Paulobaptista18@hotmail.com'}`} className="text-sm text-gray-300 hover:text-primary-400 transition-colors">
+                  {siteConfig?.contactEmail || 'Paulobaptista18@hotmail.com'}
                 </a>
               </div>
             </div>
 
             {/* WhatsApp CTA */}
             <div className="mt-6">
-              <a href={`https://wa.me/${siteConfig?.whatsappNumber || '244928476427'}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+              <a href={`https://wa.me/${siteConfig?.whatsappNumber || '244923221950'}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
                 <Phone size={16} />
                 <span>{dict.footer.whatsapp}</span>
               </a>

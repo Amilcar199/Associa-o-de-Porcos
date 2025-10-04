@@ -39,7 +39,7 @@ export default async function PrivacidadePage() {
         <h2>{isEn ? 'Storage and security' : 'Armazenamento e segurança'}</h2>
         <p>{isEn ? 'We apply reasonable technical and organizational measures to protect your data.' : 'Aplicamos medidas técnicas e organizacionais razoáveis para proteger os seus dados.'}</p>
         <h2>{isEn ? 'Your rights' : 'Seus direitos'}</h2>
-        <p>{isEn ? `You can request access, correction or deletion of your data. Contact us at ${siteConfig?.contactEmail || 'contato@associacaodeporcos.ao'}.` : `Você pode solicitar acesso, correção ou eliminação dos seus dados. Contacte-nos em ${siteConfig?.contactEmail || 'contato@associacaodeporcos.ao'}.`}</p>
+        <p>{isEn ? `You can request access, correction or deletion of your data. Contact us at ${siteConfig?.contactEmail || 'Paulobaptista18@hotmail.com'}.` : `Você pode solicitar acesso, correção ou eliminação dos seus dados. Contacte-nos em ${siteConfig?.contactEmail || 'Paulobaptista18@hotmail.com'}.`}</p>
       </div>
     </section>
   )

@@ -220,7 +220,7 @@ const CallToAction = () => {
                     <Mail size={18} className="text-white" />
                   </div>
                   <div>
-                    <p className="text-white font-medium">{siteConfig?.contactEmail || 'contato@associacaodeporcos.ao'}</p>
+                    <p className="text-white font-medium">{siteConfig?.contactEmail || 'Paulobaptista18@hotmail.com'}</p>
                     <p className="text-primary-200 text-sm">{isEn ? 'We reply within 24h' : 'Respondemos em até 24h'}</p>
                   </div>
                 </div>

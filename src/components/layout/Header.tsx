@@ -115,11 +115,11 @@ const Header = () => {
             <div className="flex items-center space-x-6">
               <div className="flex items-center space-x-2">
                 <Phone size={14} />
-                <span>{siteConfig?.contactPhone || '+244 930 675 044'}</span>
+                <span>{siteConfig?.contactPhone || '+244 923 221 950'}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Mail size={14} />
-                <span>{siteConfig?.contactEmail || 'contato@associacaodeporcos.ao'}</span>
+                <span>{siteConfig?.contactEmail || 'Paulobaptista18@hotmail.com'}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <MapPin size={14} />

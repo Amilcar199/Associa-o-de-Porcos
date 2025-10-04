@@ -100,8 +100,8 @@ export default async function LegalCompliancePage() {
           {isEn
             ? 'For legal requests, contact us at '
             : 'Para requerimentos jurídicos, contacte-nos em '}
-          <a className="text-primary-700 hover:underline" href={`mailto:${siteConfig?.contactEmail || 'contato@associacaodeporcos.ao'}`}>
-            {siteConfig?.contactEmail || 'contato@associacaodeporcos.ao'}
+          <a className="text-primary-700 hover:underline" href={`mailto:${siteConfig?.contactEmail || 'Paulobaptista18@hotmail.com'}`}>
+            {siteConfig?.contactEmail || 'Paulobaptista18@hotmail.com'}
           </a>
           .
         </p>

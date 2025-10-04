@@ -89,13 +89,13 @@ export default function ContatoPage() {
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">{isEn ? 'Contact Channels' : 'Canais de Atendimento'}</h2>
             <div className="space-y-3 text-gray-700">
-              <a href={`mailto:${siteConfig?.contactEmail || 'contato@associacaodeporcos.ao'}`} className="flex items-center gap-3 hover:text-primary-700">
-                <Mail size={18} className="text-primary-600" aria-hidden /> {siteConfig?.contactEmail || 'contato@associacaodeporcos.ao'}
+              <a href={`mailto:${siteConfig?.contactEmail || 'Paulobaptista18@hotmail.com'}`} className="flex items-center gap-3 hover:text-primary-700">
+                <Mail size={18} className="text-primary-600" aria-hidden /> {siteConfig?.contactEmail || 'Paulobaptista18@hotmail.com'}
               </a>
-              <a href="tel:+244930675044" className="flex items-center gap-3 hover:text-primary-700">
-                <Phone size={18} className="text-primary-600" aria-hidden /> +244 930 675 044
+              <a href={`tel:${(siteConfig as any)?.contactPhone || '+244923221950'}`} className="flex items-center gap-3 hover:text-primary-700">
+                <Phone size={18} className="text-primary-600" aria-hidden /> {(siteConfig as any)?.contactPhone || '+244 923 221 950'}
               </a>
-              <a href="https://wa.me/244930675044" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 hover:text-primary-700">
+              <a href={`https://wa.me/${(siteConfig as any)?.whatsappNumber || '244923221950'}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 hover:text-primary-700">
                 <MessageCircle size={18} className="text-primary-600" aria-hidden /> WhatsApp
               </a>
               <div className="flex items-center gap-3 text-gray-600">
@@ -114,7 +114,7 @@ export default function ContatoPage() {
             </div>
 
             <a
-              href="https://wa.me/244930675044"
+              href={`https://wa.me/${(siteConfig as any)?.whatsappNumber || '244923221950'}`}
               target="_blank"
               rel="noopener noreferrer"
               className="mt-5 inline-flex items-center justify-center w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition"
@@ -166,7 +166,7 @@ export default function ContatoPage() {
             <button disabled={loading} className="inline-flex items-center bg-primary-600 hover:bg-primary-700 text-white px-5 py-2.5 rounded font-medium disabled:opacity-60">
               <Send size={18} className="mr-2" aria-hidden /> {loading ? (isEn ? 'Sending...' : 'Enviando...') : (isEn ? 'Send Message' : 'Enviar Mensagem')}
             </button>
-            <a href="tel:+244930675044" className="inline-flex items-center text-primary-700 hover:text-primary-800 font-medium">{isEn ? 'Or call now' : 'Ou ligue agora'}</a>
+            <a href={`tel:${(siteConfig as any)?.contactPhone || '+244923221950'}`} className="inline-flex items-center text-primary-700 hover:text-primary-800 font-medium">{isEn ? 'Or call now' : 'Ou ligue agora'}</a>
           </div>
         </form>
       </div>
