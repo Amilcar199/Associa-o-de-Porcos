@@ -280,7 +280,7 @@ export default function ProductModal({
                 <Mail size={16} />
                 {isEn ? 'Send Message' : 'Enviar Mensagem'}
               </a>
-              <a href="tel:+244928476427" className="btn-primary flex items-center gap-2">
+              <a href="tel:+244923221950" className="btn-primary flex items-center gap-2">
                 <Phone size={16} />
                 {isEn ? 'Call Now' : 'Ligar Agora'}
               </a>

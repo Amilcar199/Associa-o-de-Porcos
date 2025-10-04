@@ -215,10 +215,10 @@ export default function ServicosPage() {
               <a href="/contato" className="inline-flex items-center gap-2 bg-white text-primary-700 hover:bg-primary-50 px-4 py-2 rounded-lg font-medium transition-colors">
                 {isEn ? 'Talk to the team' : 'Falar com a equipe'} <ArrowRight size={18} />
               </a>
-              <a href="tel:+244928476427" className="inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-400 px-4 py-2 rounded-lg font-medium transition-colors">
+              <a href="tel:+244923221950" className="inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-400 px-4 py-2 rounded-lg font-medium transition-colors">
                 <PhoneCall size={18} /> {isEn ? 'Call now' : 'Ligar agora'}
               </a>
-              <a href="https://wa.me/244928476427" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 px-4 py-2 rounded-lg font-medium transition-colors">
+              <a href="https://wa.me/244923221950" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 px-4 py-2 rounded-lg font-medium transition-colors">
                 <MessageCircle size={18} /> WhatsApp
               </a>
             </div>
