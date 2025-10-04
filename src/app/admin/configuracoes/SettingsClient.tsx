@@ -7,10 +7,10 @@ import { toast } from 'react-hot-toast'
 export default function SettingsClient() {
   const [currency, setCurrency] = useState('AOA')
   const [locale, setLocale] = useState('pt-AO')
-  const [contactEmail, setContactEmail] = useState('contato@associacaoporcos.ao')
+  const [contactEmail, setContactEmail] = useState('Paulobaptista18@hotmail.com')
   const [saving, setSaving] = useState(false)
-  const [contactPhone, setContactPhone] = useState('')
-  const [whatsappNumber, setWhatsappNumber] = useState('')
+  const [contactPhone, setContactPhone] = useState('+244 923 221 950')
+  const [whatsappNumber, setWhatsappNumber] = useState('244923221950')
   const [facebookUrl, setFacebookUrl] = useState('')
   const [instagramUrl, setInstagramUrl] = useState('')
   const [linkedinUrl, setLinkedinUrl] = useState('')
