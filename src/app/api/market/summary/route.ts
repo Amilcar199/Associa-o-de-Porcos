@@ -62,6 +62,7 @@ async function computeAverage(unit: Unit, start: Date, end: Date, region?: strin
     pipeline.push({ $match: { breed } })
   }
 
+  pipeline.push({ $match: { value: { $ne: null } } })
   pipeline.push({
     $group: {
       _id: null,
@@ -98,7 +99,8 @@ export async function GET(req: NextRequest) {
     let effectiveDayEnd = tomorrowStart
     let usedFallback = false
     if (current.avg == null) {
-      for (let i = 1; i <= 14; i++) {
+      // Expand fallback window up to 30 days back to find a recent valid day
+      for (let i = 1; i <= 30; i++) {
         const s = addDays(todayStart, -i)
         const e = addDays(todayStart, -(i - 1))
         const tmp = await computeAverage(unit, s, e, region, breed)
