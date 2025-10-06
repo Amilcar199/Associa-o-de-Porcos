@@ -99,8 +99,8 @@ export async function GET(req: NextRequest) {
     let effectiveDayEnd = tomorrowStart
     let usedFallback = false
     if (current.avg == null) {
-      // Expand fallback window up to 30 days back to find a recent valid day
-      for (let i = 1; i <= 30; i++) {
+      // Expand fallback window up to 365 days back to find a recent valid day
+      for (let i = 1; i <= 365; i++) {
         const s = addDays(todayStart, -i)
         const e = addDays(todayStart, -(i - 1))
         const tmp = await computeAverage(unit, s, e, region, breed)
@@ -116,7 +116,7 @@ export async function GET(req: NextRequest) {
 
     // Find nearest previous valid day (not necessarily consecutive)
     let prevValid: { avg: number | null, count: number } = { avg: null, count: 0 }
-    for (let i = 1; i <= 30; i++) {
+    for (let i = 1; i <= 365; i++) {
       const s = addDays(effectiveDayStart, -i)
       const e = addDays(effectiveDayStart, -(i - 1))
       const tmp = await computeAverage(unit, s, e, region, breed)
