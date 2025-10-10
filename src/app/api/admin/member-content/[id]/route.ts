@@ -58,11 +58,16 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
       'isFeatured', 'isActive', 'tags'
     ]
 
-    allowedFields.forEach(field => {
+    const updateFields: any = {}
+    allowedFields.forEach((field) => {
       if ((sanitizedData as any)[field] !== undefined) {
-        ;(existingContent as any)[field] = (sanitizedData as any)[field]
+        updateFields[field] = (sanitizedData as any)[field]
       }
     })
+
+    if (updateFields.eventDate) {
+      updateFields.eventDate = new Date(updateFields.eventDate)
+    }
 
     const updated = await prisma.memberContent.update({ where: { id }, data: updateFields })
     return NextResponse.json(successResponse(updated, 'Conteúdo atualizado com sucesso'))
