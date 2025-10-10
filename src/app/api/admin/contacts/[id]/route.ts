@@ -61,11 +61,8 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
       return errorResponse('Status inválido')
     }
 
-    await prisma.contact.update({ where: { id }, data: { status } })
-
-    return NextResponse.json(
-      successResponse(contact, 'Status do contato atualizado com sucesso')
-    )
+    const updated = await prisma.contact.update({ where: { id }, data: { status } })
+    return NextResponse.json(successResponse(updated, 'Status do contato atualizado com sucesso'))
   } catch (error: any) {
     console.error('Erro ao atualizar contato:', error)
     
