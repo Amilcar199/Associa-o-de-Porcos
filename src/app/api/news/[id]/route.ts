@@ -1,9 +1,8 @@
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import connectDB from '@/lib/mongodb'
-import News from '@/models/News'
-import { validateSession, errorResponse, successResponse, isValidObjectId, sanitizeInput } from '@/lib/api-utils'
+import prisma from '@/lib/prisma'
+import { validateSession, errorResponse, successResponse, sanitizeInput } from '@/lib/api-utils'
 
 interface RouteParams {
   params: {
@@ -14,15 +13,8 @@ interface RouteParams {
 // GET /api/news/[id] - Buscar notícia específica
 export async function GET(req: NextRequest, { params }: RouteParams) {
   try {
-    await connectDB()
-
     const { id } = params
-
-    if (!isValidObjectId(id)) {
-      return errorResponse('ID da notícia inválido')
-    }
-
-    const news = await News.findById(id)
+    const news = await prisma.news.findUnique({ where: { id } })
 
     if (!news) {
       return errorResponse('Notícia não encontrada', 404)
@@ -30,7 +22,7 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
 
     // Incrementar visualizações se for uma requisição pública
     if (!req.headers.get('authorization')) {
-      await news.incrementViews()
+      await prisma.news.update({ where: { id }, data: { views: { increment: 1 } } })
     }
 
     return NextResponse.json(successResponse(news))
@@ -43,14 +35,8 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
 // PUT /api/news/[id] - Atualizar notícia (apenas admins)
 export async function PUT(req: NextRequest, { params }: RouteParams) {
   try {
-    await connectDB()
-
     const { id } = params
-
-    if (!isValidObjectId(id)) {
-      return errorResponse('ID da notícia inválido')
-    }
-
+    
     // Validar sessão (apenas admins)
     const authResult = await validateSession(req, true)
     if ('error' in authResult) {
@@ -58,8 +44,8 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
     }
 
     // Buscar notícia existente
-    const news = await News.findById(id)
-    if (!news) {
+    const existing = await prisma.news.findUnique({ where: { id } })
+    if (!existing) {
       return errorResponse('Notícia não encontrada', 404)
     }
 
@@ -78,9 +64,27 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
     if (sanitizedData.videos && !Array.isArray(sanitizedData.videos)) {
       sanitizedData.videos = []
     }
-    // Atualizar notícia
-    Object.assign(news, sanitizedData)
-    await news.save()
+    const images = Array.isArray(sanitizedData.images) ? sanitizedData.images : undefined
+    const videos = Array.isArray(sanitizedData.videos) ? sanitizedData.videos : undefined
+    const tags = Array.isArray(sanitizedData.tags) ? sanitizedData.tags : undefined
+
+    const news = await prisma.news.update({
+      where: { id },
+      data: {
+        title: sanitizedData.title,
+        slug: sanitizedData.slug,
+        content: sanitizedData.content,
+        excerpt: sanitizedData.excerpt,
+        featuredImage: sanitizedData.featuredImage,
+        images: images as any,
+        videos: videos as any,
+        category: sanitizedData.category,
+        tags: tags as any,
+        published: typeof sanitizedData.published === 'boolean' ? sanitizedData.published : existing.published,
+        featured: typeof sanitizedData.featured === 'boolean' ? sanitizedData.featured : existing.featured,
+        publishedAt: sanitizedData.published ? (sanitizedData.publishedAt ? new Date(sanitizedData.publishedAt) : new Date()) : existing.publishedAt
+      }
+    })
 
     return NextResponse.json(
       successResponse(news, 'Notícia atualizada com sucesso')
@@ -100,27 +104,18 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
 // DELETE /api/news/[id] - Deletar notícia (apenas admins)
 export async function DELETE(req: NextRequest, { params }: RouteParams) {
   try {
-    await connectDB()
-
     const { id } = params
-
-    if (!isValidObjectId(id)) {
-      return errorResponse('ID da notícia inválido')
-    }
-
+    
     // Validar sessão (apenas admins)
     const authResult = await validateSession(req, true)
     if ('error' in authResult) {
       return errorResponse(authResult.error || 'Erro de autenticação', authResult.status)
     }
-
-    const news = await News.findById(id)
+    const news = await prisma.news.findUnique({ where: { id } })
     if (!news) {
       return errorResponse('Notícia não encontrada', 404)
     }
-
-    // Deletar notícia permanentemente
-    await News.findByIdAndDelete(id)
+    await prisma.news.delete({ where: { id } })
 
     return NextResponse.json(
       successResponse(null, 'Notícia deletada com sucesso')
