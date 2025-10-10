@@ -1,14 +1,12 @@
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import connectDB from '@/lib/mongodb'
-import SiteConfig from '@/models/SiteConfig'
+import prisma from '@/lib/prisma'
 import { validateSession, errorResponse, successResponse } from '@/lib/api-utils'
 
 export async function GET() {
   try {
-    await connectDB()
-    const cfg = await SiteConfig.findOne().lean()
+    const cfg = await prisma.siteConfig.findFirst()
     return NextResponse.json(successResponse(cfg || {}))
   } catch (error) {
     console.error('Erro ao buscar config:', error)
@@ -18,7 +16,6 @@ export async function GET() {
 
 export async function PUT(req: NextRequest) {
   try {
-    await connectDB()
     const auth = await validateSession(req, true)
     if ('error' in auth) return errorResponse(auth.error || 'Não autorizado', auth.status)
 
@@ -39,7 +36,10 @@ export async function PUT(req: NextRequest) {
     if (typeof body.twitterUrl === 'string') update.twitterUrl = body.twitterUrl
     if (typeof body.tiktokUrl === 'string') update.tiktokUrl = body.tiktokUrl
 
-    const cfg = await SiteConfig.findOneAndUpdate({}, update, { new: true, upsert: true })
+    const existing = await prisma.siteConfig.findFirst()
+    const cfg = existing
+      ? await prisma.siteConfig.update({ where: { id: existing.id }, data: update })
+      : await prisma.siteConfig.create({ data: update })
     return NextResponse.json(successResponse(cfg, 'Configurações atualizadas'))
   } catch (error) {
     console.error('Erro ao salvar config:', error)

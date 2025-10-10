@@ -1,14 +1,11 @@
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import connectDB from '@/lib/mongodb'
-import User from '@/models/User'
+import prisma from '@/lib/prisma'
 import { getPaginationParams, successResponse, errorResponse, validateSession } from '@/lib/api-utils'
 
 export async function GET(req: NextRequest) {
   try {
-    await connectDB()
-
     // Apenas admins
     const auth = await validateSession(req, true)
     if ('error' in auth) {
@@ -34,13 +31,28 @@ export async function GET(req: NextRequest) {
     const skip = (page - 1) * limit
 
     const [results, total] = await Promise.all([
-      User.find(query)
-        .sort({ [sort]: order === 'asc' ? 1 : -1 })
-        .skip(skip)
-        .limit(limit)
-        .select('name email role isActive createdAt company location')
-        .lean(),
-      User.countDocuments(query)
+      prisma.user.findMany({
+        where: {
+          AND: [
+            search ? { OR: [ { name: { contains: search, mode: 'insensitive' } }, { email: { contains: search, mode: 'insensitive' } } ] } : {},
+            role ? { role } : {},
+            isActive !== undefined ? { isActive } : {}
+          ]
+        },
+        orderBy: { [sort]: order as any },
+        skip: skip,
+        take: limit,
+        select: { name: true, email: true, role: true, isActive: true, createdAt: true, company: true, location: true }
+      }),
+      prisma.user.count({
+        where: {
+          AND: [
+            search ? { OR: [ { name: { contains: search, mode: 'insensitive' } }, { email: { contains: search, mode: 'insensitive' } } ] } : {},
+            role ? { role } : {},
+            isActive !== undefined ? { isActive } : {}
+          ]
+        }
+      })
     ])
 
     const pages = Math.ceil(total / limit)
@@ -58,8 +70,6 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    await connectDB()
-
     // Apenas admins podem criar usuários
     const auth = await validateSession(req, true)
     if ('error' in auth) {
@@ -74,13 +84,13 @@ export async function POST(req: NextRequest) {
     }
 
     // Verificar se o email já existe
-    const existingUser = await User.findOne({ email: body.email.toLowerCase() })
+    const existingUser = await prisma.user.findUnique({ where: { email: body.email.toLowerCase() } })
     if (existingUser) {
       return errorResponse('Email já está em uso')
     }
 
     // Criar novo usuário
-    const userData = {
+    const createdUser = await prisma.user.create({ data: {
       name: body.name.trim(),
       email: body.email.toLowerCase().trim(),
       password: body.password,
@@ -90,21 +100,9 @@ export async function POST(req: NextRequest) {
       location: body.location?.trim() || null,
       phone: body.phone?.trim() || null,
       website: body.website?.trim() || null,
-      socialMedia: {
-        linkedin: body.socialMedia?.linkedin?.trim() || null,
-        twitter: body.socialMedia?.twitter?.trim() || null,
-        facebook: body.socialMedia?.facebook?.trim() || null
-      },
+      social: body.socialMedia ? (body.socialMedia as any) : undefined,
       isActive: body.isActive !== undefined ? body.isActive : true
-    }
-
-    const newUser = new User(userData)
-    await newUser.save()
-
-    // Retornar usuário criado (sem senha)
-    const createdUser = await User.findById(newUser._id)
-      .select('name email role isActive createdAt company bio location phone website socialMedia avatar')
-      .lean()
+    }, select: { name: true, email: true, role: true, isActive: true, createdAt: true, company: true, bio: true, location: true, phone: true, website: true, avatar: true } })
 
     return NextResponse.json(successResponse(createdUser, 'Usuário criado com sucesso'), { status: 201 })
   } catch (error) {

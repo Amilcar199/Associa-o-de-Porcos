@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import connectDB from '@/lib/mongodb'
-import MemberContent from '@/models/MemberContent'
+import prisma from '@/lib/prisma'
 import { successResponse, errorResponse, sanitizeInput } from '@/lib/api-utils'
-import { isValidObjectId } from '@/lib/utils'
 
 interface RouteParams {
   params: { id: string }
@@ -13,21 +11,16 @@ interface RouteParams {
 // GET /api/admin/member-content/[id] - Buscar conteúdo específico
 export async function GET(req: NextRequest, { params }: RouteParams) {
   try {
-    await connectDB()
-    
     const session = await getServerSession(authOptions)
     if (!session?.user || session.user.role !== 'admin') {
       return errorResponse('Acesso negado. Apenas administradores podem acessar este recurso.', 403)
     }
 
     const { id } = params
-    if (!isValidObjectId(id)) {
-      return errorResponse('ID inválido')
-    }
-
-    const content = await MemberContent.findById(id)
-      .populate('author', 'name email')
-      .lean()
+    const content = await prisma.memberContent.findUnique({
+      where: { id },
+      select: { id: true, title: true, type: true, category: true, createdAt: true, author: { select: { name: true, email: true } } }
+    })
 
     if (!content) {
       return errorResponse('Conteúdo não encontrado', 404)
@@ -43,23 +36,17 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
 // PATCH /api/admin/member-content/[id] - Atualizar conteúdo
 export async function PATCH(req: NextRequest, { params }: RouteParams) {
   try {
-    await connectDB()
-    
     const session = await getServerSession(authOptions)
     if (!session?.user || session.user.role !== 'admin') {
       return errorResponse('Acesso negado. Apenas administradores podem acessar este recurso.', 403)
     }
 
     const { id } = params
-    if (!isValidObjectId(id)) {
-      return errorResponse('ID inválido')
-    }
 
     const body = await req.json()
     const sanitizedData = sanitizeInput(body)
 
-    // Buscar conteúdo existente
-    const existingContent = await MemberContent.findById(id)
+    const existingContent = await prisma.memberContent.findUnique({ where: { id } })
     if (!existingContent) {
       return errorResponse('Conteúdo não encontrado', 404)
     }
@@ -77,12 +64,8 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
       }
     })
 
-    await existingContent.save()
-    
-    // Populate author para retorno
-    await existingContent.populate('author', 'name email')
-    
-    return NextResponse.json(successResponse(existingContent, 'Conteúdo atualizado com sucesso'))
+    const updated = await prisma.memberContent.update({ where: { id }, data: updateFields })
+    return NextResponse.json(successResponse(updated, 'Conteúdo atualizado com sucesso'))
   } catch (error) {
     console.error('Erro ao atualizar conteúdo:', error)
     return errorResponse('Erro interno do servidor', 500)
@@ -92,25 +75,17 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
 // DELETE /api/admin/member-content/[id] - Excluir conteúdo
 export async function DELETE(req: NextRequest, { params }: RouteParams) {
   try {
-    await connectDB()
-    
     const session = await getServerSession(authOptions)
     if (!session?.user || session.user.role !== 'admin') {
       return errorResponse('Acesso negado. Apenas administradores podem acessar este recurso.', 403)
     }
 
     const { id } = params
-    if (!isValidObjectId(id)) {
-      return errorResponse('ID inválido')
-    }
-
-    const content = await MemberContent.findById(id)
+    const content = await prisma.memberContent.findUnique({ where: { id } })
     if (!content) {
       return errorResponse('Conteúdo não encontrado', 404)
     }
-
-    await MemberContent.findByIdAndDelete(id)
-    
+    await prisma.memberContent.delete({ where: { id } })
     return NextResponse.json(successResponse({}, 'Conteúdo excluído com sucesso'))
   } catch (error) {
     console.error('Erro ao excluir conteúdo:', error)
