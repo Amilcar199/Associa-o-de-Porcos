@@ -17,6 +17,12 @@ model User {
 
   accounts Account[]
   sessions Session[]
+  // Relations to app models
+  products           Product[]
+  news               News[]
+  memberContents     MemberContent[]
+  marketQuotesCreated  MarketQuote[] @relation("MarketQuoteCreatedBy")
+  marketQuotesApproved MarketQuote[] @relation("MarketQuoteApprovedBy")
 }
 
 model Account {
@@ -91,4 +97,153 @@ model Collaborator {
 
   @@index([isActive, featured, orderInt])
   @@index([orderInt])
+}
+
+model Product {
+  id           String   @id @default(cuid())
+  name         String
+  description  String
+  breed        String
+  age          Int
+  weight       Int
+  price        Float?
+  pricePerKg   Float?
+  saleForm     String?
+  images       Json
+  videos       Json?
+  features     Json?
+  healthStatus String
+  vaccinated   Boolean
+  location     String
+  code         String   @unique
+  availability String   @default("available")
+  sellerId     String?
+  tags         Json?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  seller User? @relation(fields: [sellerId], references: [id], onDelete: SetNull)
+}
+
+model News {
+  id            String   @id @default(cuid())
+  title         String
+  slug          String   @unique
+  content       String
+  excerpt       String
+  featuredImage String
+  images        Json?
+  videos        Json?
+  authorId      String?
+  category      String
+  tags          Json?
+  published     Boolean  @default(false)
+  featured      Boolean  @default(false)
+  views         Int      @default(0)
+  publishedAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  author User? @relation(fields: [authorId], references: [id], onDelete: SetNull)
+}
+
+model MemberContent {
+  id            String   @id @default(cuid())
+  title         String
+  description   String
+  type          String
+  category      String
+  url           String?
+  thumbnail     String?
+  content       String?
+  fileUrl       String?
+  videoUrl      String?
+  eventDate     DateTime?
+  eventLocation String?
+  isFeatured    Boolean  @default(false)
+  isActive      Boolean  @default(true)
+  authorId      String?
+  tags          Json?
+  views         Int      @default(0)
+  downloads     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  author User? @relation(fields: [authorId], references: [id], onDelete: SetNull)
+}
+
+model MarketQuote {
+  id              String   @id @default(cuid())
+  weekISO         String
+  region          String
+  saleForm        String
+  status          String   @default("draft")
+  refPricePerKg   Float
+  refPricePerHead Float?
+  minSamples      Int      @default(0)
+  methodologyNote String?
+  createdById     String?
+  approvedById    String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  createdBy User? @relation("MarketQuoteCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  approvedBy User? @relation("MarketQuoteApprovedBy", fields: [approvedById], references: [id], onDelete: SetNull)
+
+  @@unique([weekISO, region, saleForm, status])
+  @@index([region, saleForm])
+}
+
+model SiteConfig {
+  id             String   @id @default(cuid())
+  logoUrl        String   @default("")
+  publicLogoUrl  String   @default("")
+  adminLogoUrl   String   @default("")
+  currency       String   @default("AOA")
+  locale         String   @default("pt-AO")
+  contactEmail   String   @default("Paulobaptista18@hotmail.com")
+  contactPhone   String   @default("+244 923 221 950")
+  whatsappNumber String   @default("244923221950")
+  facebookUrl    String   @default("")
+  instagramUrl   String   @default("")
+  linkedinUrl    String   @default("")
+  youtubeUrl     String   @default("")
+  twitterUrl     String   @default("")
+  tiktokUrl      String   @default("")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model LegalSection {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  title       String   @default("")
+  description String   @default("")
+  items       Json?
+  updatedBy   String   @default("")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  ip        String?
+  userAgent String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PushSubscription {
+  id             String   @id @default(cuid())
+  endpoint       String   @unique
+  expirationTime Int?
+  p256dh         String
+  auth           String
+  userId         String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
