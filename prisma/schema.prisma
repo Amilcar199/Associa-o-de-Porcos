@@ -10,10 +10,22 @@ datasource db {
 // NextAuth core tables (even if using JWT sessions)
 model User {
   id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
+  name          String
+  email         String    @unique
+  password      String
+  role          String    @default("visitor")
+  avatar        String?
+  phone         String?
+  company       String?
+  bio           String?
+  location      String?
+  website       String?
+  social        Json?
+  isActive      Boolean   @default(true)
   emailVerified DateTime?
   image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   accounts Account[]
   sessions Session[]
