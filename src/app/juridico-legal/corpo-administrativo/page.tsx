@@ -16,7 +16,7 @@ async function getLegal() {
   try {
     const h = headers()
     const protocol = h.get('x-forwarded-proto') || 'http'
-    const host = h.get('host') || 'localhost:3000'
+    const host = h.get('host') || 'assuino.com'
     const baseUrl = `${protocol}://${host}`
     const res = await fetch(`${baseUrl}/api/legal-content`, { cache: 'no-store' })
     const j = res.ok ? await res.json() : { data: [] }

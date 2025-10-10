@@ -28,8 +28,9 @@ export default function MetaTags({
   section,
   tags = []
 }: MetaTagsProps) {
-  const fullUrl = url ? `${process.env.NEXTAUTH_URL}${url}` : process.env.NEXTAUTH_URL;
-  const fullImage = image.startsWith('http') ? image : `${process.env.NEXTAUTH_URL}${image}`;
+  const base = process.env.NEXTAUTH_URL || 'http://assuino.com'
+  const fullUrl = url ? `${base}${url}` : base;
+  const fullImage = image.startsWith('http') ? image : `${base}${image}`;
 
   return (
     <Head>
@@ -97,8 +98,8 @@ export default function MetaTags({
             "@type": "Organization",
             "name": "${BRAND_NAME}",
             "description": description,
-            "url": process.env.NEXTAUTH_URL,
-            "logo": `${process.env.NEXTAUTH_URL}/images/logo.png`,
+            "url": base,
+            "logo": `${base}/images/logo.png`,
             "image": fullImage,
             "sameAs": [
               "https://www.facebook.com/associacaoporcos",

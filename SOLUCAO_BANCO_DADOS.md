@@ -71,12 +71,12 @@ Após executar o script de inicialização, você terá:
 ## 🔍 **Verificar se Funcionou**
 
 ### **1. Testar Login**
-1. Acesse: http://localhost:3000/login
+1. Acesse: http://assuino.com/login
 2. Use as credenciais: admin@associacao.ao / admin123
 3. Deve fazer login com sucesso
 
 ### **2. Verificar Dashboard Admin**
-1. Acesse: http://localhost:3000/admin/usuarios
+1. Acesse: http://assuino.com/admin/usuarios
 2. Deve mostrar a lista de usuários
 3. Deve permitir criar novos usuários
 
@@ -116,7 +116,7 @@ MONGODB_URI=mongodb+srv://usuario:senha@cluster.mongodb.net/banco
 NEXTAUTH_SECRET=chave-secreta-para-nextauth
 
 # Obrigatório
-NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_URL=http://assuino.com
 
 # Opcional (para OAuth)
 GOOGLE_CLIENT_ID=seu-google-client-id

@@ -30,11 +30,11 @@ export const metadata: Metadata = {
   authors: [{ name: BRAND_NAME }],
   creator: BRAND_NAME,
   publisher: BRAND_NAME,
-  metadataBase: new URL('https://associacaodeporcos.ao'),
+  metadataBase: new URL('http://assuino.com'),
   openGraph: {
     type: 'website',
     locale: 'pt_AO',
-    url: 'https://associacaodeporcos.ao',
+    url: 'http://assuino.com',
     title: `${BRAND_NAME} - Criação Sustentável e Parceria`,
     description: 'Associação dedicada à criação sustentável de suínos, promovendo parcerias entre criadores.',
     siteName: BRAND_NAME,

@@ -50,7 +50,8 @@ export async function POST(req: NextRequest) {
     await user.save();
 
     // Enviar email de recuperação
-    const resetUrl = `${process.env.NEXTAUTH_URL}/redefinir-senha?token=${resetToken}`;
+    const base = process.env.NEXTAUTH_URL || 'http://assuino.com'
+    const resetUrl = `${base}/redefinir-senha?token=${resetToken}`;
     
     const emailHtml = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">

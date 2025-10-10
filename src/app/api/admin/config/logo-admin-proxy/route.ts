@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
     const url = cfg?.adminLogoUrl || cfg?.logoUrl || ''
     if (url && url.startsWith('/api/images/')) {
       // Proxy para a imagem do GridFS
-      const res = await fetch(`${process.env.NEXTAUTH_URL || ''}${url}`, { cache: 'no-store' })
+      const res = await fetch(`${process.env.NEXTAUTH_URL || 'http://assuino.com'}${url}`, { cache: 'no-store' })
       const arrayBuf = await res.arrayBuffer()
       return new NextResponse(arrayBuf, { headers: { 'Content-Type': res.headers.get('Content-Type') || 'image/png' } })
     }
