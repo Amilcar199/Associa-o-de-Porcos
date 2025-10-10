@@ -35,11 +35,21 @@ npm install
 cp .env.example .env.local
 ```
 
-Edite o arquivo `.env.local` com suas configurações:
+Edite o arquivo `.env.local` com suas configurações (nesta branch o banco é MongoDB; variáveis de MySQL ainda não são utilizadas):
 
 ```env
-# Database
+########################################
+# Database (MongoDB - obrigatório nesta branch)
+########################################
 MONGODB_URI=mongodb://localhost:27017/associacao-porcos
+
+########################################
+# Database (MySQL - ainda não utilizado nesta branch)
+########################################
+DB_HOST=
+DB_USER=
+DB_PASSWORD=
+DB_NAME=
 
 # NextAuth.js
 NEXTAUTH_SECRET=your-nextauth-secret-here
@@ -51,7 +61,16 @@ GOOGLE_CLIENT_SECRET=your-google-client-secret
 GITHUB_CLIENT_ID=your-github-client-id
 GITHUB_CLIENT_SECRET=your-github-client-secret
 
+########################################
 # Email Configuration (Nodemailer)
+########################################
+EMAIL_SERVER_HOST=smtp.gmail.com
+EMAIL_SERVER_PORT=587
+EMAIL_SERVER_USER=your-email@gmail.com
+EMAIL_SERVER_PASSWORD=your-app-password
+EMAIL_FROM="Associação de Suinocultores do Norte <your-email@gmail.com>"
+
+# Alternative SMTP names (compatibilidade)
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_USER=your-email@gmail.com
