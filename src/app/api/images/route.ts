@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { listImages, deleteAllImages } from '@/lib/gridfs';
 import { authMiddleware } from '@/lib/api-utils';
+import prisma from '@/lib/prisma'
+import fs from 'fs'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,7 +13,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
-    const images = await listImages();
+    const images = await (prisma as any).image.findMany({ orderBy: { createdAt: 'desc' } })
     
     return NextResponse.json({
       success: true,
@@ -34,7 +35,13 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
-    const { deletedCount, failedCount } = await deleteAllImages();
+    const all = await (prisma as any).image.findMany({ select: { id: true, path: true } })
+    let deletedCount = 0
+    let failedCount = 0
+    for (const it of all) {
+      try { await fs.promises.unlink(it.path); deletedCount++ } catch { failedCount++ }
+    }
+    await (prisma as any).image.deleteMany()
     return NextResponse.json({ success: true, data: { deletedCount, failedCount } });
   } catch (error) {
     console.error('Erro ao deletar todas as imagens:', error);

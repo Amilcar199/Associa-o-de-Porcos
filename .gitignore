@@ -1,4 +1,10 @@
-.env*
+<<<<<<< HEAD
+
+=======
+# Allow committing .env.local temporarily for credential sharing
+# (Will revert after use)
+# .env*
+>>>>>>> 6fadc36 (Temporariamente permitir .env.local no repo para enviar credenciais (iremos reverter depois))
 .DS_Store
 *.log
 node_modules/
@@ -34,11 +40,14 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
-.env*.local
+<<<<<<< HEAD
+=======
+# .env*.local
 .env
 .env.development.local
 .env.test.local
 .env.production.local
+>>>>>>> 6fadc36 (Temporariamente permitir .env.local no repo para enviar credenciais (iremos reverter depois))
 
 # vercel
 .vercel
@@ -99,3 +108,5 @@ node_modules/
 # Temporary folders
 tmp/
 temp/
+
+/generated/prisma

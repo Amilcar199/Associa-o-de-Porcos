@@ -1,9 +1,10 @@
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server';
-import { uploadImage } from '@/lib/gridfs';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import prisma from '@/lib/prisma'
+import { saveBufferToDisk, deleteFromDisk } from '@/lib/storage'
 
 export async function POST(request: NextRequest) {
   try {
@@ -46,20 +47,44 @@ export async function POST(request: NextRequest) {
     // Converter arquivo para Buffer
     const buffer = Buffer.from(await file.arrayBuffer());
     
-    // Fazer upload da imagem (com metadados)
-    const result = await uploadImage(buffer, file.name, file.type, { category });
+    // Salvar no disco e registrar no Prisma
+    const saved = await saveBufferToDisk(buffer, file.name, file.type)
+    const img = await (prisma as any).image.create({
+      data: {
+        filename: saved.filename,
+        contentType: saved.contentType,
+        size: saved.size,
+        category: category || null,
+        url: saved.publicUrl,
+        path: saved.filepath,
+        uploadedById: session.user.id
+      }
+    })
 
-    // Se replaceId foi informado, deletar a antiga
+    // Se replaceId foi informado, deletar a antiga (tenta Prisma; fallback GridFS)
     if (replaceId) {
       try {
-        const { deleteImage } = await import('@/lib/gridfs')
-        await deleteImage(replaceId)
+        const old = await (prisma as any).image.findUnique({ where: { id: replaceId } })
+        if (old) {
+          await deleteFromDisk(old.path)
+          await (prisma as any).image.delete({ where: { id: replaceId } })
+        } else {
+          const { deleteImage } = await import('@/lib/gridfs')
+          await deleteImage(replaceId)
+        }
       } catch {}
     }
 
     return NextResponse.json({
       success: true,
-      data: result
+      data: {
+        fileId: img.id,
+        filename: img.filename,
+        contentType: img.contentType,
+        size: img.size,
+        url: img.url,
+        category: img.category || undefined
+      }
     });
   } catch (error) {
     console.error('Erro no upload de imagem:', error);

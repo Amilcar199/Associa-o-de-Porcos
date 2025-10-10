@@ -1,10 +1,10 @@
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getImage, deleteImage } from '@/lib/gridfs';
-import connectDB from '@/lib/mongodb';
-import LegalSection from '@/models/LegalContent';
 import { authMiddleware } from '@/lib/api-utils';
+import prisma from '@/lib/prisma'
+import fs from 'fs'
+import { getImage, deleteImage } from '@/lib/gridfs';
 
 export async function GET(
   request: NextRequest,
@@ -12,6 +12,19 @@ export async function GET(
 ) {
   try {
     const { id } = params;
+    // Primeiro tenta via Prisma/disk
+    const rec = await (prisma as any).image.findUnique({ where: { id } })
+    if (rec) {
+      const fileStream = fs.createReadStream(rec.path)
+      return new NextResponse(fileStream as any, {
+        headers: {
+          'Content-Type': rec.contentType,
+          'Cache-Control': 'public, max-age=31536000',
+        },
+      });
+    }
+
+    // Fallback GridFS
     const image = await getImage(id);
 
     if (!image) {
@@ -49,7 +62,15 @@ export async function DELETE(
     }
 
     const { id } = params;
-    const success = await deleteImage(id);
+    let success = false
+    const rec = await (prisma as any).image.findUnique({ where: { id } })
+    if (rec) {
+      try { await fs.promises.unlink(rec.path) } catch {}
+      await (prisma as any).image.delete({ where: { id } })
+      success = true
+    } else {
+      success = await deleteImage(id)
+    }
 
     if (!success) {
       return NextResponse.json(
@@ -58,14 +79,8 @@ export async function DELETE(
       );
     }
 
-    // Remover referências no modelo LegalSection (itens com url igual ao arquivo removido)
-    try {
-      await connectDB();
-      const url = `/api/images/${id}`;
-      await (LegalSection as any).updateMany({}, { $pull: { items: { url } } });
-    } catch (e) {
-      console.error('Falha ao limpar referências em LegalSection:', e);
-    }
+    // Remover referências antigas em LegalSection (Mongo) deixado de fora por ora;
+    // as novas URLs de imagem agora apontam para `public/uploads/images/*`.
 
     return NextResponse.json({
       success: true,

@@ -1,16 +1,14 @@
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server';
-import connectDB from '@/lib/mongodb';
-import User from '@/models/User';
 import { successResponse, errorResponse, sanitizeInput } from '@/lib/api-utils';
 import { isPasswordStrong } from '@/lib/password'
+import prisma from '@/lib/prisma'
+import bcrypt from 'bcryptjs'
 
 // POST /api/auth/reset-password - Redefinir senha
 export async function POST(req: NextRequest) {
   try {
-    await connectDB();
-
     const body = await req.json();
     const sanitizedData = sanitizeInput(body);
 
@@ -23,9 +21,9 @@ export async function POST(req: NextRequest) {
       return errorResponse('Senha fraca: mínimo 6 caracteres, ao menos um número e sem sequências numéricas (ex.: 123, 321)');
     }
 
-    const user = await User.findOne({ email: sanitizedData.email.toLowerCase(), isActive: true })
+    const user = await prisma.user.findUnique({ where: { email: sanitizedData.email.toLowerCase() } })
 
-    if (!user) {
+    if (!user || user.isActive === false) {
       return errorResponse('Conta não encontrada ou inativa')
     }
 
@@ -44,9 +42,9 @@ export async function POST(req: NextRequest) {
       return errorResponse('Respostas incorretas')
     }
 
-    // Atualizar senha (hash será aplicado no pre-save do modelo)
-    user.password = sanitizedData.password;
-    await user.save();
+    // Atualizar senha
+    const passwordHash = await bcrypt.hash(sanitizedData.password, 12)
+    await prisma.user.update({ where: { id: user.id }, data: { password: passwordHash } })
 
     return NextResponse.json(
       successResponse({}, 'Senha redefinida com sucesso')

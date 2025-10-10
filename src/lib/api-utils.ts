@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from './auth'
-import connectDB from './mongodb'
+// Prisma-based flows no longer need an explicit connect step
 import { ApiResponse, PaginatedResponse } from '@/types'
 
 // Interface para parâmetros de paginação
@@ -44,9 +44,6 @@ export async function withAuth(
 ) {
   return async (req: NextRequest, context: any) => {
     try {
-      // Conectar ao banco
-      await connectDB()
-
       // Validar sessão
       const authResult = await validateSession(req, requireAdmin)
       if ('error' in authResult) {

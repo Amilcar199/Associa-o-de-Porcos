@@ -3,18 +3,15 @@ export const dynamic = 'force-dynamic'
 import { NextRequest } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import connectDB from '@/lib/mongodb'
-import User from '@/models/User'
-import ActivityLog from '@/models/ActivityLog'
 import { errorResponse, successResponse, sanitizeInput } from '@/lib/api-utils'
 import { isPasswordStrong } from '@/lib/password'
+import prisma from '@/lib/prisma'
+import bcrypt from 'bcryptjs'
 
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
     if (!session?.user?.id) return errorResponse('Não autorizado', 401)
-
-    await connectDB()
 
     const { currentPassword, newPassword } = sanitizeInput(await req.json())
     if (!currentPassword || !newPassword) {
@@ -24,21 +21,23 @@ export async function POST(req: NextRequest) {
       return errorResponse('Senha fraca: mínimo 6 caracteres, ao menos um número e sem sequências numéricas (ex.: 123, 321)')
     }
 
-    const user = await User.findById(session.user.id).select('+password')
+    const user = await prisma.user.findUnique({ where: { id: session.user.id } })
     if (!user) return errorResponse('Usuário não encontrado', 404)
 
-    const ok = await user.comparePassword(currentPassword)
+    const ok = await bcrypt.compare(currentPassword, user.password)
     if (!ok) return errorResponse('Senha atual incorreta', 400)
 
-    user.password = newPassword
-    await user.save()
+    const passwordHash = await bcrypt.hash(newPassword, 12)
+    await prisma.user.update({ where: { id: user.id }, data: { password: passwordHash } })
 
     try {
-      await ActivityLog.create({
-        user: user._id,
-        type: 'password_change',
-        ip: req.headers.get('x-forwarded-for') || undefined,
-        userAgent: req.headers.get('user-agent') || undefined,
+      await prisma.activityLog.create({
+        data: {
+          userId: user.id,
+          type: 'password_change',
+          ip: req.headers.get('x-forwarded-for') || undefined || null,
+          userAgent: req.headers.get('user-agent') || undefined || null,
+        }
       })
     } catch {}
 

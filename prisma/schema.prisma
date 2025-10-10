@@ -1,0 +1,357 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// Enums
+enum Role {
+  admin
+  member
+  visitor
+}
+
+enum ContactStatus {
+  new
+  read
+  replied
+  archived
+}
+
+enum SaleForm {
+  carcaça
+  vivo
+}
+
+enum QuoteStatus {
+  draft
+  approved
+  archived
+}
+
+// Models
+model User {
+  id                     String   @id @default(cuid()) @db.VarChar(191)
+  name                   String
+  email                  String   @unique
+  password               String
+  emailVerified          DateTime?
+  image                  String?
+  role                   Role     @default(visitor)
+  avatar                 String?  @db.VarChar(500)
+  phone                  String?  @db.VarChar(32)
+  company                String?  @db.VarChar(100)
+  bio                    String?  @db.VarChar(500)
+  location               String?  @db.VarChar(100)
+  website                String?  @db.VarChar(500)
+  socialMedia            Json?
+  preferences            Json?
+  isActive               Boolean  @default(true)
+  lastLogin              DateTime?
+  passwordResetToken     String?  @db.VarChar(191)
+  passwordResetExpires   DateTime?
+  loginAttempts          Int      @default(0)
+  lockUntil              DateTime?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  // Relations
+  products               Product[]
+  news                   News[]
+  memberContents         MemberContent[]
+  createdQuotes          MarketQuote[]   @relation("CreatedQuotes")
+  approvedQuotes         MarketQuote[]   @relation("ApprovedQuotes")
+  activityLogs           ActivityLog[]
+  pushSubscriptions      PushSubscription[]
+  accounts               Account[]
+  sessions               Session[]
+  imagesUploaded         Image[]
+}
+
+model News {
+  id            String   @id @default(cuid()) @db.VarChar(191)
+  title         String   @db.VarChar(200)
+  slug          String   @unique @db.VarChar(200)
+  content       String   @db.LongText
+  excerpt       String   @db.VarChar(300)
+  featuredImage String
+  images        Json?
+  videos        Json?
+  category      String   @db.VarChar(20)
+  tags          Json?
+  published     Boolean  @default(false)
+  featured      Boolean  @default(false)
+  views         Int      @default(0)
+  publishedAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  authorId      String
+  author        User     @relation(fields: [authorId], references: [id])
+
+  @@index([category, published])
+  @@index([authorId, published])
+  @@index([published, featured, publishedAt])
+  @@index([publishedAt])
+}
+
+model Product {
+  id            String   @id @default(cuid()) @db.VarChar(191)
+  name          String   @db.VarChar(100)
+  description   String   @db.VarChar(1000)
+  breed         String
+  age           Int
+  weight        Int
+  price         Float?
+  pricePerKg    Float?
+  saleForm      SaleForm?
+  images        Json
+  videos        Json?
+  features      Json?
+  healthStatus  String
+  vaccinated    Boolean  @default(false)
+  location      String   @db.VarChar(100)
+  code          String   @unique @db.VarChar(32)
+  availability  String   @default("available")
+  tags          Json?
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  sellerId      String
+  seller        User     @relation(fields: [sellerId], references: [id])
+
+  @@index([breed, availability, isActive])
+  @@index([price, availability, isActive])
+  @@index([pricePerKg, availability, isActive])
+  @@index([saleForm, availability, isActive])
+  @@index([age, weight])
+  @@index([sellerId, isActive])
+  @@index([location, availability])
+}
+
+model MemberContent {
+  id             String   @id @default(cuid()) @db.VarChar(191)
+  title          String   @db.VarChar(200)
+  description    String   @db.VarChar(1000)
+  type           String
+  category       String   @db.VarChar(100)
+  url            String?  @db.VarChar(500)
+  thumbnail      String?  @db.VarChar(500)
+  content        String?  @db.LongText
+  fileUrl        String?  @db.VarChar(500)
+  videoUrl       String?  @db.VarChar(500)
+  eventDate      DateTime?
+  eventLocation  String?  @db.VarChar(200)
+  isFeatured     Boolean  @default(false)
+  isActive       Boolean  @default(true)
+  tags           Json?
+  views          Int      @default(0)
+  downloads      Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relations
+  authorId       String
+  author         User     @relation(fields: [authorId], references: [id])
+
+  @@index([type, category])
+  @@index([isActive, isFeatured])
+  @@index([authorId])
+  @@index([createdAt])
+}
+
+model Collaborator {
+  id           String  @id @default(cuid()) @db.VarChar(191)
+  name         String  @db.VarChar(100)
+  role         String  @db.VarChar(100)
+  company      String? @db.VarChar(100)
+  description  String? @db.VarChar(500)
+  avatar       String
+  email        String? @db.VarChar(191)
+  phone        String? @db.VarChar(32)
+  website      String? @db.VarChar(500)
+  socialMedia  Json?
+  isActive     Boolean @default(true)
+  featured     Boolean @default(false)
+  orderIndex   Int     @default(0) @map("order")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([isActive, featured, orderIndex])
+  @@index([featured, orderIndex])
+  @@index([orderIndex])
+  @@index([createdAt])
+}
+
+model Contact {
+  id        String        @id @default(cuid()) @db.VarChar(191)
+  name      String        @db.VarChar(100)
+  email     String
+  phone     String?       @db.VarChar(32)
+  subject   String        @db.VarChar(200)
+  message   String        @db.VarChar(2000)
+  status    ContactStatus @default(new)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([email])
+  @@index([status, createdAt])
+  @@index([createdAt])
+}
+
+model LegalSection {
+  id          String  @id @default(cuid()) @db.VarChar(191)
+  key         String  @unique
+  title       String  @default("")
+  description String  @default("")
+  items       Json?
+  updatedBy   String  @default("")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model MarketQuote {
+  id               String      @id @default(cuid()) @db.VarChar(191)
+  weekISO          String
+  region           String
+  saleForm         SaleForm
+  status           QuoteStatus @default(draft)
+  refPricePerKg    Float
+  refPricePerHead  Float?
+  minSamples       Int         @default(0)
+  methodologyNote  String?     @db.VarChar(1000)
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  // Relations
+  createdById      String
+  createdBy        User        @relation("CreatedQuotes", fields: [createdById], references: [id])
+  approvedById     String?
+  approvedBy       User?       @relation("ApprovedQuotes", fields: [approvedById], references: [id])
+
+  @@unique([weekISO, region, saleForm, status])
+  @@index([region, saleForm])
+}
+
+model ActivityLog {
+  id         String   @id @default(cuid()) @db.VarChar(191)
+  type       String
+  ip         String?  @db.VarChar(64)
+  userAgent  String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model PushSubscription {
+  id             String   @id @default(cuid()) @db.VarChar(191)
+  endpoint       String   @unique
+  expirationTime Int?
+  keys           Json
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relations
+  userId         String?
+  user           User?    @relation(fields: [userId], references: [id])
+}
+
+model SiteConfig {
+  id             String   @id @default("singleton") @db.VarChar(191)
+  logoUrl        String   @default("")
+  publicLogoUrl  String   @default("")
+  adminLogoUrl   String   @default("")
+  currency       String   @default("AOA")
+  locale         String   @default("pt-AO")
+  contactEmail   String   @default("")
+  contactPhone   String   @default("")
+  whatsappNumber String   @default("")
+  facebookUrl    String   @default("")
+  instagramUrl   String   @default("")
+  linkedinUrl    String   @default("")
+  youtubeUrl     String   @default("")
+  twitterUrl     String   @default("")
+  tiktokUrl      String   @default("")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+// New media model for disk-based storage replacing GridFS
+model Image {
+  id          String   @id @default(cuid()) @db.VarChar(191)
+  filename    String
+  contentType String
+  size        Int
+  category    String?  @db.VarChar(100)
+  url         String   @db.VarChar(500) // public URL (e.g., /uploads/images/xyz.png)
+  path        String   @db.VarChar(1000) // absolute or project-relative path on disk
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  uploadedById String?
+  uploadedBy   User?    @relation(fields: [uploadedById], references: [id])
+
+  @@index([category])
+  @@index([uploadedById])
+}
+
+// NextAuth models
+model Account {
+  id                String  @id @default(cuid()) @db.VarChar(191)
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid()) @db.VarChar(191)
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
