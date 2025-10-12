@@ -1,6 +1,8 @@
 // Custom Next.js server for cPanel Node.js App
 // Uses process.env.PORT provided by the platform
 
+// Load local env file in production (cPanel) without panel variables
+try { require('dotenv').config({ path: '.env.local' }); } catch {}
 const http = require('http');
 const next = require('next');
 
