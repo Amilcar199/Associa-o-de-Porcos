@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
       prisma.user.findMany({
         where: {
           AND: [
-            search ? { OR: [ { name: { contains: search, mode: 'insensitive' } }, { email: { contains: search, mode: 'insensitive' } } ] } : {},
+            search ? { OR: [ { name: { contains: search } }, { email: { contains: search } } ] } : {},
             role ? { role } : {},
             isActive !== undefined ? { isActive } : {}
           ]
@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
       prisma.user.count({
         where: {
           AND: [
-            search ? { OR: [ { name: { contains: search, mode: 'insensitive' } }, { email: { contains: search, mode: 'insensitive' } } ] } : {},
+            search ? { OR: [ { name: { contains: search } }, { email: { contains: search } } ] } : {},
             role ? { role } : {},
             isActive !== undefined ? { isActive } : {}
           ]
