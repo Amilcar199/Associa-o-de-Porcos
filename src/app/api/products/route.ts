@@ -103,7 +103,6 @@ export async function POST(req: NextRequest) {
       vaccinated: !!sanitizedData.vaccinated,
       location: sanitizedData.location,
       availability: sanitizedData.isAvailable === false ? 'reserved' : 'available',
-      seller: seller._id,
       tags: sanitizedData.tags || []
     }
 
