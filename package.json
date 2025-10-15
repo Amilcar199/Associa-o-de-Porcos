@@ -12,10 +12,13 @@
     "setup": "node scripts/setup.js",
     "seed:admin": "node scripts/create-admin.js",
     "prisma:generate": "prisma generate",
-    "prisma:push": "prisma db push"
+    "prisma:push": "prisma db push",
+    "migrate:mongo-to-prisma": "node scripts/migrate-mongo-to-prisma.js",
+    "verify:migration": "node scripts/verify-migration.js"
   },
   "dependencies": {
     "@auth/mongodb-adapter": "^3.10.0",
+    "@prisma/client": "^5.19.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.5",
     "@types/nodemailer": "^6.4.17",
@@ -32,7 +35,6 @@
     "next": "^14.0.0",
     "next-auth": "^4.24.0",
     "nodemailer": "^6.10.1",
-    "@prisma/client": "^5.19.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.47.0",
@@ -41,7 +43,6 @@
     "web-push": "^3.6.7"
   },
   "devDependencies": {
-    "prisma": "^5.19.0",
     "@tailwindcss/forms": "^0.5.7",
     "@tailwindcss/typography": "^0.5.10",
     "@types/js-cookie": "^3.0.6",
@@ -51,7 +52,9 @@
     "autoprefixer": "^10.4.16",
     "eslint": "^8.53.0",
     "eslint-config-next": "^14.0.0",
+    "mysql2": "^3.15.2",
     "postcss": "^8.4.31",
+    "prisma": "^5.19.0",
     "tailwindcss": "^3.3.0",
     "typescript": "^5.9.2"
   },
