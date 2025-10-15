@@ -12,7 +12,9 @@
     "setup": "node scripts/setup.js",
     "seed:admin": "node scripts/create-admin.js",
     "prisma:generate": "prisma generate",
-    "prisma:push": "prisma db push"
+    "prisma:push": "prisma db push",
+    "migrate:mongo-to-prisma": "node scripts/migrate-mongo-to-prisma.js",
+    "verify:migration": "node scripts/verify-migration.js"
   },
   "dependencies": {
     "@auth/mongodb-adapter": "^3.10.0",
