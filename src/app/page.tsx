@@ -11,6 +11,9 @@ import PartnersSection from '@/components/sections/PartnersSection'
 export const metadata: Metadata = {
   title: `Home - ${BRAND_NAME}`,
   description: `Bem-vindo à ${BRAND_NAME}. Sustentabilidade, qualidade e parcerias para impulsionar resultados na suinocultura.`,
+  alternates: {
+    canonical: `${process.env.NEXTAUTH_URL || 'https://assuino.com'}/`,
+  },
   openGraph: {
     title: `${BRAND_NAME} - Sustentabilidade e Qualidade`,
     description: 'Boas práticas, inovação e parcerias para fortalecer toda a cadeia da suinocultura.',
