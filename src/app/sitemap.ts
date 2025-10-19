@@ -1,11 +1,13 @@
 // @ts-nocheck
 import { MetadataRoute } from 'next';
+import connectDB from '@/lib/mongodb'
+import News from '@/models/News'
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXTAUTH_URL || 'http://assuino.com';
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const baseUrl = process.env.NEXTAUTH_URL || 'https://assuino.com';
   
   // Páginas estáticas
-  const staticPages = [
+  const staticPages: MetadataRoute.Sitemap = [
     {
       url: baseUrl,
       lastModified: new Date(),
@@ -68,8 +70,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
-  // Páginas dinâmicas (seriam buscadas do banco de dados)
-  const dynamicPages = [
+  // Páginas dinâmicas base
+  const dynamicPages: MetadataRoute.Sitemap = [
     {
       url: `${baseUrl}/noticias`,
       lastModified: new Date(),
@@ -96,5 +98,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
-  return [...staticPages, ...dynamicPages];
+  // Notícias publicadas do banco de dados
+  let newsPages: MetadataRoute.Sitemap = []
+  try {
+    await connectDB()
+    const news = await News.find({ published: true }).select('slug updatedAt').lean()
+    newsPages = news.map((n: any) => ({
+      url: `${baseUrl}/noticias/${n.slug}`,
+      lastModified: n.updatedAt ? new Date(n.updatedAt) : new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    })) as MetadataRoute.Sitemap
+  } catch (e) {
+    // silently ignore
+  }
+
+  return [...staticPages, ...dynamicPages, ...newsPages];
 }

@@ -30,11 +30,11 @@ export const metadata: Metadata = {
   authors: [{ name: BRAND_NAME }],
   creator: BRAND_NAME,
   publisher: BRAND_NAME,
-  metadataBase: new URL('http://assuino.com'),
+  metadataBase: new URL('https://assuino.com'),
   openGraph: {
     type: 'website',
     locale: 'pt_AO',
-    url: 'http://assuino.com',
+    url: 'https://assuino.com',
     title: `${BRAND_NAME} - Criação Sustentável e Parceria`,
     description: 'Associação dedicada à criação sustentável de suínos, promovendo parcerias entre criadores.',
     siteName: BRAND_NAME,
@@ -76,12 +76,39 @@ export default function RootLayout({
 }) {
   const cookieStore = cookies()
   const locale = cookieStore.get('locale')?.value || 'pt-AO'
+  const baseUrl = process.env.NEXTAUTH_URL || 'https://assuino.com'
   return (
     <html lang={locale} className={`${inter.variable} ${poppins.variable}`}>
       <head>
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="manifest" href="/manifest.webmanifest" />
         <meta name="theme-color" content="#16a34a" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: BRAND_NAME,
+              url: baseUrl,
+              logo: `${baseUrl}/icon-512x512.png`,
+              image: `${baseUrl}/og`,
+              sameAs: [
+                "https://www.facebook.com/associacaoporcos",
+                "https://www.instagram.com/associacaoporcos",
+                "https://www.linkedin.com/company/associacaoporcos"
+              ],
+              contactPoint: {
+                "@type": "ContactPoint",
+                contactType: "customer service",
+                email: "contato@associacaoporcos.ao",
+                telephone: "+244 928 476 427"
+              }
+            })
+          }}
+        />
       </head>
       <body className="min-h-screen bg-gray-50 font-sans antialiased overflow-x-hidden">
         <AuthProvider>

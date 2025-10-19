@@ -29,6 +29,9 @@ export async function generateMetadata({ params }: RouteParams): Promise<Metadat
     return {
       title: `${news.title} - ${BRAND_NAME}`,
       description: news.excerpt,
+      alternates: {
+        canonical: `${process.env.NEXTAUTH_URL || 'https://assuino.com'}/noticias/${params.slug}`,
+      },
       openGraph: {
         title: news.title,
         description: news.excerpt,
@@ -80,8 +83,29 @@ export default async function NewsPage({ params }: RouteParams) {
       )
     }
 
+    const baseUrl = process.env.NEXTAUTH_URL || 'https://assuino.com'
+    const canonical = `${baseUrl}/noticias/${params.slug}`
+
     return (
       <article className="max-w-4xl mx-auto px-4 py-8">
+        <link rel="canonical" href={canonical} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "NewsArticle",
+              headline: (news as any).title,
+              datePublished: (news as any).publishedAt ? new Date((news as any).publishedAt).toISOString() : undefined,
+              dateModified: (news as any).updatedAt ? new Date((news as any).updatedAt).toISOString() : undefined,
+              image: (news as any).featuredImage ? [(news as any).featuredImage] : undefined,
+              mainEntityOfPage: canonical,
+              author: (news as any).author ? { "@type": "Person", name: (news as any).author?.name || "Autor" } : undefined,
+              publisher: { "@type": "Organization", name: BRAND_NAME, logo: { "@type": "ImageObject", url: `${baseUrl}/icon-512x512.png` } },
+              description: (news as any).excerpt
+            })
+          }}
+        />
         {/* Header da notícia */}
         <header className="mb-8">
           <div className="mb-4">
