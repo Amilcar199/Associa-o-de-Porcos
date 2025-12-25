@@ -1,18 +1,16 @@
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server';
-import connectDB from '@/lib/mongodb';
-import User from '@/models/User';
 import { successResponse, errorResponse, sanitizeInput, isValidEmail } from '@/lib/api-utils';
 import { sendWelcomeEmail, sendEmail } from '@/lib/email';
 import crypto from 'crypto'
 import { isPasswordStrong } from '@/lib/password'
+import prisma from '@/lib/prisma'
+import bcrypt from 'bcryptjs'
 
 // POST /api/auth/register - Registrar novo usuário
 export async function POST(req: NextRequest) {
   try {
-    await connectDB();
-
     const body = await req.json();
     const sanitizedData = sanitizeInput(body);
 
@@ -30,7 +28,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Verificar se o email já existe
-    const existingUser = await User.findOne({ email: sanitizedData.email });
+    const existingUser = await prisma.user.findUnique({ where: { email: sanitizedData.email.toLowerCase() } });
     if (existingUser) {
       return errorResponse('Email já está em uso');
     }
@@ -49,30 +47,42 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Criar usuário
-    const userData = {
-      name: sanitizedData.name,
-      email: sanitizedData.email,
-      password: sanitizedData.password,
-      phone: sanitizedData.phone || undefined,
-      company: sanitizedData.company || undefined,
-      bio: sanitizedData.bio || undefined,
-      role,
-      isActive: sanitizedData.isActive !== undefined ? sanitizedData.isActive : true,
-      preferences: {
-        newsletter: true,
-        notifications: true
-      }
-    };
+    const passwordHash = await bcrypt.hash(sanitizedData.password, 12)
 
-    const user = new User(userData);
-    await user.save();
+    // Criar usuário
+    const user = await prisma.user.create({
+      data: {
+        name: sanitizedData.name,
+        email: sanitizedData.email.toLowerCase(),
+        password: passwordHash,
+        phone: sanitizedData.phone || undefined,
+        company: sanitizedData.company || undefined,
+        bio: sanitizedData.bio || undefined,
+        role,
+        isActive: sanitizedData.isActive !== undefined ? Boolean(sanitizedData.isActive) : true,
+        preferences: {
+          newsletter: true,
+          notifications: true
+        } as any
+      }
+    })
 
     // Opcional: enviar email de boas-vindas
     try { await sendWelcomeEmail(sanitizedData.email, sanitizedData.name) } catch {}
 
     // Retornar usuário sem senha
-    const userResponse = user.toPublicJSON();
+    const userResponse = {
+      id: user.id,
+      name: user.name,
+      avatar: user.avatar,
+      role: user.role,
+      company: user.company,
+      bio: user.bio,
+      location: user.location,
+      website: user.website,
+      socialMedia: user.socialMedia,
+      createdAt: user.createdAt
+    }
 
     return NextResponse.json(
       successResponse(userResponse, 'Conta criada com sucesso!'),

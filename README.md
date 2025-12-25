@@ -1,20 +1,20 @@
 # Associação de Porcos - Website Institucional
 
-Website institucional completo para a Associação de Porcos, desenvolvido com Next.js 14, TypeScript, Tailwind CSS e MongoDB.
+Website institucional completo para a Associação de Porcos, desenvolvido com Next.js 14, TypeScript, Tailwind CSS e Prisma + MySQL (migrado de MongoDB).
 
 ## 🚀 Tecnologias
 
 - **Frontend:** Next.js 14, React, TypeScript, Tailwind CSS
-- **Backend:** Next.js API Routes, MongoDB, Mongoose
+- **Backend:** Next.js API Routes, Prisma ORM, MySQL
 - **Autenticação:** NextAuth.js
 - **Email:** Nodemailer
-- **Upload de Imagens:** MongoDB GridFS
+- **Upload de Imagens:** (em migração) de MongoDB GridFS para armazenamento em disco + tabela `Image`
 - **Deploy:** Vercel (recomendado)
 
 ## 📋 Pré-requisitos
 
 - Node.js 18+ 
-- MongoDB (local ou Atlas)
+- MySQL 8+
 - Conta de email para envio (Gmail, Outlook, etc.)
 
 ## 🛠️ Instalação
@@ -38,8 +38,8 @@ cp .env.example .env.local
 Edite o arquivo `.env.local` com suas configurações:
 
 ```env
-# Database
-MONGODB_URI=mongodb://localhost:27017/associacao-porcos
+# Database (MySQL)
+DATABASE_URL="mysql://user:password@localhost:3306/associacao_porcos"
 
 # NextAuth.js
 NEXTAUTH_SECRET=your-nextauth-secret-here
@@ -48,8 +48,6 @@ NEXTAUTH_URL=http://assuino.com
 # OAuth Providers (opcional)
 GOOGLE_CLIENT_ID=your-google-client-id
 GOOGLE_CLIENT_SECRET=your-google-client-secret
-GITHUB_CLIENT_ID=your-github-client-id
-GITHUB_CLIENT_SECRET=your-github-client-secret
 
 # Email Configuration (Nodemailer)
 SMTP_HOST=smtp.gmail.com
@@ -87,11 +85,13 @@ src/
 │   ├── sections/         # Seções da homepage
 │   └── ui/               # Componentes reutilizáveis
 ├── lib/                  # Utilitários
-│   ├── mongodb.ts        # Conexão MongoDB
+│   ├── prisma.ts         # Cliente Prisma (MySQL)
 │   ├── auth.ts           # Configuração NextAuth
 │   ├── email.ts          # Configuração Nodemailer
 │   └── api-utils.ts      # Utilitários da API
-├── models/               # Modelos Mongoose
+├── models/               # (legado) Modelos Mongoose
+prisma/
+├── schema.prisma         # Esquema Prisma (MySQL)
 └── types/                # Tipos TypeScript
 ```
 
