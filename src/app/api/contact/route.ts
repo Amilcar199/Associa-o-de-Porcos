@@ -1,8 +1,7 @@
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import connectDB from '@/lib/mongodb'
-import Contact from '@/models/Contact'
+import prisma from '@/lib/prisma'
 import {
   successResponse,
   errorResponse,
@@ -14,8 +13,6 @@ import { sendContactNotification } from '@/lib/email'
 // POST /api/contact - Criar nova mensagem de contato (público)
 export async function POST(req: NextRequest) {
   try {
-    await connectDB()
-
     const body = await req.json()
     const sanitizedData = sanitizeInput(body)
 
@@ -36,17 +33,18 @@ export async function POST(req: NextRequest) {
       return errorResponse('Mensagem não pode ter mais que 2000 caracteres')
     }
 
-    // Criar contato
-    const contact = new Contact({
-      name: sanitizedData.name,
-      email: sanitizedData.email,
-      phone: sanitizedData.phone || undefined,
-      subject: sanitizedData.subject,
-      message: sanitizedData.message,
-      status: 'new'
+    // Criar contato (Prisma / MySQL)
+    const contact = await prisma.contact.create({
+      data: {
+        name: sanitizedData.name,
+        email: sanitizedData.email,
+        phone: sanitizedData.phone || null,
+        subject: sanitizedData.subject,
+        message: sanitizedData.message,
+        status: 'new'
+      },
+      select: { id: true }
     })
-
-    await contact.save()
 
     // Enviar notificação por email para o admin (se configurado)
     if (process.env.ADMIN_EMAIL) {
@@ -65,7 +63,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       successResponse(
-        { id: contact._id },
+        { id: contact.id },
         'Mensagem enviada com sucesso! Entraremos em contato em breve.'
       ),
       { status: 201 }

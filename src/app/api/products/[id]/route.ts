@@ -1,9 +1,8 @@
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import connectDB from '@/lib/mongodb'
-import Product from '@/models/Product'
-import { validateSession, errorResponse, successResponse, isValidObjectId, sanitizeInput } from '@/lib/api-utils'
+import prisma from '@/lib/prisma'
+import { validateSession, errorResponse, successResponse, sanitizeInput } from '@/lib/api-utils'
 
 interface RouteParams {
   params: {
@@ -14,16 +13,8 @@ interface RouteParams {
 // GET /api/products/[id] - Buscar produto específico
 export async function GET(req: NextRequest, { params }: RouteParams) {
   try {
-    await connectDB()
-
     const { id } = params
-
-    if (!isValidObjectId(id)) {
-      return errorResponse('ID do produto inválido')
-    }
-
-    // Buscar o produto, mesmo se o campo isActive não existir (registros antigos)
-    const product = await Product.findOne({ _id: id, $or: [ { isActive: true }, { isActive: { $exists: false } } ] })
+    const product = await prisma.product.findUnique({ where: { id } })
 
     if (!product) {
       return errorResponse('Produto não encontrado', 404)
@@ -39,14 +30,8 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
 // PUT /api/products/[id] - Atualizar produto (apenas admins)
 export async function PUT(req: NextRequest, { params }: RouteParams) {
   try {
-    await connectDB()
-
     const { id } = params
-
-    if (!isValidObjectId(id)) {
-      return errorResponse('ID do produto inválido')
-    }
-
+    
     // Validar sessão (apenas admins)
     const authResult = await validateSession(req, true)
     if ('error' in authResult) {
@@ -54,8 +39,8 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
     }
 
     // Buscar produto existente
-    const product = await Product.findById(id)
-    if (!product) {
+    const existing = await prisma.product.findUnique({ where: { id } })
+    if (!existing) {
       return errorResponse('Produto não encontrado', 404)
     }
 
@@ -75,39 +60,35 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
       return errorResponse('Status de saúde e status de vacinação são obrigatórios')
     }
 
-    // Mapear campos aceitos
-    const updateData: any = {
-      name: sanitizedData.name,
-      description: sanitizedData.description,
-      breed: sanitizedData.breed,
-      age: sanitizedData.age,
-      weight: sanitizedData.weight,
-      price: sanitizedData.price,
-      pricePerKg: sanitizedData.pricePerKg,
-      saleForm: sanitizedData.saleForm,
-      features: sanitizedData.features,
-      healthStatus: sanitizedData.healthStatus,
-      vaccinated: sanitizedData.vaccinated,
-      location: sanitizedData.location,
-      tags: sanitizedData.tags,
-    }
-    if (sanitizedData.images || sanitizedData.imageUrl) {
-      updateData.images = Array.isArray(sanitizedData.images) && sanitizedData.images.length
-        ? sanitizedData.images
-        : (sanitizedData.imageUrl ? [sanitizedData.imageUrl] : [])
-    }
-    if (sanitizedData.videos) {
-      updateData.videos = Array.isArray(sanitizedData.videos) ? sanitizedData.videos : []
-    }
-    if (typeof sanitizedData.isAvailable === 'boolean') {
-      updateData.availability = sanitizedData.isAvailable ? 'available' : 'reserved'
-    } else if (sanitizedData.availability) {
-      updateData.availability = sanitizedData.availability
-    }
+    const images = (Array.isArray(sanitizedData.images) && sanitizedData.images.length
+      ? sanitizedData.images
+      : (sanitizedData.imageUrl ? [sanitizedData.imageUrl] : undefined)) as string[] | undefined
+    const videos = Array.isArray(sanitizedData.videos) ? sanitizedData.videos as string[] : undefined
+    const tags = Array.isArray(sanitizedData.tags) ? sanitizedData.tags as string[] : undefined
 
-    // Atualizar produto
-    Object.assign(product, updateData)
-    await product.save()
+    const product = await prisma.product.update({
+      where: { id },
+      data: {
+        name: sanitizedData.name,
+        description: sanitizedData.description,
+        breed: sanitizedData.breed,
+        age: sanitizedData.age,
+        weight: sanitizedData.weight,
+        price: sanitizedData.price ?? existing.price,
+        pricePerKg: sanitizedData.pricePerKg ?? existing.pricePerKg,
+        saleForm: sanitizedData.saleForm ?? existing.saleForm,
+        features: (sanitizedData.features ?? existing.features) as any,
+        healthStatus: sanitizedData.healthStatus,
+        vaccinated: sanitizedData.vaccinated,
+        location: sanitizedData.location,
+        tags: (tags ?? existing.tags) as any,
+        images: (images ?? (existing.images as any)) as any,
+        videos: (videos ?? (existing.videos as any)) as any,
+        availability: typeof sanitizedData.isAvailable === 'boolean'
+          ? (sanitizedData.isAvailable ? 'available' : 'reserved')
+          : (sanitizedData.availability ?? existing.availability)
+      }
+    })
 
     return NextResponse.json(
       successResponse(product, 'Produto atualizado com sucesso')
@@ -127,27 +108,18 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
 // DELETE /api/products/[id] - Deletar produto (apenas admins)
 export async function DELETE(req: NextRequest, { params }: RouteParams) {
   try {
-    await connectDB()
-
     const { id } = params
-
-    if (!isValidObjectId(id)) {
-      return errorResponse('ID do produto inválido')
-    }
-
+    
     // Validar sessão (apenas admins)
     const authResult = await validateSession(req, true)
     if ('error' in authResult) {
       return errorResponse(authResult.error || 'Erro de autenticação', authResult.status)
     }
-
-    const product = await Product.findById(id)
+    const product = await prisma.product.findUnique({ where: { id } })
     if (!product) {
       return errorResponse('Produto não encontrado', 404)
     }
-
-    // Deletar produto permanentemente
-    await Product.findByIdAndDelete(id)
+    await prisma.product.delete({ where: { id } })
 
     return NextResponse.json(
       successResponse(null, 'Produto deletado com sucesso')

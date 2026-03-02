@@ -1,6 +1,5 @@
 import { Metadata } from 'next'
-import connectDB from '@/lib/mongodb'
-import News from '@/models/News'
+import prisma from '@/lib/prisma'
 import { formatDate } from '@/lib/utils'
 import { BRAND_NAME } from '@/lib/brand'
 import ViewCounter from './ViewCounter'
@@ -17,8 +16,7 @@ export async function generateMetadata({ params }: RouteParams): Promise<Metadat
   const locale = cookies().get('locale')?.value || 'pt-AO'
   const isEn = String(locale).startsWith('en')
   try {
-    await connectDB()
-    const news = await News.findOne({ slug: params.slug, published: true }).populate('author', 'name')
+    const news = await prisma.news.findFirst({ where: { slug: params.slug, published: true } })
     if (!news) {
       return {
         title: isEn ? 'News not found' : 'Notícia não encontrada',
@@ -52,8 +50,7 @@ export async function generateMetadata({ params }: RouteParams): Promise<Metadat
 // Gerar dados estáticos para notícias publicadas
 export async function generateStaticParams() {
   try {
-    await connectDB()
-    const news = await News.find({ published: true }).select('slug').lean()
+    const news = await prisma.news.findMany({ where: { published: true }, select: { slug: true } })
     return news.map((item) => ({ slug: item.slug }))
   } catch (error) {
     return []
@@ -64,8 +61,7 @@ export default async function NewsPage({ params }: RouteParams) {
   const locale = cookies().get('locale')?.value || 'pt-AO'
   const isEn = String(locale).startsWith('en')
   try {
-    await connectDB()
-    const news = await News.findOne({ slug: params.slug, published: true }).lean()
+    const news = await prisma.news.findFirst({ where: { slug: params.slug, published: true } })
     if (!news) {
       return (
         <article className="max-w-4xl mx-auto px-4 py-8">
@@ -118,16 +114,16 @@ export default async function NewsPage({ params }: RouteParams) {
           <h1 className="text-4xl font-bold text-gray-900 mb-4">{news.title}</h1>
           <div className="flex items-center space-x-4 text-gray-600 mb-6">
             {news.publishedAt && (
-              <time dateTime={news.publishedAt.toISOString()}>{formatDate(news.publishedAt)}</time>
+              <time dateTime={new Date(news.publishedAt).toISOString()}>{formatDate(new Date(news.publishedAt))}</time>
             )}
-            <ViewCounter newsId={(news._id as any).toString()} initialViews={news.views || 0} />
+            <ViewCounter newsId={news.id} initialViews={news.views || 0} />
           </div>
         </header>
 
         {/* Galeria de imagens */}
-        {(news.images && news.images.length > 0) ? (
+        {(Array.isArray((news as any).images) && (news as any).images.length > 0) ? (
           <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-            {(news.images as string[]).map((url: string, idx: number) => (
+            {((news as any).images as string[]).map((url: string, idx: number) => (
               <img key={idx} src={url} alt={`${news.title} ${idx+1}`} className="w-full h-64 object-cover rounded-lg" />
             ))}
           </div>
@@ -167,11 +163,11 @@ export default async function NewsPage({ params }: RouteParams) {
         )}
 
         {/* Tags */}
-        {news.tags && news.tags.length > 0 && (
+        {Array.isArray((news as any).tags) && (news as any).tags.length > 0 && (
           <div className="mt-8 pt-8 border-t border-gray-200">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">{isEn ? 'Tags:' : 'Tags:'}</h3>
             <div className="flex flex-wrap gap-2">
-              {(news.tags as string[] || []).map((tag: string, index: number) => (
+              {(((news as any).tags as string[]) || []).map((tag: string, index: number) => (
                 <span key={index} className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full">{tag}</span>
               ))}
             </div>
