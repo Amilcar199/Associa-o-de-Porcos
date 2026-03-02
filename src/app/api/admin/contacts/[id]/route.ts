@@ -1,9 +1,8 @@
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import connectDB from '@/lib/mongodb'
-import Contact from '@/models/Contact'
-import { validateSession, errorResponse, successResponse, isValidObjectId, sanitizeInput } from '@/lib/api-utils'
+import prisma from '@/lib/prisma'
+import { validateSession, errorResponse, successResponse, sanitizeInput } from '@/lib/api-utils'
 
 interface RouteParams {
   params: {
@@ -14,21 +13,15 @@ interface RouteParams {
 // GET /api/admin/contacts/[id] - Buscar contato específico (apenas admins)
 export async function GET(req: NextRequest, { params }: RouteParams) {
   try {
-    await connectDB()
-
     const { id } = params
-
-    if (!isValidObjectId(id)) {
-      return errorResponse('ID do contato inválido')
-    }
-
+    
     // Validar sessão (apenas admins)
     const authResult = await validateSession(req, true)
     if ('error' in authResult) {
       return errorResponse(authResult.error || 'Erro de autenticação', authResult.status)
     }
 
-    const contact = await Contact.findById(id)
+    const contact = await prisma.contact.findUnique({ where: { id } })
 
     if (!contact) {
       return errorResponse('Contato não encontrado', 404)
@@ -36,7 +29,7 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
 
     // Marcar como lido se ainda não foi
     if (contact.status === 'new') {
-      await contact.markAsRead()
+      await prisma.contact.update({ where: { id }, data: { status: 'read' } })
     }
 
     return NextResponse.json(successResponse(contact))
@@ -49,22 +42,15 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
 // PUT /api/admin/contacts/[id] - Atualizar status do contato (apenas admins)
 export async function PUT(req: NextRequest, { params }: RouteParams) {
   try {
-    await connectDB()
-
     const { id } = params
-
-    if (!isValidObjectId(id)) {
-      return errorResponse('ID do contato inválido')
-    }
-
+    
     // Validar sessão (apenas admins)
     const authResult = await validateSession(req, true)
     if ('error' in authResult) {
       return errorResponse(authResult.error || 'Erro de autenticação', authResult.status)
     }
-
-    const contact = await Contact.findById(id)
-    if (!contact) {
+    const existing = await prisma.contact.findUnique({ where: { id } })
+    if (!existing) {
       return errorResponse('Contato não encontrado', 404)
     }
 
@@ -75,13 +61,8 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
       return errorResponse('Status inválido')
     }
 
-    // Atualizar status
-    contact.status = status
-    await contact.save()
-
-    return NextResponse.json(
-      successResponse(contact, 'Status do contato atualizado com sucesso')
-    )
+    const updated = await prisma.contact.update({ where: { id }, data: { status } })
+    return NextResponse.json(successResponse(updated, 'Status do contato atualizado com sucesso'))
   } catch (error: any) {
     console.error('Erro ao atualizar contato:', error)
     
@@ -97,27 +78,18 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
 // DELETE /api/admin/contacts/[id] - Deletar contato (apenas admins)
 export async function DELETE(req: NextRequest, { params }: RouteParams) {
   try {
-    await connectDB()
-
     const { id } = params
-
-    if (!isValidObjectId(id)) {
-      return errorResponse('ID do contato inválido')
-    }
-
+    
     // Validar sessão (apenas admins)
     const authResult = await validateSession(req, true)
     if ('error' in authResult) {
       return errorResponse(authResult.error || 'Erro de autenticação', authResult.status)
     }
-
-    const contact = await Contact.findById(id)
+    const contact = await prisma.contact.findUnique({ where: { id } })
     if (!contact) {
       return errorResponse('Contato não encontrado', 404)
     }
-
-    // Deletar contato permanentemente
-    await Contact.findByIdAndDelete(id)
+    await prisma.contact.delete({ where: { id } })
 
     return NextResponse.json(
       successResponse(null, 'Contato deletado com sucesso')

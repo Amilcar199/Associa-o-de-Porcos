@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import connectDB from '@/lib/mongodb'
-import Contact from '@/models/Contact'
+import prisma from '@/lib/prisma'
 import {
   getPaginationParams,
   getSearchFilters,
@@ -17,8 +16,6 @@ export const dynamic = 'force-dynamic'
 // GET /api/admin/contacts - Listar contatos para admins
 export async function GET(req: NextRequest) {
   try {
-    await connectDB()
-
     // Validar sessão (apenas admins)
     const authResult = await validateSession(req, true)
     if ('error' in authResult) {
@@ -29,38 +26,43 @@ export async function GET(req: NextRequest) {
     const pagination = getPaginationParams(searchParams)
     const filters = getSearchFilters(searchParams)
 
-    // Filtros específicos para contatos
-    const contactFilters: any = {}
-    
+    // Construir where
+    const where: any = {}
+    if (filters.search) {
+      where.OR = [
+        { name: { contains: filters.search, mode: 'insensitive' } },
+        { subject: { contains: filters.search, mode: 'insensitive' } },
+        { message: { contains: filters.search, mode: 'insensitive' } }
+      ]
+    }
     if (searchParams.get('email')) {
-      contactFilters.email = new RegExp(searchParams.get('email')!, 'i')
+      where.email = { contains: searchParams.get('email')!, mode: 'insensitive' }
+    }
+    if (filters.status !== undefined) {
+      where.status = String(filters.status)
+    }
+    const dateFrom = searchParams.get('dateFrom')
+    const dateTo = searchParams.get('dateTo')
+    if (dateFrom || dateTo) {
+      where.createdAt = {}
+      if (dateFrom) (where.createdAt as any).gte = new Date(dateFrom)
+      if (dateTo) (where.createdAt as any).lte = new Date(dateTo)
     }
 
-    // Filtros de data
-    if (searchParams.get('dateFrom')) {
-      const dateFrom = new Date(searchParams.get('dateFrom')!)
-      contactFilters.createdAt = { ...contactFilters.createdAt, $gte: dateFrom }
-    }
-    if (searchParams.get('dateTo')) {
-      const dateTo = new Date(searchParams.get('dateTo')!)
-      contactFilters.createdAt = { ...contactFilters.createdAt, $lte: dateTo }
-    }
+    const total = await prisma.contact.count({ where })
+    const data = await prisma.contact.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+      skip: (pagination.page! - 1) * pagination.limit!,
+      take: pagination.limit!
+    })
 
-    // Construir query final
-    const baseQuery = buildMongoQuery(filters)
-    const finalQuery = { 
-      ...baseQuery, 
-      ...contactFilters
-    }
-
-    // Executar consulta com paginação
-    const result = await paginateResults(
-      Contact,
-      finalQuery,
-      pagination
-    )
-
-    return NextResponse.json(paginatedResponse(result.data, result.pagination))
+    return NextResponse.json(paginatedResponse(data as any, {
+      page: pagination.page,
+      limit: pagination.limit,
+      total,
+      pages: Math.ceil(total / pagination.limit!)
+    }))
   } catch (error) {
     console.error('Erro ao buscar contatos:', error)
     return errorResponse('Erro interno do servidor', 500)

@@ -1,9 +1,8 @@
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import connectDB from '@/lib/mongodb'
-import Collaborator from '@/models/Collaborator'
-import { validateSession, errorResponse, successResponse, isValidObjectId, sanitizeInput } from '@/lib/api-utils'
+import prisma from '@/lib/prisma'
+import { validateSession, errorResponse, successResponse, sanitizeInput } from '@/lib/api-utils'
 
 interface RouteParams {
   params: {
@@ -14,15 +13,8 @@ interface RouteParams {
 // GET /api/collaborators/[id] - Buscar colaborador específico
 export async function GET(req: NextRequest, { params }: RouteParams) {
   try {
-    await connectDB()
-
     const { id } = params
-
-    if (!isValidObjectId(id)) {
-      return errorResponse('ID do colaborador inválido')
-    }
-
-    const collaborator = await Collaborator.findById(id)
+    const collaborator = await prisma.collaborator.findUnique({ where: { id } })
 
     if (!collaborator) {
       return errorResponse('Colaborador não encontrado', 404)
@@ -38,23 +30,16 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
 // PUT /api/collaborators/[id] - Atualizar colaborador (apenas admins)
 export async function PUT(req: NextRequest, { params }: RouteParams) {
   try {
-    await connectDB()
-
     const { id } = params
-
-    if (!isValidObjectId(id)) {
-      return errorResponse('ID do colaborador inválido')
-    }
-
+    
     // Validar sessão (apenas admins)
     const authResult = await validateSession(req, true)
     if ('error' in authResult) {
       return errorResponse(authResult.error || 'Erro de autenticação', authResult.status)
     }
 
-    // Buscar colaborador existente
-    const collaborator = await Collaborator.findById(id)
-    if (!collaborator) {
+    const existing = await prisma.collaborator.findUnique({ where: { id } })
+    if (!existing) {
       return errorResponse('Colaborador não encontrado', 404)
     }
 
@@ -66,9 +51,25 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
       return errorResponse('Nome, cargo e empresa são obrigatórios')
     }
 
-    // Atualizar colaborador
-    Object.assign(collaborator, sanitizedData)
-    await collaborator.save()
+    const collaborator = await prisma.collaborator.update({
+      where: { id },
+      data: {
+        name: sanitizedData.name,
+        role: sanitizedData.role,
+        company: sanitizedData.company || null,
+        description: sanitizedData.description || null,
+        avatar: sanitizedData.avatar,
+        email: sanitizedData.email || null,
+        phone: sanitizedData.phone || null,
+        website: sanitizedData.website || null,
+        linkedin: sanitizedData.socialMedia?.linkedin || null,
+        instagram: sanitizedData.socialMedia?.instagram || null,
+        facebook: sanitizedData.socialMedia?.facebook || null,
+        isActive: sanitizedData.isActive !== false,
+        featured: !!sanitizedData.featured,
+        orderInt: typeof sanitizedData.order === 'number' ? sanitizedData.order : existing.orderInt,
+      }
+    })
 
     return NextResponse.json(
       successResponse(collaborator, 'Colaborador atualizado com sucesso')
@@ -88,27 +89,20 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
 // DELETE /api/collaborators/[id] - Deletar colaborador (apenas admins)
 export async function DELETE(req: NextRequest, { params }: RouteParams) {
   try {
-    await connectDB()
-
     const { id } = params
-
-    if (!isValidObjectId(id)) {
-      return errorResponse('ID do colaborador inválido')
-    }
-
+    
     // Validar sessão (apenas admins)
     const authResult = await validateSession(req, true)
     if ('error' in authResult) {
       return errorResponse(authResult.error || 'Erro de autenticação', authResult.status)
     }
 
-    const collaborator = await Collaborator.findById(id)
+    const collaborator = await prisma.collaborator.findUnique({ where: { id } })
     if (!collaborator) {
       return errorResponse('Colaborador não encontrado', 404)
     }
 
-    // Deletar colaborador permanentemente
-    await Collaborator.findByIdAndDelete(id)
+    await prisma.collaborator.delete({ where: { id } })
 
     return NextResponse.json(
       successResponse(null, 'Colaborador deletado com sucesso')

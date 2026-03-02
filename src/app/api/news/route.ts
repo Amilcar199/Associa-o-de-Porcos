@@ -1,8 +1,7 @@
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import connectDB from '@/lib/mongodb'
-import News from '@/models/News'
+import prisma from '@/lib/prisma'
 import {
   getPaginationParams,
   getSearchFilters,
@@ -19,63 +18,51 @@ import {
 // GET /api/news - Listar notícias com paginação e filtros
 export async function GET(req: NextRequest) {
   try {
-    await connectDB()
-
     const { searchParams } = new URL(req.url)
     const pagination = getPaginationParams(searchParams)
-    const filters = getSearchFilters(searchParams)
-
-    // Filtros específicos para notícias
-    const newsFilters: any = {}
-    
-    if (searchParams.get('author')) {
-      newsFilters.author = searchParams.get('author')
+    // Filtros
+    const where: any = { published: true }
+    const search = searchParams.get('search') || undefined
+    if (search) {
+      where.OR = [
+        { title: { contains: search, mode: 'insensitive' } },
+        { content: { contains: search, mode: 'insensitive' } },
+        { excerpt: { contains: search, mode: 'insensitive' } }
+      ]
     }
-    if (searchParams.get('slug')) {
-      newsFilters.slug = searchParams.get('slug')
-    }
-
-    // Filtros de data
-    if (searchParams.get('dateFrom')) {
-      const dateFrom = new Date(searchParams.get('dateFrom')!)
-      newsFilters.publishedAt = { ...newsFilters.publishedAt, $gte: dateFrom }
-    }
-    if (searchParams.get('dateTo')) {
-      const dateTo = new Date(searchParams.get('dateTo')!)
-      newsFilters.publishedAt = { ...newsFilters.publishedAt, $lte: dateTo }
-    }
-
-    // Construir query final
-    const baseQuery = buildMongoQuery(filters)
-    const finalQuery = { 
-      ...baseQuery, 
-      ...newsFilters,
-      published: true // Apenas notícias publicadas para o público
+    const authorId = searchParams.get('author') || undefined
+    if (authorId) where.authorId = authorId
+    const slug = searchParams.get('slug') || undefined
+    if (slug) where.slug = slug
+    const dateFrom = searchParams.get('dateFrom')
+    const dateTo = searchParams.get('dateTo')
+    if (dateFrom || dateTo) {
+      where.publishedAt = {}
+      if (dateFrom) (where.publishedAt as any).gte = new Date(dateFrom)
+      if (dateTo) (where.publishedAt as any).lte = new Date(dateTo)
     }
 
-    // Se for busca por slug específico, retornar apenas um resultado
-    if (newsFilters.slug) {
-      const news = await News.findOne(finalQuery).populate('author', 'name avatar')
-      
-      if (!news) {
-        return errorResponse('Notícia não encontrada', 404)
-      }
-
-      // Incrementar visualizações
-      await News.findByIdAndUpdate(news._id, { $inc: { views: 1 } })
-
-      return NextResponse.json(successResponse(news))
+    if (slug) {
+      const news = await prisma.news.findFirst({ where })
+      if (!news) return errorResponse('Notícia não encontrada', 404)
+      await prisma.news.update({ where: { id: news.id }, data: { views: { increment: 1 } } })
+      return NextResponse.json(successResponse(news as any))
     }
 
-    // Executar consulta com paginação
-    const result = await paginateResults(
-      News,
-      finalQuery,
-      pagination,
-      'author'
-    )
+    const total = await prisma.news.count({ where })
+    const data = await prisma.news.findMany({
+      where,
+      orderBy: { publishedAt: 'desc' },
+      skip: (pagination.page! - 1) * pagination.limit!,
+      take: pagination.limit!
+    })
 
-    return NextResponse.json(paginatedResponse(result.data, result.pagination))
+    return NextResponse.json(paginatedResponse(data as any, {
+      page: pagination.page,
+      limit: pagination.limit,
+      total,
+      pages: Math.ceil(total / pagination.limit!)
+    }))
   } catch (error) {
     console.error('Erro ao buscar notícias:', error)
     return errorResponse('Erro interno do servidor', 500)
@@ -85,8 +72,6 @@ export async function GET(req: NextRequest) {
 // POST /api/news - Criar nova notícia (apenas admins)
 export async function POST(req: NextRequest) {
   try {
-    await connectDB()
-
     // Validar sessão (apenas admins podem criar notícias)
     const authResult = await validateSession(req, true)
     if ('error' in authResult) {
@@ -97,17 +82,13 @@ export async function POST(req: NextRequest) {
     const sanitizedData = sanitizeInput(body)
 
     // Definir o autor como o usuário logado
-    sanitizedData.author = authResult.user.id
+    const authorId = authResult.user.id
 
     // Gerar slug se não fornecido
     if (!sanitizedData.slug && sanitizedData.title) {
       sanitizedData.slug = generateSlug(sanitizedData.title)
-      
-      // Verificar se slug já existe
-      const existingNews = await News.findOne({ slug: sanitizedData.slug })
-      if (existingNews) {
-        sanitizedData.slug = `${sanitizedData.slug}-${Date.now()}`
-      }
+      const existing = await prisma.news.findUnique({ where: { slug: sanitizedData.slug } })
+      if (existing) sanitizedData.slug = `${sanitizedData.slug}-${Date.now()}`
     }
 
     // Definir data de publicação se publicado
@@ -115,23 +96,31 @@ export async function POST(req: NextRequest) {
       sanitizedData.publishedAt = new Date()
     }
 
-    // Criar notícia
-    if (!sanitizedData.images && sanitizedData.featuredImage) {
-      sanitizedData.images = [sanitizedData.featuredImage]
-    }
-    if (!Array.isArray(sanitizedData.videos)) {
-      sanitizedData.videos = []
-    }
-    const news = new News(sanitizedData)
-    await news.save()
+    const images = Array.isArray(sanitizedData.images) && sanitizedData.images.length
+      ? sanitizedData.images
+      : (sanitizedData.featuredImage ? [sanitizedData.featuredImage] : [])
+    const videos = Array.isArray(sanitizedData.videos) ? sanitizedData.videos : []
+    const tags = Array.isArray(sanitizedData.tags) ? sanitizedData.tags : []
 
-    // Buscar notícia com dados do autor
-    const populatedNews = await News.findById(news._id).populate('author', 'name avatar')
+    const created = await prisma.news.create({
+      data: {
+        title: sanitizedData.title,
+        slug: sanitizedData.slug,
+        content: sanitizedData.content,
+        excerpt: sanitizedData.excerpt,
+        featuredImage: sanitizedData.featuredImage,
+        images: images as any,
+        videos: videos as any,
+        authorId,
+        category: sanitizedData.category,
+        tags: tags as any,
+        published: !!sanitizedData.published,
+        featured: !!sanitizedData.featured,
+        publishedAt: sanitizedData.published ? (sanitizedData.publishedAt ? new Date(sanitizedData.publishedAt) : new Date()) : null
+      }
+    })
 
-    return NextResponse.json(
-      successResponse(populatedNews, 'Notícia criada com sucesso'),
-      { status: 201 }
-    )
+    return NextResponse.json(successResponse(created, 'Notícia criada com sucesso'), { status: 201 })
   } catch (error: any) {
     console.error('Erro ao criar notícia:', error)
     
@@ -140,7 +129,7 @@ export async function POST(req: NextRequest) {
       return errorResponse(`Erro de validação: ${errors.join(', ')}`)
     }
 
-    if (error.code === 11000 && error.keyPattern?.slug) {
+    if ((error as any).code === 'P2002') {
       return errorResponse('Já existe uma notícia com este slug')
     }
     

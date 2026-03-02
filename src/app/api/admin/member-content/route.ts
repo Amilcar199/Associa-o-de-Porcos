@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import connectDB from '@/lib/mongodb'
-import MemberContent from '@/models/MemberContent'
+import prisma from '@/lib/prisma'
 import { successResponse, errorResponse, sanitizeInput } from '@/lib/api-utils'
 
 export const dynamic = 'force-dynamic'
@@ -10,8 +9,6 @@ export const dynamic = 'force-dynamic'
 // GET /api/admin/member-content - Listar conteúdo de membros (apenas admins)
 export async function GET(req: NextRequest) {
   try {
-    await connectDB()
-    
     const session = await getServerSession(authOptions)
     if (!session?.user || session.user.role !== 'admin') {
       return errorResponse('Acesso negado. Apenas administradores podem acessar este recurso.', 403)
@@ -45,14 +42,28 @@ export async function GET(req: NextRequest) {
     const skip = (page - 1) * limit
     
     // Executar queries
+    const where: any = {}
+    if (search) {
+      where.OR = [
+        { title: { contains: search, mode: 'insensitive' } },
+        { description: { contains: search, mode: 'insensitive' } },
+        { content: { contains: search, mode: 'insensitive' } }
+      ]
+    }
+    if (type) where.type = type
+    if (category) where.category = category
+    if (status === 'active') where.isActive = true
+    if (status === 'inactive') where.isActive = false
+
     const [content, total] = await Promise.all([
-      MemberContent.find(query)
-        .populate('author', 'name email')
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit)
-        .lean(),
-      MemberContent.countDocuments(query)
+      prisma.memberContent.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+        select: { id: true, title: true, type: true, category: true, createdAt: true, author: { select: { name: true, email: true } } }
+      }),
+      prisma.memberContent.count({ where })
     ])
 
     const totalPages = Math.ceil(total / limit)
@@ -77,7 +88,6 @@ export async function GET(req: NextRequest) {
 // POST /api/admin/member-content - Criar novo conteúdo (apenas admins)
 export async function POST(req: NextRequest) {
   try {
-    await connectDB()
     
     const session = await getServerSession(authOptions)
     if (!session?.user || session.user.role !== 'admin') {
@@ -92,22 +102,26 @@ export async function POST(req: NextRequest) {
       return errorResponse('Título, descrição, tipo e categoria são obrigatórios')
     }
 
-    // Criar novo conteúdo
-    const newContent = new MemberContent({
-      ...sanitizedData,
-      author: session.user.id,
-      isActive: true,
+    const created = await prisma.memberContent.create({ data: {
+      title: sanitizedData.title,
+      description: sanitizedData.description,
+      type: sanitizedData.type,
+      category: sanitizedData.category,
+      url: sanitizedData.url || null,
+      thumbnail: sanitizedData.thumbnail || null,
+      content: sanitizedData.content || null,
+      fileUrl: sanitizedData.fileUrl || null,
+      videoUrl: sanitizedData.videoUrl || null,
+      eventDate: sanitizedData.eventDate ? new Date(sanitizedData.eventDate) : null,
+      eventLocation: sanitizedData.eventLocation || null,
       isFeatured: false,
+      isActive: true,
+      authorId: session.user.id,
+      tags: Array.isArray(sanitizedData.tags) ? sanitizedData.tags as any : [] as any,
       views: 0,
       downloads: 0
-    })
-
-    await newContent.save()
-    
-    // Populate author para retorno
-    await newContent.populate('author', 'name email')
-    
-    return NextResponse.json(successResponse(newContent, 'Conteúdo criado com sucesso'), { status: 201 })
+    }})
+    return NextResponse.json(successResponse(created, 'Conteúdo criado com sucesso'), { status: 201 })
   } catch (error) {
     console.error('Erro ao criar conteúdo:', error)
     return errorResponse('Erro interno do servidor', 500)
