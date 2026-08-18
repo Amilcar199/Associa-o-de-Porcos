@@ -15,6 +15,7 @@ import {
   BarChart3,
   Upload,
   FileText,
+  Bell,
   ChevronDown,
   ChevronRight
 } from 'lucide-react'
@@ -86,6 +87,11 @@ const AdminSidebar = () => {
       href: '/admin/contatos',
       icon: MessageSquare,
       badge: 'custom'
+    },
+    {
+      name: 'Notificações',
+      href: '/admin/notificacoes',
+      icon: Bell
     },
     {
       name: 'Mídia',

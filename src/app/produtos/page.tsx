@@ -22,7 +22,7 @@ const placeholderImages = [
 
 async function getProducts() {
   try {
-    const cfgRes = await fetch(`/api/admin/config`, { cache: 'no-store' })
+    const cfgRes = await fetch(`/api/config`, { cache: 'no-store' })
     const cfgJson = cfgRes.ok ? await cfgRes.json() : { data: {} }
     const currency = cfgJson?.data?.currency || 'AOA'
     const locale = cfgJson?.data?.locale || 'pt-AO'

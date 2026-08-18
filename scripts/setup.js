@@ -7,7 +7,7 @@ console.log('🐷 Configurando Associação de Porcos...\n')
 
 // Verificar se o arquivo .env.local existe
 const envPath = path.join(process.cwd(), '.env.local')
-const envExamplePath = path.join(process.cwd(), 'env.example')
+const envExamplePath = path.join(process.cwd(), '.env.example')
 
 if (!fs.existsSync(envPath) && fs.existsSync(envExamplePath)) {
   console.log('📋 Criando arquivo .env.local...')
@@ -17,7 +17,7 @@ if (!fs.existsSync(envPath) && fs.existsSync(envExamplePath)) {
 } else if (fs.existsSync(envPath)) {
   console.log('✅ Arquivo .env.local já existe.\n')
 } else {
-  console.log('⚠️  Arquivo env.example não encontrado. Crie manualmente o .env.local.\n')
+  console.log('⚠️  Arquivo .env.example não encontrado. Crie manualmente o .env.local.\n')
 }
 
 // Verificar estrutura de pastas públicas

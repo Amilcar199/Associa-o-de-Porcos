@@ -124,7 +124,7 @@ export async function POST(req: NextRequest) {
           const payload = JSON.stringify({
             title: 'Recuperação de senha',
             body: `Solicitação de recuperação recebida. Toque para continuar.`,
-            data: { url: `/redefinir-senha?token=${resetToken}` }
+            data: { url: '/esqueci-senha' }
           })
           await Promise.allSettled(subs.map(s => webpush.sendNotification({ endpoint: s.endpoint, keys: s.keys } as any, payload)))
         }

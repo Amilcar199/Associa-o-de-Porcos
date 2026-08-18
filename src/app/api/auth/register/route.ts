@@ -4,8 +4,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import { successResponse, errorResponse, sanitizeInput, isValidEmail } from '@/lib/api-utils';
-import { sendWelcomeEmail, sendEmail } from '@/lib/email';
-import crypto from 'crypto'
+import { sendWelcomeEmail } from '@/lib/email';
+import { syncNewsletterPreference } from '@/lib/notifications'
 import { isPasswordStrong } from '@/lib/password'
 
 // POST /api/auth/register - Registrar novo usuário
@@ -61,12 +61,14 @@ export async function POST(req: NextRequest) {
       isActive: sanitizedData.isActive !== undefined ? sanitizedData.isActive : true,
       preferences: {
         newsletter: true,
-        notifications: true
+        emailNotifications: true
       }
     };
 
     const user = new User(userData);
     await user.save();
+
+    try { await syncNewsletterPreference(sanitizedData.email, true) } catch {}
 
     // Opcional: enviar email de boas-vindas
     try { await sendWelcomeEmail(sanitizedData.email, sanitizedData.name) } catch {}

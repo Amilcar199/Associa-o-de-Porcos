@@ -12,16 +12,14 @@ import {
   Mail
 } from 'lucide-react'
 import { useLanguage } from '@/components/providers/LanguageProvider'
-import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
+import { useSiteConfig } from '@/hooks/useSiteConfig'
 
 const CallToAction = () => {
   const { locale } = useLanguage()
   const isEn = locale.startsWith('en')
-  const [siteConfig, setSiteConfig] = useState<any>(null)
+  const { config: siteConfig } = useSiteConfig()
   const { data: session } = useSession()
-
-  useEffect(()=>{ (async()=>{ try { const r = await fetch('/api/admin/config',{ cache:'no-store' }); if(r.ok){ const j = await r.json(); setSiteConfig(j?.data || null) } } catch {} })() },[])
 
   const benefits = isEn ? [
     { icon: Users, title: 'Active Community', description: 'Connect with over 500 experienced farmers' },
@@ -210,7 +208,7 @@ const CallToAction = () => {
                     <Phone size={18} className="text-white" />
                   </div>
                   <div>
-                    <p className="text-white font-medium">+244 928 476 427</p>
+                    <p className="text-white font-medium">{siteConfig.contactPhone}</p>
                     <p className="text-primary-200 text-sm">{isEn ? 'WhatsApp and Calls' : 'WhatsApp e Ligações'}</p>
                   </div>
                 </div>
@@ -220,7 +218,7 @@ const CallToAction = () => {
                     <Mail size={18} className="text-white" />
                   </div>
                   <div>
-                    <p className="text-white font-medium">{siteConfig?.contactEmail || 'Paulobaptista18@hotmail.com'}</p>
+                    <p className="text-white font-medium">{siteConfig.contactEmail}</p>
                     <p className="text-primary-200 text-sm">{isEn ? 'We reply within 24h' : 'Respondemos em até 24h'}</p>
                   </div>
                 </div>
@@ -238,7 +236,7 @@ const CallToAction = () => {
                 </Link>
                 
                 <a
-                  href="https://wa.me/244928476427"
+                  href={`https://wa.me/${siteConfig.whatsappNumber}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 inline-flex items-center justify-center"

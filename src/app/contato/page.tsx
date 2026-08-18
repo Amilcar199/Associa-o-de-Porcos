@@ -34,7 +34,7 @@ export default function ContatoPage() {
   }, [])
 
   useEffect(()=>{
-    (async()=>{ try { const r = await fetch('/api/admin/config', { cache: 'no-store' }); if (r.ok) { const j = await r.json(); setSiteConfig(j?.data || null) } } catch {} })()
+    (async()=>{ try { const r = await fetch('/api/config', { cache: 'no-store' }); if (r.ok) { const j = await r.json(); setSiteConfig(j?.data || null) } } catch {} })()
   },[])
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {

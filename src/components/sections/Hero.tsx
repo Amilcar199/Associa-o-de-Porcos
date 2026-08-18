@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
-import { ChevronRight, Play, Users, Award, Leaf } from 'lucide-react'
+import { ChevronRight, Users, Award, Leaf } from 'lucide-react'
 import Slide1 from '@/components/assets/Foto Slider1.jpg'
 import Slide2 from '@/components/assets/Foto slider2.jpg'
 import Slide3 from '@/components/assets/Foto slider 3.jpg'
@@ -205,7 +205,7 @@ const Hero = () => {
               >
                 <Link
                   href={slides[currentSlide].ctaLink}
-                  className="inline-flex items-center justify-center bg-primary-600 hover:bg-primary-700 text-white font-semibold py-4 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg"
+                  className="inline-flex items-center justify-center bg-primary-600 hover:bg-primary-700 text-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-[1.02] shadow-lg shadow-primary-900/30"
                 >
                   {slides[currentSlide].cta}
                   <ChevronRight size={20} className="ml-2" />
@@ -213,10 +213,9 @@ const Hero = () => {
                 
                 <Link
                   href="/sobre"
-                  className="inline-flex items-center justify-center border-2 border-white text-white hover:bg-white hover:text-gray-900 font-semibold py-4 px-8 rounded-lg transition-all duration-300"
+                  className="inline-flex items-center justify-center border-2 border-white/80 text-white hover:bg-white hover:text-gray-900 font-semibold py-4 px-8 rounded-xl transition-all duration-300 backdrop-blur-sm"
                 >
-                  <Play size={20} className="mr-2" />
-                  {dict.hero?.watchVideo || 'Assista ao Vídeo'}
+                  {isEn ? 'About the Association' : 'Sobre a Associação'}
                 </Link>
               </motion.div>
 

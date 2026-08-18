@@ -173,7 +173,7 @@ export default {
 		saveChanges: 'Salvar Alterações',
 		preferencesTitle: 'Preferências de Notificação',
 		emailNotif: { title: 'Notificações por Email', desc: 'Receba atualizações importantes por email' },
-		smsNotif: { title: 'Notificações por SMS', desc: 'Receba alertas importantes por SMS' },
+		pushNotif: { title: 'Notificações no navegador', desc: 'Receba avisos quando o site estiver aberto ou instalado' },
 		newsletter: { title: 'Newsletter', desc: 'Receba novidades e dicas por email' },
 		savePreferences: 'Salvar Preferências',
 		securityTitle: 'Segurança da Conta',

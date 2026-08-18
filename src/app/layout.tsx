@@ -121,9 +121,12 @@ export default function RootLayout({
             position="top-right"
             toastOptions={{
               duration: 4000,
+              success: { style: { background: '#16a34a', color: '#fff' } },
+              error: { style: { background: '#dc2626', color: '#fff' } },
               style: {
-                background: '#22c55e',
+                background: '#111827',
                 color: '#ffffff',
+                borderRadius: '12px',
               },
             }}
           />

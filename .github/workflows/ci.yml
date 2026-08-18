@@ -19,9 +19,15 @@ jobs:
           cache: 'npm'
       - name: Install dependencies
         run: npm ci || npm install
+      - name: Lint
+        run: npm run lint
+      - name: Type check
+        run: npm run type-check
       - name: Build
         run: npm run build
         env:
           NEXT_TELEMETRY_DISABLED: 1
           # Avoid runtime DB calls during build for static paths
           MONGODB_URI: mongodb://127.0.0.1:27017/dummy
+          NEXTAUTH_SECRET: ci-dummy-secret
+          NEXTAUTH_URL: http://localhost:3000

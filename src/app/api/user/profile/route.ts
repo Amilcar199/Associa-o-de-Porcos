@@ -7,6 +7,7 @@ import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import { successResponse, errorResponse, sanitizeInput } from '@/lib/api-utils';
 import ActivityLog from '@/models/ActivityLog';
+import { syncNewsletterPreference } from '@/lib/notifications'
 
 // GET /api/user/profile - Buscar perfil do usuário logado
 export async function GET(req: NextRequest) {
@@ -62,6 +63,10 @@ export async function PUT(req: NextRequest) {
 
     if (!updatedUser) {
       return errorResponse('Usuário não encontrado', 404);
+    }
+
+    if (typeof sanitizedData?.preferences?.newsletter === 'boolean') {
+      try { await syncNewsletterPreference(updatedUser.email, sanitizedData.preferences.newsletter) } catch {}
     }
 
     try {

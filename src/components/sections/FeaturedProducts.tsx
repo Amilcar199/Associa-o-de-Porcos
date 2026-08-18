@@ -62,7 +62,7 @@ const FeaturedProducts = () => {
 
   useEffect(() => {
     fetchFeaturedProducts()
-    ;(async()=>{ try { const r = await fetch('/api/admin/config',{ cache:'no-store' }); if(r.ok){ const j = await r.json(); const curr = j?.data?.currency || 'AOA'; setCurrency(curr); setShowConverted(locale.startsWith('en') && curr !== 'USD') } } catch {} })()
+    ;(async()=>{ try { const r = await fetch('/api/config',{ cache:'no-store' }); if(r.ok){ const j = await r.json(); const curr = j?.data?.currency || 'AOA'; setCurrency(curr); setShowConverted(locale.startsWith('en') && curr !== 'USD') } } catch {} })()
   }, [])
 
 

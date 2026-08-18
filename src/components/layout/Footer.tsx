@@ -12,27 +12,22 @@ import {
   Linkedin,
   Heart,
   ArrowRight } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useCookieConsent } from '@/components/cookies/CookieConsentProvider'
 import { useLanguage } from '@/components/providers/LanguageProvider'
 import pt from '@/lib/i18n/dictionaries/pt'
 import en from '@/lib/i18n/dictionaries/en'
 import { BRAND_NAME } from '@/lib/brand'
+import { useSiteConfig } from '@/hooks/useSiteConfig'
 
 const Footer = () => {
   const currentYear = new Date().getFullYear()
-  const [siteConfig, setSiteConfig] = useState<any>(null)
+  const { config: siteConfig } = useSiteConfig()
   const { openPreferences } = useCookieConsent()
   const { locale } = useLanguage()
   const dict = locale.startsWith('en') ? en : pt
   const isEn = locale.startsWith('en')
 
-  useEffect(()=>{
-    const load = async () => {
-      try { const res = await fetch('/api/admin/config', { cache: 'no-store' }); if (res.ok){ const j = await res.json(); setSiteConfig(j?.data || null) } } catch {}
-    }
-    load()
-  }, [])
 
   const quickLinks = [
     { name: dict.nav.home, href: '/' },
@@ -111,9 +106,9 @@ const Footer = () => {
   }
 
   return (
-    <footer className="bg-gray-900 text-white">
+    <footer className="bg-gray-950 text-white">
       {/* Newsletter Section */}
-      <div className="bg-primary-700">
+      <div className="bg-gradient-to-r from-primary-700 to-emerald-700">
         <div className="container-custom py-8">
           <div className="flex flex-col md:flex-row items-center justify-between">
             <div className="mb-4 md:mb-0">

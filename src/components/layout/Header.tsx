@@ -24,13 +24,14 @@ import pt from '@/lib/i18n/dictionaries/pt'
 import en from '@/lib/i18n/dictionaries/en'
 import HeaderLanguageMenu from '@/components/i18n/HeaderLanguageMenu'
 import { BRAND_NAME, BRAND_TITLE_LINE1, BRAND_TITLE_LINE2 } from '@/lib/brand'
+import { useSiteConfig } from '@/hooks/useSiteConfig'
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const [isAboutMenuOpen, setIsAboutMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
-  const [siteConfig, setSiteConfig] = useState(null as any)
+  const { config: siteConfig } = useSiteConfig()
   const { data: session, status } = useSession()
   const pathname = usePathname()
   const router = useRouter()
@@ -46,12 +47,6 @@ const Header = () => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  useEffect(()=>{
-    const load = async () => {
-      try { const res = await fetch('/api/admin/config', { cache: 'no-store' }); if (res.ok){ const j = await res.json(); setSiteConfig(j?.data || null) } } catch {}
-    }
-    load()
-  },[])
 
   // Prefetch programático das rotas mais acessadas
   useEffect(() => {

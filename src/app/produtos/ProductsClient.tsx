@@ -60,7 +60,7 @@ export default function ProductsClient({ products }: ProductsClientProps) {
 
   // Load currency for client-side formatted fallbacks
   useEffect(()=>{
-    ;(async()=>{ try { const r = await fetch('/api/admin/config',{cache:'no-store'}); if(r.ok){ const j = await r.json(); const curr = j?.data?.currency || 'AOA'; setCurrency(curr); setShowConverted(locale.startsWith('en') && curr !== 'USD') } } catch {} })()
+    ;(async()=>{ try { const r = await fetch('/api/config',{cache:'no-store'}); if(r.ok){ const j = await r.json(); const curr = j?.data?.currency || 'AOA'; setCurrency(curr); setShowConverted(locale.startsWith('en') && curr !== 'USD') } } catch {} })()
   },[])
 
   // Client-side fetch fallback if no SSR products (to mirror homepage behavior)

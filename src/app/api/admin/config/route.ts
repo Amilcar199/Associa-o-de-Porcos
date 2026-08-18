@@ -5,8 +5,11 @@ import connectDB from '@/lib/mongodb'
 import SiteConfig from '@/models/SiteConfig'
 import { validateSession, errorResponse, successResponse } from '@/lib/api-utils'
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
+    const auth = await validateSession(req, true)
+    if ('error' in auth) return errorResponse(auth.error || 'Não autorizado', auth.status)
+
     await connectDB()
     const cfg = await SiteConfig.findOne().lean()
     return NextResponse.json(successResponse(cfg || {}))

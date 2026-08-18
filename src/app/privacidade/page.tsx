@@ -15,7 +15,7 @@ async function getSiteConfig() {
     const protocol = h.get('x-forwarded-proto') || 'http'
     const host = h.get('host') || 'assuino.com'
     const baseUrl = `${protocol}://${host}`
-    const cfgRes = await fetch(`${baseUrl}/api/admin/config`, { cache: 'no-store' })
+    const cfgRes = await fetch(`${baseUrl}/api/config`, { cache: 'no-store' })
     const cfgJson = cfgRes.ok ? await cfgRes.json() : { data: {} }
     return cfgJson?.data || {}
   } catch {

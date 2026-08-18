@@ -6,6 +6,26 @@ import { languageToRouteSegment, parseAcceptLanguage, routeSegmentToDefaultLocal
 
 const LOCALE_COOKIE_KEY = 'locale'
 
+const PUBLIC_API_PREFIXES = [
+  '/api/products',
+  '/api/news',
+  '/api/collaborators',
+  '/api/config',
+  '/api/newsletter',
+  '/api/push/public-key',
+  '/api/push/subscribe',
+  '/api/market',
+  '/api/legal-content',
+  '/api/public-images',
+  '/api/public-assets',
+  '/api/contact',
+]
+
+function isPublicApi(pathname: string) {
+  if (pathname.startsWith('/api/auth')) return true
+  return PUBLIC_API_PREFIXES.some((prefix) => pathname.startsWith(prefix))
+}
+
 export default withAuth(
   function middleware(req: NextRequest & NextRequestWithAuth) {
     const url = req.nextUrl
@@ -38,14 +58,7 @@ export default withAuth(
       }
     }
 
-    // Allow public read-only API endpoints
-    if (
-      pathname.startsWith('/api/products') ||
-      pathname.startsWith('/api/news') ||
-      pathname.startsWith('/api/collaborators') ||
-      pathname.startsWith('/api/push/public-key') ||
-      pathname.startsWith('/api/push/subscribe')
-    ) {
+    if (isApi && isPublicApi(pathname)) {
       return NextResponse.next()
     }
 
@@ -66,12 +79,7 @@ export default withAuth(
       }
     }
 
-    // Protect API routes that require authentication (except auth/session and contact)
-    if (pathname.startsWith('/api/auth') && !pathname.startsWith('/api/auth/session')) {
-      return NextResponse.next()
-    }
-
-    if (pathname.startsWith('/api/') && pathname !== '/api/contact') {
+    if (pathname.startsWith('/api/') && !isPublicApi(pathname)) {
       if (!token) {
         return NextResponse.json(
           { error: 'Token de autenticação necessário' },
@@ -105,10 +113,7 @@ export default withAuth(
           pathname.startsWith('/cookies') ||
           pathname.startsWith('/_next') ||
           pathname.startsWith('/favicon') ||
-          pathname === '/api/contact' ||
-          pathname.startsWith('/api/products') ||
-          pathname.startsWith('/api/news') ||
-          pathname.startsWith('/api/collaborators')
+          isPublicApi(pathname)
         ) {
           return true
         }
@@ -132,6 +137,10 @@ export const config = {
     // Also run on these specific routes for auth/API protections
     '/admin/:path*',
     '/api/admin/:path*',
+    '/api/config',
+    '/api/newsletter/:path*',
+    '/api/push/:path*',
+    '/api/market/:path*',
     '/api/products/:path*',
     '/api/news/:path*',
     '/api/collaborators/:path*',
