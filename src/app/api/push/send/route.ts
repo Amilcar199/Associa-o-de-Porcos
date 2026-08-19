@@ -12,7 +12,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    if (!process.env.VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY) {
+    const vapidPublicKey = process.env.VAPID_PUBLIC_KEY || process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
+    if (!vapidPublicKey || !process.env.VAPID_PRIVATE_KEY) {
       return NextResponse.json({ error: 'VAPID keys not configured' }, { status: 500 })
     }
 

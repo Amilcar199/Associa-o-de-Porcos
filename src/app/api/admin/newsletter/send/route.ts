@@ -19,7 +19,23 @@ export async function POST(req: NextRequest) {
     }
 
     await connectDB()
-    const emails = await collectNewsletterEmails()
+
+    // Se vierem destinatários específicos, usa-os (validados); caso contrário, envia a todos os inscritos
+    const requestedRecipients: string[] = Array.isArray(body.recipients)
+      ? body.recipients.map((e: any) => String(e).trim().toLowerCase()).filter(Boolean)
+      : []
+
+    let emails: string[]
+    if (requestedRecipients.length > 0) {
+      const allReachable = new Set(await collectNewsletterEmails())
+      emails = requestedRecipients.filter((e) => allReachable.has(e))
+      if (emails.length === 0) {
+        return errorResponse('Nenhum dos destinatários selecionados está inscrito na newsletter', 400)
+      }
+    } else {
+      emails = await collectNewsletterEmails()
+    }
+
     if (emails.length === 0) {
       return errorResponse('Não há destinatários inscritos', 400)
     }

@@ -10,6 +10,9 @@ export default function AdminNotificationsPage() {
   const [channel, setChannel] = useState<'push' | 'newsletter'>('push')
   const [sending, setSending] = useState(false)
   const [stats, setStats] = useState({ activeCount: 0, totalReach: 0 })
+  const [recipientMode, setRecipientMode] = useState<'all' | 'individual'>('all')
+  const [subscribers, setSubscribers] = useState<{ email: string; active: boolean }[]>([])
+  const [selectedEmails, setSelectedEmails] = useState<string[]>([])
 
   useEffect(() => {
     ;(async () => {
@@ -21,14 +24,23 @@ export default function AdminNotificationsPage() {
             activeCount: json?.data?.activeCount || 0,
             totalReach: json?.data?.totalReach || 0,
           })
+          setSubscribers((json?.data?.subscribers || []).filter((s: any) => s.active))
         }
       } catch {}
     })()
   }, [])
 
+  const toggleEmail = (email: string) => {
+    setSelectedEmails((prev) => prev.includes(email) ? prev.filter((e) => e !== email) : [...prev, email])
+  }
+
   const send = async () => {
     if (!title.trim() || !body.trim()) {
       toast.error('Preencha título e mensagem')
+      return
+    }
+    if (channel === 'newsletter' && recipientMode === 'individual' && selectedEmails.length === 0) {
+      toast.error('Selecione pelo menos um destinatário')
       return
     }
     setSending(true)
@@ -49,7 +61,11 @@ export default function AdminNotificationsPage() {
         const res = await fetch('/api/admin/newsletter/send', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ title, content: `<p>${body.replace(/\n/g, '<br/>')}</p>` }),
+          body: JSON.stringify({
+            title,
+            content: `<p>${body.replace(/\n/g, '<br/>')}</p>`,
+            ...(recipientMode === 'individual' ? { recipients: selectedEmails } : {}),
+          }),
         })
         const json = await res.json()
         if (!res.ok) {
@@ -110,6 +126,48 @@ export default function AdminNotificationsPage() {
             <span className="inline-flex items-center gap-2"><Mail size={16} /> Newsletter</span>
           </button>
         </div>
+
+        {channel === 'newsletter' && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Destinatários</label>
+            <div className="flex gap-2 p-1 bg-gray-100 rounded-lg w-fit mb-3">
+              <button
+                onClick={() => setRecipientMode('all')}
+                className={`px-4 py-1.5 rounded-md text-sm font-medium ${recipientMode === 'all' ? 'bg-white shadow text-gray-900' : 'text-gray-600'}`}
+              >
+                Todos os inscritos ({stats.totalReach})
+              </button>
+              <button
+                onClick={() => setRecipientMode('individual')}
+                className={`px-4 py-1.5 rounded-md text-sm font-medium ${recipientMode === 'individual' ? 'bg-white shadow text-gray-900' : 'text-gray-600'}`}
+              >
+                Selecionar individualmente
+              </button>
+            </div>
+
+            {recipientMode === 'individual' && (
+              <div className="border border-gray-200 rounded-lg max-h-56 overflow-y-auto divide-y divide-gray-100">
+                {subscribers.length === 0 && (
+                  <p className="text-sm text-gray-500 p-3">Nenhum assinante ativo encontrado.</p>
+                )}
+                {subscribers.map((subscriber) => (
+                  <label key={subscriber.email} className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={selectedEmails.includes(subscriber.email)}
+                      onChange={() => toggleEmail(subscriber.email)}
+                      className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                    />
+                    {subscriber.email}
+                  </label>
+                ))}
+              </div>
+            )}
+            {recipientMode === 'individual' && selectedEmails.length > 0 && (
+              <p className="text-xs text-gray-500 mt-1">{selectedEmails.length} destinatário(s) selecionado(s)</p>
+            )}
+          </div>
+        )}
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Título</label>

@@ -118,7 +118,8 @@ export async function POST(req: NextRequest) {
 
     // Tentar enviar push opcional com aviso e deep link (sem exibir OTP/token)
     try {
-      if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
+      const vapidPublicKey = process.env.VAPID_PUBLIC_KEY || process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
+      if (vapidPublicKey && process.env.VAPID_PRIVATE_KEY) {
         const subs = await PushSubscription.find({ userId: user._id }).lean()
         if (subs.length > 0) {
           const payload = JSON.stringify({
