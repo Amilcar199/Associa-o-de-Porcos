@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useLanguage } from '@/components/providers/LanguageProvider'
 
@@ -15,17 +15,30 @@ export default function ResetPasswordClient() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
-  const [email, setEmail] = useState('')
-  const [questions, setQuestions] = useState<{ id: string; label: string }[]>([])
-  const [answers, setAnswers] = useState<Record<string, string>>({})
+  const [tokenStatus, setTokenStatus] = useState<'checking' | 'valid' | 'invalid'>('checking')
   const router = useRouter()
-  
+  const searchParams = useSearchParams()
+  const token = searchParams.get('token') || ''
 
   useEffect(() => {
-    setQuestions([])
-  }, [])
-
-  // token-based validation removed
+    const checkToken = async () => {
+      if (!token) {
+        setTokenStatus('invalid')
+        return
+      }
+      try {
+        const response = await fetch('/api/auth/validate-reset-token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token }),
+        })
+        setTokenStatus(response.ok ? 'valid' : 'invalid')
+      } catch {
+        setTokenStatus('invalid')
+      }
+    }
+    checkToken()
+  }, [token])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -61,18 +74,11 @@ export default function ResetPasswordClient() {
       return
     }
 
-    // Email é obrigatório no novo fluxo
-    if (!email) {
-      setError(isEn ? 'Email is required' : 'Email é obrigatório')
-      setLoading(false)
-      return
-    }
-
     try {
       const response = await fetch('/api/auth/reset-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password: formData.password, answers }),
+        body: JSON.stringify({ token, password: formData.password }),
       })
       const data = await response.json()
       if (!response.ok) setError(data.message || (isEn ? 'Error resetting password' : 'Erro ao redefinir senha'))
@@ -100,42 +106,27 @@ export default function ResetPasswordClient() {
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          {
+          {tokenStatus === 'checking' && (
+            <p className="text-sm text-gray-600 text-center">{isEn ? 'Validating link...' : 'Validando link...'}</p>
+          )}
+
+          {tokenStatus === 'invalid' && (
+            <div className="space-y-4">
+              <div className="bg-red-50 border border-red-200 rounded-md p-4">
+                <p className="text-sm text-red-800">
+                  {isEn
+                    ? 'This link is invalid or has expired. Please request a new password recovery email.'
+                    : 'Este link é inválido ou expirou. Solicite um novo email de recuperação de senha.'}
+                </p>
+              </div>
+              <Link href="/esqueci-senha" className="block text-center text-sm font-medium text-green-600 hover:text-green-500">
+                {isEn ? 'Request new link' : 'Solicitar novo link'}
+              </Link>
+            </div>
+          )}
+
+          {tokenStatus === 'valid' && (
             <form className="space-y-6" onSubmit={handleSubmit}>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Email</label>
-                <input
-                  type="email"
-                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="space-y-4">
-                <p className="text-sm text-gray-700">{isEn ? 'Answer a few questions to continue:' : 'Responda a algumas perguntas para continuar:'}</p>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">{isEn ? 'Last 2 digits of your phone' : 'Últimos 2 dígitos do seu telefone'}</label>
-                  <input
-                    type="text"
-                    maxLength={2}
-                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-                    value={answers['phone_last2'] || ''}
-                    onChange={(e) => setAnswers((prev) => ({ ...prev, phone_last2: e.target.value.replace(/[^0-9]/g, '') }))}
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">{isEn ? 'Your company name' : 'Nome da sua empresa'}</label>
-                  <input
-                    type="text"
-                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-                    value={answers['company_exact'] || ''}
-                    onChange={(e) => setAnswers((prev) => ({ ...prev, company_exact: e.target.value }))}
-                    required
-                  />
-                </div>
-              </div>
 
               {error && (
                 <div className="bg-red-50 border border-red-200 rounded-md p-4">
@@ -227,7 +218,7 @@ export default function ResetPasswordClient() {
                 </button>
               </div>
             </form>
-          }
+          )}
 
           <div className="mt-6 text-center">
             <Link href="/login" className="inline-flex items-center text-sm text-green-600 hover:text-green-500">

@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic'
 
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
  
 import ResetPasswordClient from './ResetPasswordClient'
 import { cookies } from 'next/headers'
@@ -15,6 +16,10 @@ export function generateMetadata(): Metadata {
 }
 
 export default function ResetPasswordPage() {
-  return <ResetPasswordClient />
+  return (
+    <Suspense fallback={null}>
+      <ResetPasswordClient />
+    </Suspense>
+  )
 }
 

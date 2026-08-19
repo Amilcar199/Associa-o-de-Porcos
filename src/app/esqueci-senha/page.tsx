@@ -9,10 +9,31 @@ export default function ForgotPasswordPage() {
   const { locale } = useLanguage();
   const isEn = locale.startsWith('en');
   const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [sent, setSent] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    window.location.href = '/redefinir-senha';
+    setLoading(true);
+    setError('');
+    try {
+      const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        setError(data.message || (isEn ? 'Something went wrong. Please try again.' : 'Algo correu mal. Tente novamente.'));
+      } else {
+        setSent(true);
+      }
+    } catch {
+      setError(isEn ? 'Something went wrong. Please try again.' : 'Algo correu mal. Tente novamente.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -26,7 +47,21 @@ export default function ForgotPasswordPage() {
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+          {sent ? (
+            <div className="bg-green-50 border border-green-200 rounded-md p-4">
+              <p className="text-sm text-green-800">
+                {isEn
+                  ? 'If that email exists in our system, you will receive recovery instructions shortly. Check your inbox (and spam folder).'
+                  : 'Se esse email existir no nosso sistema, receberá instruções de recuperação em breve. Verifique a sua caixa de entrada (e o spam).'}
+              </p>
+            </div>
+          ) : (
           <form className="space-y-6" onSubmit={handleSubmit}>
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-md p-4">
+                <p className="text-sm text-red-800">{error}</p>
+              </div>
+            )}
           
 
             <div>
@@ -48,11 +83,12 @@ export default function ForgotPasswordPage() {
             </div>
 
             <div>
-              <button type="submit" className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                {isEn ? 'Continue' : 'Continuar'}
+              <button type="submit" disabled={loading} className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed">
+                {loading ? (isEn ? 'Sending...' : 'Enviando...') : (isEn ? 'Continue' : 'Continuar')}
               </button>
             </div>
           </form>
+          )}
 
           <div className="mt-6 text-center">
             <Link href="/login" className="inline-flex items-center text-sm text-green-600 hover:text-green-500">
