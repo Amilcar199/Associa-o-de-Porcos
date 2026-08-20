@@ -47,6 +47,7 @@ export default function ProductsClient({ products }: ProductsClientProps) {
   const [minWeight, setMinWeight] = useState('' as string)
   const [maxAge, setMaxAge] = useState('' as string)
   const [priceType, setPriceType] = useState<'head' | 'kg'>('head')
+  const activeFilterCount = [query, health, vaccinated, minPrice, maxPrice, minWeight, maxAge, priceType !== 'head' ? priceType : ''].filter(Boolean).length
 
   const openProductModal = (product: Product) => {
     setSelectedProduct(product)
@@ -61,7 +62,7 @@ export default function ProductsClient({ products }: ProductsClientProps) {
   // Load currency for client-side formatted fallbacks
   useEffect(()=>{
     ;(async()=>{ try { const r = await fetch('/api/config',{cache:'no-store'}); if(r.ok){ const j = await r.json(); const curr = j?.data?.currency || 'AOA'; setCurrency(curr); setShowConverted(locale.startsWith('en') && curr !== 'USD') } } catch {} })()
-  },[])
+  },[locale])
 
   // Client-side fetch fallback if no SSR products (to mirror homepage behavior)
   useEffect(()=>{
@@ -160,33 +161,29 @@ export default function ProductsClient({ products }: ProductsClientProps) {
   return (
     <>
       {/* Filters */}
-      <div className="mb-6 bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-8">
-          <input
-            value={query}
-            onChange={e=>setQuery(e.target.value)}
-            placeholder={isEn ? 'Search by name, breed...' : 'Buscar por nome, raça...'}
-            className="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-          />
-          <select value={health} onChange={e=>setHealth(e.target.value)} className="px-3 py-2 border rounded-lg">
+      <div className="mb-6 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+        <div className="mb-4 flex items-center justify-between"><div><h2 className="font-heading text-lg font-semibold text-gray-900">{isEn ? 'Find an animal' : 'Encontrar um animal'}</h2><p className="text-sm text-gray-500">{isEn ? 'Refine the list using the available criteria.' : 'Refine a lista usando os critérios disponíveis.'}</p></div><span className="rounded-full bg-primary-50 px-3 py-1 text-xs font-medium text-primary-700">{activeFilterCount} {isEn ? 'active filters' : 'filtros ativos'}</span></div>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <label className="text-xs font-medium text-gray-600">{isEn ? 'Search' : 'Pesquisa'}<input id="product-search" value={query} onChange={e=>setQuery(e.target.value)} placeholder={isEn ? 'Name, breed or description' : 'Nome, raça ou descrição'} className="input-field px-3 py-2" /></label>
+          <label className="text-xs font-medium text-gray-600">{isEn ? 'Health' : 'Saúde'}<select id="product-health" value={health} onChange={e=>setHealth(e.target.value)} className="input-field px-3 py-2">
             <option value="">{isEn ? 'Health (all)' : 'Saúde (todas)'}</option>
             <option value="excellent">{isEn ? 'Excellent' : 'Excelente'}</option>
             <option value="good">{isEn ? 'Good' : 'Bom'}</option>
             <option value="fair">{isEn ? 'Fair' : 'Regular'}</option>
-          </select>
-          <select value={vaccinated} onChange={e=>setVaccinated(e.target.value)} className="px-3 py-2 border rounded-lg">
+          </select></label>
+          <label className="text-xs font-medium text-gray-600">{isEn ? 'Vaccination' : 'Vacinação'}<select id="product-vaccinated" value={vaccinated} onChange={e=>setVaccinated(e.target.value)} className="input-field px-3 py-2">
             <option value="">{isEn ? 'Vaccinated (all)' : 'Vacinado (todos)'}</option>
             <option value="true">{isEn ? 'Vaccinated' : 'Vacinado'}</option>
             <option value="false">{isEn ? 'Not Vaccinated' : 'Não vacinado'}</option>
-          </select>
-          <select value={priceType} onChange={e=>setPriceType(e.target.value as any)} className="px-3 py-2 border rounded-lg">
+          </select></label>
+          <label className="text-xs font-medium text-gray-600">{isEn ? 'Price basis' : 'Base do preço'}<select id="product-price-type" value={priceType} onChange={e=>setPriceType(e.target.value as any)} className="input-field px-3 py-2">
             <option value="head">{isEn ? 'Price /head' : 'Preço /cabeça'}</option>
             <option value="kg">{isEn ? 'Price /kg' : 'Preço /kg'}</option>
-          </select>
-          <input type="number" min="0" value={minPrice} onChange={e=>setMinPrice(e.target.value)} placeholder={(isEn ? 'Min price' : 'Preço mín.') + (priceType === 'kg' ? ' /kg' : ` ${isEn ? '/head' : '/cabeça'}`)} className="px-3 py-2 border rounded-lg" />
-          <input type="number" min="0" value={maxPrice} onChange={e=>setMaxPrice(e.target.value)} placeholder={(isEn ? 'Max price' : 'Preço máx.') + (priceType === 'kg' ? ' /kg' : ` ${isEn ? '/head' : '/cabeça'}`)} className="px-3 py-2 border rounded-lg" />
-          <input type="number" min="0" value={minWeight} onChange={e=>setMinWeight(e.target.value)} placeholder={isEn ? 'Min weight (kg)' : 'Peso mín. (kg)'} className="px-3 py-2 border rounded-lg" />
-          <input type="number" min="0" value={maxAge} onChange={e=>setMaxAge(e.target.value)} placeholder={isEn ? 'Max age (months)' : 'Idade máx. (meses)'} className="px-3 py-2 border rounded-lg" />
+          </select></label>
+          <label className="text-xs font-medium text-gray-600">{isEn ? 'Minimum price' : 'Preço mínimo'}<input id="product-min-price" type="number" min="0" value={minPrice} onChange={e=>setMinPrice(e.target.value)} placeholder={priceType === 'kg' ? '/kg' : (isEn ? '/head' : '/cabeça')} className="input-field px-3 py-2" /></label>
+          <label className="text-xs font-medium text-gray-600">{isEn ? 'Maximum price' : 'Preço máximo'}<input id="product-max-price" type="number" min="0" value={maxPrice} onChange={e=>setMaxPrice(e.target.value)} placeholder={priceType === 'kg' ? '/kg' : (isEn ? '/head' : '/cabeça')} className="input-field px-3 py-2" /></label>
+          <label className="text-xs font-medium text-gray-600">{isEn ? 'Minimum weight' : 'Peso mínimo'}<input id="product-min-weight" type="number" min="0" value={minWeight} onChange={e=>setMinWeight(e.target.value)} placeholder="kg" className="input-field px-3 py-2" /></label>
+          <label className="text-xs font-medium text-gray-600">{isEn ? 'Maximum age' : 'Idade máxima'}<input id="product-max-age" type="number" min="0" value={maxAge} onChange={e=>setMaxAge(e.target.value)} placeholder={isEn ? 'months' : 'meses'} className="input-field px-3 py-2" /></label>
         </div>
         <div className="mt-3 flex flex-wrap gap-2">
           {(() => {
@@ -195,7 +192,8 @@ export default function ProductsClient({ products }: ProductsClientProps) {
               <button
                 onClick={()=>{ setQuery(''); setHealth(''); setVaccinated(''); setMinPrice(''); setMaxPrice(''); setMinWeight(''); setMaxAge(''); setPriceType('head') }}
                 disabled={!hasActiveFilters}
-                className={`text-sm px-3 py-1.5 rounded border ${hasActiveFilters ? 'text-gray-700 hover:bg-gray-50' : 'text-gray-400 cursor-not-allowed bg-gray-50'}`}
+                type="button"
+                className={`rounded-lg border px-3 py-1.5 text-sm ${hasActiveFilters ? 'text-gray-700 hover:bg-gray-50' : 'cursor-not-allowed bg-gray-50 text-gray-400'}`}
               >
                 {isEn ? 'Clear filters' : 'Limpar filtros'}
               </button>
@@ -207,10 +205,14 @@ export default function ProductsClient({ products }: ProductsClientProps) {
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {filtered.map((product: Product, idx: number) => (
-          <div 
+          <div
             key={product._id || idx} 
             onClick={() => openProductModal(product)}
-            className="group bg-white rounded-xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition cursor-pointer hover:scale-[1.02]"
+            onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openProductModal(product) } }}
+            role="button"
+            tabIndex={0}
+            aria-label={`${isEn ? 'Open details for' : 'Abrir detalhes de'} ${product.name}`}
+            className="group cursor-pointer overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
           >
             {/* Imagem */}
             <div className="relative h-48">

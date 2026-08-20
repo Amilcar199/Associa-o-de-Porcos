@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { X, Calendar, Eye, Tag, ArrowLeft, ArrowRight } from 'lucide-react'
 import Image from 'next/image'
 import Placeholder from '@/components/assets/Foto Suino.webp'
@@ -30,6 +30,7 @@ export default function NewsModal({
   const isEn = String(locale).startsWith('en')
   const [isLoading, setIsLoading] = useState(false)
   const [isZoomOpen, setIsZoomOpen] = useState(false)
+  const dialogRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (isOpen && news) {
@@ -38,6 +39,14 @@ export default function NewsModal({
       setTimeout(() => setIsLoading(false), 300)
     }
   }, [isOpen, news])
+
+  useEffect(() => {
+    if (!isOpen) return
+    dialogRef.current?.focus()
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = previousOverflow }
+  }, [isOpen])
 
   if (!isOpen || !news) return null
 
@@ -55,7 +64,12 @@ export default function NewsModal({
       tabIndex={0}
     >
       <div 
-        className="relative w-full max-w-4xl max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="news-dialog-title"
+        tabIndex={-1}
+        className="relative w-full max-w-4xl max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col focus:outline-none"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -72,6 +86,7 @@ export default function NewsModal({
           {/* Botão fechar */}
           <button
             onClick={onClose}
+            aria-label={isEn ? 'Close news article' : 'Fechar notícia'}
             className="absolute top-4 right-4 w-10 h-10 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110"
           >
             <X size={20} className="text-white" />
@@ -81,6 +96,7 @@ export default function NewsModal({
           <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
             <button
               onClick={(e)=>{ e.stopPropagation(); onPrevious?.() }}
+              aria-label={isEn ? 'Previous article' : 'Notícia anterior'}
               disabled={!hasPrevious}
               className={`p-2 rounded-full backdrop-blur-sm transition-all duration-200 ${
                 hasPrevious 
@@ -93,6 +109,7 @@ export default function NewsModal({
             
             <button
               onClick={(e)=>{ e.stopPropagation(); onNext?.() }}
+              aria-label={isEn ? 'Next article' : 'Próxima notícia'}
               disabled={!hasNext}
               className={`p-2 rounded-full backdrop-blur-sm transition-all duration-200 ${
                 hasNext 
@@ -124,7 +141,7 @@ export default function NewsModal({
           ) : (
             <>
               {/* Título */}
-              <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4 leading-tight">
+              <h1 id="news-dialog-title" className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4 leading-tight">
                 {news.title}
               </h1>
 
@@ -142,7 +159,7 @@ export default function NewsModal({
                 )}
                 <div className="flex items-center gap-2">
                   <Tag size={16} className="text-primary-600" />
-                  <span>{(() => { const words = String(news.excerpt || '').split(' ').length; const minutes = Math.ceil(words / 200); return isEn ? `${minutes} min read` : `${minutes} min de leitura`; })()}</span>
+                  <span>{(() => { const words = String(news.content || news.excerpt || '').trim().split(/\s+/).filter(Boolean).length; const minutes = Math.max(1, Math.ceil(words / 200)); return isEn ? `${minutes} min read` : `${minutes} min de leitura`; })()}</span>
                 </div>
               </div>
 

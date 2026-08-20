@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { X, Calendar, Weight, MapPin, Phone, Mail, ArrowLeft, ArrowRight } from 'lucide-react'
 import Image from 'next/image'
 import Placeholder from '@/components/assets/Foto Suino.webp'
@@ -45,6 +45,7 @@ export default function ProductModal({
   const [isLoading, setIsLoading] = useState(false)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isZoomOpen, setIsZoomOpen] = useState(false)
+  const dialogRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (isOpen && product) {
@@ -54,9 +55,17 @@ export default function ProductModal({
     }
   }, [isOpen, product])
 
+  useEffect(() => {
+    if (!isOpen) return
+    dialogRef.current?.focus()
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = previousOverflow }
+  }, [isOpen])
+
   useEffect(()=>{
     ;(async()=>{ try { const r = await fetch('/api/config',{cache:'no-store'}); if(r.ok){ const j = await r.json(); const curr = j?.data?.currency || 'AOA'; setCurrency(curr); setShowConverted(locale.startsWith('en')) } } catch {} })()
-  },[])
+  },[locale])
 
   useEffect(()=>{
     if (showConverted && product?.price) {
@@ -114,22 +123,22 @@ export default function ProductModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={onClose} onKeyDown={handleKeyDown} tabIndex={0}>
-      <div className="relative w-full max-w-5xl max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
+      <div ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="product-dialog-title" tabIndex={-1} className="relative w-full max-w-5xl max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col focus:outline-none" onClick={(e) => e.stopPropagation()}>
         {/* Header com imagem */}
         <div className="relative h-64 lg:h-72 overflow-hidden cursor-zoom-in" onClick={() => setIsZoomOpen(true)}>
           <Image src={(images[currentImageIndex] as any) || (Placeholder as any)} alt={(product.name ?? '') as string} fill className="object-cover" priority />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-          <button onClick={onClose} className="absolute top-4 right-4 w-10 h-10 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110">
+          <button onClick={onClose} aria-label={isEn ? 'Close product details' : 'Fechar detalhes do produto'} className="absolute top-4 right-4 w-10 h-10 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110">
             <X size={20} className="text-white" />
           </button>
-          <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
-            <button onClick={(e)=>{ e.stopPropagation(); onPrevious?.() }} disabled={!hasPrevious} className={`p-2 rounded-full backdrop-blur-sm transition-all duration-200 ${hasPrevious ? 'bg-white/20 hover:bg-white/30 text-white hover:scale-110' : 'bg-white/10 text_white/50 cursor-not-allowed'}`}>
-              <ArrowLeft size={20} />
-            </button>
-            <button onClick={(e)=>{ e.stopPropagation(); onNext?.() }} disabled={!hasNext} className={`p-2 rounded-full backdrop-blur-sm transition-all duration-200 ${hasNext ? 'bg_white/20 hover:bg_white/30 text-white hover:scale-110' : 'bg-white/10 text-white/50 cursor-not-allowed'}`}>
-              <ArrowRight size={20} />
-            </button>
-          </div>
+            <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
+              <button onClick={(e)=>{ e.stopPropagation(); onPrevious?.() }} aria-label={isEn ? 'Previous product' : 'Produto anterior'} disabled={!hasPrevious} className={`p-2 rounded-full backdrop-blur-sm transition-all duration-200 ${hasPrevious ? 'bg-white/20 hover:bg-white/30 text-white hover:scale-110' : 'bg-white/10 text-white/50 cursor-not-allowed'}`}>
+                <ArrowLeft size={20} />
+              </button>
+              <button onClick={(e)=>{ e.stopPropagation(); onNext?.() }} aria-label={isEn ? 'Next product' : 'Próximo produto'} disabled={!hasNext} className={`p-2 rounded-full backdrop-blur-sm transition-all duration-200 ${hasNext ? 'bg-white/20 hover:bg-white/30 text-white hover:scale-110' : 'bg-white/10 text-white/50 cursor-not-allowed'}`}>
+                <ArrowRight size={20} />
+              </button>
+            </div>
           <div className="absolute top-4 left-4 space-y-2">
             <span className={`px-3 py-1 text-sm font-medium rounded-full ${getHealthStatusColor(product.healthStatus)}`}>{getHealthStatusText(product.healthStatus)}</span>
             {product.vaccinated && (<span className="bg-blue-100 text-blue-800 px-3 py-1 text-sm font-medium rounded-full block">{isEn ? 'Vaccinated' : 'Vacinado'}</span>)}
@@ -154,7 +163,7 @@ export default function ProductModal({
           {images.length > 1 && (
             <div className="absolute top-4 right-16 flex gap-2">
               {images.map((_, idx) => (
-                <button key={idx} onClick={() => setCurrentImageIndex(idx)} className={`w-3 h-3 rounded-full transition-all ${idx === currentImageIndex ? 'bg-white scale-125' : 'bg-white/50 hover:bg-white/80'}`} />
+                <button key={idx} onClick={() => setCurrentImageIndex(idx)} aria-label={`${isEn ? 'View image' : 'Ver imagem'} ${idx + 1}`} aria-current={idx === currentImageIndex} className={`w-3 h-3 rounded-full transition-all ${idx === currentImageIndex ? 'bg-white scale-125' : 'bg-white/50 hover:bg-white/80'}`} />
               ))}
             </div>
           )}
@@ -172,7 +181,7 @@ export default function ProductModal({
           ) : (
             <>
               <div className="mb-6">
-                <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2 leading-tight">{product.name}</h1>
+                <h1 id="product-dialog-title" className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2 leading-tight">{product.name}</h1>
                 <p className="text-xl text-primary-600 font-semibold">{product.breed}</p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">

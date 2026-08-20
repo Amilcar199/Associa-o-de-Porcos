@@ -12,6 +12,8 @@ export default function ContatoPage() {
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(null as string | null)
   const [error, setError] = useState(null as string | null)
+  const [subject, setSubject] = useState('')
+  const [message, setMessage] = useState('')
   
 
   useEffect(() => {
@@ -19,17 +21,8 @@ export default function ContatoPage() {
     const subject = params?.get('subject') || null
     const message = params?.get('message') || null
     if (subject || message) {
-      const form = document.querySelector('form') as HTMLFormElement | null
-      if (form) {
-        if (subject) {
-          const subj = form.querySelector('input[name="subject"]') as HTMLInputElement | null
-          if (subj) subj.value = subject
-        }
-        if (message) {
-          const msg = form.querySelector('textarea[name="message"]') as HTMLTextAreaElement | null
-          if (msg) msg.value = message
-        }
-      }
+      if (subject) setSubject(subject)
+      if (message) setMessage(message)
     }
   }, [])
 
@@ -63,6 +56,8 @@ export default function ContatoPage() {
       if (res.ok && json.success) {
         setSuccess(isEn ? 'Message sent successfully!' : 'Mensagem enviada com sucesso!')
         form.reset()
+        setSubject('')
+        setMessage('')
       } else {
         setError(json.error || (isEn ? 'Failed to send, please try again.' : 'Falha ao enviar, tente novamente.'))
       }
@@ -107,7 +102,7 @@ export default function ContatoPage() {
                   <p>Rua Manuel Caldeira nº 6, Luanda</p>
                   <p className="text-xs text-gray-500">Plus Code: 56QG+92 Luanda</p>
                   <a href="https://maps.app.goo.gl/PUczChGSKeG7QjVU9" target="_blank" rel="noopener noreferrer" className="hover:text-primary-700 transition-colors">
-                    Ver no Google Maps
+                    {isEn ? 'View on Google Maps' : 'Ver no Google Maps'}
                   </a>
                 </div>
               </div>
@@ -131,39 +126,39 @@ export default function ContatoPage() {
 
         {/* Formulário */}
         <form onSubmit={handleSubmit} className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-5">
-          {success && <div className="p-3 bg-green-50 text-green-700 rounded">{success}</div>}
-          {error && <div className="p-3 bg-red-50 text-red-700 rounded">{error}</div>}
+          {success && <div role="status" aria-live="polite" className="rounded-xl bg-green-50 p-3 text-green-700">{success}</div>}
+          {error && <div role="alert" aria-live="assertive" className="rounded-xl bg-red-50 p-3 text-red-700">{error}</div>}
 
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm text-gray-700 mb-1">{isEn ? 'Name' : 'Nome'}</label>
-              <input name="name" placeholder={isEn ? 'Your full name' : 'Seu nome completo'} required className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500" />
+              <label htmlFor="contact-name" className="block text-sm text-gray-700 mb-1">{isEn ? 'Name' : 'Nome'}</label>
+              <input id="contact-name" name="name" autoComplete="name" placeholder={isEn ? 'Your full name' : 'Seu nome completo'} required className="input-field px-3 py-2" />
             </div>
             <div>
-              <label className="block text-sm text-gray-700 mb-1">Email</label>
-              <input name="email" type="email" placeholder={isEn ? 'your@email.com' : 'seu@email.com'} required className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500" />
+              <label htmlFor="contact-email" className="block text-sm text-gray-700 mb-1">Email</label>
+              <input id="contact-email" name="email" type="email" autoComplete="email" placeholder={isEn ? 'your@email.com' : 'seu@email.com'} required className="input-field px-3 py-2" />
             </div>
           </div>
 
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm text-gray-700 mb-1">{isEn ? 'Phone' : 'Telefone'}</label>
-              <input name="phone" placeholder="(+244) 9xx xxx xxx" className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500" />
+              <label htmlFor="contact-phone" className="block text-sm text-gray-700 mb-1">{isEn ? 'Phone' : 'Telefone'}</label>
+              <input id="contact-phone" name="phone" autoComplete="tel" placeholder="(+244) 9xx xxx xxx" className="input-field px-3 py-2" />
             </div>
             <div>
-              <label className="block text-sm text-gray-700 mb-1">{isEn ? 'Subject' : 'Assunto'}</label>
-              <input name="subject" placeholder={isEn ? 'Ex.: Budget, Partnership' : 'Ex.: Orçamento, Parceria'} required className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500" />
+              <label htmlFor="contact-subject" className="block text-sm text-gray-700 mb-1">{isEn ? 'Subject' : 'Assunto'}</label>
+              <input id="contact-subject" name="subject" value={subject} onChange={event => setSubject(event.target.value)} placeholder={isEn ? 'Ex.: Budget, Partnership' : 'Ex.: Orçamento, Parceria'} required className="input-field px-3 py-2" />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm text-gray-700 mb-1">{isEn ? 'Message' : 'Mensagem'}</label>
-            <textarea name="message" required rows={6} placeholder={isEn ? 'Describe your need in detail' : 'Descreva sua necessidade com detalhes'} className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500" />
+            <label htmlFor="contact-message" className="block text-sm text-gray-700 mb-1">{isEn ? 'Message' : 'Mensagem'}</label>
+            <textarea id="contact-message" name="message" value={message} onChange={event => setMessage(event.target.value)} required rows={6} placeholder={isEn ? 'Describe your need in detail' : 'Descreva sua necessidade com detalhes'} className="input-field px-3 py-2" />
             <p className="mt-2 text-xs text-gray-500">{isEn ? 'We protect your data. We will use your information only to return the contact.' : 'Protegemos seus dados. Usaremos suas informações apenas para retornar o contato.'}</p>
           </div>
 
           <div className="flex items-center gap-3">
-            <button disabled={loading} className="inline-flex items-center bg-primary-600 hover:bg-primary-700 text-white px-5 py-2.5 rounded font-medium disabled:opacity-60">
+            <button type="submit" disabled={loading} className="btn-primary inline-flex items-center disabled:opacity-60">
               <Send size={18} className="mr-2" aria-hidden /> {loading ? (isEn ? 'Sending...' : 'Enviando...') : (isEn ? 'Send Message' : 'Enviar Mensagem')}
             </button>
             <a href={`tel:${(siteConfig as any)?.contactPhone || '+244923221950'}`} className="inline-flex items-center text-primary-700 hover:text-primary-800 font-medium">{isEn ? 'Or call now' : 'Ou ligue agora'}</a>

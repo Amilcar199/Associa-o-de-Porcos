@@ -29,6 +29,8 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const router = useRouter();
+  const passwordHasNumber = /\d/.test(formData.password)
+  const passwordHasLength = formData.password.length >= 6
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -113,10 +115,11 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-600 text-xl font-bold text-white shadow-lg shadow-primary-600/20">AS</div>
+          <h2 className="text-3xl font-heading font-bold text-gray-900">
             {dict.auth.registerTitle}
           </h2>
           <p className="mt-2 text-sm text-gray-600">
@@ -126,11 +129,10 @@ export default function RegisterPage() {
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          {true ? (
+        <div className="rounded-2xl border border-white/80 bg-white/95 py-8 px-4 shadow-xl shadow-gray-900/5 backdrop-blur sm:px-10">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-md p-4">
+              <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4">
                 <div className="flex">
                   <AlertCircle className="h-5 w-5 text-red-400" />
                   <div className="ml-3">
@@ -141,7 +143,7 @@ export default function RegisterPage() {
             )}
 
             {success && (
-              <div className="bg-green-50 border border-green-200 rounded-md p-4">
+              <div role="status" className="rounded-xl border border-green-200 bg-green-50 p-4">
                 <div className="flex">
                   <CheckCircle className="h-5 w-5 text-green-400" />
                   <div className="ml-3">
@@ -152,21 +154,23 @@ export default function RegisterPage() {
             )}
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label id="account-type-label" className="block text-sm font-medium text-gray-700">
                 {dict.auth.accountType}
               </label>
-              <div className="mt-1 grid grid-cols-2 gap-3">
+              <div className="mt-2 grid grid-cols-2 gap-3" role="radiogroup" aria-labelledby="account-type-label">
                 <button
                   type="button"
                   onClick={() => setFormData(prev => ({ ...prev, accountType: 'cliente', company: '' }))}
-                  className={`border rounded-md p-2 text-sm ${formData.accountType === 'cliente' ? 'border-green-600 text-green-700' : 'border-gray-300 text-gray-700'}`}
+                  aria-pressed={formData.accountType === 'cliente'}
+                  className={`rounded-xl border p-3 text-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${formData.accountType === 'cliente' ? 'border-primary-600 bg-primary-50 text-primary-700' : 'border-gray-200 text-gray-700 hover:border-primary-300'}`}
                 >
                   {dict.auth.accountTypeClient}
                 </button>
                 <button
                   type="button"
                   onClick={() => setFormData(prev => ({ ...prev, accountType: 'membro' }))}
-                  className={`border rounded-md p-2 text-sm ${formData.accountType === 'membro' ? 'border-green-600 text-green-700' : 'border-gray-300 text-gray-700'}`}
+                  aria-pressed={formData.accountType === 'membro'}
+                  className={`rounded-xl border p-3 text-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${formData.accountType === 'membro' ? 'border-primary-600 bg-primary-50 text-primary-700' : 'border-gray-200 text-gray-700 hover:border-primary-300'}`}
                 >
                   {dict.auth.accountTypeMember}
                 </button>
@@ -190,7 +194,7 @@ export default function RegisterPage() {
                   required
                   value={formData.name}
                   onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                  className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                  className="input-field pl-10 pr-3"
                   placeholder={dict.auth.name}
                 />
               </div>
@@ -212,7 +216,7 @@ export default function RegisterPage() {
                   required
                   value={formData.email}
                   onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                  className="input-field pl-10 pr-3"
                   placeholder={dict.auth.placeholderEmail}
                 />
               </div>
@@ -233,7 +237,7 @@ export default function RegisterPage() {
                   autoComplete="tel"
                   value={formData.phone}
                   onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                  className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                  className="input-field pl-10 pr-3"
                   placeholder="(+244) 9xx xxx xxx"
                 />
               </div>
@@ -254,7 +258,7 @@ export default function RegisterPage() {
                   type="text"
                   value={formData.company}
                   onChange={(e) => setFormData(prev => ({ ...prev, company: e.target.value }))}
-                  className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                  className="input-field pl-10 pr-3"
                   placeholder={dict.auth.companyOptional}
                 />
               </div>
@@ -273,7 +277,7 @@ export default function RegisterPage() {
                   rows={4}
                   value={formData.description}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  className="appearance-none block w-full pr-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                  className="input-field pr-3"
                   placeholder={dict.auth.description}
                 />
               </div>
@@ -296,13 +300,14 @@ export default function RegisterPage() {
                   required
                   value={formData.password}
                   onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                  className="appearance-none block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                  className="input-field pl-10 pr-10"
                   placeholder={dict.auth.passwordMin}
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
                   onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+                  className="absolute inset-y-0 right-0 flex items-center pr-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
                 >
                   {showPassword ? (
                     <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
@@ -310,6 +315,10 @@ export default function RegisterPage() {
                     <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
                   )}
                 </button>
+              </div>
+              <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs" aria-live="polite">
+                <span className={passwordHasLength ? 'text-green-700' : 'text-gray-500'}>{passwordHasLength ? '✓' : '•'} {locale.startsWith('en') ? '6+ characters' : '6+ caracteres'}</span>
+                <span className={passwordHasNumber ? 'text-green-700' : 'text-gray-500'}>{passwordHasNumber ? '✓' : '•'} {locale.startsWith('en') ? 'One number' : 'Um número'}</span>
               </div>
             </div>
 
@@ -334,7 +343,8 @@ export default function RegisterPage() {
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  aria-label={showConfirmPassword ? 'Ocultar confirmação de senha' : 'Mostrar confirmação de senha'}
+                  className="absolute inset-y-0 right-0 flex items-center pr-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
                   {showConfirmPassword ? (
@@ -350,20 +360,19 @@ export default function RegisterPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn-primary w-full disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {loading ? dict.auth.creatingAccount : dict.auth.createAccount}
               </button>
             </div>
           </form>
-          ) : null}
 
           {/* Seção de registro social removida */}
 
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               {dict.auth.haveAccount}{' '}
-              <Link href="/login" className="font-medium text-green-600 hover:text-green-500">
+              <Link href="/login" className="font-medium text-primary-700 hover:text-primary-800">
                 {dict.auth.loginHere}
               </Link>
             </p>

@@ -221,7 +221,7 @@ export default function AboutClient() {
                 viewport={{ once: true }}
                 className="relative h-56 rounded-2xl overflow-hidden shadow"
               >
-                <Image src={src} alt={isEn ? 'Association gallery' : 'Galeria da Associação de Suinocultores do Norte'} fill className="object-cover" sizes="(max-width:768px) 100vw, 33vw" />
+                <Image src={src} alt={[isEn ? 'Pig farming activity' : 'Atividade de suinocultura', isEn ? 'Producer support' : 'Apoio ao produtor', isEn ? 'Pig farming and market' : 'Suinocultura e mercado'][idx]} fill className="object-cover" sizes="(max-width:768px) 100vw, 33vw" />
               </motion.div>
             ))}
           </div>
@@ -251,14 +251,8 @@ export default function AboutClient() {
               <h3 className="text-3xl font-heading font-bold mb-3">{isEn ? 'Our presence in Angola' : 'Nossa presença em Angola'}</h3>
               <p className="text-gray-700 mb-3">{isEn ? 'We operate nationally with local partnerships and close support to producers. We deliver knowledge, technical assistance and quality standards to consistently drive results.' : 'Estamos presentes em território nacional com parcerias locais e atuação próxima ao produtor. Levamos conhecimento, assistência técnica e padrões de qualidade para impulsionar resultados de forma consistente.'}</p>
               <p className="text-gray-600 mb-6">{isEn ? 'Below are some provinces where we maintain operations and continuous support:' : 'Abaixo, algumas das províncias onde mantemos operações e apoio contínuo:'}</p>
-              <ul className="space-y-2">
-                <li className="text-3xl font-heading font-extrabold text-primary-700">Luanda</li>
-                <li className="text-xl text-gray-800">Benguela</li>
-                <li className="text-xl text-gray-800">Bengo</li>
-                <li className="text-xl text-gray-800">Icolo e Bengo</li>
-                <li className="text-xl text-gray-800">Malanje</li>
-                <li className="text-xl text-gray-800">Huambo</li>
-                <li className="text-xl text-gray-800">Kuanza Norte</li>
+              <ul className="grid grid-cols-2 gap-2 text-base font-medium text-gray-800 sm:grid-cols-3">
+                {['Luanda', 'Benguela', 'Bengo', 'Icolo e Bengo', 'Malanje', 'Huambo', 'Kuanza Norte'].map(province => <li key={province} className="rounded-lg border border-gray-200 bg-white px-3 py-2">{province}</li>)}
                 
               </ul>
             </div>

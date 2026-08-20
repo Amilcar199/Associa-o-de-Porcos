@@ -88,7 +88,11 @@ export default function NewsClient({ news, isEn }: { news: NewsItem[]; isEn: boo
           <article
             key={n._id || idx}
             onClick={() => openModal(n)}
-            className="group bg-white rounded-xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition cursor-pointer"
+            onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openModal(n) } }}
+            role="button"
+            tabIndex={0}
+            aria-label={`${isEn ? 'Read article' : 'Ler notícia'}: ${n.title}`}
+            className="group cursor-pointer overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
           >
             <div className="relative h-44">
               <Image
