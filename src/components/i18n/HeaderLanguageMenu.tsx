@@ -27,8 +27,8 @@ export default function HeaderLanguageMenu() {
   return (
     <div className="relative" ref={ref}>
       <button
-        onClick={() => setOpen(v => !v)}
-        className="inline-flex items-center gap-2 rounded-md border border-gray-200 bg-white px-2.5 py-1.5 text-sm shadow-sm hover:bg-gray-50"
+        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(v => !v) }}
+        type="button" className="relative z-[80] inline-flex items-center gap-2 rounded-md border border-gray-200 bg-white px-2.5 py-1.5 text-sm shadow-sm hover:bg-gray-50 cursor-pointer pointer-events-auto"
         aria-haspopup="menu"
         aria-expanded={open}
         title={current.label}
@@ -39,13 +39,13 @@ export default function HeaderLanguageMenu() {
         </span>
       </button>
       {open && (
-        <div className="relative md:absolute md:right-0 mt-2 w-48 rounded-md border border-gray-200 bg-white shadow-lg z-[70]">
+        <div className="absolute right-0 mt-2 w-48 rounded-md border border-gray-200 bg-white shadow-lg z-[70]">
           <ul className="py-1 text-sm">
             {OPTIONS.map(opt => (
               <li key={opt.value}>
                 <button
                   className={`flex w-full items-center gap-2 px-3 py-2 hover:bg-gray-100 ${opt.value === locale ? 'text-primary-600' : 'text-gray-700'}`}
-                  onClick={() => { setLocale(opt.value); setOpen(false) }}
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); setLocale(opt.value); setOpen(false) }}
                 >
                   <span className="text-base leading-none">{getFlag(opt.value)}</span>
                   <span>{opt.label}</span>

@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useMemo, useState, ReactNode } from 'react'
 import Cookies from 'js-cookie'
-import { DEFAULT_LOCALE, Locale, languageToRouteSegment, parseAcceptLanguage } from '@/lib/i18n/config'
+import { DEFAULT_LOCALE, Locale, languageToRouteSegment, normalizeLocale, parseAcceptLanguage } from '@/lib/i18n/config'
 import { usePathname, useRouter } from 'next/navigation'
 
 const LOCALE_COOKIE_KEY = 'locale'
@@ -20,14 +20,15 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 	const [locale, setLocaleState] = useState<Locale>(DEFAULT_LOCALE)
 
 	useEffect(() => {
-		const existing = Cookies.get(LOCALE_COOKIE_KEY) as Locale | undefined
-		if (existing) {
-			setLocaleState(existing)
+		const existing = Cookies.get(LOCALE_COOKIE_KEY)
+		if (existing && (existing === 'pt-AO' || existing === 'pt-PT' || existing === 'pt-BR' || existing === 'en-US')) {
+			setLocaleState(existing as Locale)
 			return
 		}
+		Cookies.remove(LOCALE_COOKIE_KEY, { path: '/' })
 		// Detect from browser
 		const detected = typeof navigator !== 'undefined' ? (navigator.language || '').toLowerCase() : ''
-		const resolved = parseAcceptLanguage(detected)
+		const resolved = normalizeLocale(parseAcceptLanguage(detected))
 		Cookies.set(LOCALE_COOKIE_KEY, resolved, { expires: 365, sameSite: 'lax' })
 		setLocaleState(resolved)
 	}, [])
@@ -39,7 +40,8 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 		const first = parts[0]
 		const hasLangPrefix = first === 'pt' || first === 'en'
 		const rest = hasLangPrefix ? parts.slice(1).join('/') : parts.join('/')
-		const segment = languageToRouteSegment(next)
+		const normalized = normalizeLocale(next)
+		const segment = languageToRouteSegment(normalized)
 		const newPath = `/${segment}/${rest}`.replace(/\/$/, '')
 
 		if (options?.updateRoute === false) {

@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic'
 import type { Metadata } from 'next'
 import { cookies } from 'next/headers'
 import ProductsClient from '@/app/produtos/ProductsClient'
+import { localizeProduct } from '@/lib/i18n/content'
 
 export function generateMetadata(): Metadata {
   const locale = cookies().get('locale')?.value || 'pt-AO'
@@ -20,7 +21,7 @@ const placeholderImages = [
   'https://images.unsplash.com/photo-1599327576016-7cc3f4f1bb4a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80'
 ]
 
-async function getProducts() {
+async function getProducts(locale: string) {
   try {
     const cfgRes = await fetch(`/api/config`, { cache: 'no-store' })
     const cfgJson = cfgRes.ok ? await cfgRes.json() : { data: {} }
@@ -38,7 +39,7 @@ async function getProducts() {
     })
 
     let enriched = data.map((p: any, idx: number) => ({
-      ...p,
+      ...localizeProduct(p, locale),
       imageUrl: (p.images && p.images[0]) || p.imageUrl || placeholderImages[idx % placeholderImages.length],
       priceFormatted: p.priceFormatted || (typeof p.price === 'number' ? currencyFormatter.format(p.price) : undefined)
     }))
@@ -50,7 +51,7 @@ async function getProducts() {
         const jsonFeatured = await resFeatured.json()
         const dataFeatured = jsonFeatured.data || []
         enriched = dataFeatured.map((p: any, idx: number) => ({
-          ...p,
+          ...localizeProduct(p, locale),
           imageUrl: (p.images && p.images[0]) || p.imageUrl || placeholderImages[idx % placeholderImages.length],
           priceFormatted: p.priceFormatted || (typeof p.price === 'number' ? currencyFormatter.format(p.price) : undefined)
         }))
@@ -78,9 +79,9 @@ async function getProducts() {
 }
 
 export default async function ProdutosPage() {
-  const products = await getProducts()
   const locale = cookies().get('locale')?.value || 'pt-AO'
   const isEn = String(locale).startsWith('en')
+  const products = await getProducts(locale)
   const normalizedProducts = (products || []).map((p: any, idx: number) => ({
     ...p,
     _id: p._id || p.code || String(idx),

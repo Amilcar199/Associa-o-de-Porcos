@@ -137,6 +137,15 @@ const ProductSchema = new Schema<IProduct>({
     ref: 'User',
     required: [true, 'Vendedor é obrigatório'],
   },
+  translations: {
+    en: {
+      name: { type: String, trim: true, maxlength: 100 },
+      description: { type: String, trim: true, maxlength: 1000 },
+      location: { type: String, trim: true, maxlength: 100 },
+      features: { type: [String], default: [] },
+      tags: { type: [String], default: [] },
+    }
+  },
   tags: {
     type: [String],
     default: [],

@@ -23,6 +23,14 @@ export interface User extends Document {
 }
 
 // Tipos de produto (porcos)
+export interface ProductTranslation {
+  name?: string
+  description?: string
+  location?: string
+  features?: string[]
+  tags?: string[]
+}
+
 export interface Product extends Document {
   _id: string
   name: string
@@ -43,12 +51,20 @@ export interface Product extends Document {
   availability: 'available' | 'sold' | 'reserved'
   seller: User | string
   tags: string[]
+  translations?: { en?: ProductTranslation }
   isActive: boolean
   createdAt: Date
   updatedAt: Date
 }
 
 // Tipos de notícias
+export interface NewsTranslation {
+  title?: string
+  content?: string
+  excerpt?: string
+  tags?: string[]
+}
+
 export interface News extends Document {
   _id: string
   title: string
@@ -64,6 +80,7 @@ export interface News extends Document {
   published: boolean
   featured: boolean
   views: number
+  translations?: { en?: NewsTranslation }
   publishedAt?: Date
   createdAt: Date
   updatedAt: Date

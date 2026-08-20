@@ -2,7 +2,7 @@ import { withAuth } from 'next-auth/middleware'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import type { NextRequestWithAuth } from 'next-auth/middleware'
-import { languageToRouteSegment, parseAcceptLanguage, routeSegmentToDefaultLocale } from '@/lib/i18n/config'
+import { languageToRouteSegment, parseAcceptLanguage, routeSegmentToDefaultLocale, SUPPORTED_LOCALES } from '@/lib/i18n/config'
 
 const LOCALE_COOKIE_KEY = 'locale'
 
@@ -60,7 +60,7 @@ export default withAuth(
       } else if (!routePathname.startsWith('/admin')) {
         const cookieLocale = req.cookies.get(LOCALE_COOKIE_KEY)?.value
         const headerLocale = parseAcceptLanguage(req.headers.get('accept-language'))
-        const chosen = cookieLocale || headerLocale
+        const chosen = cookieLocale && SUPPORTED_LOCALES.includes(cookieLocale as any) ? cookieLocale : headerLocale
         const segment = languageToRouteSegment(chosen as Parameters<typeof languageToRouteSegment>[0])
         const redirectUrl = new URL(`/${segment}${routePathname}`, req.url)
         redirectUrl.search = url.search

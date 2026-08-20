@@ -6,6 +6,7 @@ import { headers } from 'next/headers'
  
 import { cookies } from 'next/headers'
 import NewsClient from '@/app/noticias/NewsClient'
+import { localizeNews } from '@/lib/i18n/content'
 
 export function generateMetadata(): Metadata {
   const locale = cookies().get('locale')?.value || 'pt-AO'
@@ -22,7 +23,7 @@ const placeholderImages = [
   'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80'
 ]
 
-async function getNews() {
+async function getNews(locale: string) {
   try {
     const h = headers()
     const protocol = h.get('x-forwarded-proto') || 'http'
@@ -35,7 +36,7 @@ async function getNews() {
     const data = json.data || []
 
     const enriched = data.map((n: any, idx: number) => ({
-      ...n,
+      ...localizeNews(n, locale),
       imageUrl: n.featuredImage || n.imageUrl || placeholderImages[idx % placeholderImages.length],
       publishedAtFormatted:
         n.publishedAtFormatted || (n.publishedAt
@@ -61,9 +62,9 @@ async function getNews() {
 }
 
 export default async function NoticiasPage() {
-  const news = await getNews()
   const locale = cookies().get('locale')?.value || 'pt-AO'
   const isEn = String(locale).startsWith('en')
+  const news = await getNews(locale)
 
   return (
     <section className="">

@@ -5,6 +5,7 @@ import { formatDate } from '@/lib/utils'
 import { BRAND_NAME } from '@/lib/brand'
 import ViewCounter from './ViewCounter'
 import { cookies } from 'next/headers'
+import { localizeNews } from '@/lib/i18n/content'
 
 interface RouteParams {
   params: {
@@ -65,7 +66,8 @@ export default async function NewsPage({ params }: RouteParams) {
   const isEn = String(locale).startsWith('en')
   try {
     await connectDB()
-    const news = await News.findOne({ slug: params.slug, published: true }).lean()
+    const rawNews = await News.findOne({ slug: params.slug, published: true }).lean()
+    const news = rawNews ? localizeNews(rawNews, locale) : null
     if (!news) {
       return (
         <article className="max-w-4xl mx-auto px-4 py-8">

@@ -3,6 +3,16 @@ export type Locale = 'pt-AO' | 'pt-PT' | 'pt-BR' | 'en-US'
 export const SUPPORTED_LOCALES: Locale[] = ['pt-AO', 'pt-PT', 'pt-BR', 'en-US']
 export const DEFAULT_LOCALE: Locale = 'pt-AO'
 
+export function isSupportedLocale(value: string | null | undefined): value is Locale {
+	return value === 'pt-AO' || value === 'pt-PT' || value === 'pt-BR' || value === 'en-US'
+}
+
+export function normalizeLocale(value: string | null | undefined): Locale {
+	if (isSupportedLocale(value)) return value
+	if (value?.toLowerCase().startsWith('en')) return 'en-US'
+	return DEFAULT_LOCALE
+}
+
 export function languageToRouteSegment(locale: Locale): 'pt' | 'en' {
 	return locale.startsWith('pt') ? 'pt' : 'en'
 }

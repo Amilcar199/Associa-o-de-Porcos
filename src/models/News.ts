@@ -30,6 +30,14 @@ const NewsSchema = new Schema<INews>({
     trim: true,
     maxlength: [300, 'Resumo não pode ter mais que 300 caracteres'],
   },
+  translations: {
+    en: {
+      title: { type: String, trim: true, maxlength: 200 },
+      content: { type: String, trim: true },
+      excerpt: { type: String, trim: true, maxlength: 300 },
+      tags: { type: [String], default: [] },
+    }
+  },
   featuredImage: {
     type: String,
     required: [true, 'Imagem de destaque é obrigatória'],
