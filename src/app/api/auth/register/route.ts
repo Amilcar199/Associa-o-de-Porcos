@@ -16,6 +16,15 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const sanitizedData = sanitizeInput(body);
 
+    if (sanitizedData.phone) {
+      const phone = String(sanitizedData.phone).trim()
+      if (!/^[+\d\s().-]+$/.test(phone)) {
+        return errorResponse('Telefone inválido')
+      }
+      const digits = phone.replace(/\D/g, '')
+      sanitizedData.phone = phone.startsWith('+') ? `+${digits}` : digits
+    }
+
     // Validações
     if (!sanitizedData.name || !sanitizedData.email || !sanitizedData.password) {
       return errorResponse('Nome, email e senha são obrigatórios');
