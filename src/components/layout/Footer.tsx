@@ -132,17 +132,13 @@ const Footer = () => {
           <div className="lg:col-span-1">
             <Link href="/" className="flex items-center space-x-3 mb-4">
               <div className="w-16 h-16 md:w-20 md:h-20 relative">
-                {siteConfig?.publicLogoUrl || siteConfig?.logoUrl ? (
-                  <img src={siteConfig.publicLogoUrl || siteConfig.logoUrl} alt="Logo" className="w-full h-full object-contain" />
-                ) : (
-                  <Image
-                    src={LogoPng}
-                    alt={BRAND_NAME}
-                    fill
-                    className="object-contain"
-                    sizes="(max-width: 768px) 64px, 80px"
-                  />
-                )}
+                <Image
+                  src={LogoPng}
+                  alt={BRAND_NAME}
+                  fill
+                  className="object-contain"
+                  sizes="(max-width: 768px) 64px, 80px"
+                />
               </div>
               <div>
 

@@ -177,18 +177,14 @@ const Header = () => {
             {/* Logo */}
             <Link href="/" className="flex items-center space-x-3 lg:space-x-5">
               <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-36 lg:h-36 relative">
-                {siteConfig?.publicLogoUrl || siteConfig?.logoUrl ? (
-                  <img src={siteConfig.publicLogoUrl || siteConfig.logoUrl} alt="Logo" className="w-full h-full object-contain" />
-                ) : (
-                  <Image
-                    src={LogoPng}
-                    alt={BRAND_NAME}
-                    fill
-                    className="object-contain"
-                    sizes="(max-width: 640px) 80px, (max-width: 768px) 96px, (max-width: 1024px) 112px, 144px"
-                    priority
-                  />
-                )}
+                <Image
+                  src={LogoPng}
+                  alt={BRAND_NAME}
+                  fill
+                  className="object-contain"
+                  sizes="(max-width: 640px) 80px, (max-width: 768px) 96px, (max-width: 1024px) 112px, 144px"
+                  priority
+                />
               </div>
               <div className="hidden sm:block">
                 <h1 className="text-lg lg:text-3xl font-heading font-bold text-white leading-tight">
