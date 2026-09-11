@@ -16,6 +16,7 @@ import {
   Upload,
   FileText,
   Bell,
+  MapPin,
   ChevronDown,
   ChevronRight
 } from 'lucide-react'
@@ -87,6 +88,11 @@ const AdminSidebar = () => {
       href: '/admin/contatos',
       icon: MessageSquare,
       badge: 'custom'
+    },
+    {
+      name: 'Suinocultura',
+      href: '/admin/suinocultura',
+      icon: MapPin
     },
     {
       name: 'Notificações',

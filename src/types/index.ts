@@ -197,6 +197,52 @@ export interface MarketQuote extends Document {
   updatedAt: Date
 }
 
+export interface FarmHerd {
+  total: number
+  females: number
+  forSlaughter: number
+  forBreeding: number
+}
+
+export interface Farm extends Document {
+  _id: string
+  producerName: string
+  farmName?: string
+  province: string
+  municipality?: string
+  coordinates?: { lat: number; lng: number }
+  phone?: string
+  email?: string
+  herd: FarmHerd
+  notes?: string
+  status: 'pending' | 'approved' | 'rejected'
+  owner?: string
+  isActive: boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface FarmFormData {
+  producerName: string
+  farmName?: string
+  province: string
+  municipality?: string
+  coordinates?: { lat: number; lng: number }
+  phone?: string
+  email?: string
+  herd: FarmHerd
+  notes?: string
+}
+
+export interface ProvinceStats {
+  province: string
+  farmersCount: number
+  totalPigs: number
+  females: number
+  forSlaughter: number
+  forBreeding: number
+}
+
 export interface PaginatedResponse<T> extends ApiResponse<T[]> {
   pagination: {
     page: number

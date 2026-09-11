@@ -19,6 +19,7 @@ const PUBLIC_API_PREFIXES = [
   '/api/public-images',
   '/api/public-assets',
   '/api/contact',
+  '/api/farms',
 ]
 
 function isPathOrChild(pathname: string, path: string) {

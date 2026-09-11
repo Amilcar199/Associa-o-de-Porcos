@@ -121,6 +121,12 @@ src/
 - [x] Recuperação de senha
 - [x] Autenticação avançada
 
+### ✅ Fase 4 - Mapa Interativo de Suinocultura
+- [x] Cadastro público de fazendas com aprovação administrativa
+- [x] Estatísticas agregadas por província no mapa de Angola
+- [x] Gestão de cadastros pendentes, aprovados e rejeitados no painel admin
+- [x] Modelo MongoDB `Farm` com validação do rebanho
+
 ## 🔐 Autenticação
 
 O sistema possui três níveis de acesso:
@@ -236,6 +242,7 @@ O menu lateral à esquerda contém as seções abaixo:
   - Conteúdo de Membros: gerenciar conteúdos exclusivos para a área de membros.
   - Novo Conteúdo: criar conteúdo exclusivo.
 - **Contatos**: Mensagens recebidas pelo formulário de contato. Marque como lidas/resolvidas conforme necessário.
+- **Suinocultura**: Rever, aprovar, rejeitar ou remover cadastros de fazendas que aparecem no mapa público.
 - **Mídia**: Gerenciar imagens do site (upload, listar e reutilizar).
 - **Relatórios**: Estatísticas e relatórios de uso/conteúdo.
 - **Configurações**: Ajustes gerais do site (ex.: logo e informações básicas quando disponíveis).

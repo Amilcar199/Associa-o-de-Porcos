@@ -11,6 +11,7 @@ import { Award, Leaf, Users, Target, ShieldCheck, Sparkles, ArrowRight, Recycle,
 import MapaAngola from '@/components/assets/Mapa de Angola.png'
 import { useLanguage } from '@/components/providers/LanguageProvider'
 import { useSession } from 'next-auth/react'
+import InteractiveMapSection from '@/components/sections/PigMap/InteractiveMapSection'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -259,6 +260,9 @@ export default function AboutClient() {
           </div>
         </div>
       </div>
+
+      {/* Mapa Interativo de Suinocultura */}
+      <InteractiveMapSection isEn={isEn} />
 
       {/* CTA Final */}
       <div className="container-custom py-12 lg:py-16">
