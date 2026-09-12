@@ -8,6 +8,7 @@ import {
   ShoppingCart,
   Newspaper,
   MessageSquare,
+  PiggyBank,
   Plus,
   Edit,
   Trash,
@@ -16,7 +17,7 @@ import {
 import Modal from './ui/Modal'
 
 interface ActivityItem {
-  type: 'user' | 'product' | 'news' | 'contact'
+  type: 'user' | 'product' | 'news' | 'contact' | 'member-content' | 'farm'
   action: string
   date: Date
   user?: string
@@ -34,10 +35,10 @@ const RecentActivity = () => {
 
   const fetchRecentActivity = async () => {
     try {
-      const response = await fetch('/api/admin/stats')
+      const response = await fetch('/api/admin/activity?page=1&limit=6')
       if (response.ok) {
         const data = await response.json()
-        setActivities(data.data.recentActivity)
+        setActivities(data.data || [])
       }
     } catch (error) {
       console.error('Erro ao buscar atividade recente:', error)
@@ -53,10 +54,10 @@ const RecentActivity = () => {
   const fetchAll = async () => {
     try {
       setAllLoading(true)
-      const response = await fetch('/api/admin/stats')
+      const response = await fetch('/api/admin/activity?page=1&limit=50')
       if (response.ok) {
         const data = await response.json()
-        setAllActivities(data.data.recentActivity || [])
+        setAllActivities(data.data || [])
         setOpenAll(true)
       }
     } catch (error) {
@@ -86,6 +87,10 @@ const RecentActivity = () => {
         return <Newspaper className="w-4 h-4 text-purple-500" />
       case 'contact':
         return <MessageSquare className="w-4 h-4 text-orange-500" />
+      case 'farm':
+        return <PiggyBank className="w-4 h-4 text-emerald-500" />
+      case 'member-content':
+        return <Newspaper className="w-4 h-4 text-indigo-500" />
       default:
         return <Clock className="w-4 h-4 text-gray-500" />
     }
@@ -101,6 +106,10 @@ const RecentActivity = () => {
         return 'border-purple-200 bg-purple-50'
       case 'contact':
         return 'border-orange-200 bg-orange-50'
+      case 'farm':
+        return 'border-emerald-200 bg-emerald-50'
+      case 'member-content':
+        return 'border-indigo-200 bg-indigo-50'
       default:
         return 'border-gray-200 bg-gray-50'
     }

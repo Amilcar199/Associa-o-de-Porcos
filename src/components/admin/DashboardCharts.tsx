@@ -35,11 +35,11 @@ const DashboardCharts = () => {
   if (loading) {
     return (
       <div className="space-y-6">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 animate-pulse">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 animate-pulse">
           <div className="h-6 bg-gray-200 rounded mb-4"></div>
           <div className="h-64 bg-gray-200 rounded"></div>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 animate-pulse">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 animate-pulse">
           <div className="h-6 bg-gray-200 rounded mb-4"></div>
           <div className="h-40 bg-gray-200 rounded"></div>
         </div>
@@ -78,7 +78,7 @@ const DashboardCharts = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
+        className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6"
       >
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-semibold text-gray-900 flex items-center">
@@ -127,7 +127,7 @@ const DashboardCharts = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
-        className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
+        className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6"
       >
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-semibold text-gray-900 flex items-center">
@@ -164,7 +164,7 @@ const DashboardCharts = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.4 }}
-        className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
+        className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6"
       >
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-semibold text-gray-900 flex items-center">

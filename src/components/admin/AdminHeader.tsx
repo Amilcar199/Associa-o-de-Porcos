@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import LogoPng from '@/components/assets/Logo.png'
@@ -35,6 +35,31 @@ const AdminHeader = ({ user }: AdminHeaderProps) => {
   const [notifs, setNotifs] = useState<any[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
   const [lastOpenedTs, setLastOpenedTs] = useState<number>(0)
+  const notifRef = useRef<HTMLDivElement>(null)
+  const profileRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handleOutsidePointer = (event: MouseEvent | TouchEvent) => {
+      const target = event.target as Node
+      if (notifRef.current && !notifRef.current.contains(target)) setIsNotifOpen(false)
+      if (profileRef.current && !profileRef.current.contains(target)) setIsProfileMenuOpen(false)
+    }
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsNotifOpen(false)
+        setIsProfileMenuOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleOutsidePointer)
+    document.addEventListener('touchstart', handleOutsidePointer)
+    document.addEventListener('keydown', handleEscape)
+    return () => {
+      document.removeEventListener('mousedown', handleOutsidePointer)
+      document.removeEventListener('touchstart', handleOutsidePointer)
+      document.removeEventListener('keydown', handleEscape)
+    }
+  }, [])
 
   // Mobile menu items
   const mobileMenuItems: Array<{ name: string; href: string; children?: Array<{ name: string; href: string }> }> = [
@@ -150,7 +175,7 @@ const AdminHeader = ({ user }: AdminHeaderProps) => {
             {/* Seletor de idioma removido do header admin conforme solicitação */}
 
             {/* Notifications */}
-            <div className="relative">
+            <div ref={notifRef} className="relative">
               <button
                 onClick={async ()=>{ 
                   const willOpen = !isNotifOpen
@@ -208,7 +233,7 @@ const AdminHeader = ({ user }: AdminHeaderProps) => {
             </Link>
 
             {/* Profile dropdown */}
-            <div className="relative">
+            <div ref={profileRef} className="relative">
               <button
                 onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
                 className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 transition-colors"

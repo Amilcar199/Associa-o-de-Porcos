@@ -75,7 +75,9 @@ npm run dev
 src/
 ├── app/                    # App Router (Next.js 14)
 │   ├── admin/             # Painel administrativo
+│   │   ├── suinocultura/  # Aprovação de cadastros do Mapa Interativo
 │   ├── api/               # API Routes
+│   │   ├── farms/         # Cadastro/estatísticas do Mapa Interativo
 │   ├── login/             # Página de login
 │   ├── registro/          # Página de registro
 │   ├── perfil/            # Perfil do usuário
@@ -85,13 +87,14 @@ src/
 │   ├── admin/            # Componentes do admin
 │   ├── layout/           # Header, Footer, etc.
 │   ├── sections/         # Seções da homepage
+│   │   └── PigMap/        # Mapa Interativo de Suinocultura
 │   └── ui/               # Componentes reutilizáveis
 ├── lib/                  # Utilitários
 │   ├── mongodb.ts        # Conexão MongoDB
 │   ├── auth.ts           # Configuração NextAuth
 │   ├── email.ts          # Configuração Nodemailer
 │   └── api-utils.ts      # Utilitários da API
-├── models/               # Modelos Mongoose
+├── models/               # Modelos Mongoose (User, Product, News, Farm, ...)
 └── types/                # Tipos TypeScript
 ```
 
@@ -126,6 +129,66 @@ src/
 - [x] Estatísticas agregadas por província no mapa de Angola
 - [x] Gestão de cadastros pendentes, aprovados e rejeitados no painel admin
 - [x] Modelo MongoDB `Farm` com validação do rebanho
+
+## Mapa Interativo de Suinocultura
+
+A página "Sobre" apresenta um mapa de Angola com dados agregados de produtores,
+total de porcos, fêmeas, animais disponíveis para abate e animais disponíveis
+para reprodução por província. O cadastro público de fazendas fica pendente até
+ser revisto e aprovado por um administrador.
+
+### Implementação do mapa
+
+O mapa usa **Leaflet**, **react-leaflet** e tiles do OpenStreetMap. Como o projecto
+não possui um GeoJSON oficial verificado das províncias de Angola, a implementação
+usa marcadores (`CircleMarker`) nos centros aproximados das 21 províncias. O raio
+e a cor dos marcadores variam conforme o total de porcos registado.
+
+As coordenadas e nomes das províncias estão centralizados em
+`src/components/sections/PigMap/angola-provinces.ts`. No futuro, um GeoJSON oficial
+poderá substituir os marcadores sem alterar o contrato das APIs.
+
+### Modelo `Farm`
+
+O modelo `src/models/Farm.ts` guarda o produtor, fazenda, província, município,
+contactos, observações e os dados do rebanho (`total`, `females`, `forSlaughter` e
+`forBreeding`). Os estados de moderação são `pending`, `approved` e `rejected`.
+As estatísticas públicas consideram apenas registos aprovados e activos.
+
+### Rotas do mapa
+
+| Método | Rota | Acesso | Descrição |
+| --- | --- | --- | --- |
+| `POST` | `/api/farms` | Público | Cria um cadastro pendente |
+| `GET` | `/api/farms` | Público | Lista fazendas aprovadas, sem contactos |
+| `GET` | `/api/farms/stats` | Público | Retorna estatísticas das 21 províncias |
+| `GET` | `/api/admin/farms` | Admin | Lista cadastros com filtro por estado |
+| `PATCH` | `/api/admin/farms/:id` | Admin | Aprova, rejeita ou edita um cadastro |
+| `DELETE` | `/api/admin/farms/:id` | Admin | Remove um cadastro |
+
+`/api/farms` está incluída em `PUBLIC_API_PREFIXES` no middleware para permitir
+que o formulário e o mapa funcionem sem autenticação. Cadastros enviados por
+utilizadores autenticados podem ser associados à respectiva conta.
+
+### Componentes
+
+- `InteractiveMapSection.tsx`: carrega as estatísticas, mostra os totais e abre o formulário.
+- `PigFarmMap.tsx`: renderiza o mapa Leaflet e os marcadores provinciais.
+- `FarmRegisterModal.tsx`: formulário público de cadastro de fazenda.
+- `FarmsManager.tsx`: gestão administrativa dos cadastros.
+- `src/app/admin/suinocultura/page.tsx`: página do módulo no painel admin.
+
+### Teste local
+
+```bash
+npm install
+npm run dev
+```
+
+1. Aceda a `http://localhost:3000/sobre` e procure "Mapa Interativo".
+2. Envie um cadastro de teste pelo formulário.
+3. Entre como administrador e abra **Admin > Suinocultura**.
+4. Aprove o cadastro e recarregue a página pública para ver as estatísticas.
 
 ## 🔐 Autenticação
 

@@ -128,7 +128,7 @@ const DashboardStats = () => {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {[...Array(4)].map((_, index) => (
-          <div key={index} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 animate-pulse">
+          <div key={index} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 animate-pulse">
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <div className="w-8 h-8 bg-gray-200 rounded"></div>
@@ -156,15 +156,15 @@ const DashboardStats = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: index * 0.1 }}
-            className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
+            className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow"
           >
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <div className={`w-8 h-8 ${colors.bg} rounded flex items-center justify-center`}>
-                  <card.icon className="w-5 h-5 text-white" />
+                <div className={`w-11 h-11 ${colors.light} rounded-xl flex items-center justify-center`}>
+                  <card.icon className={`w-5 h-5 ${colors.text}`} />
                 </div>
               </div>
-              <div className="ml-5 w-0 flex-1">
+              <div className="ml-4 w-0 flex-1">
                 <dl>
                   <dt className="text-sm font-medium text-gray-500 truncate">
                     {card.title}
@@ -178,7 +178,7 @@ const DashboardStats = () => {
               </div>
             </div>
             
-            <div className="mt-4">
+            <div className="mt-4 pt-4 border-t border-gray-50">
               <div className="flex items-center text-sm">
                 {card.trend === 'up' ? (
                   <TrendingUp className="w-4 h-4 text-green-500 mr-1" />

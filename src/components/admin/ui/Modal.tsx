@@ -64,7 +64,7 @@ const Modal = ({
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className={`relative w-full ${sizeClasses[size]} bg-white rounded-lg shadow-xl`}
+              className={`relative w-full ${sizeClasses[size]} bg-white rounded-2xl shadow-xl`}
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}

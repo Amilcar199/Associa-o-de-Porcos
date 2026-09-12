@@ -143,7 +143,7 @@ const DataTable = ({
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
       {/* Header com busca */}
       {showHeader && (
         <div className="px-6 py-4 border-b border-gray-200">

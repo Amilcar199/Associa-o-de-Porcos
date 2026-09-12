@@ -69,7 +69,7 @@ const ConfirmDialog = ({
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
-          className="relative w-full max-w-md bg-white rounded-lg shadow-xl"
+          className="relative w-full max-w-md bg-white rounded-2xl shadow-xl"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="p-6">
