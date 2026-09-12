@@ -20,8 +20,10 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
       delete updates.approve
     }
 
-    const doc = await (MarketQuote as any).findByIdAndUpdate(id, updates, { new: true })
+    const doc: any = await (MarketQuote as any).findById(id)
     if (!doc) return errorResponse('Não encontrado', 404)
+    Object.assign(doc, updates)
+    await doc.save()
     return NextResponse.json(successResponse(doc))
   } catch (error: any) {
     console.error('Erro em PATCH /admin/market-quotes/:id:', error)
