@@ -44,7 +44,6 @@ export default function BolsaClient() {
   const [periodDays, setPeriodDays] = React.useState(90)
   const [regionsList, setRegionsList] = React.useState<string[]>([])
   const [breedsList, setBreedsList] = React.useState<string[]>([])
-  const [saleFormCounts, setSaleFormCounts] = React.useState<Partial<Record<SaleForm, number>>>({})
   const [cleanOutliers, setCleanOutliers] = React.useState(false)
   const [weighted, setWeighted] = React.useState(false)
   const [bandPct, setBandPct] = React.useState(10)
@@ -74,7 +73,6 @@ export default function BolsaClient() {
     fetch('/api/market/meta', { cache: 'no-store' }).then(response => response.json()).then(result => {
       setRegionsList(result?.data?.regions || [])
       setBreedsList(result?.data?.breeds || [])
-      setSaleFormCounts(result?.data?.saleForms || {})
     }).catch(() => undefined)
   }, [])
 
@@ -119,7 +117,7 @@ export default function BolsaClient() {
     <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
       <div className="mb-3 flex items-center gap-2 text-gray-400"><Filter className="h-4 w-4" /><span className="text-xs font-medium uppercase tracking-wide">{isEn ? 'Filters' : 'Filtros'}</span></div>
       <div className="grid gap-3 md:grid-cols-4">
-        <label className="text-xs font-medium text-gray-500">{isEn ? 'Sale form' : 'Forma de venda'}<select value={saleForm} onChange={event => setSaleForm(event.target.value as SaleForm)} className="mt-1 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-200"><option value="carcaça">{isEn ? `Carcass (AOA/kg)${saleFormCounts.carcaça != null ? ` · ${saleFormCounts.carcaça}` : ''}` : `Carcaça (AOA/kg)${saleFormCounts.carcaça != null ? ` · ${saleFormCounts.carcaça} registos` : ''}`}</option><option value="vivo">{isEn ? `Live (AOA/head)${saleFormCounts.vivo != null ? ` · ${saleFormCounts.vivo}` : ''}` : `Vivo (AOA/cabeça)${saleFormCounts.vivo != null ? ` · ${saleFormCounts.vivo} registos` : ''}`}</option></select></label>
+        <label className="text-xs font-medium text-gray-500">{isEn ? 'Sale form' : 'Forma de venda'}<select value={saleForm} onChange={event => setSaleForm(event.target.value as SaleForm)} className="mt-1 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-200"><option value="carcaça">{isEn ? 'Carcass (AOA/kg)' : 'Carcaça (AOA/kg)'}</option><option value="vivo">{isEn ? 'Live (AOA/head)' : 'Vivo (AOA/cabeça)'}</option></select></label>
         <label className="text-xs font-medium text-gray-500">{isEn ? 'Region' : 'Região'}<select value={region} onChange={event => setRegion(event.target.value)} className="mt-1 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5"><option value="">{isEn ? 'All' : 'Todas'}</option>{regionsList.map(item => <option key={item}>{item}</option>)}</select></label>
         <label className="text-xs font-medium text-gray-500">{isEn ? 'Period' : 'Período'}<select value={periodDays} onChange={event => setPeriodDays(Number(event.target.value))} className="mt-1 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5"><option value={30}>30 dias</option><option value={90}>90 dias</option><option value={180}>180 dias</option><option value={365}>365 dias</option></select></label>
         {session ? <label className="text-xs font-medium text-gray-500">{isEn ? 'Breed' : 'Raça'}<select value={breed} onChange={event => setBreed(event.target.value)} className="mt-1 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5"><option value="">{isEn ? 'All' : 'Todas'}</option>{breedsList.map(item => <option key={item}>{item}</option>)}</select></label> : <div />}

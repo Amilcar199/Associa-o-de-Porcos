@@ -24,6 +24,8 @@ const MarketQuoteSchema = new Schema({
 MarketQuoteSchema.index({ weekISO: 1, region: 1, saleForm: 1, status: 1 }, { unique: true })
 MarketQuoteSchema.index({ region: 1, saleForm: 1 })
 
+export default models.MarketQuote || model('MarketQuote', MarketQuoteSchema)
+
 // Validação: ao aprovar, exigir N mínimo de amostras recentes por região/forma
 MarketQuoteSchema.pre('save', async function (next) {
   const self: any = this as any
@@ -83,6 +85,4 @@ MarketQuoteSchema.post('save', async function (doc: any) {
     }
   } catch {}
 })
-
-export default models.MarketQuote || model('MarketQuote', MarketQuoteSchema)
 

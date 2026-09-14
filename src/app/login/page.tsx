@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Mail, Lock, Eye, EyeOff, AlertCircle, LogIn } from 'lucide-react';
 import { useLanguage } from '@/components/providers/LanguageProvider';
 import pt from '@/lib/i18n/dictionaries/pt';
 import en from '@/lib/i18n/dictionaries/en';
@@ -48,7 +49,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-600 text-xl font-bold text-white shadow-lg shadow-primary-600/20">AS</div>
           <h2 className="text-3xl font-heading font-bold text-gray-900">
@@ -58,9 +59,9 @@ export default function LoginPage() {
             {dict.auth.loginSubtitle}
           </p>
         </div>
-      </div>
+      </motion.div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }} className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="rounded-2xl border border-white/80 bg-white/95 py-8 px-4 shadow-xl shadow-gray-900/5 backdrop-blur sm:px-10">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
@@ -154,8 +155,13 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="btn-primary w-full disabled:cursor-not-allowed disabled:opacity-50"
+                className="btn-primary w-full disabled:cursor-not-allowed disabled:opacity-50 inline-flex items-center justify-center gap-2"
               >
+                {loading ? (
+                  <span className="h-4 w-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <LogIn size={18} />
+                )}
                 {loading ? dict.auth.loggingIn : dict.auth.login}
               </button>
             </div>
@@ -173,7 +179,7 @@ export default function LoginPage() {
             </p>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

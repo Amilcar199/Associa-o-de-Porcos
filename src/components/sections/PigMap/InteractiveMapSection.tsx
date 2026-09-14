@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
 import { motion } from 'framer-motion'
-import { MapPin, Users, PiggyBank, UserRound, Beef, Sprout, PlusCircle } from 'lucide-react'
+import { MapPin, Users, PiggyBank, Heart, Beef, Sprout, PlusCircle } from 'lucide-react'
 import FarmRegisterModal from './FarmRegisterModal'
 import type { ProvinceStats } from '@/types'
 
@@ -100,7 +100,7 @@ export default function InteractiveMapSection({ isEn = false }: InteractiveMapSe
           {[
             { label: isEn ? 'Producers' : 'Produtores', value: totals?.farmersCount ?? '—', icon: Users },
             { label: isEn ? 'Total Pigs' : 'Total de Porcos', value: totals?.totalPigs ?? '—', icon: PiggyBank },
-            { label: isEn ? 'Females' : 'Fêmeas', value: totals?.females ?? '—', icon: UserRound },
+            { label: isEn ? 'Females' : 'Fêmeas', value: totals?.females ?? '—', icon: Heart },
             { label: isEn ? 'For Slaughter' : 'P/ Abate', value: totals?.forSlaughter ?? '—', icon: Beef },
             { label: isEn ? 'For Breeding' : 'P/ Reprodução', value: totals?.forBreeding ?? '—', icon: Sprout },
           ].map((item) => (

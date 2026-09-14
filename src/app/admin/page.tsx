@@ -30,10 +30,10 @@ export default async function AdminDashboard() {
         <div className="absolute -right-4 bottom-0 w-24 h-24 rounded-full bg-white/10" />
         <div className="relative">
           <h1 className="text-2xl lg:text-3xl font-bold">
-            {getGreeting()}{firstName ? `, ${firstName}` : ''}
+            {getGreeting()}{firstName ? `, ${firstName}` : ''} 👋
           </h1>
           <p className="text-primary-100 mt-1">
-            Aqui está a visão geral do sistema e as actividades mais recentes.
+            Aqui está a visão geral do sistema e as atividades mais recentes.
           </p>
         </div>
       </div>

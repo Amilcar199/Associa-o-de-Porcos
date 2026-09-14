@@ -3,12 +3,30 @@
 import { useState, useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
- 
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  User as UserIcon,
+  Settings as SettingsIcon,
+  ShieldCheck,
+  History,
+  Globe,
+  Bell,
+  Mail as MailIcon,
+  Smartphone,
+  Sparkles,
+  KeyRound,
+  Monitor,
+  AlertTriangle,
+  X as XIcon,
+  Loader2
+} from 'lucide-react';
+
 import { useLanguage } from '@/components/providers/LanguageProvider';
 import HeaderLanguageMenu from '@/components/i18n/HeaderLanguageMenu'
 import pt from '@/lib/i18n/dictionaries/pt';
 import en from '@/lib/i18n/dictionaries/en';
 import ImageUpload from '@/components/admin/ui/ImageUpload';
+import LogoPng from '@/components/assets/Logo.png';
  
 
 interface UserProfile {
@@ -37,6 +55,7 @@ interface UserProfile {
 }
 
 export default function ProfilePage() {
+  const defaultAvatar = LogoPng.src;
   type ProfileFormState = {
     name: string;
     phone: string;
@@ -251,8 +270,8 @@ export default function ProfilePage() {
 
   if (status === 'loading' || loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="animate-spin rounded-full h-10 w-10 border-4 border-primary-100 border-t-primary-600"></div>
       </div>
     );
   }
@@ -261,21 +280,50 @@ export default function ProfilePage() {
     return null;
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">{dict.profile.pageTitle}</h1>
-          <p className="text-gray-600">{dict.profile.pageSubtitle}</p>
-        </div>
+  const tabs = [
+    { key: 'profile', label: dict.profile.tabs.profile, icon: UserIcon },
+    { key: 'settings', label: dict.profile.tabs.settings, icon: SettingsIcon },
+    { key: 'security', label: dict.profile.tabs.security, icon: ShieldCheck },
+    { key: 'activity', label: locale.startsWith('en') ? 'Activity' : 'Atividades', icon: History },
+  ]
 
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Hero */}
+      <div className="relative overflow-hidden bg-gradient-to-r from-primary-700 to-primary-600 text-white">
+        <div className="absolute -right-16 -top-16 w-64 h-64 rounded-full bg-white/10" />
+        <div className="absolute -left-10 bottom-0 w-40 h-40 rounded-full bg-white/10" />
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-12">
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="flex items-center gap-4">
+            <div className="relative shrink-0">
+              <img
+                className="h-16 w-16 rounded-full object-cover ring-4 ring-white/20"
+                src={profile?.avatar || defaultAvatar}
+                alt="Avatar"
+                onError={(event) => {
+                  event.currentTarget.onerror = null;
+                  event.currentTarget.src = defaultAvatar;
+                }}
+              />
+            </div>
+            <div>
+              <h1 className="text-2xl lg:text-3xl font-heading font-bold">{dict.profile.pageTitle}</h1>
+              <p className="text-primary-100 mt-1">{dict.profile.pageSubtitle}</p>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 pb-12">
         {/* Upgrade Banner for Visitors */}
         {showVisitorBanner && (
-          <div className="mb-6 rounded-md border border-yellow-200 bg-yellow-50 p-4">
-            <div className="flex items-start">
-              <div className="ml-0 w-full">
-                <p className="text-sm text-yellow-800">
+          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-4 shadow-sm">
+            <div className="flex items-start gap-3">
+              <div className="shrink-0 w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center">
+                <Sparkles size={18} className="text-amber-600" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm text-amber-900">
                   {locale.startsWith('en')
                     ? 'You are currently a Client (Visitor). Become an Association Member to access exclusive content and benefits.'
                     : 'Você é atualmente um Cliente (Visitante). Torne-se Membro da Associação para acessar conteúdos e benefícios exclusivos.'}
@@ -295,77 +343,48 @@ export default function ProfilePage() {
                         alert(locale.startsWith('en') ? 'Error sending request' : 'Erro ao enviar solicitação')
                       }
                     }}
-                    className="inline-flex items-center justify-center px-3 py-2 rounded-md bg-green-600 text-white text-sm hover:bg-green-700"
+                    className="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-primary-600 text-white text-sm font-medium hover:bg-primary-700 transition-colors"
                   >
                     {locale.startsWith('en') ? 'Request Membership' : 'Solicitar Associação'}
                   </button>
                   <a
                     href="/membros"
-                    className="inline-flex items-center justify-center px-3 py-2 rounded-md border text-sm text-green-700 border-green-200 hover:bg-green-50"
+                    className="inline-flex items-center justify-center px-4 py-2 rounded-xl border border-amber-200 text-sm font-medium text-amber-800 hover:bg-amber-100 transition-colors"
                   >
                     {locale.startsWith('en') ? 'Learn more' : 'Saiba mais'}
                   </a>
                   <button
                     type="button"
                     onClick={() => { try { localStorage.setItem('hideVisitorUpgradeBanner','1') } catch {}; setShowVisitorBanner(false) }}
-                    className="ml-auto text-xs text-yellow-800 hover:underline"
+                    className="sm:ml-auto text-xs text-amber-700 hover:underline self-center"
                   >
                     {locale.startsWith('en') ? "Don't show again" : 'Não mostrar novamente'}
                   </button>
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
         )}
 
-        <div className="bg-white rounded-lg shadow">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           {/* Tabs */}
-          <div className="border-b border-gray-200">
-            <nav className="-mb-px flex flex-wrap gap-x-4 gap-y-2 px-4 sm:px-6 overflow-x-hidden">
-              <button
-                onClick={() => setActiveTab('profile')}
-                className={`py-3 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'profile'
-                    ? 'border-green-500 text-green-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                <span className="inline-block w-4 h-4 mr-2" aria-hidden>👤</span>
-                {dict.profile.tabs.profile}
-              </button>
-              <button
-                onClick={() => setActiveTab('settings')}
-                className={`py-3 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'settings'
-                    ? 'border-green-500 text-green-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                <span className="inline-block w-4 h-4 mr-2" aria-hidden>⚙️</span>
-                {dict.profile.tabs.settings}
-              </button>
-              <button
-                onClick={() => setActiveTab('security')}
-                className={`py-3 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'security'
-                    ? 'border-green-500 text-green-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                <span className="inline-block w-4 h-4 mr-2" aria-hidden>🛡️</span>
-                {dict.profile.tabs.security}
-              </button>
-              <button
-                onClick={() => setActiveTab('activity')}
-                className={`py-3 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'activity'
-                    ? 'border-green-500 text-green-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                <span className="inline-block w-4 h-4 mr-2" aria-hidden>🕓</span>
-                {locale.startsWith('en') ? 'Activity' : 'Atividades'}
-              </button>
+          <div className="border-b border-gray-100">
+            <nav className="flex overflow-x-auto no-scrollbar px-3 sm:px-4 gap-1 py-2">
+              {tabs.map((tab) => {
+                const active = activeTab === tab.key
+                return (
+                  <button
+                    key={tab.key}
+                    onClick={() => setActiveTab(tab.key)}
+                    className={`shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
+                      active ? 'bg-primary-50 text-primary-700' : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50'
+                    }`}
+                  >
+                    <tab.icon size={16} />
+                    {tab.label}
+                  </button>
+                )
+              })}
             </nav>
           </div>
 
@@ -376,9 +395,13 @@ export default function ProfilePage() {
                 <div className="flex items-center space-x-6">
                   <div className="flex-shrink-0">
                     <img
-                      className="h-24 w-24 rounded-full object-cover"
-                      src={profile?.avatar || '/default-avatar.png'}
+                      className="h-24 w-24 rounded-full object-cover ring-4 ring-gray-50"
+                      src={profile?.avatar || defaultAvatar}
                       alt="Avatar"
+                      onError={(event) => {
+                        event.currentTarget.onerror = null;
+                        event.currentTarget.src = defaultAvatar;
+                      }}
                     />
                   </div>
                   <div>
@@ -402,7 +425,7 @@ export default function ProfilePage() {
                       type="text"
                       value={formData.name}
                       onChange={(e) => setFormData((prev: ProfileFormState) => ({ ...prev, name: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className="input-field px-3 py-2"
                       required
                     />
                   </div>
@@ -415,7 +438,7 @@ export default function ProfilePage() {
                       type="email"
                       value={session.user?.email || ''}
                       disabled
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50"
+                      className="input-field px-3 py-2 bg-gray-50 cursor-not-allowed"
                     />
                   </div>
 
@@ -427,7 +450,7 @@ export default function ProfilePage() {
                       type="tel"
                       value={formData.phone}
                       onChange={(e) => setFormData((prev: ProfileFormState) => ({ ...prev, phone: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className="input-field px-3 py-2"
                     />
                   </div>
 
@@ -439,7 +462,7 @@ export default function ProfilePage() {
                       type="text"
                       value={formData.company}
                       onChange={(e) => setFormData((prev: ProfileFormState) => ({ ...prev, company: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className="input-field px-3 py-2"
                     />
                   </div>
 
@@ -451,7 +474,7 @@ export default function ProfilePage() {
                       type="text"
                       value={formData.location}
                       onChange={(e) => setFormData((prev: ProfileFormState) => ({ ...prev, location: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className="input-field px-3 py-2"
                       placeholder={dict.profile.locationPlaceholder}
                     />
                   </div>
@@ -464,7 +487,7 @@ export default function ProfilePage() {
                       type="url"
                       value={formData.website}
                       onChange={(e) => setFormData((prev: ProfileFormState) => ({ ...prev, website: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className="input-field px-3 py-2"
                       placeholder={dict.profile.websitePlaceholder}
                     />
                   </div>
@@ -478,7 +501,7 @@ export default function ProfilePage() {
                     value={formData.bio}
                     onChange={(e) => setFormData((prev: ProfileFormState) => ({ ...prev, bio: e.target.value }))}
                     rows={4}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="input-field px-3 py-2"
                     placeholder={dict.profile.bioPlaceholder}
                   />
                 </div>
@@ -498,7 +521,7 @@ export default function ProfilePage() {
                           ...prev, 
                           socialMedia: { ...prev.socialMedia, linkedin: e.target.value }
                         }))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        className="input-field px-3 py-2"
                         placeholder="https://linkedin.com/in/..."
                       />
                     </div>
@@ -514,7 +537,7 @@ export default function ProfilePage() {
                           ...prev, 
                           socialMedia: { ...prev.socialMedia, twitter: e.target.value }
                         }))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        className="input-field px-3 py-2"
                         placeholder="https://twitter.com/..."
                       />
                     </div>
@@ -530,7 +553,7 @@ export default function ProfilePage() {
                           ...prev, 
                           socialMedia: { ...prev.socialMedia, facebook: e.target.value }
                         }))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        className="input-field px-3 py-2"
                         placeholder="https://facebook.com/..."
                       />
                     </div>
@@ -541,8 +564,9 @@ export default function ProfilePage() {
                   <button
                     type="submit"
                     disabled={saving}
-                    className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
                   >
+                    {saving && <Loader2 size={16} className="animate-spin" />}
                     {saving ? dict.profile.saving : dict.profile.saveChanges}
                   </button>
                 </div>
@@ -555,9 +579,11 @@ export default function ProfilePage() {
                 
                 <div className="space-y-4">
                   {session.user?.role === 'visitor' && (
-                    <div className="border border-green-200 rounded-lg p-4 bg-green-50">
+                    <div className="border border-primary-100 rounded-2xl p-4 bg-primary-50">
                       <div className="flex items-start gap-3">
-                        <span className="h-5 w-5 text-green-600" aria-hidden>🌟</span>
+                        <div className="shrink-0 w-9 h-9 rounded-xl bg-primary-100 flex items-center justify-center">
+                          <Sparkles size={18} className="text-primary-600" />
+                        </div>
                         <div className="flex-1">
                           <h4 className="text-sm font-medium text-gray-900">{locale.startsWith('en') ? 'Become a Member' : 'Torne-se Membro'}</h4>
                           <p className="text-sm text-gray-600 mt-1">
@@ -580,13 +606,13 @@ export default function ProfilePage() {
                                   alert(locale.startsWith('en') ? 'Error sending request' : 'Erro ao enviar solicitação')
                                 }
                               }}
-                              className="inline-flex items-center justify-center px-3 py-2 rounded-md bg-green-600 text-white text-sm hover:bg-green-700"
+                              className="inline-flex items-center justify-center px-3 py-2 rounded-xl bg-primary-600 text-white text-sm font-medium hover:bg-primary-700 transition-colors"
                             >
                               {locale.startsWith('en') ? 'Request Membership' : 'Solicitar Associação'}
                             </button>
                             <a
                               href="/membros"
-                              className="inline-flex items-center justify-center px-3 py-2 rounded-md border text-sm text-green-700 border-green-200 hover:bg-green-50"
+                              className="inline-flex items-center justify-center px-3 py-2 rounded-xl border text-sm font-medium text-primary-700 border-primary-200 hover:bg-primary-100 transition-colors"
                             >
                               {locale.startsWith('en') ? 'Learn more' : 'Saiba mais'}
                             </a>
@@ -597,8 +623,10 @@ export default function ProfilePage() {
                   )}
                   {/* Idioma */}
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="w-4 h-4 text-gray-500" aria-hidden>🌐</span>
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-xl bg-gray-50 flex items-center justify-center shrink-0">
+                        <Globe size={16} className="text-gray-500" />
+                      </div>
                       <div>
                         <h4 className="text-sm font-medium text-gray-900">{locale.startsWith('en') ? 'Language' : 'Idioma'}</h4>
                         <p className="text-sm text-gray-500">{locale.startsWith('en') ? 'Select navigation language' : 'Selecione o idioma de navegação'}</p>
@@ -606,11 +634,16 @@ export default function ProfilePage() {
                     </div>
                     <HeaderLanguageMenu />
                   </div>
-                  <hr className="border-gray-200" />
+                  <hr className="border-gray-100" />
                   <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-900">{dict.profile.emailNotif.title}</h4>
-                      <p className="text-sm text-gray-500">{dict.profile.emailNotif.desc}</p>
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-xl bg-gray-50 flex items-center justify-center shrink-0">
+                        <MailIcon size={16} className="text-gray-500" />
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-900">{dict.profile.emailNotif.title}</h4>
+                        <p className="text-sm text-gray-500">{dict.profile.emailNotif.desc}</p>
+                      </div>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
@@ -622,14 +655,19 @@ export default function ProfilePage() {
                         }))}
                         className="sr-only peer"
                       />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
                     </label>
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-900">{dict.profile.pushNotif.title}</h4>
-                      <p className="text-sm text-gray-500">{dict.profile.pushNotif.desc}</p>
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-xl bg-gray-50 flex items-center justify-center shrink-0">
+                        <Smartphone size={16} className="text-gray-500" />
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-900">{dict.profile.pushNotif.title}</h4>
+                        <p className="text-sm text-gray-500">{dict.profile.pushNotif.desc}</p>
+                      </div>
                     </div>
                     <span className="text-xs text-gray-500">
                       {typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted'
@@ -639,9 +677,14 @@ export default function ProfilePage() {
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-900">{dict.profile.newsletter.title}</h4>
-                      <p className="text-sm text-gray-500">{dict.profile.newsletter.desc}</p>
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-xl bg-gray-50 flex items-center justify-center shrink-0">
+                        <Bell size={16} className="text-gray-500" />
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-900">{dict.profile.newsletter.title}</h4>
+                        <p className="text-sm text-gray-500">{dict.profile.newsletter.desc}</p>
+                      </div>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
@@ -653,7 +696,7 @@ export default function ProfilePage() {
                         }))}
                         className="sr-only peer"
                       />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
                     </label>
                   </div>
                 </div>
@@ -662,8 +705,9 @@ export default function ProfilePage() {
                   <button
                     onClick={handleSubmit}
                     disabled={saving}
-                    className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
                   >
+                    {saving && <Loader2 size={16} className="animate-spin" />}
                     {saving ? dict.profile.saving : dict.profile.savePreferences}
                   </button>
                 </div>
@@ -674,14 +718,14 @@ export default function ProfilePage() {
               <div className="space-y-6">
                 <h3 className="text-lg font-medium text-gray-900">{dict.profile.securityTitle}</h3>
                 
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                  <div className="flex">
-                    <div className="flex-shrink-0">
-                      <span className="h-5 w-5 text-yellow-400" aria-hidden>🛡️</span>
+                <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4">
+                  <div className="flex gap-3">
+                    <div className="shrink-0 w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center">
+                      <ShieldCheck size={18} className="text-amber-600" />
                     </div>
-                    <div className="ml-3">
-                      <h4 className="text-sm font-medium text-yellow-800">{dict.profile.securityTipsTitle}</h4>
-                      <div className="mt-2 text-sm text-yellow-700">
+                    <div>
+                      <h4 className="text-sm font-medium text-amber-900">{dict.profile.securityTipsTitle}</h4>
+                      <div className="mt-2 text-sm text-amber-800">
                         <ul className="list-disc list-inside space-y-1">
                           {dict.profile.securityTips.map((tip, i) => (
                             <li key={i}>{tip}</li>
@@ -693,31 +737,52 @@ export default function ProfilePage() {
                 </div>
 
                 <div className="space-y-4">
-                  <div className="border border-gray-200 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-gray-900 mb-2">{dict.profile.changePasswordTitle}</h4>
-                    <p className="text-sm text-gray-500 mb-4">{dict.profile.changePasswordDesc}</p>
+                  <div className="border border-gray-100 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div className="flex items-start gap-3">
+                      <div className="shrink-0 w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center">
+                        <KeyRound size={16} className="text-blue-600" />
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-900">{dict.profile.changePasswordTitle}</h4>
+                        <p className="text-sm text-gray-500">{dict.profile.changePasswordDesc}</p>
+                      </div>
+                    </div>
                     <button
                       onClick={() => setShowPasswordModal(true)}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                      className="shrink-0 px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors"
                     >
                       {dict.profile.changePasswordBtn}
                     </button>
                   </div>
 
-                  <div className="border border-gray-200 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-gray-900 mb-2">{dict.profile.sessionsTitle}</h4>
-                    <p className="text-sm text-gray-500 mb-4">{dict.profile.sessionsDesc}</p>
+                  <div className="border border-gray-100 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div className="flex items-start gap-3">
+                      <div className="shrink-0 w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center">
+                        <Monitor size={16} className="text-gray-600" />
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-900">{dict.profile.sessionsTitle}</h4>
+                        <p className="text-sm text-gray-500">{dict.profile.sessionsDesc}</p>
+                      </div>
+                    </div>
                     <button
                       onClick={() => setShowSessionsModal(true)}
-                      className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+                      className="shrink-0 px-4 py-2 rounded-xl bg-gray-700 text-white text-sm font-medium hover:bg-gray-800 transition-colors"
                     >
                       {dict.profile.sessionsBtn}
                     </button>
                   </div>
 
-                  <div className="border border-red-200 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-red-900 mb-2">{dict.profile.dangerZoneTitle}</h4>
-                    <p className="text-sm text-red-700 mb-4">{dict.profile.dangerZoneDesc}</p>
+                  <div className="border border-red-100 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-red-50/40">
+                    <div className="flex items-start gap-3">
+                      <div className="shrink-0 w-9 h-9 rounded-xl bg-red-100 flex items-center justify-center">
+                        <AlertTriangle size={16} className="text-red-600" />
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-medium text-red-900">{dict.profile.dangerZoneTitle}</h4>
+                        <p className="text-sm text-red-700">{dict.profile.dangerZoneDesc}</p>
+                      </div>
+                    </div>
                     <button
                       onClick={async () => {
                         const confirmDelete = window.confirm('Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita.');
@@ -738,7 +803,7 @@ export default function ProfilePage() {
                           alert('Erro ao excluir conta');
                         }
                       }}
-                      className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                      className="shrink-0 px-4 py-2 rounded-xl bg-red-600 text-white text-sm font-medium hover:bg-red-700 transition-colors"
                     >
                       {dict.profile.deleteAccountBtn}
                     </button>
@@ -750,12 +815,17 @@ export default function ProfilePage() {
               <div className="space-y-4">
                 <h3 className="text-lg font-medium text-gray-900">{locale.startsWith('en') ? 'Account activity' : 'Atividade da conta'}</h3>
                 {activityLoading ? (
-                  <div className="text-sm text-gray-500">{dict.user.loading}</div>
+                  <div className="flex items-center gap-2 text-sm text-gray-500 py-6">
+                    <Loader2 size={16} className="animate-spin" /> {dict.user.loading}
+                  </div>
                 ) : activity.length === 0 ? (
-                  <div className="text-sm text-gray-500">{locale.startsWith('en') ? 'No records.' : 'Sem registros.'}</div>
+                  <div className="text-center py-10">
+                    <History className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+                    <p className="text-sm text-gray-500">{locale.startsWith('en') ? 'No records.' : 'Sem registros.'}</p>
+                  </div>
                 ) : (
-                  <div className="overflow-hidden rounded-lg border border-gray-200">
-                    <table className="min-w-full divide-y divide-gray-200">
+                  <div className="overflow-hidden rounded-2xl border border-gray-100">
+                    <table className="min-w-full divide-y divide-gray-100">
                       <thead className="bg-gray-50">
                         <tr>
                           <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{locale.startsWith('en') ? 'Date' : 'Data'}</th>
@@ -764,7 +834,7 @@ export default function ProfilePage() {
                           <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{locale.startsWith('en') ? 'User-Agent' : 'User-Agent'}</th>
                         </tr>
                       </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
+                      <tbody className="bg-white divide-y divide-gray-100">
                         {activity.map((log: any, idx: number) => (
                           <tr key={log._id || idx}>
                             <td className="px-4 py-2 text-sm text-gray-700">{new Date(log.createdAt).toLocaleString()}</td>
@@ -826,57 +896,81 @@ export default function ProfilePage() {
 function PasswordModal({ open, onClose, onSubmit, loading, error, values, setValues, dict, locale }: any) {
   if (!open) return null;
   return (
-    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
-        <div className="flex items-center justify-between p-4 border-b">
-          <h3 className="text-lg font-semibold text-gray-900">{dict.profile.changePasswordTitle}</h3>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded" aria-label="Fechar">
-            <span className="w-5 h-5 text-gray-600" aria-hidden>×</span>
-          </button>
-        </div>
-        <div className="p-4 space-y-4">
-          {error && <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded p-2">{error}</div>}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{locale.startsWith('en') ? 'Current password' : 'Senha atual'}</label>
-            <input type="password" value={values.currentPassword} onChange={(e)=>setValues((v:any)=>({...v,currentPassword:e.target.value}))} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" />
+    <AnimatePresence>
+      <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.96, y: 12 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.96, y: 12 }}
+          className="bg-white rounded-2xl shadow-xl w-full max-w-md"
+        >
+          <div className="flex items-center justify-between p-5 border-b border-gray-100">
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <KeyRound size={18} className="text-primary-600" /> {dict.profile.changePasswordTitle}
+            </h3>
+            <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-400 hover:text-gray-600 transition-colors" aria-label="Fechar">
+              <XIcon size={18} />
+            </button>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{locale.startsWith('en') ? 'New password' : 'Nova senha'}</label>
-            <input type="password" value={values.newPassword} onChange={(e)=>setValues((v:any)=>({...v,newPassword:e.target.value}))} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" />
+          <div className="p-5 space-y-4">
+            {error && <div className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl p-3">{error}</div>}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{locale.startsWith('en') ? 'Current password' : 'Senha atual'}</label>
+              <input type="password" value={values.currentPassword} onChange={(e)=>setValues((v:any)=>({...v,currentPassword:e.target.value}))} className="input-field px-3 py-2" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{locale.startsWith('en') ? 'New password' : 'Nova senha'}</label>
+              <input type="password" value={values.newPassword} onChange={(e)=>setValues((v:any)=>({...v,newPassword:e.target.value}))} className="input-field px-3 py-2" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{locale.startsWith('en') ? 'Confirm new password' : 'Confirmar nova senha'}</label>
+              <input type="password" value={values.confirmPassword} onChange={(e)=>setValues((v:any)=>({...v,confirmPassword:e.target.value}))} className="input-field px-3 py-2" />
+            </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{locale.startsWith('en') ? 'Confirm new password' : 'Confirmar nova senha'}</label>
-            <input type="password" value={values.confirmPassword} onChange={(e)=>setValues((v:any)=>({...v,confirmPassword:e.target.value}))} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" />
+          <div className="p-5 border-t border-gray-100 flex justify-end gap-2">
+            <button onClick={onClose} className="px-4 py-2 rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors">{dict.cookies.cancel}</button>
+            <button onClick={onSubmit} disabled={loading} className="px-4 py-2 rounded-xl bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-50 transition-colors inline-flex items-center gap-2">
+              {loading && <Loader2 size={16} className="animate-spin" />}
+              {loading ? (locale.startsWith('en') ? 'Saving...' : 'Salvando...') : (locale.startsWith('en') ? 'Save' : 'Salvar')}
+            </button>
           </div>
-        </div>
-        <div className="p-4 border-t flex justify-end gap-2">
-          <button onClick={onClose} className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">{dict.cookies.cancel}</button>
-          <button onClick={onSubmit} disabled={loading} className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50">{loading ? (locale.startsWith('en') ? 'Saving...' : 'Salvando...') : (locale.startsWith('en') ? 'Save' : 'Salvar')}</button>
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </AnimatePresence>
   )
 }
 
 function ConfirmSessionsModal({ open, onClose, onConfirm, loading, dict, locale }: any) {
   if (!open) return null;
   return (
-    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
-        <div className="flex items-center justify-between p-4 border-b">
-          <h3 className="text-lg font-semibold text-gray-900">{dict.profile.sessionsTitle}</h3>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded" aria-label="Fechar">
-            <span className="w-5 h-5 text-gray-600" aria-hidden>×</span>
-          </button>
-        </div>
-        <div className="p-4 text-sm text-gray-700">
-          {locale.startsWith('en') ? 'This will end active sessions on other devices and browsers. You will remain logged in on this device.' : 'Isso irá encerrar sessões ativas em outros dispositivos e navegadores. Você permanecerá logado neste dispositivo.'}
-        </div>
-        <div className="p-4 border-t flex justify-end gap-2">
-          <button onClick={onClose} className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">{dict.cookies.cancel}</button>
-          <button onClick={onConfirm} disabled={loading} className="px-4 py-2 rounded-lg bg-gray-700 text-white hover:bg-gray-800 disabled:opacity-50">{loading ? (locale.startsWith('en') ? 'Processing...' : 'Processando...') : (locale.startsWith('en') ? 'End sessions' : 'Encerrar sessões')}</button>
-        </div>
+    <AnimatePresence>
+      <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.96, y: 12 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.96, y: 12 }}
+          className="bg-white rounded-2xl shadow-xl w-full max-w-md"
+        >
+          <div className="flex items-center justify-between p-5 border-b border-gray-100">
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <Monitor size={18} className="text-gray-600" /> {dict.profile.sessionsTitle}
+            </h3>
+            <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-400 hover:text-gray-600 transition-colors" aria-label="Fechar">
+              <XIcon size={18} />
+            </button>
+          </div>
+          <div className="p-5 text-sm text-gray-600">
+            {locale.startsWith('en') ? 'This will end active sessions on other devices and browsers. You will remain logged in on this device.' : 'Isso irá encerrar sessões ativas em outros dispositivos e navegadores. Você permanecerá logado neste dispositivo.'}
+          </div>
+          <div className="p-5 border-t border-gray-100 flex justify-end gap-2">
+            <button onClick={onClose} className="px-4 py-2 rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors">{dict.cookies.cancel}</button>
+            <button onClick={onConfirm} disabled={loading} className="px-4 py-2 rounded-xl bg-gray-700 text-white hover:bg-gray-800 disabled:opacity-50 transition-colors inline-flex items-center gap-2">
+              {loading && <Loader2 size={16} className="animate-spin" />}
+              {loading ? (locale.startsWith('en') ? 'Processing...' : 'Processando...') : (locale.startsWith('en') ? 'End sessions' : 'Encerrar sessões')}
+            </button>
+          </div>
+        </motion.div>
       </div>
-    </div>
+    </AnimatePresence>
   )
 }

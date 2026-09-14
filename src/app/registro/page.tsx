@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { Eye, EyeOff, Mail, Lock, User, Phone, Building, AlertCircle, CheckCircle } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Eye, EyeOff, Mail, Lock, User, Phone, Building, AlertCircle, CheckCircle, CheckCircle2, Circle, UserPlus } from 'lucide-react';
 import { useLanguage } from '@/components/providers/LanguageProvider';
 import pt from '@/lib/i18n/dictionaries/pt';
 import en from '@/lib/i18n/dictionaries/en';
@@ -116,7 +117,7 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-600 text-xl font-bold text-white shadow-lg shadow-primary-600/20">AS</div>
           <h2 className="text-3xl font-heading font-bold text-gray-900">
@@ -126,9 +127,9 @@ export default function RegisterPage() {
             {dict.auth.registerSubtitle}
           </p>
         </div>
-      </div>
+      </motion.div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }} className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="rounded-2xl border border-white/80 bg-white/95 py-8 px-4 shadow-xl shadow-gray-900/5 backdrop-blur sm:px-10">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
@@ -317,8 +318,12 @@ export default function RegisterPage() {
                 </button>
               </div>
               <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs" aria-live="polite">
-                <span className={passwordHasLength ? 'text-green-700' : 'text-gray-500'}>{passwordHasLength ? '✓' : '•'} {locale.startsWith('en') ? '6+ characters' : '6+ caracteres'}</span>
-                <span className={passwordHasNumber ? 'text-green-700' : 'text-gray-500'}>{passwordHasNumber ? '✓' : '•'} {locale.startsWith('en') ? 'One number' : 'Um número'}</span>
+                <span className={`inline-flex items-center gap-1 ${passwordHasLength ? 'text-green-700' : 'text-gray-500'}`}>
+                  {passwordHasLength ? <CheckCircle2 size={13} /> : <Circle size={13} />} {locale.startsWith('en') ? '6+ characters' : '6+ caracteres'}
+                </span>
+                <span className={`inline-flex items-center gap-1 ${passwordHasNumber ? 'text-green-700' : 'text-gray-500'}`}>
+                  {passwordHasNumber ? <CheckCircle2 size={13} /> : <Circle size={13} />} {locale.startsWith('en') ? 'One number' : 'Um número'}
+                </span>
               </div>
             </div>
 
@@ -338,7 +343,7 @@ export default function RegisterPage() {
                   required
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                  className="appearance-none block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                  className="input-field pl-10 pr-10"
                   placeholder={dict.auth.confirmPassword}
                 />
                 <button
@@ -360,11 +365,17 @@ export default function RegisterPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="btn-primary w-full disabled:cursor-not-allowed disabled:opacity-50"
+                className="btn-primary w-full disabled:cursor-not-allowed disabled:opacity-50 inline-flex items-center justify-center gap-2"
               >
+                {loading ? (
+                  <span className="h-4 w-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <UserPlus size={18} />
+                )}
                 {loading ? dict.auth.creatingAccount : dict.auth.createAccount}
               </button>
             </div>
+
           </form>
 
           {/* Seção de registro social removida */}
@@ -378,7 +389,7 @@ export default function RegisterPage() {
             </p>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

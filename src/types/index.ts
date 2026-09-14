@@ -197,18 +197,19 @@ export interface MarketQuote extends Document {
   updatedAt: Date
 }
 
+// Tipos do Mapa Interativo de Suinocultura/Agricultura
 export interface FarmHerd {
-  total: number
-  females: number
-  forSlaughter: number
-  forBreeding: number
+  total: number // quantidade total de porcos
+  females: number // fêmeas
+  forSlaughter: number // disponíveis para abate
+  forBreeding: number // disponíveis para fertilização/reprodução
 }
 
 export interface Farm extends Document {
   _id: string
-  producerName: string
-  farmName?: string
-  province: string
+  producerName: string // nome do produtor
+  farmName?: string // nome da fazenda
+  province: string // província de Angola
   municipality?: string
   coordinates?: { lat: number; lng: number }
   phone?: string
@@ -234,6 +235,7 @@ export interface FarmFormData {
   notes?: string
 }
 
+// Estatísticas agregadas por província (mapa interativo)
 export interface ProvinceStats {
   province: string
   farmersCount: number

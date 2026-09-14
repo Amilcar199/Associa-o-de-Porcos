@@ -16,14 +16,6 @@ export async function GET(req: NextRequest) {
 
     const regions = await (Product as any).distinct('location', { $or: [ { isActive: true }, { isActive: { $exists: false } } ] })
     const breeds = await (Product as any).distinct('breed', { $or: [ { isActive: true }, { isActive: { $exists: false } } ] })
-    const saleForms = await (Product as any).aggregate([
-      { $match: { $and: [
-        { $or: [{ isActive: true }, { isActive: { $exists: false } }] },
-        { $or: [{ availability: 'available' }, { availability: { $exists: false } }] },
-        { saleForm: { $in: ['carcaça', 'vivo'] } },
-      ] } },
-      { $group: { _id: '$saleForm', count: { $sum: 1 } } },
-    ])
 
     const methodologyPT = 'Os indicadores usam média simples ou ponderada (quando habilitado) do preço por kg (AOA/kg) para "carcaça" e AOA/cabeça para "vivo". Outliers podem ser limpos por banda (±X%) em torno da cotação oficial por região/forma, quando disponível.'
     const methodologyEN = 'Indicators use simple or weighted averages (when enabled): AOA/kg for "carcass" and AOA/head for "live". Outliers may be cleaned using a band (±X%) around the official quote by region/form, when available.'
@@ -32,10 +24,6 @@ export async function GET(req: NextRequest) {
       lastUpdated: lastDoc?.updatedAt || null,
       regions: (regions as string[]).filter(Boolean).map(r => String(r).trim()).filter(Boolean).sort(),
       breeds: (breeds as string[]).filter(Boolean).map(b => String(b).trim()).filter(Boolean).sort(),
-      saleForms: saleForms.reduce((result: Record<string, number>, item: { _id: string; count: number }) => {
-        result[item._id] = item.count
-        return result
-      }, {}),
       methodology: {
         pt: methodologyPT,
         en: methodologyEN

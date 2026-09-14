@@ -75,28 +75,64 @@ npm run dev
 src/
 ├── app/                    # App Router (Next.js 14)
 │   ├── admin/             # Painel administrativo
-│   │   ├── suinocultura/  # Aprovação de cadastros do Mapa Interativo
-│   ├── api/               # API Routes
-│   │   ├── farms/         # Cadastro/estatísticas do Mapa Interativo
-│   ├── login/             # Página de login
-│   ├── registro/          # Página de registro
-│   ├── perfil/            # Perfil do usuário
-│   ├── membros/           # Área de membros
-│   └── layout.tsx         # Layout principal
-├── components/            # Componentes React
-│   ├── admin/            # Componentes do admin
-│   ├── layout/           # Header, Footer, etc.
-│   ├── sections/         # Seções da homepage
-│   │   └── PigMap/        # Mapa Interativo de Suinocultura
-│   └── ui/               # Componentes reutilizáveis
-├── lib/                  # Utilitários
-│   ├── mongodb.ts        # Conexão MongoDB
-│   ├── auth.ts           # Configuração NextAuth
-│   ├── email.ts          # Configuração Nodemailer
-│   └── api-utils.ts      # Utilitários da API
-├── models/               # Modelos Mongoose (User, Product, News, Farm, ...)
-└── types/                # Tipos TypeScript
+│   │   ├── produtos/      # CRUD de produtos (porcos à venda)
+│   │   ├── noticias/      # CRUD de notícias
+│   │   ├── colaboradores/ # Gestão de colaboradores
+│   │   ├── usuarios/      # Gestão de usuários e permissões
+│   │   ├── solicitacoes/  # Aprovação de pedidos de associação
+│   │   ├── suinocultura/  # Aprovação de cadastros do Mapa Interativo (novo)
+│   │   ├── contatos/      # Mensagens do formulário de contacto
+│   │   ├── configuracoes/ # Configurações gerais do site
+│   │   └── relatorios/    # Estatísticas e relatórios
+│   ├── api/               # API Routes (REST, JSON)
+│   │   ├── products/      # Produtos (porcos à venda)
+│   │   ├── news/          # Notícias
+│   │   ├── collaborators/ # Colaboradores
+│   │   ├── contact/       # Formulário de contacto (público)
+│   │   ├── farms/         # Cadastro/estatísticas do Mapa Interativo (novo, público)
+│   │   ├── admin/         # Endpoints restritos a administradores
+│   │   ├── auth/          # NextAuth.js
+│   │   ├── members/       # Área de membros
+│   │   ├── market/        # Cotações da "Bolsa"
+│   │   └── ...
+│   ├── sobre/             # Página "Quem Somos" (inclui o Mapa Interativo)
+│   ├── produtos/          # Vitrine pública de produtos
+│   ├── noticias/          # Vitrine pública de notícias
+│   ├── bolsa/             # Cotações de mercado
+│   ├── login/, registro/  # Autenticação
+│   ├── perfil/            # Perfil do usuário autenticado
+│   ├── membros/           # Área exclusiva de membros
+│   └── layout.tsx         # Layout raiz (idioma, providers, header/footer)
+├── components/
+│   ├── admin/             # Componentes usados só no painel admin
+│   │   ├── ui/             # DataTable, Modal, ConfirmDialog (reutilizáveis)
+│   │   └── FarmsManager.tsx # Aprovação de cadastros do mapa (novo)
+│   ├── layout/             # Header, Footer
+│   ├── sections/           # Seções de página (Hero, Notícias, etc.)
+│   │   └── PigMap/          # Mapa Interativo de Suinocultura (novo)
+│   ├── modals/             # Modais de visualização de conteúdo público
+│   ├── providers/          # Contextos globais (idioma, auth, service worker)
+│   └── i18n/               # Seletor de idioma
+├── lib/                    # Utilitários
+│   ├── mongodb.ts          # Conexão/cache de conexão com MongoDB
+│   ├── auth.ts             # Configuração do NextAuth (credentials + OAuth)
+│   ├── api-utils.ts        # Helpers de API (sessão, paginação, respostas)
+│   ├── email.ts            # Envio de emails (Nodemailer)
+│   └── i18n/               # Configuração de idiomas suportados
+├── models/                 # Modelos Mongoose (User, Product, News, Farm, ...)
+├── middleware.ts           # Auth, i18n por cookie/URL e rotas públicas de API
+└── types/                  # Tipos TypeScript compartilhados
 ```
+
+### Como o site funciona (visão geral)
+
+- **Framework**: Next.js 14 com App Router. Cada pasta em `src/app` é uma rota; arquivos `page.tsx` são páginas e `route.ts` são endpoints de API.
+- **Internacionalização**: o `middleware.ts` detecta o idioma (cookie `locale` ou cabeçalho `Accept-Language`), redireciona para `/pt/...` ou `/en/...` e reescreve internamente para a rota real. O hook `useLanguage()` (`components/providers/LanguageProvider.tsx`) expõe o idioma atual aos componentes client-side.
+- **Autenticação**: NextAuth.js (`lib/auth.ts`) com estratégia de credenciais (email/senha) e adaptador MongoDB. Três papéis (`role`): `admin`, `member`, `visitor`.
+- **Autorização/roteamento**: o `middleware.ts` decide, por prefixo de rota, se a página/endpoint é pública, exige apenas login, ou exige `role === 'admin'`. A lista `PUBLIC_API_PREFIXES` define quais rotas de API não exigem token.
+- **Banco de dados**: MongoDB via Mongoose. `lib/mongodb.ts` mantém uma conexão em cache (padrão recomendado para Next.js serverless). Cada coleção tem um modelo em `src/models` e uma interface correspondente em `src/types/index.ts`.
+- **Padrão das API Routes**: cada `route.ts` chama `connectDB()`, valida a sessão quando necessário (`validateSession`), sanitiza o corpo da requisição (`sanitizeInput`) e responde com os helpers `successResponse` / `errorResponse` de `lib/api-utils.ts`. Listagens usam `getPaginationParams` + `paginateResults` para paginação consistente.
+- **Painel administrativo**: `app/admin/layout.tsx` protege todas as rotas `/admin/*` no servidor (redireciona se não for admin) e o `middleware.ts` reforça a mesma regra nas chamadas de API `/api/admin/*`. O menu lateral (`components/admin/AdminSidebar.tsx`) organiza os módulos de gestão; cada módulo tem um "Manager" (`components/admin/*Manager.tsx`) que consome a respectiva API e usa os componentes reutilizáveis `DataTable`, `Modal` e `ConfirmDialog` (`components/admin/ui/`).
 
 ## 🎯 Funcionalidades
 
@@ -124,71 +160,136 @@ src/
 - [x] Recuperação de senha
 - [x] Autenticação avançada
 
-### ✅ Fase 4 - Mapa Interativo de Suinocultura
-- [x] Cadastro público de fazendas com aprovação administrativa
-- [x] Estatísticas agregadas por província no mapa de Angola
-- [x] Gestão de cadastros pendentes, aprovados e rejeitados no painel admin
-- [x] Modelo MongoDB `Farm` com validação do rebanho
+### ✅ Fase 4 - Mapa Interativo de Suinocultura/Agricultura
+- [x] Cadastro público de fazendas (formulário na aba "Sobre")
+- [x] Moderação: cadastros ficam pendentes até aprovação de um admin
+- [x] Mapa interativo de Angola com estatísticas agregadas por província
+- [x] Painel admin para aprovar/rejeitar/remover cadastros
 
-## Mapa Interativo de Suinocultura
+## 🗺️ Mapa Interativo de Suinocultura (Aba "Sobre")
 
-A página "Sobre" apresenta um mapa de Angola com dados agregados de produtores,
-total de porcos, fêmeas, animais disponíveis para abate e animais disponíveis
-para reprodução por província. O cadastro público de fazendas fica pendente até
-ser revisto e aprovado por um administrador.
+Esta funcionalidade permite que produtores/suinocultores cadastrem a sua fazenda e que
+qualquer visitante veja, num mapa de Angola, dados agregados de produção por província
+(nº de produtores, total de porcos, fêmeas, disponíveis para abate e disponíveis para
+reprodução/fertilização).
 
-### Implementação do mapa
+### Por que Leaflet + react-leaflet?
 
-O mapa usa **Leaflet**, **react-leaflet** e tiles do OpenStreetMap. Como o projecto
-não possui um GeoJSON oficial verificado das províncias de Angola, a implementação
-usa marcadores (`CircleMarker`) nos centros aproximados das 21 províncias. O raio
-e a cor dos marcadores variam conforme o total de porcos registado.
+Foram consideradas três opções:
 
-As coordenadas e nomes das províncias estão centralizados em
-`src/components/sections/PigMap/angola-provinces.ts`. No futuro, um GeoJSON oficial
-poderá substituir os marcadores sem alterar o contrato das APIs.
+| Biblioteca | Prós | Contras |
+| --- | --- | --- |
+| **Leaflet / react-leaflet** ✅ escolhida | Leve (~40 KB gzip), open-source, sem chave de API, tiles gratuitos do OpenStreetMap, ótimo suporte a marcadores/popups interativos | Não vem com fronteiras administrativas prontas (resolvido usando marcadores por província) |
+| Mapbox GL JS | Visual muito polido, suporte a estilos customizados | Exige conta e chave de API (token), tem limites de uso gratuito, bundle maior |
+| react-simple-maps (TopoJSON) | Bom para "choropleth" (províncias coloridas) | Precisa de um ficheiro TopoJSON preciso das 21 províncias de Angola; sem esse ficheiro pronto, o risco de fronteiras incorretas é maior |
 
-### Modelo `Farm`
+Como não tínhamos um ficheiro GeoJSON/TopoJSON oficial e verificado das 21 províncias de
+Angola disponível no projeto, a implementação atual usa **marcadores (CircleMarker) na
+capital/centro aproximado de cada província** — o que a própria especificação do pedido já
+previa ("clicar em uma província... ou marcador"). Isso garante um mapa funcional e preciso
+o suficiente sem depender de dados geográficos externos não verificados.
 
-O modelo `src/models/Farm.ts` guarda o produtor, fazenda, província, município,
-contactos, observações e os dados do rebanho (`total`, `females`, `forSlaughter` e
-`forBreeding`). Os estados de moderação são `pending`, `approved` e `rejected`.
-As estatísticas públicas consideram apenas registos aprovados e activos.
+> **Evolução futura recomendada**: se a associação obtiver um GeoJSON oficial das províncias
+> (por exemplo, do IGCA — Instituto Geográfico e Cadastral de Angola), é possível trocar os
+> `CircleMarker` por um `<GeoJSON>` do react-leaflet e pintar cada província (choropleth) em
+> vez de usar apenas um ponto central, sem alterar a API do backend.
 
-### Rotas do mapa
+### Modelo de dados (`src/models/Farm.ts`)
+
+```ts
+{
+  producerName: string        // Nome do produtor (obrigatório)
+  farmName?: string           // Nome da fazenda
+  province: string            // Uma das 21 províncias de Angola (enum)
+  municipality?: string
+  coordinates?: { lat, lng }  // Opcional, se o produtor quiser um ponto exato
+  phone?: string
+  email?: string
+  herd: {
+    total: number             // Quantidade total de porcos (obrigatório)
+    females: number           // Fêmeas
+    forSlaughter: number      // Disponíveis para abate
+    forBreeding: number       // Disponíveis para fertilização/reprodução
+  }
+  notes?: string
+  status: 'pending' | 'approved' | 'rejected'  // Moderação
+  owner?: ObjectId (User)     // Preenchido automaticamente se o produtor estiver logado
+  isActive: boolean
+}
+```
+
+A lista das 21 províncias (com coordenadas aproximadas usadas pelo mapa) está centralizada
+em `src/components/sections/PigMap/angola-provinces.ts`, reaproveitando a mesma divisão
+administrativa já usada no formulário de produtos (`admin/produtos/novo`).
+
+**Por que moderação (`status: pending/approved/rejected`)?** Como o formulário de cadastro é
+público (qualquer visitante pode preencher), os dados só entram nas estatísticas agregadas do
+mapa depois de um administrador aprovar, evitando spam ou números incorretos distorcerem o
+mapa público. Isso segue o mesmo padrão já usado no site para "Solicitações" de associação.
+
+### Rotas / API
 
 | Método | Rota | Acesso | Descrição |
 | --- | --- | --- | --- |
-| `POST` | `/api/farms` | Público | Cria um cadastro pendente |
-| `GET` | `/api/farms` | Público | Lista fazendas aprovadas, sem contactos |
-| `GET` | `/api/farms/stats` | Público | Retorna estatísticas das 21 províncias |
-| `GET` | `/api/admin/farms` | Admin | Lista cadastros com filtro por estado |
-| `PATCH` | `/api/admin/farms/:id` | Admin | Aprova, rejeita ou edita um cadastro |
+| `POST` | `/api/farms` | Público | Cria um novo cadastro de fazenda (status inicial `pending`) |
+| `GET` | `/api/farms` | Público | Lista fazendas **aprovadas** (sem dados de contacto), com filtro opcional `?province=` |
+| `GET` | `/api/farms/stats` | Público | Estatísticas agregadas por província (usado pelo mapa). Sempre retorna as 21 províncias, mesmo sem cadastros |
+| `GET` | `/api/admin/farms` | Admin | Lista todos os cadastros, com filtro `?status=pending\|approved\|rejected` |
+| `PATCH` | `/api/admin/farms/:id` | Admin | Aprova/rejeita ou edita um cadastro (`{ status }`, `{ herd }`, etc.) |
 | `DELETE` | `/api/admin/farms/:id` | Admin | Remove um cadastro |
 
-`/api/farms` está incluída em `PUBLIC_API_PREFIXES` no middleware para permitir
-que o formulário e o mapa funcionem sem autenticação. Cadastros enviados por
-utilizadores autenticados podem ser associados à respectiva conta.
+Exemplo de resposta de `GET /api/farms/stats`:
 
-### Componentes
+```json
+{
+  "success": true,
+  "data": {
+    "provinces": [
+      { "province": "Luanda", "farmersCount": 3, "totalPigs": 540, "females": 210, "forSlaughter": 120, "forBreeding": 60 },
+      { "province": "Huambo", "farmersCount": 0, "totalPigs": 0, "females": 0, "forSlaughter": 0, "forBreeding": 0 }
+    ],
+    "totals": { "farmersCount": 3, "totalPigs": 540, "females": 210, "forSlaughter": 120, "forBreeding": 60 }
+  }
+}
+```
 
-- `InteractiveMapSection.tsx`: carrega as estatísticas, mostra os totais e abre o formulário.
-- `PigFarmMap.tsx`: renderiza o mapa Leaflet e os marcadores provinciais.
-- `FarmRegisterModal.tsx`: formulário público de cadastro de fazenda.
-- `FarmsManager.tsx`: gestão administrativa dos cadastros.
-- `src/app/admin/suinocultura/page.tsx`: página do módulo no painel admin.
+`/api/farms` foi adicionado à lista `PUBLIC_API_PREFIXES` em `src/middleware.ts`, para que o
+formulário público e o mapa funcionem sem exigir login.
 
-### Teste local
+### Componentes de Frontend
+
+Todos em `src/components/sections/PigMap/`:
+
+- **`angola-provinces.ts`** — lista das 21 províncias com coordenadas (lat/lng) e centro/zoom padrão do mapa.
+- **`PigFarmMap.tsx`** — o mapa em si (Leaflet). Carrega o `TileLayer` do OpenStreetMap e desenha um `CircleMarker` por província: raio e cor proporcionais ao total de porcos (cinza = sem cadastros ainda). Ao clicar, abre um `Popup` com as estatísticas da região e um botão "Cadastrar fazenda nesta província".
+- **`FarmRegisterModal.tsx`** — modal com o formulário de cadastro (produtor, fazenda, província, telefone/email, e os 4 campos do rebanho). Envia `POST /api/farms` e mostra mensagem de sucesso ("aguardando aprovação").
+- **`InteractiveMapSection.tsx`** — componente "orquestrador": busca `/api/farms/stats`, mostra os 5 cartões de totais (produtores, total de porcos, fêmeas, abate, reprodução), renderiza o mapa (via `next/dynamic` com `ssr: false`, pois o Leaflet precisa do `window`) e controla a abertura do modal de cadastro (tanto pelo botão principal "Cadastrar minha fazenda" quanto pelo botão dentro do popup de cada província).
+
+No lado do admin: `src/components/admin/FarmsManager.tsx` (listagem com filtro por status,
+aprovar/rejeitar/remover) e a página `src/app/admin/suinocultura/page.tsx`, acessível pelo
+item "Suinocultura" no menu lateral do painel.
+
+### Passo a passo: como o formulário se conecta ao mapa
+
+1. **Visitante abre `/sobre`** → `AboutClient.tsx` renderiza `<InteractiveMapSection />` perto do fim da página.
+2. **`InteractiveMapSection` busca `GET /api/farms/stats`** assim que monta, e guarda o resultado (`provinces` + `totals`) em estado local.
+3. **O mapa é desenhado** com um marcador por província, usando os dados já carregados — sem chamadas adicionais por província (tudo vem numa única requisição agregada).
+4. **O visitante clica em "Cadastrar minha fazenda"** (botão principal) **ou** no botão "Cadastrar fazenda nesta província" dentro do popup de um marcador → abre `FarmRegisterModal`, já com a província pré-selecionada no segundo caso.
+5. **O produtor preenche o formulário** (nome, fazenda, província, rebanho) e submete → `POST /api/farms` cria o registo com `status: 'pending'` no MongoDB (coleção `farms`).
+6. **Um administrador entra em `/admin/suinocultura`**, revê os cadastros pendentes e clica em "Aprovar" → `PATCH /api/admin/farms/:id` muda o `status` para `approved`.
+7. **Da próxima vez que o mapa recarregar** `/api/farms/stats` (ex.: o visitante atualiza a página, ou o próprio `onRegistered` chama `loadStats()` logo após o envio para refletir already-visible totals se o admin aprovar rapidamente), os números da província aprovada passam a contar nas estatísticas agregadas e o marcador correspondente cresce/muda de cor no mapa.
+
+### Como testar localmente
 
 ```bash
-npm install
+npm install            # instala leaflet, react-leaflet e @types/leaflet (adicionados ao package.json)
 npm run dev
 ```
 
-1. Aceda a `http://localhost:3000/sobre` e procure "Mapa Interativo".
-2. Envie um cadastro de teste pelo formulário.
-3. Entre como administrador e abra **Admin > Suinocultura**.
-4. Aprove o cadastro e recarregue a página pública para ver as estatísticas.
+1. Acesse `http://localhost:3000/sobre` e role até "Mapa Interativo".
+2. Clique em "Cadastrar minha fazenda" e envie um cadastro de teste.
+3. Entre com uma conta admin, vá a **Admin → Suinocultura** e aprove o cadastro.
+4. Volte a `/sobre` e recarregue: o marcador da província escolhida deve refletir os novos números.
 
 ## 🔐 Autenticação
 
@@ -267,7 +368,7 @@ Este manual explica de forma simples como navegar no site, tanto como visitante 
 - **Cabeçalho e menu**: No topo você encontrará os links principais: Início, Quem Somos, Serviços, Produtos, Notícias e Contato. No canto direito aparecem as opções de Login e Registrar.
 - **Troca de idioma**: Use o seletor de idioma no topo para alternar entre português e inglês.
 - **Início**: Página com destaques e atalhos para as áreas principais.
-- **Quem Somos / Sobre**: Informações sobre a associação. No submenu você encontra também a página de Colaboradores.
+- **Quem Somos / Sobre**: Informações sobre a associação. No submenu você encontra também a página de Colaboradores. Nesta página está também o **Mapa Interativo de Suinocultura**: você pode ver estatísticas por província e cadastrar a sua própria fazenda clicando em "Cadastrar minha fazenda" (o cadastro fica visível no mapa após aprovação da equipa da associação).
 - **Serviços**: Lista de serviços oferecidos.
 - **Produtos**: Lista de produtos. Clique em um item para ver detalhes (quando disponível).
 - **Notícias**: Acompanhe as últimas novidades. Clique na notícia para ler a matéria completa.
@@ -305,7 +406,7 @@ O menu lateral à esquerda contém as seções abaixo:
   - Conteúdo de Membros: gerenciar conteúdos exclusivos para a área de membros.
   - Novo Conteúdo: criar conteúdo exclusivo.
 - **Contatos**: Mensagens recebidas pelo formulário de contato. Marque como lidas/resolvidas conforme necessário.
-- **Suinocultura**: Rever, aprovar, rejeitar ou remover cadastros de fazendas que aparecem no mapa público.
+- **Suinocultura**: Aprovar, rejeitar ou remover cadastros de fazendas enviados pelos produtores através do Mapa Interativo na página "Sobre". Apenas cadastros aprovados entram nas estatísticas públicas do mapa.
 - **Mídia**: Gerenciar imagens do site (upload, listar e reutilizar).
 - **Relatórios**: Estatísticas e relatórios de uso/conteúdo.
 - **Configurações**: Ajustes gerais do site (ex.: logo e informações básicas quando disponíveis).
@@ -331,6 +432,11 @@ O menu lateral à esquerda contém as seções abaixo:
   1) Ir em Contatos.
   2) Abrir a mensagem, copiar o email do remetente e responder via sua caixa de email.
   3) Marcar como resolvida no painel (se aplicável).
+
+- **Aprovar cadastro de fazenda (Mapa Interativo)**:
+  1) Ir em Suinocultura.
+  2) Revisar os dados do produtor e do rebanho na lista "Pendente".
+  3) Clicar em Aprovar (✔) para publicar no mapa, ou Rejeitar (✖) caso os dados sejam inválidos.
 
 - **Enviar e usar imagens**:
   1) Ir em Mídia e fazer upload da imagem.

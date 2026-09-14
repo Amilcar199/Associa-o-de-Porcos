@@ -92,35 +92,15 @@ const DashboardStats = () => {
   const getColorClasses = (color: string) => {
     switch (color) {
       case 'blue':
-        return {
-          bg: 'bg-blue-500',
-          light: 'bg-blue-50',
-          text: 'text-blue-600'
-        }
+        return { bg: 'bg-blue-500', light: 'bg-blue-50', text: 'text-blue-600' }
       case 'green':
-        return {
-          bg: 'bg-green-500',
-          light: 'bg-green-50',
-          text: 'text-green-600'
-        }
+        return { bg: 'bg-green-500', light: 'bg-green-50', text: 'text-green-600' }
       case 'purple':
-        return {
-          bg: 'bg-purple-500',
-          light: 'bg-purple-50',
-          text: 'text-purple-600'
-        }
+        return { bg: 'bg-purple-500', light: 'bg-purple-50', text: 'text-purple-600' }
       case 'orange':
-        return {
-          bg: 'bg-orange-500',
-          light: 'bg-orange-50',
-          text: 'text-orange-600'
-        }
+        return { bg: 'bg-orange-500', light: 'bg-orange-50', text: 'text-orange-600' }
       default:
-        return {
-          bg: 'bg-gray-500',
-          light: 'bg-gray-50',
-          text: 'text-gray-600'
-        }
+        return { bg: 'bg-gray-500', light: 'bg-gray-50', text: 'text-gray-600' }
     }
   }
 
@@ -170,7 +150,7 @@ const DashboardStats = () => {
                     {card.title}
                   </dt>
                   <dd className="flex items-baseline">
-                    <div className="text-2xl font-semibold text-gray-900">
+                    <div className="text-2xl font-bold text-gray-900">
                       {card.value.toLocaleString()}
                     </div>
                   </dd>

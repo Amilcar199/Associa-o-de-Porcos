@@ -24,7 +24,7 @@ function range(start: Date, end: Date) {
   return { $gte: start, $lt: end }
 }
 
-async function computeAverage(unit: Unit, start: Date, end: Date, region?: string, breed?: string, saleForm?: 'carcaça' | 'vivo' | null) {
+async function computeAverage(unit: Unit, start: Date, end: Date, region?: string, breed?: string) {
   const matchStage: any = {
     $and: [
       { $or: [ { isActive: true }, { isActive: { $exists: false } } ] },
@@ -35,9 +35,6 @@ async function computeAverage(unit: Unit, start: Date, end: Date, region?: strin
 
   if (region) {
     matchStage.$and.push({ location: { $regex: new RegExp(region, 'i') } })
-  }
-  if (saleForm) {
-    matchStage.$and.push({ saleForm })
   }
 
   const addFields: any = {
@@ -81,52 +78,6 @@ async function computeAverage(unit: Unit, start: Date, end: Date, region?: strin
   return { avg: result[0].avgValue as number, count: result[0].count as number }
 }
 
-async function findMostRecentAverage(unit: Unit, start: Date, end: Date, region?: string, breed?: string, saleForm?: 'carcaça' | 'vivo' | null) {
-  const matchStage: any = {
-    $and: [
-      { $or: [{ isActive: true }, { isActive: { $exists: false } }] },
-      { $or: [{ availability: 'available' }, { availability: { $exists: false } }] },
-      { $or: [{ updatedAt: range(start, end) }, { createdAt: range(start, end) }] },
-    ],
-  }
-  if (region) matchStage.$and.push({ location: { $regex: new RegExp(region, 'i') } })
-  if (breed) matchStage.$and.push({ breed })
-  if (saleForm) matchStage.$and.push({ saleForm })
-
-  const value = unit === 'kg' ? '$pricePerKg' : '$price'
-  const pipeline: any[] = [
-    { $match: matchStage },
-    { $addFields: {
-      ts: { $ifNull: ['$updatedAt', '$createdAt'] },
-      pricePerKg: {
-        $ifNull: ['$pricePerKg', {
-          $cond: [
-            { $and: [{ $gt: ['$price', 0] }, { $gt: ['$weight', 0] }] },
-            { $divide: ['$price', '$weight'] },
-            null,
-          ],
-        }],
-      },
-    } },
-    { $addFields: { value } },
-    { $match: { value: { $ne: null } } },
-    { $addFields: { day: { $dateToString: { format: '%Y-%m-%d', date: '$ts' } } } },
-    { $group: { _id: '$day', count: { $sum: 1 }, avg: { $avg: '$value' } } },
-    { $sort: { _id: -1 } },
-    { $limit: 1 },
-  ]
-
-  const result = await (Product as any).aggregate(pipeline)
-  if (!result.length || result[0].avg == null) return null
-
-  const dayStart = new Date(`${result[0]._id}T00:00:00.000Z`)
-  return {
-    average: { avg: result[0].avg as number, count: result[0].count as number },
-    start: dayStart,
-    end: addDays(dayStart, 1),
-  }
-}
-
 export async function GET(req: NextRequest) {
   try {
     await connectDB()
@@ -141,31 +92,42 @@ export async function GET(req: NextRequest) {
     const todayStart = startOfDay(now)
     const tomorrowStart = addDays(todayStart, 1)
 
-    const current = await computeAverage(unit, todayStart, tomorrowStart, region, breed, saleFormParam)
+    const current = await computeAverage(unit, todayStart, tomorrowStart, region, breed)
 
     let effectiveCurrent = current
     let effectiveDayStart = todayStart
     let effectiveDayEnd = tomorrowStart
     let usedFallback = false
     if (current.avg == null) {
-      const fallback = await findMostRecentAverage(unit, addDays(todayStart, -365), tomorrowStart, region, breed, saleFormParam)
-      if (fallback) {
-        effectiveCurrent = fallback.average
-        effectiveDayStart = fallback.start
-        effectiveDayEnd = fallback.end
-        usedFallback = true
+      // Expand fallback window up to 365 days back to find a recent valid day
+      for (let i = 1; i <= 365; i++) {
+        const s = addDays(todayStart, -i)
+        const e = addDays(todayStart, -(i - 1))
+        const tmp = await computeAverage(unit, s, e, region, breed)
+        if (tmp.avg != null) {
+          effectiveCurrent = tmp
+          effectiveDayStart = s
+          effectiveDayEnd = e
+          usedFallback = true
+          break
+        }
       }
     }
 
+    // Find nearest previous valid day (not necessarily consecutive)
     let prevValid: { avg: number | null, count: number } = { avg: null, count: 0 }
-    const previous = await findMostRecentAverage(unit, addDays(effectiveDayStart, -365), effectiveDayStart, region, breed, saleFormParam)
-    if (previous) prevValid = previous.average
+    for (let i = 1; i <= 365; i++) {
+      const s = addDays(effectiveDayStart, -i)
+      const e = addDays(effectiveDayStart, -(i - 1))
+      const tmp = await computeAverage(unit, s, e, region, breed)
+      if (tmp.avg != null) { prevValid = tmp; break }
+    }
 
-    const last7 = await computeAverage(unit, addDays(effectiveDayEnd, -7), effectiveDayEnd, region, breed, saleFormParam)
-    const prev7 = await computeAverage(unit, addDays(effectiveDayEnd, -14), addDays(effectiveDayEnd, -7), region, breed, saleFormParam)
+    const last7 = await computeAverage(unit, addDays(effectiveDayEnd, -7), effectiveDayEnd, region, breed)
+    const prev7 = await computeAverage(unit, addDays(effectiveDayEnd, -14), addDays(effectiveDayEnd, -7), region, breed)
 
-    const last30 = await computeAverage(unit, addDays(effectiveDayEnd, -30), effectiveDayEnd, region, breed, saleFormParam)
-    const prev30 = await computeAverage(unit, addDays(effectiveDayEnd, -60), addDays(effectiveDayEnd, -30), region, breed, saleFormParam)
+    const last30 = await computeAverage(unit, addDays(effectiveDayEnd, -30), effectiveDayEnd, region, breed)
+    const prev30 = await computeAverage(unit, addDays(effectiveDayEnd, -60), addDays(effectiveDayEnd, -30), region, breed)
 
     function changePct(cur: number | null, prev: number | null) {
       if (cur == null || prev == null || prev === 0) return null

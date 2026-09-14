@@ -73,15 +73,7 @@ export async function GET(req: NextRequest) {
       }
     } catch {}
 
-    const reference = typeof anchor.ref === 'number' && Number.isFinite(anchor.ref) ? anchor.ref : null
-    const filteredDocs = cleanOutliers && reference != null
-      ? (docs as any[]).filter((d: any) => {
-          const value = typeof d.value === 'number' ? d.value : Number(d.value)
-          return !Number.isFinite(value) || (value >= reference * (1 - anchor.bandPct) && value <= reference * (1 + anchor.bandPct))
-        })
-      : docs as any[]
-
-    const data = filteredDocs.map((d: any) => {
+    const data = (docs as any[]).map((d: any) => {
       const outOfBand = !!(anchor.ref != null && d.value != null && (
         d.value < (anchor.ref * (1 - anchor.bandPct)) || d.value > (anchor.ref * (1 + anchor.bandPct))
       ))
@@ -94,7 +86,7 @@ export async function GET(req: NextRequest) {
         unit,
         value: d.value ?? null,
         saleForm: d.saleForm || saleFormParam || null,
-        outOfBand
+        outOfBand: cleanOutliers ? false : outOfBand
       }
     })
 

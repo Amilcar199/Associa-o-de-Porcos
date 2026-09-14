@@ -14,7 +14,9 @@ import {
   LogOut, 
   User, 
   Settings,
-  Home
+  Home,
+  Clock,
+  CheckCheck
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -38,19 +40,25 @@ const AdminHeader = ({ user }: AdminHeaderProps) => {
   const notifRef = useRef<HTMLDivElement>(null)
   const profileRef = useRef<HTMLDivElement>(null)
 
+  // Fecha os dropdowns ao clicar/tocar fora deles ou ao pressionar Esc
   useEffect(() => {
-    const handleOutsidePointer = (event: MouseEvent | TouchEvent) => {
+    function handleOutsidePointer(event: MouseEvent | TouchEvent) {
       const target = event.target as Node
-      if (notifRef.current && !notifRef.current.contains(target)) setIsNotifOpen(false)
-      if (profileRef.current && !profileRef.current.contains(target)) setIsProfileMenuOpen(false)
+      if (notifRef.current && !notifRef.current.contains(target)) {
+        setIsNotifOpen(false)
+      }
+      if (profileRef.current && !profileRef.current.contains(target)) {
+        setIsProfileMenuOpen(false)
+      }
     }
-    const handleEscape = (event: KeyboardEvent) => {
+    function handleEscape(event: KeyboardEvent) {
       if (event.key === 'Escape') {
         setIsNotifOpen(false)
         setIsProfileMenuOpen(false)
       }
     }
-
+    // 'mousedown' cobre desktop; 'touchstart' garante o mesmo comportamento em ecrãs
+    // touch (tablets/telemóveis), onde cliques fora nem sempre disparam 'mousedown'.
     document.addEventListener('mousedown', handleOutsidePointer)
     document.addEventListener('touchstart', handleOutsidePointer)
     document.addEventListener('keydown', handleEscape)
@@ -119,7 +127,7 @@ const AdminHeader = ({ user }: AdminHeaderProps) => {
   }
 
   return (
-    <header className="bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-50">
+    <header className="bg-white/95 backdrop-blur border-b border-gray-200 shadow-sm fixed top-0 left-0 right-0 z-50">
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           {/* Left Side */}
@@ -167,7 +175,7 @@ const AdminHeader = ({ user }: AdminHeaderProps) => {
                       window.location.href = `/admin?search=${q}`
                     }
                   }}
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                  className="block w-full pl-10 pr-3 py-2 border border-gray-200 bg-gray-50 rounded-xl leading-5 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-primary-500/40 focus:border-primary-500 sm:text-sm transition-colors"
                 />
               </div>
             </div>
@@ -175,48 +183,70 @@ const AdminHeader = ({ user }: AdminHeaderProps) => {
             {/* Seletor de idioma removido do header admin conforme solicitação */}
 
             {/* Notifications */}
-            <div ref={notifRef} className="relative">
+            <div className="relative" ref={notifRef}>
               <button
-                onClick={async ()=>{ 
+                onClick={() => {
                   const willOpen = !isNotifOpen
-                  if (willOpen) {
-                    await refreshNotifs()
-                  }
                   setIsNotifOpen(willOpen)
                   if (willOpen) {
+                    setIsProfileMenuOpen(false)
+                    // Atualiza a lista em segundo plano; não bloqueia a abertura do painel
+                    refreshNotifs()
                     const now = Date.now()
                     setLastOpenedTs(now)
                     try { localStorage.setItem('adminNotifLastOpened', String(now)) } catch {}
                     setUnreadCount(0)
                   }
                 }}
-                className="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-full relative"
+                aria-haspopup="true"
+                aria-expanded={isNotifOpen}
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full relative transition-colors"
               >
                 <Bell size={20} />
                 {unreadCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 block h-2 w-2 rounded-full bg-red-500"></span>
+                  <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-4 w-4 bg-red-500 text-[10px] font-semibold text-white items-center justify-center">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  </span>
                 )}
               </button>
               <AnimatePresence>
                 {isNotifOpen && (
                   <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    className="absolute right-0 mt-2 w-72 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50"
+                    initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50"
                   >
-                    <div className="px-4 py-2 text-sm font-medium text-gray-700 border-b">Notificações</div>
-                    {notifs.length === 0 ? (
-                      <div className="px-4 py-4 text-sm text-gray-500">Sem novas notificações</div>
-                    ) : notifs.map((n, idx) => (
-                      <div key={idx} className="px-4 py-2 text-sm text-gray-700 border-b last:border-b-0">
-                        <div className="font-medium text-gray-900">{n.user || 'Sistema'}</div>
-                        <div className="text-gray-600">{n.action}</div>
-                        <div className="text-xs text-gray-400">{new Date(n.date).toLocaleString('pt-AO')}</div>
-                      </div>
-                    ))}
-                    <div className="px-4 py-2">
-                      <Link href="/admin" className="text-sm text-primary-600 hover:text-primary-700">Ver todas</Link>
+                    <div className="px-4 py-3 flex items-center justify-between border-b border-gray-100 bg-gray-50">
+                      <span className="text-sm font-semibold text-gray-800">Notificações</span>
+                      {notifs.length > 0 && (
+                        <span className="inline-flex items-center gap-1 text-xs text-gray-400">
+                          <CheckCheck size={14} /> em dia
+                        </span>
+                      )}
+                    </div>
+                    <div className="max-h-80 overflow-y-auto">
+                      {notifs.length === 0 ? (
+                        <div className="px-4 py-8 text-center">
+                          <Bell className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                          <p className="text-sm text-gray-500">Sem novas notificações</p>
+                        </div>
+                      ) : notifs.map((n, idx) => (
+                        <div key={idx} className="px-4 py-3 text-sm border-b border-gray-50 last:border-b-0 hover:bg-gray-50 transition-colors">
+                          <div className="font-medium text-gray-900">{n.user || 'Sistema'}</div>
+                          <div className="text-gray-600">{n.action}</div>
+                          <div className="mt-1 flex items-center gap-1 text-xs text-gray-400">
+                            <Clock size={12} /> {new Date(n.date).toLocaleString('pt-AO')}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="px-4 py-2.5 bg-gray-50 border-t border-gray-100">
+                      <Link href="/admin" onClick={() => setIsNotifOpen(false)} className="text-sm font-medium text-primary-600 hover:text-primary-700">Ver todas</Link>
                     </div>
                   </motion.div>
                 )}
@@ -226,16 +256,18 @@ const AdminHeader = ({ user }: AdminHeaderProps) => {
             {/* Back to Site */}
             <Link
               href="/"
-              className="hidden sm:inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+              className="hidden sm:inline-flex items-center px-3 py-2 border border-gray-200 text-sm font-medium rounded-xl text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-300 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
             >
               <Home size={16} className="mr-2" />
               Ver Site
             </Link>
 
             {/* Profile dropdown */}
-            <div ref={profileRef} className="relative">
+            <div className="relative" ref={profileRef}>
               <button
-                onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+                onClick={() => { setIsProfileMenuOpen(!isProfileMenuOpen); setIsNotifOpen(false) }}
+                aria-haspopup="true"
+                aria-expanded={isProfileMenuOpen}
                 className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 transition-colors"
               >
                 <div className="w-8 h-8 rounded-full bg-primary-600 flex items-center justify-center text-white font-medium">
@@ -264,22 +296,24 @@ const AdminHeader = ({ user }: AdminHeaderProps) => {
               <AnimatePresence>
                 {isProfileMenuOpen && (
                   <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50"
+                    initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50"
                   >
-                    <div className="px-4 py-3 border-b border-gray-200">
+                    <div className="px-4 py-3 border-b border-gray-100">
                       <p className="text-sm font-medium text-gray-900">
                         {user.name}
                       </p>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-500 truncate">
                         {user.email}
                       </p>
                     </div>
                     
                     <Link
                       href="/perfil"
+                      onClick={() => setIsProfileMenuOpen(false)}
                       className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
                     >
                       <User size={16} />
@@ -288,6 +322,7 @@ const AdminHeader = ({ user }: AdminHeaderProps) => {
                     
                     <Link
                       href="/admin/configuracoes"
+                      onClick={() => setIsProfileMenuOpen(false)}
                       className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
                     >
                       <Settings size={16} />
