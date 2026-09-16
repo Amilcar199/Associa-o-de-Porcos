@@ -222,6 +222,9 @@ export default function ProfilePage() {
       return;
     }
     const hasNumber = /\d/.test(pwForm.newPassword)
+    const hasLower = /[a-z]/.test(pwForm.newPassword)
+    const hasUpper = /[A-Z]/.test(pwForm.newPassword)
+    const hasSpecial = /[^A-Za-z0-9]/.test(pwForm.newPassword)
     const hasSeq = (() => {
       let inc = 1, dec = 1
       for (let i = 1; i < pwForm.newPassword.length; i++) {
@@ -235,10 +238,10 @@ export default function ProfilePage() {
       }
       return false
     })()
-    if (pwForm.newPassword.length < 6 || !hasNumber || hasSeq) {
+    if (pwForm.newPassword.length < 8 || !hasNumber || !hasLower || !hasUpper || !hasSpecial || hasSeq) {
       setPwError(locale.startsWith('en')
-        ? 'Weak password: minimum 6 characters, at least one number, and no numeric sequences (e.g., 123, 321)'
-        : 'Senha fraca: mínimo 6 caracteres, ao menos um número e sem sequências numéricas (ex.: 123, 321)')
+        ? 'Weak password: minimum 8 characters, with at least 1 uppercase letter, 1 lowercase letter, 1 number and 1 special character (e.g., !@#$%), and no numeric sequences (e.g., 123, 321)'
+        : 'Senha fraca: mínimo 8 caracteres, com pelo menos 1 letra maiúscula, 1 minúscula, 1 número e 1 caractere especial (ex.: !@#$%), e sem sequências numéricas (ex.: 123, 321)')
       return
     }
     if (pwForm.newPassword !== pwForm.confirmPassword) {

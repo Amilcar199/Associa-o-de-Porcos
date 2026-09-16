@@ -53,6 +53,9 @@ export default function ResetPasswordClient() {
     }
 
     const hasNumber = /\d/.test(formData.password)
+    const hasLower = /[a-z]/.test(formData.password)
+    const hasUpper = /[A-Z]/.test(formData.password)
+    const hasSpecial = /[^A-Za-z0-9]/.test(formData.password)
     const hasSeq = (() => {
       let inc = 1, dec = 1
       for (let i = 1; i < formData.password.length; i++) {
@@ -66,10 +69,10 @@ export default function ResetPasswordClient() {
       }
       return false
     })()
-    if (formData.password.length < 6 || !hasNumber || hasSeq) {
+    if (formData.password.length < 8 || !hasNumber || !hasLower || !hasUpper || !hasSpecial || hasSeq) {
       setError(isEn
-        ? 'Weak password: minimum 6 characters, at least one number, and no numeric sequences (e.g., 123, 321)'
-        : 'Senha fraca: mínimo 6 caracteres, ao menos um número e sem sequências numéricas (ex.: 123, 321)')
+        ? 'Weak password: minimum 8 characters, with at least 1 uppercase letter, 1 lowercase letter, 1 number and 1 special character (e.g., !@#$%), and no numeric sequences (e.g., 123, 321)'
+        : 'Senha fraca: mínimo 8 caracteres, com pelo menos 1 letra maiúscula, 1 minúscula, 1 número e 1 caractere especial (ex.: !@#$%), e sem sequências numéricas (ex.: 123, 321)')
       setLoading(false)
       return
     }
@@ -163,7 +166,7 @@ export default function ResetPasswordClient() {
                     value={formData.password}
                     onChange={(e) => setFormData((prev: ResetForm) => ({ ...prev, password: e.target.value }))}
                     className="appearance-none block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                    placeholder={isEn ? 'Minimum 6 characters' : 'Mínimo 6 caracteres'}
+                    placeholder={isEn ? 'Minimum 8 characters' : 'Mínimo 8 caracteres'}
                   />
                   <button type="button" className="absolute inset-y-0 right-0 pr-3 flex items-center" onClick={() => setShowPassword(!showPassword)} aria-label={isEn ? (showPassword ? 'Hide password' : 'Show password') : (showPassword ? 'Ocultar senha' : 'Mostrar senha')}>
                     {showPassword ? (

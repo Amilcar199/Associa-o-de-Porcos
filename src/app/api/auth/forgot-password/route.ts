@@ -9,9 +9,14 @@ import { sendEmail } from '@/lib/email';
 import { BRAND_NAME } from '@/lib/brand'
 import PushSubscription from '@/models/PushSubscription'
 import webpush from '@/lib/webpush'
+import { rateLimitOrNull } from '@/lib/rate-limit'
 
 // POST /api/auth/forgot-password - Solicitar recuperação de senha
 export async function POST(req: NextRequest) {
+  // Máx. 3 pedidos por IP a cada 15 minutos — evita spam de emails de recuperação
+  const limited = rateLimitOrNull(req, { key: 'forgot-password', limit: 3, windowMs: 15 * 60 * 1000 })
+  if (limited) return limited
+
   try {
     await connectDB();
 

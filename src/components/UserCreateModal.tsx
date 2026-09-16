@@ -48,8 +48,14 @@ export default function UserCreateModal({ isOpen, onClose, onUserCreated }: User
 
     if (!formData.password) {
       newErrors.password = 'Senha é obrigatória'
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Senha deve ter pelo menos 6 caracteres'
+    } else if (
+      formData.password.length < 8 ||
+      !/[a-z]/.test(formData.password) ||
+      !/[A-Z]/.test(formData.password) ||
+      !/\d/.test(formData.password) ||
+      !/[^A-Za-z0-9]/.test(formData.password)
+    ) {
+      newErrors.password = 'Senha deve ter 8+ caracteres, com maiúscula, minúscula, número e caractere especial'
     }
 
     if (formData.password !== formData.confirmPassword) {
@@ -225,7 +231,7 @@ export default function UserCreateModal({ isOpen, onClose, onUserCreated }: User
                   className={`pl-9 pr-10 w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 ${
                     errors.password ? 'border-red-300' : 'border-gray-300'
                   }`}
-                  placeholder="Mínimo 6 caracteres"
+                  placeholder="Mínimo 8 caracteres, com maiúscula, número e símbolo"
                 />
                 <button
                   type="button"

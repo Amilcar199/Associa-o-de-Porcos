@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import connectDB from '@/lib/mongodb'
 import User from '@/models/User'
 import { getPaginationParams, successResponse, errorResponse, validateSession } from '@/lib/api-utils'
+import { isPasswordStrong, PASSWORD_POLICY_MESSAGE } from '@/lib/password'
 
 export async function GET(req: NextRequest) {
   try {
@@ -71,6 +72,10 @@ export async function POST(req: NextRequest) {
     // Validação dos campos obrigatórios
     if (!body.name || !body.email || !body.password || !body.role) {
       return errorResponse('Nome, email, senha e papel são obrigatórios')
+    }
+
+    if (!isPasswordStrong(body.password)) {
+      return errorResponse(PASSWORD_POLICY_MESSAGE)
     }
 
     // Verificar se o email já existe

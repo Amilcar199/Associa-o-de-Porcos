@@ -10,9 +10,14 @@ import {
   isValidEmail
 } from '@/lib/api-utils'
 import { sendContactNotification } from '@/lib/email'
+import { rateLimitOrNull } from '@/lib/rate-limit'
 
 // POST /api/contact - Criar nova mensagem de contato (público)
 export async function POST(req: NextRequest) {
+  // Máx. 5 mensagens por IP a cada 10 minutos — evita spam pelo formulário de contacto
+  const limited = rateLimitOrNull(req, { key: 'contact', limit: 5, windowMs: 10 * 60 * 1000 })
+  if (limited) return limited
+
   try {
     await connectDB()
 

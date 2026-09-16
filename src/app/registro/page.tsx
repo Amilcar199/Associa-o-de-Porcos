@@ -31,7 +31,10 @@ export default function RegisterPage() {
   const [success, setSuccess] = useState('');
   const router = useRouter();
   const passwordHasNumber = /\d/.test(formData.password)
-  const passwordHasLength = formData.password.length >= 6
+  const passwordHasLength = formData.password.length >= 8
+  const passwordHasLower = /[a-z]/.test(formData.password)
+  const passwordHasUpper = /[A-Z]/.test(formData.password)
+  const passwordHasSpecial = /[^A-Za-z0-9]/.test(formData.password)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,6 +55,9 @@ export default function RegisterPage() {
     }
 
     const hasNumber = /\d/.test(formData.password)
+    const hasLower = /[a-z]/.test(formData.password)
+    const hasUpper = /[A-Z]/.test(formData.password)
+    const hasSpecial = /[^A-Za-z0-9]/.test(formData.password)
     const hasSeq = (() => {
       let inc = 1, dec = 1
       for (let i = 1; i < formData.password.length; i++) {
@@ -65,10 +71,10 @@ export default function RegisterPage() {
       }
       return false
     })()
-    if (formData.password.length < 6 || !hasNumber || hasSeq) {
+    if (formData.password.length < 8 || !hasNumber || !hasLower || !hasUpper || !hasSpecial || hasSeq) {
       setError(locale.startsWith('en')
-        ? 'Weak password: minimum 6 characters, at least one number, and no numeric sequences (e.g., 123, 321)'
-        : 'Senha fraca: mínimo 6 caracteres, ao menos um número e sem sequências numéricas (ex.: 123, 321)')
+        ? 'Weak password: minimum 8 characters, with at least 1 uppercase letter, 1 lowercase letter, 1 number and 1 special character (e.g., !@#$%), and no numeric sequences (e.g., 123, 321)'
+        : 'Senha fraca: mínimo 8 caracteres, com pelo menos 1 letra maiúscula, 1 minúscula, 1 número e 1 caractere especial (ex.: !@#$%), e sem sequências numéricas (ex.: 123, 321)')
       setLoading(false)
       return
     }
@@ -319,10 +325,19 @@ export default function RegisterPage() {
               </div>
               <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs" aria-live="polite">
                 <span className={`inline-flex items-center gap-1 ${passwordHasLength ? 'text-green-700' : 'text-gray-500'}`}>
-                  {passwordHasLength ? <CheckCircle2 size={13} /> : <Circle size={13} />} {locale.startsWith('en') ? '6+ characters' : '6+ caracteres'}
+                  {passwordHasLength ? <CheckCircle2 size={13} /> : <Circle size={13} />} {locale.startsWith('en') ? '8+ characters' : '8+ caracteres'}
+                </span>
+                <span className={`inline-flex items-center gap-1 ${passwordHasUpper ? 'text-green-700' : 'text-gray-500'}`}>
+                  {passwordHasUpper ? <CheckCircle2 size={13} /> : <Circle size={13} />} {locale.startsWith('en') ? 'Uppercase letter' : 'Letra maiúscula'}
+                </span>
+                <span className={`inline-flex items-center gap-1 ${passwordHasLower ? 'text-green-700' : 'text-gray-500'}`}>
+                  {passwordHasLower ? <CheckCircle2 size={13} /> : <Circle size={13} />} {locale.startsWith('en') ? 'Lowercase letter' : 'Letra minúscula'}
                 </span>
                 <span className={`inline-flex items-center gap-1 ${passwordHasNumber ? 'text-green-700' : 'text-gray-500'}`}>
                   {passwordHasNumber ? <CheckCircle2 size={13} /> : <Circle size={13} />} {locale.startsWith('en') ? 'One number' : 'Um número'}
+                </span>
+                <span className={`inline-flex items-center gap-1 ${passwordHasSpecial ? 'text-green-700' : 'text-gray-500'}`}>
+                  {passwordHasSpecial ? <CheckCircle2 size={13} /> : <Circle size={13} />} {locale.startsWith('en') ? 'Special character' : 'Caractere especial'}
                 </span>
               </div>
             </div>

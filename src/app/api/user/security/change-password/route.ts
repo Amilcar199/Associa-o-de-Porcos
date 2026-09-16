@@ -7,7 +7,7 @@ import connectDB from '@/lib/mongodb'
 import User from '@/models/User'
 import ActivityLog from '@/models/ActivityLog'
 import { errorResponse, successResponse, sanitizeInput } from '@/lib/api-utils'
-import { isPasswordStrong } from '@/lib/password'
+import { isPasswordStrong, PASSWORD_POLICY_MESSAGE } from '@/lib/password'
 
 export async function POST(req: NextRequest) {
   try {
@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
       return errorResponse('Senha inválida.')
     }
     if (!isPasswordStrong(String(newPassword))) {
-      return errorResponse('Senha fraca: mínimo 6 caracteres, ao menos um número e sem sequências numéricas (ex.: 123, 321)')
+      return errorResponse(PASSWORD_POLICY_MESSAGE)
     }
 
     const user = await User.findById(session.user.id).select('+password')

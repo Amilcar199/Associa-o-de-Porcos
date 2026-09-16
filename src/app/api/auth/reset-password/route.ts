@@ -4,10 +4,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import { successResponse, errorResponse, sanitizeInput } from '@/lib/api-utils';
-import { isPasswordStrong } from '@/lib/password'
+import { isPasswordStrong, PASSWORD_POLICY_MESSAGE } from '@/lib/password'
+import { rateLimitOrNull } from '@/lib/rate-limit'
 
 // POST /api/auth/reset-password - Redefinir senha
 export async function POST(req: NextRequest) {
+  const limited = rateLimitOrNull(req, { key: 'reset-password', limit: 10, windowMs: 15 * 60 * 1000 })
+  if (limited) return limited
+
   try {
     await connectDB();
 
@@ -20,7 +24,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (!isPasswordStrong(sanitizedData.password)) {
-      return errorResponse('Senha fraca: mínimo 6 caracteres, ao menos um número e sem sequências numéricas (ex.: 123, 321)');
+      return errorResponse(PASSWORD_POLICY_MESSAGE);
     }
 
     const user = await User.findOne({

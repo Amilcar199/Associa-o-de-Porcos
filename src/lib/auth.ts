@@ -6,6 +6,7 @@ import connectDB from './mongodb'
 import User from '@/models/User'
 import { AuthUser } from '@/types'
 import GoogleProvider from 'next-auth/providers/google'
+import { checkRateLimit } from './rate-limit'
 
 const hasMongoUri = !!process.env.MONGODB_URI
 const hasNextAuthSecret = !!process.env.NEXTAUTH_SECRET
@@ -34,9 +35,29 @@ export const authOptions: NextAuthOptions = {
           placeholder: 'Sua senha'
         }
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         if (!credentials?.email || !credentials?.password) {
           throw new Error('Email e senha são obrigatórios')
+        }
+
+        // Rate limiting contra força bruta no login.
+        // O segundo parâmetro do authorize() do NextAuth não é um NextRequest
+        // completo (não tem métodos como .get()), por isso extraímos o IP
+        // diretamente do objeto de headers disponível aqui.
+        const rawHeaders = (req?.headers ?? {}) as Record<string, string | string[] | undefined>
+        const forwardedFor = rawHeaders['x-forwarded-for'] ?? rawHeaders['X-Forwarded-For']
+        const ip = (Array.isArray(forwardedFor) ? forwardedFor[0] : forwardedFor)?.split(',')[0]?.trim()
+          || (rawHeaders['x-real-ip'] as string | undefined)
+          || 'unknown'
+        const emailKey = credentials.email.toLowerCase()
+
+        // Limite por IP: evita credential-stuffing (testar muitas contas a partir do mesmo IP)
+        const ipLimit = checkRateLimit(ip, { key: 'login-ip', limit: 20, windowMs: 15 * 60 * 1000 })
+        // Limite por email: evita força bruta contra uma única conta a partir de vários IPs
+        const emailLimit = checkRateLimit(emailKey, { key: 'login-email', limit: 5, windowMs: 15 * 60 * 1000 })
+
+        if (!ipLimit.success || !emailLimit.success) {
+          throw new Error('Demasiadas tentativas de login. Aguarde alguns minutos e tente novamente.')
         }
 
         try {
@@ -44,7 +65,7 @@ export const authOptions: NextAuthOptions = {
           
           // Buscar usuário por email
           const user = await User.findOne({ 
-            email: credentials.email.toLowerCase(),
+            email: emailKey,
             isActive: true 
           }).select('+password')
 

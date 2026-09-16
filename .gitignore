@@ -44,6 +44,12 @@ yarn-error.log*
 # vercel
 .vercel
 
+# ficheiros de debug de testes locais (curl, Postman) — nunca comitar,
+# podem conter cookies/tokens de sessão reais
+cookies.txt
+csrf.json
+*.cookie
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

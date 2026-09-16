@@ -4,8 +4,14 @@ import { NextRequest, NextResponse } from 'next/server'
 import connectDB from '@/lib/mongodb'
 import User from '@/models/User'
 import { sanitizeInput } from '@/lib/api-utils'
+import { rateLimitOrNull } from '@/lib/rate-limit'
 
 export async function POST(req: NextRequest) {
+  // Endpoint sensível: permite tentar adivinhar respostas de segurança.
+  // Limite apertado para dificultar força bruta.
+  const limited = rateLimitOrNull(req, { key: 'verify-security-answers', limit: 5, windowMs: 15 * 60 * 1000 })
+  if (limited) return limited
+
   try {
     await connectDB()
     const body = await req.json()
