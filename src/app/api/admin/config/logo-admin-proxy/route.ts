@@ -16,10 +16,9 @@ export async function GET(req: NextRequest) {
       const arrayBuf = await res.arrayBuffer()
       return new NextResponse(arrayBuf, { headers: { 'Content-Type': res.headers.get('Content-Type') || 'image/png' } })
     }
-    // Fallback para logo estática
-    return NextResponse.redirect(new URL('/_next/static/media/Logo.png', req.url))
+    // Use the bundled asset URL because Next.js adds a content hash to static assets.
+    return NextResponse.redirect(new URL(LogoPng.src, req.url))
   } catch {
-    return NextResponse.redirect(new URL('/_next/static/media/Logo.png', req.url))
+    return NextResponse.redirect(new URL(LogoPng.src, req.url))
   }
 }
-
