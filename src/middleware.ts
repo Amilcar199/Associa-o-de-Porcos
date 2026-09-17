@@ -18,6 +18,10 @@ const PUBLIC_API_PREFIXES = [
   '/api/legal-content',
   '/api/public-images',
   '/api/public-assets',
+  // A leitura dos ficheiros publicados é pública; upload e eliminação
+  // continuam protegidos pelos próprios handlers das rotas.
+  '/api/images',
+  '/api/videos',
   '/api/contact',
   '/api/farms',
 ]
