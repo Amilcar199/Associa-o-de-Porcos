@@ -2,10 +2,41 @@
 
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
- 
+import Placeholder from '@/components/assets/Foto Suino.webp'
+
 import ProductModal from '@/components/modals/ProductModal'
 import { useLanguage } from '@/components/providers/LanguageProvider'
-import { formatPrice, convertAndFormat } from '@/lib/utils'
+import { formatPrice, convertAndFormat, isExternalImageUrl, normalizeImageUrl } from '@/lib/utils'
+
+// Miniatura do cartão de produto com fallback automático:
+// se product.imageUrl estiver vazio ou o ficheiro falhar a carregar,
+// mostra a imagem placeholder em vez do ícone de imagem quebrada do browser.
+function ProductThumb({ src, alt }: { src?: string; alt: string }) {
+  const [failed, setFailed] = useState(false)
+  const normalizedSrc = normalizeImageUrl(src)
+  const finalSrc = (!normalizedSrc || failed) ? String(Placeholder) : normalizedSrc
+  if (isExternalImageUrl(finalSrc)) {
+    return (
+      <img
+        src={finalSrc}
+        alt={alt}
+        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
+        onError={() => setFailed(true)}
+      />
+    )
+  }
+
+  return (
+    <Image
+      src={finalSrc}
+      alt={alt}
+      fill
+      className="object-cover transition-transform duration-300 group-hover:scale-110"
+      sizes="(max-width:768px) 100vw, 33vw"
+      onError={() => setFailed(true)}
+    />
+  )
+}
 
 interface Product {
   _id: string
@@ -216,13 +247,7 @@ export default function ProductsClient({ products }: ProductsClientProps) {
           >
             {/* Imagem */}
             <div className="relative h-48">
-              <Image
-                src={product.imageUrl}
-                alt={product.name || (isEn ? 'Product' : 'Produto')}
-                fill
-                className="object-cover group-hover:scale-110 transition-transform duration-300"
-                sizes="(max-width:768px) 100vw, 33vw"
-              />
+              <ProductThumb src={product.imageUrl} alt={product.name || (isEn ? 'Product' : 'Produto')} />
               {/* Badge de preço */}
               {(typeof product.price === 'number' && product.price > 0) || (typeof product.pricePerKg === 'number' && product.pricePerKg > 0) ? (
                 <div className="absolute top-3 right-3 flex flex-col items-end gap-1">

@@ -107,24 +107,104 @@ export async function uploadVideo(
   });
 }
 
-export async function getImage(fileId: string): Promise<{ stream: any; contentType: string } | null> {
+export async function getImage(fileId: string): Promise<{ stream: any; contentType: string; length: number } | null> {
   try {
     await connectDB();
     const db = (mongoose.connection as any).db as Db;
     if (!db) return null
     const bucket = new GridFSBucket(db, { bucketName: 'images' });
-    
+
     const objectId = new ObjectId(fileId);
     const fileDoc = await bucket.find({ _id: objectId }).next();
+    if (!fileDoc) return null
     const downloadStream = bucket.openDownloadStream(objectId);
-    
+
     return {
       stream: downloadStream,
-      contentType: fileDoc?.metadata?.contentType || 'image/jpeg'
+      contentType: fileDoc?.metadata?.contentType || 'image/jpeg',
+      length: fileDoc?.length || 0,
     };
   } catch (error) {
     console.error('Erro ao buscar imagem:', error);
     return null;
+  }
+}
+
+/**
+ * Igual a getImage, mas com suporte a intervalo de bytes (HTTP Range).
+ * Necessário para vídeos: sem isto, o browser não consegue avançar/recuar
+ * no vídeo e, em alguns casos (Safari/iOS), nem sequer reproduz.
+ */
+export async function getImageRange(
+  fileId: string,
+  range?: { start: number; end: number }
+): Promise<{ stream: any; contentType: string; length: number } | null> {
+  try {
+    await connectDB();
+    const db = (mongoose.connection as any).db as Db;
+    if (!db) return null
+    const bucket = new GridFSBucket(db, { bucketName: 'images' });
+
+    const objectId = new ObjectId(fileId);
+    const fileDoc = await bucket.find({ _id: objectId }).next();
+    if (!fileDoc) return null
+
+    const downloadStream = range
+      ? bucket.openDownloadStream(objectId, { start: range.start, end: range.end + 1 })
+      : bucket.openDownloadStream(objectId);
+
+    return {
+      stream: downloadStream,
+      contentType: fileDoc?.metadata?.contentType || 'image/jpeg',
+      length: fileDoc?.length || 0,
+    };
+  } catch (error) {
+    console.error('Erro ao buscar imagem:', error);
+    return null;
+  }
+}
+
+export async function getVideo(
+  fileId: string,
+  range?: { start: number; end: number }
+): Promise<{ stream: any; contentType: string; length: number } | null> {
+  try {
+    await connectDB();
+    const db = (mongoose.connection as any).db as Db;
+    if (!db) return null
+    const bucket = new GridFSBucket(db, { bucketName: 'videos' });
+
+    const objectId = new ObjectId(fileId);
+    const fileDoc = await bucket.find({ _id: objectId }).next();
+    if (!fileDoc) return null
+
+    const downloadStream = range
+      ? bucket.openDownloadStream(objectId, { start: range.start, end: range.end + 1 })
+      : bucket.openDownloadStream(objectId);
+
+    return {
+      stream: downloadStream,
+      contentType: fileDoc?.metadata?.contentType || 'video/mp4',
+      length: fileDoc?.length || 0,
+    };
+  } catch (error) {
+    console.error('Erro ao buscar vídeo:', error);
+    return null;
+  }
+}
+
+export async function deleteVideo(fileId: string): Promise<boolean> {
+  try {
+    await connectDB();
+    const db = (mongoose.connection as any).db as Db;
+    if (!db) return false
+    const bucket = new GridFSBucket(db, { bucketName: 'videos' });
+
+    await bucket.delete(new ObjectId(fileId));
+    return true;
+  } catch (error) {
+    console.error('Erro ao deletar vídeo:', error);
+    return false;
   }
 }
 

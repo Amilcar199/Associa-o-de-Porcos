@@ -2,9 +2,7 @@ export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server';
 import { Readable } from 'stream';
-import { getImageRange, deleteImage } from '@/lib/gridfs';
-import connectDB from '@/lib/mongodb';
-import LegalSection from '@/models/LegalContent';
+import { getVideo, deleteVideo } from '@/lib/gridfs';
 import { authMiddleware } from '@/lib/api-utils';
 
 function parseRange(rangeHeader: string | null, size: number): { start: number; end: number } | null {
@@ -16,6 +14,17 @@ function parseRange(rangeHeader: string | null, size: number): { start: number; 
   return { start, end }
 }
 
+// GET /api/videos/[id] - Servir o vídeo guardado no GridFS.
+//
+// NOTA IMPORTANTE: esta rota estava em falta (a pasta [id] existia mas vazia).
+// Todos os vídeos do site (produtos, notícias, conteúdo de membros) apontam
+// para /api/videos/{id}, mas sem este ficheiro o Next.js devolvia 404 para
+// qualquer pedido — por isso NENHUM vídeo carregava em lado nenhum do site.
+//
+// O suporte a "Range" (pedidos por intervalo de bytes) é essencial para
+// vídeo: sem ele, o browser não consegue avançar/recuar na barra de
+// progresso e, em vários browsers (Safari/iOS em particular), o vídeo
+// nem sequer começa a reproduzir.
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -23,12 +32,11 @@ export async function GET(
   try {
     const { id } = params;
 
-    // Precisamos do tamanho do ficheiro antes de decidir se há Range,
-    // por isso primeiro buscamos sem intervalo definido.
-    const probe = await getImageRange(id);
+    // Precisamos do tamanho do ficheiro antes de decidir se há Range.
+    const probe = await getVideo(id);
     if (!probe) {
       return NextResponse.json(
-        { error: 'Imagem não encontrada' },
+        { error: 'Vídeo não encontrado' },
         { status: 404 }
       );
     }
@@ -37,40 +45,37 @@ export async function GET(
     const range = parseRange(rangeHeader, probe.length)
 
     // Se foi pedido um intervalo, é preciso reabrir a stream já posicionada
-    // nesse intervalo (a stream da "probe" acima já está a meio de abrir
-    // desde o byte 0, por isso não pode ser reaproveitada).
-    const image = range ? await getImageRange(id, range) : probe;
-    if (!image) {
+    // nesse intervalo (a stream da "probe" acima já começou a abrir desde
+    // o byte 0, por isso não pode ser reaproveitada).
+    const video = range ? await getVideo(id, range) : probe;
+    if (!video) {
       return NextResponse.json(
-        { error: 'Imagem não encontrada' },
+        { error: 'Vídeo não encontrado' },
         { status: 404 }
       );
     }
 
-    // BUG CORRIGIDO: `image.stream` é uma Readable stream do Node.js
-    // (vem do driver MongoDB/GridFS). A Web API `Response`/`NextResponse`
-    // exige uma ReadableStream do tipo Web Streams — passar a stream do
-    // Node diretamente resulta num corpo de resposta vazio/corrompido,
-    // fazendo a imagem aparecer quebrada no browser. `Readable.toWeb()`
-    // faz essa conversão corretamente.
-    const webStream = Readable.toWeb(image.stream as Readable) as unknown as ReadableStream;
+    // `video.stream` é uma Readable stream do Node.js (driver MongoDB/GridFS).
+    // A Web API `Response`/`NextResponse` exige uma ReadableStream do tipo
+    // Web Streams — por isso é preciso converter com Readable.toWeb().
+    const webStream = Readable.toWeb(video.stream as Readable) as unknown as ReadableStream;
 
     const headers: Record<string, string> = {
-      'Content-Type': image.contentType,
+      'Content-Type': video.contentType,
       'Cache-Control': 'public, max-age=31536000, immutable',
       'Accept-Ranges': 'bytes',
     };
 
     if (range) {
-      headers['Content-Range'] = `bytes ${range.start}-${range.end}/${image.length}`
+      headers['Content-Range'] = `bytes ${range.start}-${range.end}/${video.length}`
       headers['Content-Length'] = String(range.end - range.start + 1)
       return new NextResponse(webStream, { status: 206, headers });
     }
 
-    headers['Content-Length'] = String(image.length)
+    headers['Content-Length'] = String(video.length)
     return new NextResponse(webStream, { status: 200, headers });
   } catch (error) {
-    console.error('Erro ao buscar imagem:', error);
+    console.error('Erro ao buscar vídeo:', error);
     return NextResponse.json(
       { error: 'Erro interno do servidor' },
       { status: 500 }
@@ -78,42 +83,33 @@ export async function GET(
   }
 }
 
+// DELETE /api/videos/[id] - Remover um vídeo do GridFS (apenas autenticado)
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    // Verificar autenticação e autorização
     const authResult = await authMiddleware(request);
     if (!authResult.success) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
     const { id } = params;
-    const success = await deleteImage(id);
+    const success = await deleteVideo(id);
 
     if (!success) {
       return NextResponse.json(
-        { error: 'Erro ao deletar imagem' },
+        { error: 'Erro ao deletar vídeo' },
         { status: 500 }
       );
     }
 
-    // Remover referências no modelo LegalSection (itens com url igual ao arquivo removido)
-    try {
-      await connectDB();
-      const url = `/api/images/${id}`;
-      await (LegalSection as any).updateMany({}, { $pull: { items: { url } } });
-    } catch (e) {
-      console.error('Falha ao limpar referências em LegalSection:', e);
-    }
-
     return NextResponse.json({
       success: true,
-      message: 'Imagem deletada com sucesso'
+      message: 'Vídeo deletado com sucesso'
     });
   } catch (error) {
-    console.error('Erro ao deletar imagem:', error);
+    console.error('Erro ao deletar vídeo:', error);
     return NextResponse.json(
       { error: 'Erro interno do servidor' },
       { status: 500 }

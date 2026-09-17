@@ -4,6 +4,31 @@
 import mongoose from 'mongoose'
 
 /**
+ * Converts image-result URLs (for example Bing Images) into the actual
+ * image URL. Search-result pages are not valid image sources for next/image.
+ */
+export function normalizeImageUrl(value?: string): string {
+  const source = (value || '').trim()
+  if (!source) return ''
+
+  try {
+    const parsed = new URL(source)
+    if (parsed.hostname === 'www.bing.com' && parsed.pathname === '/images/search') {
+      const mediaUrl = parsed.searchParams.get('mediaurl')
+      if (mediaUrl) return mediaUrl
+    }
+  } catch {
+    return source
+  }
+
+  return source
+}
+
+export function isExternalImageUrl(value: string): boolean {
+  return /^https?:\/\//i.test(value)
+}
+
+/**
  * Formata uma data para o formato português de Angola
  */
 export function formatDate(date: Date | string): string {
