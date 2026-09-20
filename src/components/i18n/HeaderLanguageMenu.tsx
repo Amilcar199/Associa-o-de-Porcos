@@ -16,19 +16,21 @@ export default function HeaderLanguageMenu() {
   const ref = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
-    const onClick = (e: MouseEvent) => {
+    const onPointerDown = (e: PointerEvent) => {
       if (!ref.current) return
       if (!ref.current.contains(e.target as Node)) setOpen(false)
     }
-    window.addEventListener('click', onClick)
-    return () => window.removeEventListener('click', onClick)
+
+    document.addEventListener('pointerdown', onPointerDown)
+    return () => document.removeEventListener('pointerdown', onPointerDown)
   }, [])
 
   return (
-    <div className="relative" ref={ref}>
+    <div className="relative z-[300]" ref={ref}>
       <button
-        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(v => !v) }}
-        type="button" className="relative z-[80] inline-flex items-center gap-2 rounded-md border border-gray-200 bg-white px-2.5 py-1.5 text-sm shadow-sm hover:bg-gray-50 cursor-pointer pointer-events-auto"
+        onPointerDown={(e) => e.stopPropagation()}
+        onClick={(e) => { e.stopPropagation(); setOpen(v => !v) }}
+        type="button" className="relative z-[310] inline-flex items-center gap-2 rounded-md border border-gray-200 bg-white px-2.5 py-1.5 text-sm shadow-sm hover:bg-gray-50 cursor-pointer pointer-events-auto"
         aria-haspopup="menu"
         aria-expanded={open}
         title={current.label}
@@ -39,13 +41,15 @@ export default function HeaderLanguageMenu() {
         </span>
       </button>
       {open && (
-        <div className="absolute right-0 mt-2 w-48 rounded-md border border-gray-200 bg-white shadow-lg z-[70]">
+        <div className="absolute right-0 mt-2 w-48 rounded-md border border-gray-200 bg-white shadow-lg z-[320]">
           <ul className="py-1 text-sm">
             {OPTIONS.map(opt => (
               <li key={opt.value}>
                 <button
+                  type="button"
                   className={`flex w-full items-center gap-2 px-3 py-2 hover:bg-gray-100 ${opt.value === locale ? 'text-primary-600' : 'text-gray-700'}`}
-                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); setLocale(opt.value); setOpen(false) }}
+                  onPointerDown={(e) => e.stopPropagation()}
+                  onClick={(e) => { e.stopPropagation(); setLocale(opt.value); setOpen(false) }}
                 >
                   <span className="text-base leading-none">{getFlag(opt.value)}</span>
                   <span>{opt.label}</span>

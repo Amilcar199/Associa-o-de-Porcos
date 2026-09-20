@@ -104,7 +104,7 @@ const Header = () => {
   return (
     <>
       {/* Top Bar com informações de contato */}
-      <div className="bg-primary-800 text-white py-1 hidden md:block relative z-[60]">
+      <div className="bg-primary-800 text-white py-1 hidden md:block relative z-[200] overflow-visible">
         <div className="container-custom">
           <div className="flex justify-between items-center text-sm">
             <div className="flex items-center space-x-6">
@@ -168,7 +168,7 @@ const Header = () => {
 
       {/* Header Principal */}
       <header 
-        className={`sticky top-0 z-[60] bg-primary-800 transition-all duration-300 ${
+        className={`sticky top-0 z-[210] bg-primary-800 transition-all duration-300 overflow-visible ${
           isScrolled ? 'shadow-md' : 'shadow-sm'
         }`}
       >
