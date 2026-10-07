@@ -75,14 +75,16 @@ export default withAuth(
 
     if (isApi && isPublicApi(routePathname)) return NextResponse.next()
 
+    const inactive = Boolean((token as any)?.inactive)
+
     if (routePathname.startsWith('/admin')) {
-      if (!token || (token as any).role !== 'admin') {
+      if (inactive || !token || (token as any).role !== 'admin') {
         return NextResponse.redirect(new URL('/login?error=insufficient_permissions', req.url))
       }
     }
 
     if (isPathOrChild(routePathname, '/api/admin')) {
-      if (!token || (token as any).role !== 'admin') {
+      if (inactive || !token || (token as any).role !== 'admin') {
         return NextResponse.json(
           { error: 'Acesso negado. Apenas administradores podem acessar este recurso.' },
           { status: 403 }
@@ -90,7 +92,7 @@ export default withAuth(
       }
     }
 
-    if (routePathname.startsWith('/api/') && !isPublicApi(routePathname) && !token) {
+    if (routePathname.startsWith('/api/') && !isPublicApi(routePathname) && (!token || inactive)) {
       return NextResponse.json(
         { error: 'Token de autenticação necessário' },
         { status: 401 }
@@ -115,8 +117,8 @@ export default withAuth(
           return true
         }
 
-        if (pathname.startsWith('/admin') || pathname.startsWith('/perfil') || pathname.startsWith('/api/')) {
-          return !!token
+        if (pathname.startsWith('/admin') || pathname.startsWith('/perfil') || pathname.startsWith('/membros') || pathname.startsWith('/api/')) {
+          return !!token && !(token as any).inactive
         }
 
         return true

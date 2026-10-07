@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { uploadVideo, deleteVideo } from '@/lib/gridfs';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { rateLimitOrNull } from '@/lib/rate-limit';
 
 // Mantém uma proteção de tamanho no servidor sem aplicar o limite específico
 // de funções serverless da Vercel. O Railway suporta uploads maiores; o limite
@@ -11,10 +12,13 @@ import { authOptions } from '@/lib/auth';
 const MAX_VIDEO_SIZE_BYTES = 80 * 1024 * 1024; // 80MB
 
 export async function POST(request: NextRequest) {
+  const limited = rateLimitOrNull(request, { key: 'video-upload', limit: 5, windowMs: 60 * 60 * 1000 })
+  if (limited) return limited
+
   try {
     const session: any = await getServerSession(authOptions as any);
-    if (!session || !session.user) {
-      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (!session || session.user?.role !== 'admin') {
+      return NextResponse.json({ error: 'Apenas administradores podem enviar vídeos' }, { status: 403 });
     }
 
     const formData = await request.formData();
@@ -46,6 +50,10 @@ export async function POST(request: NextRequest) {
         },
         { status: 400 }
       );
+    }
+
+    if (replaceId && session.user?.role !== 'admin') {
+      return NextResponse.json({ error: 'Apenas administradores podem substituir ficheiros existentes' }, { status: 403 });
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());

@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from './auth'
 import connectDB from './mongodb'
 import { ApiResponse, PaginatedResponse } from '@/types'
+import { safeSortField } from './query-guards'
 
 // Interface para parâmetros de paginação
 export interface PaginationParams {
@@ -141,8 +142,8 @@ export function buildMongoQuery(filters: SearchFilters) {
 
 // Função para construir sort do MongoDB
 export function buildMongoSort(sort: string, order: 'asc' | 'desc') {
-  const sortObj: any = {}
-  sortObj[sort] = order === 'asc' ? 1 : -1
+  const sortObj: Record<string, 1 | -1> = {}
+  sortObj[safeSortField(sort)] = order === 'asc' ? 1 : -1
   return sortObj
 }
 

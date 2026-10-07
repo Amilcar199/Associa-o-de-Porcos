@@ -5,6 +5,7 @@ import connectDB from '@/lib/mongodb'
 import User from '@/models/User'
 import { sanitizeInput } from '@/lib/api-utils'
 import { rateLimitOrNull } from '@/lib/rate-limit'
+import { hashResetToken } from '@/lib/password'
 
 export async function POST(req: NextRequest) {
   // Endpoint sensível: permite tentar adivinhar respostas de segurança.
@@ -20,7 +21,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'Token e respostas são obrigatórios' }, { status: 400 })
     }
 
-    const user = await User.findOne({ passwordResetToken: token, passwordResetExpires: { $gt: new Date() } })
+    const user = await User.findOne({ passwordResetToken: hashResetToken(String(token)), passwordResetExpires: { $gt: new Date() } })
     if (!user) {
       return NextResponse.json({ message: 'Token inválido ou expirado' }, { status: 400 })
     }

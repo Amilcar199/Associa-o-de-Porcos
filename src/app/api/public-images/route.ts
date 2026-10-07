@@ -4,6 +4,7 @@ import path from 'path'
 import { authMiddleware } from '@/lib/api-utils'
 import connectDB from '@/lib/mongodb'
 import LegalSection from '@/models/LegalContent'
+import { isInsideDirectory } from '@/lib/safe-path'
 
 export const dynamic = 'force-dynamic'
 
@@ -79,7 +80,7 @@ export async function DELETE(request: NextRequest) {
 
     const publicDir = path.join(process.cwd(), 'public')
     const abs = path.normalize(path.join(publicDir, relPath))
-    if (!abs.startsWith(publicDir)) return NextResponse.json({ error: 'Caminho inválido' }, { status: 400 })
+    if (!isInsideDirectory(publicDir, abs)) return NextResponse.json({ error: 'Caminho inválido' }, { status: 400 })
 
     if (!fs.existsSync(abs)) return NextResponse.json({ error: 'Arquivo não encontrado' }, { status: 404 })
     const stat = fs.statSync(abs)

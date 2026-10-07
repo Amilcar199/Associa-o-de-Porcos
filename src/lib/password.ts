@@ -1,3 +1,5 @@
+import { createHash } from 'crypto'
+
 export function hasNumericSequence(password: string, minRunLength: number = 3): boolean {
   let increasingRunLength = 1
   let decreasingRunLength = 1
@@ -45,6 +47,10 @@ export function isPasswordStrong(password: string): boolean {
 }
 
 // Mensagem de erro correspondente às regras acima, para mostrar ao utilizador.
+export function hashResetToken(token: string): string {
+  return createHash('sha256').update(token).digest('hex')
+}
+
 export const PASSWORD_POLICY_MESSAGE =
   'Senha fraca: mínimo 8 caracteres, com pelo menos 1 letra maiúscula, 1 minúscula, ' +
   '1 número e 1 caractere especial (ex.: !@#$%), e sem sequências numéricas (ex.: 123, 321)'

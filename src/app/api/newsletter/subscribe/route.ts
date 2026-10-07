@@ -6,8 +6,12 @@ import connectDB from '@/lib/mongodb'
 import NewsletterSubscriber from '@/models/NewsletterSubscriber'
 import { isValidEmail } from '@/lib/api-utils'
 import { BRAND_NAME } from '@/lib/brand'
+import { rateLimitOrNull } from '@/lib/rate-limit'
 
 export async function POST(req: NextRequest) {
+  const limited = rateLimitOrNull(req, { key: 'newsletter-subscribe', limit: 5, windowMs: 60 * 60 * 1000 })
+  if (limited) return limited
+
   try {
     const { email } = await req.json()
     if (!email || typeof email !== 'string' || !isValidEmail(email)) {

@@ -10,6 +10,7 @@ import { BRAND_NAME } from '@/lib/brand'
 import PushSubscription from '@/models/PushSubscription'
 import webpush from '@/lib/webpush'
 import { rateLimitOrNull } from '@/lib/rate-limit'
+import { hashResetToken } from '@/lib/password'
 
 // POST /api/auth/forgot-password - Solicitar recuperação de senha
 export async function POST(req: NextRequest) {
@@ -34,15 +35,10 @@ export async function POST(req: NextRequest) {
 
     // Buscar usuário
     const user = await User.findOne({ email: sanitizedData.email });
-    if (!user) {
-      // Por segurança, não revelar se o email existe ou não
+    if (!user || !user.isActive) {
       return NextResponse.json(
         successResponse({}, 'Se o email existir, você receberá instruções de recuperação.')
       );
-    }
-
-    if (!user.isActive) {
-      return errorResponse('Conta desativada. Entre em contato com o suporte.');
     }
 
     // Gerar token de recuperação
@@ -50,7 +46,7 @@ export async function POST(req: NextRequest) {
     const resetTokenExpiry = new Date(Date.now() + 3600000); // 1 hora
 
     // Salvar token no usuário
-    user.passwordResetToken = resetToken;
+    user.passwordResetToken = hashResetToken(resetToken);
     user.passwordResetExpires = resetTokenExpiry;
     await user.save();
 

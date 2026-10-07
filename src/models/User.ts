@@ -144,15 +144,17 @@ userSchema.methods.resetLoginAttempts = function() {
 
 // Método para gerar token de reset de senha
 userSchema.methods.generatePasswordResetToken = function() {
-  const token = require('crypto').randomBytes(32).toString('hex');
-  this.passwordResetToken = token;
+  const crypto = require('crypto');
+  const token = crypto.randomBytes(32).toString('hex');
+  this.passwordResetToken = crypto.createHash('sha256').update(token).digest('hex');
   this.passwordResetExpires = Date.now() + 1 * 60 * 60 * 1000; // 1 hora
   return token;
 };
 
-// Método para verificar token de reset de senha
 userSchema.methods.verifyPasswordResetToken = function(token: string) {
-  return this.passwordResetToken === token && 
+  const crypto = require('crypto');
+  const hashed = crypto.createHash('sha256').update(String(token)).digest('hex');
+  return this.passwordResetToken === hashed &&
          this.passwordResetExpires > Date.now();
 };
 

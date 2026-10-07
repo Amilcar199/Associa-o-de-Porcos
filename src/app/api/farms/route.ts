@@ -13,6 +13,7 @@ import {
   getPaginationParams,
   paginateResults,
 } from '@/lib/api-utils'
+import { rateLimitOrNull } from '@/lib/rate-limit'
 import { ANGOLA_PROVINCE_NAMES } from '@/components/sections/PigMap/angola-provinces'
 
 // GET /api/farms - Lista pública de fazendas aprovadas (opcionalmente filtradas por província)
@@ -53,6 +54,9 @@ export async function GET(req: NextRequest) {
 
 // POST /api/farms - Cadastro público de uma fazenda (fica pendente de aprovação do admin)
 export async function POST(req: NextRequest) {
+  const limited = rateLimitOrNull(req, { key: 'farms-register', limit: 5, windowMs: 60 * 60 * 1000 })
+  if (limited) return limited
+
   try {
     await connectDB()
 

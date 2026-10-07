@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import connectDB from '@/lib/mongodb'
 import Product from '@/models/Product'
-import { successResponse, errorResponse } from '@/lib/api-utils'
+import { successResponse, errorResponse, validateSession } from '@/lib/api-utils'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
   try {
+    const auth = await validateSession(req, true)
+    if ('error' in auth) {
+      return NextResponse.json({ error: auth.error }, { status: auth.status })
+    }
+
     await connectDB()
     
     const { breed } = await req.json()

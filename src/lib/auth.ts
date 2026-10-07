@@ -7,6 +7,8 @@ import User from '@/models/User'
 import { AuthUser } from '@/types'
 import GoogleProvider from 'next-auth/providers/google'
 import { checkRateLimit } from './rate-limit'
+import { hasPermission as roleHasPermission, isAdminRole, isMemberRole } from './permissions'
+import crypto from 'crypto'
 
 const hasMongoUri = !!process.env.MONGODB_URI
 const hasNextAuthSecret = !!process.env.NEXTAUTH_SECRET
@@ -69,16 +71,21 @@ export const authOptions: NextAuthOptions = {
             isActive: true 
           }).select('+password')
 
-          if (!user) {
-            throw new Error('Usuário não encontrado ou inativo')
+          const invalidLogin = 'Email ou senha incorretos'
+
+          if (!user || user.isLocked()) {
+            throw new Error(invalidLogin)
           }
 
-          // Permitir login independentemente do status de verificação de email
-          // Verificar senha
           const isPasswordValid = await user.comparePassword(credentials.password)
-          
+
           if (!isPasswordValid) {
-            throw new Error('Senha incorreta')
+            await user.incLoginAttempts()
+            throw new Error(invalidLogin)
+          }
+
+          if (user.loginAttempts || user.lockUntil) {
+            await user.resetLoginAttempts()
           }
 
           return {
@@ -119,39 +126,60 @@ export const authOptions: NextAuthOptions = {
   },
   
   callbacks: {
+    async signIn({ user, account }) {
+      if (account?.provider !== 'google' || !user.email) return true
+      await connectDB()
+      const email = user.email.toLowerCase()
+      const existing = await User.findOne({ email })
+      if (!existing) {
+        await User.create({
+          name: user.name || 'Utilizador',
+          email,
+          password: crypto.randomBytes(24).toString('hex'),
+          role: 'visitor',
+          isActive: true,
+        })
+        return true
+      }
+      return existing.isActive !== false
+    },
+
     async jwt({ token, user }) {
-      // Primeira vez que o usuário faz login
       if (user) {
         token.role = user.role
         token.avatar = user.avatar
+        token.inactive = false
+        token.checkedAt = Date.now()
       }
-      
-      // Atualizar dados do usuário a cada request se necessário
-      if (token.email) {
+
+      const checkedAt = typeof token.checkedAt === 'number' ? token.checkedAt : 0
+      const shouldRefresh = !user && !!token.email && Date.now() - checkedAt > 60_000
+      if (shouldRefresh) {
         try {
           await connectDB()
-          const dbUser = await User.findOne({ 
-            email: token.email,
-            isActive: true 
-          })
-          
-          if (dbUser) {
+          const dbUser = await User.findOne({ email: token.email })
+          token.checkedAt = Date.now()
+          if (!dbUser || dbUser.isActive === false) {
+            token.inactive = true
+            token.role = 'visitor'
+          } else {
+            token.inactive = false
             token.name = dbUser.name
             token.role = dbUser.role
             token.avatar = dbUser.avatar
           }
         } catch (error) {
-          console.error('Erro ao atualizar token:', error)
+          console.error('Erro ao actualizar token:', error)
         }
       }
-      
+
       return token
     },
     
     async session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.sub!
-        session.user.role = (token.role as 'admin' | 'member' | 'visitor')
+        session.user.role = token.inactive ? 'visitor' : (token.role as 'admin' | 'member' | 'visitor')
         session.user.avatar = token.avatar as string
       }
       return session
@@ -195,27 +223,11 @@ export const authOptions: NextAuthOptions = {
 }
 
 // Função utilitária para verificar se o usuário é admin
-export const isAdmin = (user: AuthUser | null): boolean => {
-  return user?.role === 'admin'
-}
+export const isAdmin = (user: AuthUser | null): boolean => isAdminRole(user?.role)
 
-// Função utilitária para verificar se o usuário é membro
-export const isMember = (user: AuthUser | null): boolean => {
-  return user?.role === 'member' || user?.role === 'admin'
-}
+export const isMember = (user: AuthUser | null): boolean => isMemberRole(user?.role)
 
-// Função utilitária para verificar permissões
 export const hasPermission = (user: AuthUser | null, requiredRole: string): boolean => {
   if (!user) return false
-  
-  const roleHierarchy = {
-    visitor: 0,
-    member: 1,
-    admin: 2
-  }
-  
-  const userLevel = roleHierarchy[user.role as keyof typeof roleHierarchy] || 0
-  const requiredLevel = roleHierarchy[requiredRole as keyof typeof roleHierarchy] || 0
-  
-  return userLevel >= requiredLevel
+  return roleHasPermission(user.role, requiredRole)
 }

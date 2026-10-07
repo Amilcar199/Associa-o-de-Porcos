@@ -4,8 +4,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { uploadImage } from '@/lib/gridfs';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { rateLimitOrNull } from '@/lib/rate-limit';
 
 export async function POST(request: NextRequest) {
+  const limited = rateLimitOrNull(request, { key: 'image-upload', limit: 20, windowMs: 60 * 60 * 1000 })
+  if (limited) return limited
+
   try {
     // Verificar autenticação (qualquer usuário logado pode enviar avatar)
     const session: any = await getServerSession(authOptions as any);
@@ -41,6 +45,10 @@ export async function POST(request: NextRequest) {
         { error: 'Arquivo muito grande. Tamanho máximo: 5MB' },
         { status: 400 }
       );
+    }
+
+    if (replaceId && session.user?.role !== 'admin') {
+      return NextResponse.json({ error: 'Apenas administradores podem substituir ficheiros existentes' }, { status: 403 });
     }
 
     // Converter arquivo para Buffer

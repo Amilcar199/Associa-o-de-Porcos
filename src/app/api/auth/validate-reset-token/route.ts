@@ -4,9 +4,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import { successResponse, errorResponse, sanitizeInput } from '@/lib/api-utils';
+import { hashResetToken } from '@/lib/password'
+import { rateLimitOrNull } from '@/lib/rate-limit'
 
 // POST /api/auth/validate-reset-token - Validar token de reset
 export async function POST(req: NextRequest) {
+  const limited = rateLimitOrNull(req, { key: 'validate-reset-token', limit: 20, windowMs: 15 * 60 * 1000 })
+  if (limited) return limited
+
   try {
     await connectDB();
 
@@ -19,7 +24,7 @@ export async function POST(req: NextRequest) {
 
     // Buscar usuário com o token
     const user = await User.findOne({
-      passwordResetToken: sanitizedData.token,
+      passwordResetToken: hashResetToken(String(sanitizedData.token)),
       passwordResetExpires: { $gt: new Date() }
     });
 

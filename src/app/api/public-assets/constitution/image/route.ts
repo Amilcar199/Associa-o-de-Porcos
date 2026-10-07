@@ -4,6 +4,7 @@ import path from 'path'
 import { authMiddleware } from '@/lib/api-utils'
 import connectDB from '@/lib/mongodb'
 import LegalSection from '@/models/LegalContent'
+import { isInsideDirectory } from '@/lib/safe-path'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -20,7 +21,7 @@ export async function GET(request: NextRequest) {
 
     const baseDir = path.join(process.cwd(), 'src', 'components', 'assets', 'Conteudos Suinos', 'pdf_paginas_png')
     const abs = path.normalize(path.join(baseDir, name))
-    if (!abs.startsWith(baseDir)) return NextResponse.json({ error: 'Caminho inválido' }, { status: 400 })
+    if (!isInsideDirectory(baseDir, abs)) return NextResponse.json({ error: 'Caminho inválido' }, { status: 400 })
     if (!fs.existsSync(abs)) return NextResponse.json({ error: 'Arquivo não encontrado' }, { status: 404 })
 
     const stat = fs.statSync(abs)
@@ -55,7 +56,7 @@ export async function DELETE(request: NextRequest) {
 
     const baseDir = path.join(process.cwd(), 'src', 'components', 'assets', 'Conteudos Suinos', 'pdf_paginas_png')
     const abs = path.normalize(path.join(baseDir, name))
-    if (!abs.startsWith(baseDir)) return NextResponse.json({ error: 'Caminho inválido' }, { status: 400 })
+    if (!isInsideDirectory(baseDir, abs)) return NextResponse.json({ error: 'Caminho inválido' }, { status: 400 })
     if (!fs.existsSync(abs)) return NextResponse.json({ error: 'Arquivo não encontrado' }, { status: 404 })
 
     const stat = fs.statSync(abs)

@@ -3,8 +3,13 @@ export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from 'next/server'
 import connectDB from '@/lib/mongodb'
 import User from '@/models/User'
+import { hashResetToken } from '@/lib/password'
+import { rateLimitOrNull } from '@/lib/rate-limit'
 
 export async function GET(req: NextRequest) {
+  const limited = rateLimitOrNull(req, { key: 'reset-security-questions', limit: 20, windowMs: 15 * 60 * 1000 })
+  if (limited) return limited
+
   try {
     await connectDB()
     const { searchParams } = new URL(req.url)
@@ -13,7 +18,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ message: 'Token é obrigatório' }, { status: 400 })
     }
 
-    const user = await User.findOne({ passwordResetToken: token, passwordResetExpires: { $gt: new Date() } })
+    const user = await User.findOne({ passwordResetToken: hashResetToken(token), passwordResetExpires: { $gt: new Date() } })
     if (!user) {
       return NextResponse.json({ message: 'Token inválido ou expirado' }, { status: 400 })
     }

@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import { successResponse, errorResponse, sanitizeInput } from '@/lib/api-utils';
-import { isPasswordStrong, PASSWORD_POLICY_MESSAGE } from '@/lib/password'
+import { isPasswordStrong, PASSWORD_POLICY_MESSAGE, hashResetToken } from '@/lib/password'
 import { rateLimitOrNull } from '@/lib/rate-limit'
 
 // POST /api/auth/reset-password - Redefinir senha
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     }
 
     const user = await User.findOne({
-      passwordResetToken: sanitizedData.token,
+      passwordResetToken: hashResetToken(String(sanitizedData.token)),
       passwordResetExpires: { $gt: new Date() },
       isActive: true,
     })

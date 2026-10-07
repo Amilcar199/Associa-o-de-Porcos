@@ -61,22 +61,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Garantir que exista um seller válido (admin ativo)
-    let seller = await User.findOne({ role: 'admin', isActive: true }).select('_id')
-    if (!seller && process.env.NODE_ENV !== 'production') {
-      try {
-        const demo = new User({
-          name: 'Admin Demo',
-          email: 'admin@demo.local',
-          password: 'admin123',
-          role: 'admin',
-          isActive: true
-        })
-        await demo.save()
-        seller = { _id: demo._id } as any
-      } catch (e) {
-        console.error('Não foi possível criar admin demo:', e)
-      }
-    }
+    const seller = await User.findOne({ role: 'admin', isActive: true }).select('_id')
     if (!seller) {
       return errorResponse('Nenhum administrador ativo encontrado para atribuir como vendedor. Crie um admin primeiro.')
     }
