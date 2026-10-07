@@ -1,8 +1,6 @@
 // Lista oficial das 21 províncias de Angola (divisão administrativa vigente)
 // com coordenadas aproximadas das capitais/centros provinciais.
-// Reutilizada pelo formulário de cadastro de fazendas e pelo mapa interativo
-// da aba "Sobre". Caso a organização deseje maior precisão, estas coordenadas
-// podem ser substituídas por centróides oficiais do IGCA.
+// Reutilizada pelo formulário de cadastro de fazendas.
 
 export interface ProvinceGeo {
   name: string

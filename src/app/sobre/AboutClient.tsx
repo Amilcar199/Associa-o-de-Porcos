@@ -8,7 +8,6 @@ import Suino from '@/components/assets/Foto Suino.webp'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Award, Leaf, Users, Target, ShieldCheck, Sparkles, ArrowRight, Recycle, LineChart, Flag, Milestone, TrendingUp } from 'lucide-react'
-import MapaAngola from '@/components/assets/Mapa de Angola.png'
 import { useLanguage } from '@/components/providers/LanguageProvider'
 import { useSession } from 'next-auth/react'
 import InteractiveMapSection from '@/components/sections/PigMap/InteractiveMapSection'
@@ -232,21 +231,7 @@ export default function AboutClient() {
       {/* Localização - Fundo da Página */}
       <div className="bg-gray-50 py-12 lg:py-16">
         <div className="container-custom">
-          <div className="grid md:grid-cols-2 gap-8 lg:gap-12 items-center">
-            {/* Imagem à Esquerda */}
-            <div>
-              <div className="relative w-full h-96 lg:h-[34rem] rounded-2xl overflow-hidden shadow">
-                <Image
-                  src={MapaAngola}
-                  alt={isEn ? 'Map of Angola' : 'Mapa de Angola'}
-                  fill
-                  className="object-contain"
-                  sizes="(max-width:768px) 100vw, 50vw"
-                />
-              </div>
-            </div>
-
-            {/* Texto à Direita */}
+          <div className="max-w-3xl">
             <div>
               <span className="inline-block bg-primary-100 text-primary-800 px-3 py-1 rounded-full text-sm font-medium mb-3">{isEn ? 'Our Presence' : 'Nossa Presença'}</span>
               <h3 className="text-3xl font-heading font-bold mb-3">{isEn ? 'Our presence in Angola' : 'Nossa presença em Angola'}</h3>

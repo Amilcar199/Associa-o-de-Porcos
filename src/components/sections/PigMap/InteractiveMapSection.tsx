@@ -1,21 +1,12 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import dynamic from 'next/dynamic'
 import { motion } from 'framer-motion'
-import { MapPin, Users, PiggyBank, Heart, Beef, Sprout, PlusCircle } from 'lucide-react'
+import { Users, PiggyBank, Heart, Beef, Sprout, PlusCircle } from 'lucide-react'
 import FarmRegisterModal from './FarmRegisterModal'
+import AngolaSvgMap from './AngolaSvgMap'
+import { getProvinceMeta } from './angola-map-meta'
 import type { ProvinceStats } from '@/types'
-
-// O mapa usa Leaflet, que depende de `window`. Deve ser carregado só no cliente.
-const PigFarmMap = dynamic(() => import('./PigFarmMap'), {
-  ssr: false,
-  loading: () => (
-    <div className="h-full w-full flex items-center justify-center bg-gray-100 rounded-2xl">
-      <div className="animate-pulse text-gray-400 text-sm">Carregando mapa...</div>
-    </div>
-  ),
-})
 
 interface InteractiveMapSectionProps {
   isEn?: boolean
@@ -38,6 +29,7 @@ export default function InteractiveMapSection({ isEn = false }: InteractiveMapSe
   const [error, setError] = useState<string | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedProvince, setSelectedProvince] = useState<string | undefined>(undefined)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
 
   const loadStats = useCallback(async () => {
     setLoading(true)
@@ -66,37 +58,30 @@ export default function InteractiveMapSection({ isEn = false }: InteractiveMapSe
     setModalOpen(true)
   }
 
+  const selectedMeta = selectedId ? getProvinceMeta(selectedId) : undefined
+  const selectedStats = selectedMeta
+    ? data?.provinces.find((item) => item.province === selectedMeta.dataName)
+    : undefined
   const totals = data?.totals
 
   return (
     <div className="bg-white py-12 lg:py-16">
       <div className="container-custom">
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
-          <div>
-            <span className="inline-block bg-primary-100 text-primary-800 px-3 py-1 rounded-full text-sm font-medium mb-3">
-              {isEn ? 'Interactive Map' : 'Mapa Interativo'}
-            </span>
-            <h3 className="text-3xl font-heading font-bold">
-              {isEn ? 'Pig Farming Across Angola' : 'Suinocultura em Angola'}
-            </h3>
-            <p className="text-gray-600 mt-2 max-w-2xl">
-              {isEn
-                ? 'Explore aggregated pig-farming data by province. Click a marker to see local statistics, or register your own farm to appear on the map.'
-                : 'Explore dados agregados de suinocultura por província. Clique num marcador para ver as estatísticas locais, ou cadastre a sua fazenda para aparecer no mapa.'}
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => openModal(undefined)}
-            className="btn-primary inline-flex items-center justify-center shrink-0"
-          >
-            <PlusCircle size={18} className="mr-2" aria-hidden />
-            {isEn ? 'Register my farm' : 'Cadastrar minha fazenda'}
-          </button>
+        <div className="mx-auto mb-8 max-w-3xl text-center">
+          <span className="mb-3 inline-block rounded-full bg-primary-100 px-3 py-1 text-sm font-medium text-primary-800">
+            {isEn ? 'Interactive Map' : 'Mapa Interativo'}
+          </span>
+          <h3 className="font-heading text-3xl font-bold">
+            {isEn ? 'Provinces of Angola' : 'Províncias de Angola'}
+          </h3>
+          <p className="mx-auto mt-2 max-w-2xl text-gray-600">
+            {isEn
+              ? 'Explore the provinces in one click. Hover a province to see local pig-farming figures, or click it to register a farm.'
+              : 'Conheça as províncias e saiba mais sobre a suinocultura em Angola em apenas um clique!'}
+          </p>
         </div>
 
-        {/* Totais agregados */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+        <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-5">
           {[
             { label: isEn ? 'Producers' : 'Produtores', value: totals?.farmersCount ?? '—', icon: Users },
             { label: isEn ? 'Total Pigs' : 'Total de Porcos', value: totals?.totalPigs ?? '—', icon: PiggyBank },
@@ -104,12 +89,23 @@ export default function InteractiveMapSection({ isEn = false }: InteractiveMapSe
             { label: isEn ? 'For Slaughter' : 'P/ Abate', value: totals?.forSlaughter ?? '—', icon: Beef },
             { label: isEn ? 'For Breeding' : 'P/ Reprodução', value: totals?.forBreeding ?? '—', icon: Sprout },
           ].map((item) => (
-            <div key={item.label} className="bg-gray-50 rounded-xl border border-gray-100 p-4 text-center">
-              <item.icon size={18} className="mx-auto text-primary-600 mb-1" />
+            <div key={item.label} className="rounded-xl border border-gray-100 bg-gray-50 p-4 text-center">
+              <item.icon size={18} className="mx-auto mb-1 text-primary-600" />
               <div className="text-xl font-bold text-gray-900">{item.value}</div>
               <div className="text-xs text-gray-600">{item.label}</div>
             </div>
           ))}
+        </div>
+
+        <div className="mb-6 flex justify-center">
+          <button
+            type="button"
+            onClick={() => openModal(undefined)}
+            className="btn-primary inline-flex items-center justify-center"
+          >
+            <PlusCircle size={18} className="mr-2" aria-hidden />
+            {isEn ? 'Register my farm' : 'Cadastrar minha fazenda'}
+          </button>
         </div>
 
         <motion.div
@@ -117,41 +113,66 @@ export default function InteractiveMapSection({ isEn = false }: InteractiveMapSe
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           viewport={{ once: true }}
-          className="relative h-[420px] lg:h-[520px] rounded-2xl overflow-hidden shadow border border-gray-100"
+          className="rounded-2xl border border-gray-100 bg-white px-4 py-6 shadow-sm"
         >
           {loading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-white/70 z-[500]">
-              <div className="animate-pulse text-gray-500 text-sm">{isEn ? 'Loading map...' : 'Carregando mapa...'}</div>
+            <div className="flex h-[420px] items-center justify-center">
+              <div className="animate-pulse text-sm text-gray-500">{isEn ? 'Loading map...' : 'Carregando mapa...'}</div>
             </div>
           )}
           {error && !loading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-white z-[500]">
-              <div className="text-center text-sm text-red-600 px-6">
+            <div className="flex h-[320px] items-center justify-center">
+              <div className="px-6 text-center text-sm text-red-600">
                 <p>{error}</p>
-                <button onClick={loadStats} className="mt-2 underline text-primary-700">
+                <button onClick={loadStats} className="mt-2 text-primary-700 underline">
                   {isEn ? 'Try again' : 'Tentar novamente'}
                 </button>
               </div>
             </div>
           )}
-          {data && (
-            <PigFarmMap provinces={data.provinces} isEn={isEn} onRegisterClick={openModal} />
+          {!loading && !error && (
+            <AngolaSvgMap
+              provinces={data?.provinces}
+              isEn={isEn}
+              selectedId={selectedId}
+              onProvinceClick={(dataName, id) => {
+                setSelectedProvince(dataName)
+                setSelectedId(id)
+              }}
+            />
           )}
         </motion.div>
 
-        <div className="mt-4 flex items-center gap-6 text-xs text-gray-500">
-          <span className="inline-flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-primary-700/60 border border-primary-700" />
-            {isEn ? 'Province with registered producers' : 'Província com produtores cadastrados'}
-          </span>
-          <span className="inline-flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-gray-400/40 border border-gray-400" />
-            {isEn ? 'No registrations yet' : 'Sem cadastros ainda'}
-          </span>
-        </div>
+        {selectedMeta && (
+          <div className="mx-auto mt-4 max-w-xl rounded-xl border border-gray-100 bg-gray-50 p-4 text-sm text-gray-700">
+            <p className="mb-2 text-base font-semibold text-gray-900">{selectedMeta.label}</p>
+            {selectedStats && selectedStats.farmersCount > 0 ? (
+              <ul className="space-y-1">
+                <li><strong>{selectedStats.farmersCount}</strong> {isEn ? 'registered producer(s)' : 'produtor(es) cadastrado(s)'}</li>
+                <li><strong>{selectedStats.totalPigs}</strong> {isEn ? 'total pigs' : 'porcos no total'}</li>
+                <li>{isEn ? 'Females' : 'Fêmeas'}: <strong>{selectedStats.females}</strong></li>
+                <li>{isEn ? 'For slaughter' : 'P/ abate'}: <strong>{selectedStats.forSlaughter}</strong></li>
+                <li>{isEn ? 'For breeding' : 'P/ reprodução'}: <strong>{selectedStats.forBreeding}</strong></li>
+              </ul>
+            ) : (
+              <p className="text-gray-500">
+                {isEn ? 'No producers registered yet in this province.' : 'Nenhum produtor cadastrado nesta província ainda.'}
+              </p>
+            )}
+            <button
+              type="button"
+              onClick={() => openModal(selectedMeta.dataName)}
+              className="mt-3 font-medium text-primary-700 underline hover:text-primary-800"
+            >
+              {isEn ? 'Register a farm here' : 'Cadastrar fazenda nesta província'}
+            </button>
+          </div>
+        )}
 
-        <p className="mt-3 text-xs text-gray-400 inline-flex items-center gap-1">
-          <MapPin size={12} /> {isEn ? 'Marker positions are approximate provincial centroids.' : 'As posições dos marcadores são centróides aproximados das províncias.'}
+        <p className="mt-4 text-center text-xs text-gray-400">
+          {isEn
+            ? 'Hover a province to preview the figures. Click it to pin the details.'
+            : 'Passe o rato sobre uma província para ver os números. Clique para fixar os detalhes.'}
         </p>
       </div>
 
