@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { Users, PiggyBank, Heart, Beef, Sprout, PlusCircle } from 'lucide-react'
 import FarmRegisterModal from './FarmRegisterModal'
 import AngolaSvgMap from './AngolaSvgMap'
+import LuandaMunicipalityMap from './LuandaMunicipalityMap'
 import { getProvinceMeta } from './angola-map-meta'
 import type { ProvinceStats } from '@/types'
 
@@ -30,6 +31,7 @@ export default function InteractiveMapSection({ isEn = false }: InteractiveMapSe
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedProvince, setSelectedProvince] = useState<string | undefined>(undefined)
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [luandaOpen, setLuandaOpen] = useState(false)
 
   const loadStats = useCallback(async () => {
     setLoading(true)
@@ -130,20 +132,28 @@ export default function InteractiveMapSection({ isEn = false }: InteractiveMapSe
               </div>
             </div>
           )}
-          {!loading && !error && (
+          {!loading && !error && (luandaOpen ? (
+            <LuandaMunicipalityMap isEn={isEn} onBack={() => setLuandaOpen(false)} />
+          ) : (
             <AngolaSvgMap
               provinces={data?.provinces}
               isEn={isEn}
               selectedId={selectedId}
               onProvinceClick={(dataName, id) => {
+                if (id === 'luanda') {
+                  setLuandaOpen(true)
+                  setSelectedId(null)
+                  setSelectedProvince('Luanda')
+                  return
+                }
                 setSelectedProvince(dataName)
                 setSelectedId(id)
               }}
             />
-          )}
+          ))}
         </motion.div>
 
-        {selectedMeta && (
+        {!luandaOpen && selectedMeta && (
           <div className="mx-auto mt-4 max-w-xl rounded-xl border border-gray-100 bg-gray-50 p-4 text-sm text-gray-700">
             <p className="mb-2 text-base font-semibold text-gray-900">{selectedMeta.label}</p>
             {selectedStats && selectedStats.farmersCount > 0 ? (
@@ -170,9 +180,13 @@ export default function InteractiveMapSection({ isEn = false }: InteractiveMapSe
         )}
 
         <p className="mt-4 text-center text-xs text-gray-400">
-          {isEn
-            ? 'Hover a province to preview the figures. Click it to pin the details.'
-            : 'Passe o rato sobre uma província para ver os números. Clique para fixar os detalhes.'}
+          {luandaOpen
+            ? (isEn
+              ? 'Hover a municipality to see the producers registered there.'
+              : 'Passe o rato sobre um município para ver os produtores cadastrados ali.')
+            : (isEn
+              ? 'Hover a province to preview the figures. Click Luanda to open its municipalities.'
+              : 'Passe o rato sobre uma província para ver os números. Clique em Luanda para ver os municípios.')}
         </p>
       </div>
 
