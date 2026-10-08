@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import ImageUpload from '@/components/admin/ui/ImageUpload'
 import { ANGOLA_PROVINCE_NAMES } from '@/components/sections/PigMap/angola-provinces'
+import PigOffers from '@/components/producer/PigOffers'
 import { useLanguage } from '@/components/providers/LanguageProvider'
 
 type SectionId = 'inicio' | 'perfil' | 'fazenda' | 'animais' | 'anuncios' | 'pedidos' | 'contactos' | 'cotacoes' | 'conteudos' | 'notificacoes'
@@ -322,19 +323,7 @@ export default function ProducerPanel() {
       )}
 
       {section === 'animais' && <AnimalList items={animals} empty={t('Nenhum animal está ligado a esta conta. Os anúncios públicos são publicados pela associação.', 'No animals are linked to this account. Public listings are published by the association.')} />}
-      {section === 'anuncios' && (
-        <div className="space-y-3">
-          <p className="text-sm text-gray-600">{t('Disponibilidade e preço dos animais da sua conta. Criar um anúncio novo no mercado continua no catálogo público.', 'Availability and price of the animals on your account. A new market listing still goes through the public catalogue.')}</p>
-          {animals.map((item: any) => (
-            <article key={item._id} className="rounded-xl border border-gray-100 bg-white p-4">
-              <h3 className="font-medium text-gray-900">{item.name}</h3>
-              <p className="text-sm text-gray-600">{item.availability || 'available'} · {item.price ? money.format(item.price) : t('preço a combinar', 'price on request')} · {item.location || ''}</p>
-            </article>
-          ))}
-          {animals.length === 0 && <p className="text-sm text-gray-500">{t('Sem anúncios ligados a esta conta.', 'No listings linked to this account.')}</p>}
-          <Link href="/produtos" className="inline-flex text-sm font-medium text-primary-700">{t('Ver o catálogo público', 'See the public catalogue')}</Link>
-        </div>
-      )}
+      {section === 'anuncios' && <PigOffers />}
 
       {section === 'pedidos' && (
         <div className="space-y-4">

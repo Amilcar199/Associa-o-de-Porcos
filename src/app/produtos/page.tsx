@@ -58,19 +58,7 @@ async function getProducts(locale: string) {
       }
     }
 
-    if (enriched.length === 0) {
-      return [
-        {
-          name: 'Suíno Reprodutor Duroc',
-          breed: 'Duroc',
-          weight: 80,
-          age: 6,
-          priceFormatted: currencyFormatter.format(120000),
-          code: 'DEMO-001',
-          imageUrl: placeholderImages[0]
-        }
-      ]
-    }
+    if (enriched.length === 0) return []
     return enriched
   } catch (e) {
     console.error('Falha ao carregar produtos:', e)
@@ -95,7 +83,7 @@ export default async function ProdutosPage() {
       <div className="bg-gradient-to-r from-primary-50 to-white border-b border-gray-100">
         <div className="container-custom py-10">
           <h1 className="text-3xl font-heading font-bold text-primary-800">{isEn ? 'Products' : 'Produtos'}</h1>
-          <p className="text-gray-600 mt-2 max-w-2xl">{isEn ? 'The association catalogue: animals listed by members. Open a listing and contact us for current availability.' : 'O catálogo da associação: animais anunciados pelos associados. Abra a ficha e fale connosco para a disponibilidade atual.'}</p>
+          <p className="text-gray-600 mt-2 max-w-2xl">{isEn ? 'The association market is for pigs: live animals or carcass, with origin, price and a way to reach the seller.' : 'O mercado da associação é de suínos: animais vivos ou carcaça, com procedência, preço e forma de falar com quem anuncia.'}</p>
         </div>
       </div>
 

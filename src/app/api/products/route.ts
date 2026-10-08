@@ -5,6 +5,9 @@ import connectDB from '@/lib/mongodb'
 import Product from '@/models/Product'
 import User from '@/models/User'
 import { validateSession, errorResponse, successResponse, sanitizeInput, getPaginationParams, getSearchFilters, buildMongoQuery, buildMongoSort, paginateResults } from '@/lib/api-utils'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
+import { publicListingFilter } from '@/lib/pig-listings'
 
 // GET /api/products - Listar produtos
 export async function GET(req: NextRequest) {
@@ -14,9 +17,22 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url)
     const pagination = getPaginationParams(searchParams)
     const filters = getSearchFilters(searchParams)
+    const session = await getServerSession(authOptions)
+    const userId = (session as any)?.user?.id
+    const isAdmin = (session as any)?.user?.role === 'admin'
+    const mine = searchParams.get('mine') === '1'
+    if (mine && !userId) return errorResponse('Não autorizado', 401)
 
-    // Construir query (apenas produtos ativos por padrão; incluir registros antigos sem o campo isActive)
-    const baseQuery: any = { $or: [ { isActive: true }, { isActive: { $exists: false } } ] }
+    const baseQuery: any = mine
+      ? { seller: userId, isActive: true }
+      : isAdmin
+        ? { $or: [{ isActive: true }, { isActive: { $exists: false } }] }
+        : publicListingFilter()
+
+    if (searchParams.get('breed')) baseQuery.breed = searchParams.get('breed')
+    if (searchParams.get('saleForm')) baseQuery.saleForm = searchParams.get('saleForm')
+    if (searchParams.get('location')) baseQuery.location = new RegExp(searchParams.get('location') || '', 'i')
+
     const query = { ...baseQuery, ...buildMongoQuery(filters) }
     const sort = buildMongoSort(
       pagination.sort ?? 'createdAt', // valor padrão
@@ -73,6 +89,7 @@ export async function POST(req: NextRequest) {
       breed: sanitizedData.breed,
       age: sanitizedData.age,
       weight: sanitizedData.weight,
+      quantity: sanitizedData.quantity || 1,
       price: sanitizedData.price,
       pricePerKg: sanitizedData.pricePerKg,
       saleForm: sanitizedData.saleForm,
@@ -85,8 +102,9 @@ export async function POST(req: NextRequest) {
       vaccinated: !!sanitizedData.vaccinated,
       location: sanitizedData.location,
       availability: sanitizedData.isAvailable === false ? 'reserved' : 'available',
+      listingStatus: 'approved',
       seller: seller._id,
-      tags: sanitizedData.tags || []
+      tags: sanitizedData.tags || ['suíno']
     }
 
     if (!productData.location) {

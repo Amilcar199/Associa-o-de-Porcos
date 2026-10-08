@@ -19,6 +19,8 @@ interface Product {
   weight: number;
   imageUrl?: string;
   availability?: 'available' | 'sold' | 'reserved';
+  listingStatus?: string;
+  rejectionNote?: string;
   isAvailable?: boolean;
   createdAt: string;
   updatedAt: string;
@@ -98,6 +100,20 @@ export default function ProductsManager() {
       console.error('Erro ao buscar produtos:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const reviewListing = async (id: string, listingStatus: 'approved' | 'rejected') => {
+    const response = await fetch(`/api/admin/products/${id}/listing`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ listingStatus }),
+    })
+    if (response.ok) {
+      toast.success(listingStatus === 'approved' ? 'Anúncio aprovado' : 'Anúncio recusado')
+      fetchProducts()
+    } else {
+      toast.error('Não foi possível atualizar o anúncio')
     }
   };
 
@@ -486,6 +502,23 @@ export default function ProductsManager() {
           </button>
         </div>
       </div>
+
+      {products.some((item) => item.listingStatus === 'pending') && (
+        <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4">
+          <h3 className="mb-3 font-semibold text-amber-950">Anúncios de suínos à espera de aprovação</h3>
+          <div className="space-y-2">
+            {products.filter((item) => item.listingStatus === 'pending').map((item) => (
+              <div key={item._id} className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-white px-3 py-2">
+                <span className="text-sm text-gray-800">{item.name} · {item.breed}</span>
+                <span className="flex gap-2">
+                  <button type="button" className="text-sm font-medium text-green-700" onClick={() => reviewListing(item._id, 'approved')}>Aprovar</button>
+                  <button type="button" className="text-sm font-medium text-red-700" onClick={() => reviewListing(item._id, 'rejected')}>Recusar</button>
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Data Table */}
       <DataTable

@@ -4,6 +4,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import connectDB from '@/lib/mongodb'
 import Product from '@/models/Product'
 import { validateSession, errorResponse, successResponse, isValidObjectId, sanitizeInput } from '@/lib/api-utils'
+import { publicListingFilter } from '@/lib/pig-listings'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 
 interface RouteParams {
   params: {
@@ -22,11 +25,16 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
       return errorResponse('ID do produto inválido')
     }
 
-    // Buscar o produto, mesmo se o campo isActive não existir (registros antigos)
-    const product = await Product.findOne({ _id: id, $or: [ { isActive: true }, { isActive: { $exists: false } } ] })
-
+    const product = await Product.findOne({ _id: id, ...publicListingFilter() })
     if (!product) {
-      return errorResponse('Produto não encontrado', 404)
+      const session = await getServerSession(authOptions)
+      const userId = (session as any)?.user?.id
+      const isAdmin = (session as any)?.user?.role === 'admin'
+      const own = userId
+        ? await Product.findOne({ _id: id, ...(isAdmin ? {} : { seller: userId }) })
+        : null
+      if (!own) return errorResponse('Produto não encontrado', 404)
+      return NextResponse.json(successResponse(own))
     }
 
     return NextResponse.json(successResponse(product))

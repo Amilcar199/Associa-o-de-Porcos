@@ -24,6 +24,9 @@ interface ProductModalProps {
     price?: number
     pricePerKg?: number
     saleForm?: 'carcaça' | 'vivo'
+    quantity?: number
+    contactPhone?: string
+    whatsapp?: string
     images?: string[]
     imageUrl?: string
     healthStatus?: 'excellent' | 'good' | 'fair'
@@ -80,6 +83,7 @@ export default function ProductModal({
 }: ProductModalProps) {
   const { locale } = useLanguage()
   const [currency, setCurrency] = useState('AOA')
+  const [interest, setInterest] = useState({ name: '', phone: '', message: '', notice: '' })
   const [showConverted, setShowConverted] = useState(false)
   const [converted, setConverted] = useState<string | null>(null)
   const isEn = locale.startsWith('en')
@@ -366,6 +370,13 @@ export default function ProductModal({
                   <p className="font-semibold text-gray-900">{product.saleForm ? (product.saleForm === 'vivo' ? (isEn ? 'Live' : 'Vivo') : (isEn ? 'Carcass' : 'Carcaça')) : '—'}</p>
                 </div>
               </div>
+              <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-4">
+                <Tag size={20} className="flex-shrink-0 text-primary-600" />
+                <div>
+                  <p className="text-xs text-gray-500">{isEn ? 'Quantity' : 'Quantidade'}</p>
+                  <p className="font-semibold text-gray-900">{product.quantity || 1}</p>
+                </div>
+              </div>
               <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-4 sm:col-span-2">
                 <ShieldCheck size={20} className={`flex-shrink-0 ${product.vaccinated ? 'text-green-600' : 'text-yellow-600'}`} />
                 <div>
@@ -382,6 +393,38 @@ export default function ProductModal({
                 <h3 className="mb-2 text-lg font-semibold text-gray-900">{isEn ? 'Description' : 'Descrição'}</h3>
                 <p className="leading-relaxed text-gray-700">{product.description}</p>
               </div>
+            )}
+
+            {product._id && (
+              <form
+                className="mb-8 space-y-3 rounded-xl border border-gray-100 bg-gray-50 p-4"
+                onSubmit={async (event) => {
+                  event.preventDefault()
+                  setInterest((current) => ({ ...current, notice: '' }))
+                  const response = await fetch(`/api/products/${product._id}/interest`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(interest),
+                  })
+                  const json = await response.json()
+                  setInterest((current) => ({
+                    ...current,
+                    notice: response.ok
+                      ? (isEn ? 'Interest sent.' : 'Interesse enviado.')
+                      : (json.error || (isEn ? 'Could not send interest.' : 'Não foi possível enviar o interesse.')),
+                    name: response.ok ? '' : current.name,
+                    phone: response.ok ? '' : current.phone,
+                    message: response.ok ? '' : current.message,
+                  }))
+                }}
+              >
+                <h3 className="font-semibold text-gray-900">{isEn ? 'I am interested' : 'Tenho interesse'}</h3>
+                <input className="input-field" placeholder={isEn ? 'Name' : 'Nome'} value={interest.name} onChange={(event) => setInterest({ ...interest, name: event.target.value })} />
+                <input className="input-field" placeholder={isEn ? 'Phone' : 'Telefone'} value={interest.phone} onChange={(event) => setInterest({ ...interest, phone: event.target.value })} />
+                <textarea className="input-field" rows={2} placeholder={isEn ? 'Message' : 'Mensagem'} value={interest.message} onChange={(event) => setInterest({ ...interest, message: event.target.value })} />
+                <button className="btn-primary" type="submit">{isEn ? 'Send interest' : 'Enviar interesse'}</button>
+                {interest.notice && <p className="text-sm text-gray-600">{interest.notice}</p>}
+              </form>
             )}
 
             {product.features && product.features.length > 0 && (
@@ -426,7 +469,12 @@ export default function ProductModal({
             <Mail size={16} />
             {isEn ? 'Send Message' : 'Enviar Mensagem'}
           </a>
-          <a href="tel:+244923221950" className="btn-primary flex items-center justify-center gap-2">
+          {product.whatsapp && (
+            <a href={`https://wa.me/${String(product.whatsapp).replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="btn-primary flex items-center justify-center gap-2">
+              WhatsApp
+            </a>
+          )}
+          <a href={product.contactPhone ? `tel:${product.contactPhone}` : 'tel:+244923221950'} className="btn-primary flex items-center justify-center gap-2">
             <Phone size={16} />
             {isEn ? 'Call Now' : 'Ligar Agora'}
           </a>

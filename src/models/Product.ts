@@ -1,5 +1,6 @@
 import mongoose, { Schema, model, models, Model } from 'mongoose'
 import { Product as IProduct } from '@/types'
+import { publicListingFilter } from '@/lib/pig-listings'
 
 const ProductSchema = new Schema<IProduct>({
   name: {
@@ -132,6 +133,32 @@ const ProductSchema = new Schema<IProduct>({
     enum: ['available', 'sold', 'reserved'],
     default: 'available',
   },
+  quantity: {
+    type: Number,
+    min: [1, 'A quantidade mínima é 1'],
+    max: [5000, 'Quantidade inválida'],
+    default: 1,
+  },
+  listingStatus: {
+    type: String,
+    enum: ['draft', 'pending', 'approved', 'rejected', 'sold', 'expired'],
+  },
+  contactPhone: {
+    type: String,
+    trim: true,
+    maxlength: [20, 'Telefone inválido'],
+  },
+  whatsapp: {
+    type: String,
+    trim: true,
+    maxlength: [20, 'WhatsApp inválido'],
+  },
+  expiresAt: Date,
+  rejectionNote: {
+    type: String,
+    trim: true,
+    maxlength: [300, 'Nota demasiado longa'],
+  },
   seller: {
     type: Schema.Types.ObjectId,
     ref: 'User',
@@ -175,6 +202,7 @@ ProductSchema.index({ pricePerKg: 1, availability: 1, isActive: 1 })
 ProductSchema.index({ saleForm: 1, availability: 1, isActive: 1 })
 ProductSchema.index({ age: 1, weight: 1 })
 ProductSchema.index({ seller: 1, isActive: 1 })
+ProductSchema.index({ listingStatus: 1, availability: 1, isActive: 1 })
 ProductSchema.index({ createdAt: -1 })
 ProductSchema.index({ tags: 1 })
 ProductSchema.index({ location: 1, availability: 1 })
@@ -254,11 +282,11 @@ ProductSchema.statics.findWithFilters = function (filters: any) {
 
 // Método estático para produtos em destaque
 ProductSchema.statics.findFeatured = function (limit = 6) {
-  return this.find({ 
-    isActive: true, 
-    availability: 'available' 
+  return this.find({
+    ...publicListingFilter(),
+    availability: 'available',
   })
-  .populate('seller', 'name email phone company')
+  .select('name breed age weight price pricePerKg saleForm images location quantity')
   .sort({ createdAt: -1 })
   .limit(limit)
 }

@@ -52,6 +52,12 @@ export interface Product extends Document {
   location: string
   code: string
   availability: 'available' | 'sold' | 'reserved'
+  quantity?: number
+  listingStatus?: 'draft' | 'pending' | 'approved' | 'rejected' | 'sold' | 'expired'
+  contactPhone?: string
+  whatsapp?: string
+  expiresAt?: Date
+  rejectionNote?: string
   seller: User | string
   tags: string[]
   translations?: { en?: ProductTranslation }

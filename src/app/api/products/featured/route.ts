@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import connectDB from '@/lib/mongodb'
 import Product from '@/models/Product'
 import { successResponse, errorResponse } from '@/lib/api-utils'
+import { publicListingFilter } from '@/lib/pig-listings'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,13 +14,10 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url)
     const limit = parseInt(searchParams.get('limit') || '6')
 
-    const products = await Product.find({ 
-      $or: [ { isActive: true }, { isActive: { $exists: false } } ],
-      availability: 'available' 
-    })
-    .populate('seller', 'name email phone company avatar')
+    const products = await Product.find(publicListingFilter())
+    .select('-contactPhone -whatsapp')
     .sort({ createdAt: -1 })
-    .limit(Math.min(limit, 20)) // Máximo 20 produtos
+    .limit(Math.min(limit, 20))
     .lean()
 
     return NextResponse.json(successResponse(products))

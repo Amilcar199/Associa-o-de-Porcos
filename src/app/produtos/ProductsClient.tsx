@@ -55,6 +55,9 @@ interface Product {
   location?: string
   features?: string[]
   saleForm?: 'carcaça' | 'vivo'
+  quantity?: number
+  contactPhone?: string
+  whatsapp?: string
 }
 
 interface ProductsClientProps {
@@ -77,8 +80,10 @@ export default function ProductsClient({ products }: ProductsClientProps) {
   const [maxPrice, setMaxPrice] = useState('' as string)
   const [minWeight, setMinWeight] = useState('' as string)
   const [maxAge, setMaxAge] = useState('' as string)
-  const [priceType, setPriceType] = useState<'head' | 'kg'>('head')
-  const activeFilterCount = [query, health, vaccinated, minPrice, maxPrice, minWeight, maxAge, priceType !== 'head' ? priceType : ''].filter(Boolean).length
+  const [priceType, setPriceType] = useState('head' as 'head' | 'kg')
+  const [saleForm, setSaleForm] = useState('')
+  const [location, setLocation] = useState('')
+  const activeFilterCount = [query, health, vaccinated, minPrice, maxPrice, minWeight, maxAge, saleForm, location, priceType !== 'head' ? priceType : ''].filter(Boolean).length
 
   const openProductModal = (product: Product) => {
     setSelectedProduct(product)
@@ -171,6 +176,8 @@ export default function ProductsClient({ products }: ProductsClientProps) {
     }
     if (minWeight && typeof p.weight === 'number' && p.weight < Number(minWeight)) return false
     if (maxAge && typeof p.age === 'number' && p.age > Number(maxAge)) return false
+    if (saleForm && p.saleForm !== saleForm) return false
+    if (location && !String(p.location || '').toLowerCase().includes(location.toLowerCase())) return false
     return true
   })
 
@@ -215,13 +222,19 @@ export default function ProductsClient({ products }: ProductsClientProps) {
           <label className="text-xs font-medium text-gray-600">{isEn ? 'Maximum price' : 'Preço máximo'}<input id="product-max-price" type="number" min="0" value={maxPrice} onChange={e=>setMaxPrice(e.target.value)} placeholder={priceType === 'kg' ? '/kg' : (isEn ? '/head' : '/cabeça')} className="input-field px-3 py-2" /></label>
           <label className="text-xs font-medium text-gray-600">{isEn ? 'Minimum weight' : 'Peso mínimo'}<input id="product-min-weight" type="number" min="0" value={minWeight} onChange={e=>setMinWeight(e.target.value)} placeholder="kg" className="input-field px-3 py-2" /></label>
           <label className="text-xs font-medium text-gray-600">{isEn ? 'Maximum age' : 'Idade máxima'}<input id="product-max-age" type="number" min="0" value={maxAge} onChange={e=>setMaxAge(e.target.value)} placeholder={isEn ? 'months' : 'meses'} className="input-field px-3 py-2" /></label>
+          <label className="text-xs font-medium text-gray-600">{isEn ? 'Location' : 'Localização'}<input id="product-location" value={location} onChange={e=>setLocation(e.target.value)} placeholder={isEn ? 'Province' : 'Província'} className="input-field px-3 py-2" /></label>
+          <label className="text-xs font-medium text-gray-600">{isEn ? 'Pig' : 'Suíno'}<select id="product-sale-form" value={saleForm} onChange={e=>setSaleForm(e.target.value)} className="input-field px-3 py-2">
+            <option value="">{isEn ? 'Live or carcass' : 'Vivo ou carcaça'}</option>
+            <option value="vivo">{isEn ? 'Live' : 'Vivo'}</option>
+            <option value="carcaça">{isEn ? 'Carcass' : 'Carcaça'}</option>
+          </select></label>
         </div>
         <div className="mt-3 flex flex-wrap gap-2">
           {(() => {
-            const hasActiveFilters = !!(query || health || vaccinated || minPrice || maxPrice || minWeight || maxAge || priceType !== 'head')
+            const hasActiveFilters = !!(query || health || vaccinated || minPrice || maxPrice || minWeight || maxAge || saleForm || location || priceType !== 'head')
             return (
               <button
-                onClick={()=>{ setQuery(''); setHealth(''); setVaccinated(''); setMinPrice(''); setMaxPrice(''); setMinWeight(''); setMaxAge(''); setPriceType('head') }}
+                onClick={()=>{ setQuery(''); setHealth(''); setVaccinated(''); setMinPrice(''); setMaxPrice(''); setMinWeight(''); setMaxAge(''); setSaleForm(''); setLocation(''); setPriceType('head') }}
                 disabled={!hasActiveFilters}
                 type="button"
                 className={`rounded-lg border px-3 py-1.5 text-sm ${hasActiveFilters ? 'text-gray-700 hover:bg-gray-50' : 'cursor-not-allowed bg-gray-50 text-gray-400'}`}
@@ -235,6 +248,11 @@ export default function ProductsClient({ products }: ProductsClientProps) {
       </div>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filtered.length === 0 && (
+          <p className="col-span-full rounded-2xl border border-dashed border-gray-200 bg-white p-8 text-center text-sm text-gray-500">
+            {isEn ? 'No pigs are published for these criteria.' : 'Não há suínos publicados com estes critérios.'}
+          </p>
+        )}
         {filtered.map((product: Product, idx: number) => (
           <div
             key={product._id || idx} 
@@ -294,8 +312,8 @@ export default function ProductsClient({ products }: ProductsClientProps) {
                   <span>{product.weight ? `${product.weight} kg` : '—'}</span>
                 </div>
                 <div>
-                  <span className="text-gray-500">{isEn ? 'Category' : 'Categoria'}: </span>
-                  <span>{getCategory(product.weight)}</span>
+                  <span className="text-gray-500">{isEn ? 'Lot' : 'Lote'}: </span>
+                  <span>{product.quantity ? `${product.quantity}` : getCategory(product.weight)}</span>
                 </div>
                 <div>
                   <span className="text-gray-500">{isEn ? 'Sale' : 'Condição'}: </span>
