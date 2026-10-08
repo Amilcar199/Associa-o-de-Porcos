@@ -44,7 +44,7 @@ export default function AboutClient() {
           >
             <span className="inline-block bg-white/15 backdrop-blur px-3 py-1 rounded-full text-sm mb-4">{isEn ? 'About Us' : 'Quem Somos'}</span>
             <h1 className="text-4xl lg:text-5xl font-heading font-bold leading-tight">{isEn ? 'Excellence and Innovation in Pig Farming' : 'Excelência e Inovação na Suinocultura'}</h1>
-            <p className="mt-4 text-primary-100 text-lg">{isEn ? 'We promote sustainability, quality and sector development by connecting producers, knowledge and the market.' : 'Promovemos a criação sustentável, a qualidade e o desenvolvimento do setor, conectando produtores, conhecimento e mercado.'}</p>
+            <p className="mt-4 text-lg text-primary-100">{isEn ? 'The association that connects producers, knowledge and the market, and explains how to take part.' : 'A associação que liga produtores, conhecimento e mercado, e mostra como participar.'}</p>
           </motion.div>
         </div>
       </div>

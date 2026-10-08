@@ -13,6 +13,7 @@ export default function robots(): MetadataRoute.Robots {
           '/api/',
           '/membros/',
           '/perfil/',
+          '/painel/',
           '/_next/',
           '/favicon.ico',
         ],

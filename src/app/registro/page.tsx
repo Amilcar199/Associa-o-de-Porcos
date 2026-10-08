@@ -108,11 +108,7 @@ export default function RegisterPage() {
       } else {
         setSuccess(dict.auth.successRegister);
         await signIn('credentials', { email: formData.email, password: formData.password, redirect: false });
-        if (formData.accountType === 'membro') {
-          router.push('/membros');
-        } else {
-          router.push('/perfil');
-        }
+        router.push('/painel');
       }
     } catch (error) {
       setError(dict.auth.errorRegister + '.');

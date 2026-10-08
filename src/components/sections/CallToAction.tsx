@@ -22,27 +22,27 @@ const CallToAction = () => {
   const { data: session } = useSession()
 
   const benefits = isEn ? [
-    { icon: Users, title: 'Active Community', description: 'Connect with over 500 experienced farmers' },
+    { icon: Users, title: 'Active Community', description: 'Connect with more than 100 associated producers' },
     { icon: Star, title: 'Guaranteed Quality', description: 'Certified products with top standards' },
     { icon: Shield, title: 'Technical Support', description: 'Specialized assistance always available' },
     { icon: Heart, title: 'Animal Welfare', description: 'Proven sustainable and ethical practices' }
   ] : [
-    { icon: Users, title: 'Comunidade Ativa', description: 'Conecte-se com mais de 500 criadores experientes' },
+    { icon: Users, title: 'Comunidade Ativa', description: 'Conecte-se com mais de 100 produtores associados' },
     { icon: Star, title: 'Qualidade Garantida', description: 'Produtos certificados com os melhores padrões' },
     { icon: Shield, title: 'Suporte Técnico', description: 'Assistência especializada sempre disponível' },
     { icon: Heart, title: 'Bem-estar Animal', description: 'Práticas sustentáveis e éticas comprovadas' }
   ]
 
   const stats = isEn ? [
-    { value: '500+', label: 'Active Members' },
-    { value: '3+', label: 'Years of Experience' },
-    { value: '98%', label: 'Customer Satisfaction' },
-    { value: '15+', label: 'Certifications' }
+    { value: '100+', label: 'Associated producers' },
+    { value: '20+', label: 'Trainings' },
+    { value: '95%', label: 'Member satisfaction' },
+    { value: '5+', label: 'Certifications' }
   ] : [
-    { value: '500+', label: 'Membros Ativos' },
-    { value: '3+', label: 'Anos de Experiência' },
-    { value: '98%', label: 'Satisfação dos Clientes' },
-    { value: '15+', label: 'Certificações' }
+    { value: '100+', label: 'Produtores associados' },
+    { value: '20+', label: 'Capacitações' },
+    { value: '95%', label: 'Satisfação dos associados' },
+    { value: '5+', label: 'Certificações' }
   ]
 
   return (

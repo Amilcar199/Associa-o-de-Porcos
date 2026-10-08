@@ -130,8 +130,8 @@ const FeaturedProducts = () => {
           </h2>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
             {locale.startsWith('en')
-              ? 'Check out our premium selection, raised with the highest standards of quality and animal welfare by our members.'
-              : 'Confira nossa seleção de suínos premium, criados com os mais altos padrões de qualidade e bem-estar animal pelos nossos associados.'}
+              ? 'Animals listed by members, raised with care for quality and welfare. This is the catalogue you use to see what is available.'
+              : 'Animais anunciados pelos associados, com cuidado de qualidade e bem-estar. É o catálogo para ver o que está disponível.'}
           </p>
         </motion.div>
 

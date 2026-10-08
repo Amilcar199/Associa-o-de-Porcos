@@ -59,7 +59,7 @@ export default function BolsaPreview() {
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold text-gray-900">{isEn ? 'Market Preview' : 'Prévia da Bolsa'}</h2>
-            <p className="text-gray-600">{isEn ? 'Current average price with quick variations' : 'Preço médio atual com variações rápidas'}</p>
+            <p className="text-gray-600">{isEn ? 'The price reference of the association, before you buy or sell.' : 'A referência de preços da associação, antes de comprar ou vender.'}</p>
           </div>
           <div className="flex items-center gap-2">
             <label className="text-xs text-gray-500">

@@ -128,7 +128,9 @@ export default function ServicosPage() {
             </span>
             <h1 className="mt-3 text-3xl md:text-4xl font-heading font-bold text-primary-800 leading-tight">{isEn ? 'Services & Specialties' : 'Serviços e Especialidades'}</h1>
             <p className="text-gray-600 mt-3 md:text-lg">
-              {isEn ? 'Technical support, training and partnerships for a more productive, sustainable and competitive pig industry.' : 'Suporte técnico, capacitação e parcerias para uma suinocultura mais produtiva, sustentável e competitiva em toda a cadeia.'}
+              {isEn
+                ? 'This is how the association delivers value: technical support, training and partnerships for a more productive and sustainable pig industry.'
+                : 'É assim que a associação entrega valor: suporte técnico, capacitação e parcerias para uma suinocultura mais produtiva e sustentável.'}
             </p>
           </div>
 

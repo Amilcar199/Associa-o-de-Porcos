@@ -95,7 +95,7 @@ export default async function ProdutosPage() {
       <div className="bg-gradient-to-r from-primary-50 to-white border-b border-gray-100">
         <div className="container-custom py-10">
           <h1 className="text-3xl font-heading font-bold text-primary-800">{isEn ? 'Products' : 'Produtos'}</h1>
-          <p className="text-gray-600 mt-2 max-w-2xl">{isEn ? 'Animals with origin and quality. Illustrative images; contact us for current availability.' : 'Animais com procedência e qualidade. Imagens ilustrativas; consulte-nos para disponibilidade atual.'}</p>
+          <p className="text-gray-600 mt-2 max-w-2xl">{isEn ? 'The association catalogue: animals listed by members. Open a listing and contact us for current availability.' : 'O catálogo da associação: animais anunciados pelos associados. Abra a ficha e fale connosco para a disponibilidade atual.'}</p>
         </div>
       </div>
 

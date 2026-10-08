@@ -12,6 +12,7 @@ import {
   X, 
   User, 
   Users,
+  LayoutGrid,
   LogOut, 
   Settings,
   Phone,
@@ -335,6 +336,13 @@ const Header = () => {
                       >
                         
                         <Link
+                          href="/painel"
+                          className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
+                        >
+                          <LayoutGrid size={16} />
+                          <span>{locale.startsWith('en') ? 'My area' : 'A minha área'}</span>
+                        </Link>
+                        <Link
                           href="/perfil"
                           className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
                         >
@@ -476,6 +484,13 @@ const Header = () => {
                         </div>
                       </div>
                       
+                      <Link
+                        href="/painel"
+                        className="flex items-center space-x-2 py-2 text-gray-700 hover:text-primary-600 transition-colors"
+                      >
+                        <LayoutGrid size={20} />
+                        <span>{locale.startsWith('en') ? 'My area' : 'A minha área'}</span>
+                      </Link>
                       <Link
                         href="/perfil"
                         className="flex items-center space-x-2 py-2 text-gray-700 hover:text-primary-600 transition-colors"

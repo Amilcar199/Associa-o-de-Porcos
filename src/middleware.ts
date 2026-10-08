@@ -117,7 +117,7 @@ export default withAuth(
           return true
         }
 
-        if (pathname.startsWith('/admin') || pathname.startsWith('/perfil') || pathname.startsWith('/membros') || pathname.startsWith('/api/')) {
+        if (pathname.startsWith('/admin') || pathname.startsWith('/perfil') || pathname.startsWith('/membros') || pathname.startsWith('/painel') || pathname.startsWith('/api/')) {
           return !!token && !(token as any).inactive
         }
 

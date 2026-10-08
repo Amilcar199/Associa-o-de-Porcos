@@ -68,8 +68,8 @@ export default async function LegalCompliancePage() {
       <div className="prose prose-green max-w-none">
         <p>
           {isEn
-            ? 'Here you can find the main legal and compliance documents of the Association.'
-            : 'Aqui você encontra os principais documentos jurídicos e de conformidade da Associação.'}
+            ? 'Institutional information: statutes, founding documents and the policies of the association.'
+            : 'A informação institucional: estatutos, documentos de constituição e as políticas da associação.'}
         </p>
 
         {/* Conteúdo geral sem documentos específicos */}

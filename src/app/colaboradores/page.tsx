@@ -37,7 +37,7 @@ export default async function ColaboradoresPage() {
       <div className="flex items-end justify-between mb-6">
         <div>
           <h1 className="text-3xl font-heading font-bold text-primary-800">{isEn ? 'Administrative Council' : 'Conselho Administrativo'}</h1>
-          <p className="text-gray-600 mt-1">{isEn ? 'Leaders who guide our association.' : 'Lideranças que orientam a nossa associação.'}</p>
+          <p className="text-gray-600 mt-1">{isEn ? 'The people who lead the association and represent its members.' : 'Quem dirige a associação e representa os associados.'}</p>
         </div>
       </div>
       <CollaboratorsClient initial={collaborators} />

@@ -63,7 +63,7 @@ const PartnersSection = () => {
             {isEn ? 'Our Network of ' : 'Nossa Rede de '}<span className="text-gradient">{isEn ? 'Experts' : 'Especialistas'}</span>
           </h2>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            {isEn ? 'Professionals who support our mission with knowledge and experience.' : 'Profissionais que apoiam nossa missão com conhecimento e experiência.'}
+            {isEn ? 'The people and partners who carry the association in public.' : 'As pessoas e os parceiros que representam a associação.'}
           </p>
         </div>
 

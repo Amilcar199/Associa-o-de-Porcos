@@ -9,6 +9,50 @@ import { successResponse, errorResponse, sanitizeInput } from '@/lib/api-utils';
 import ActivityLog from '@/models/ActivityLog';
 import { syncNewsletterPreference } from '@/lib/notifications'
 
+function textOrEmpty(value: unknown, max: number) {
+  if (typeof value !== 'string') return undefined
+  return value.trim().slice(0, max)
+}
+
+function pickProfileUpdate(input: Record<string, any>) {
+  const update: Record<string, unknown> = {}
+  const name = textOrEmpty(input.name, 100)
+  if (name) update.name = name
+  const phone = textOrEmpty(input.phone, 20)
+  if (phone) update.phone = phone
+  const company = textOrEmpty(input.company, 100)
+  if (company !== undefined) update.company = company
+  const bio = textOrEmpty(input.bio, 500)
+  if (bio !== undefined) update.bio = bio
+  const location = textOrEmpty(input.location, 100)
+  if (location !== undefined) update.location = location
+  const specialty = textOrEmpty(input.specialty, 120)
+  if (specialty !== undefined) update.specialty = specialty
+  const website = textOrEmpty(input.website, 200)
+  if (website) update.website = website
+  const avatar = textOrEmpty(input.avatar, 300)
+  if (avatar) update.avatar = avatar
+
+  if (input.socialMedia && typeof input.socialMedia === 'object') {
+    const social: Record<string, string> = {}
+    for (const key of ['linkedin', 'twitter', 'facebook'] as const) {
+      const url = textOrEmpty(input.socialMedia[key], 200)
+      if (url) social[key] = url
+    }
+    if (Object.keys(social).length) update.socialMedia = social
+  }
+
+  if (input.preferences && typeof input.preferences === 'object') {
+    update.preferences = {
+      emailNotifications: Boolean(input.preferences.emailNotifications),
+      smsNotifications: Boolean(input.preferences.smsNotifications),
+      newsletter: Boolean(input.preferences.newsletter),
+    }
+  }
+
+  return update
+}
+
 // GET /api/user/profile - Buscar perfil do usuário logado
 export async function GET(req: NextRequest) {
   try {
@@ -54,10 +98,15 @@ export async function PUT(req: NextRequest) {
     delete sanitizedData.role;
     delete sanitizedData.password;
 
+    const profileUpdate = pickProfileUpdate(sanitizedData);
+    if (Object.keys(profileUpdate).length === 0) {
+      return errorResponse('Nenhum campo válido para actualizar');
+    }
+
     // Atualizar usuário
     const updatedUser = await User.findByIdAndUpdate(
       session.user.id,
-      { $set: sanitizedData },
+      { $set: profileUpdate },
       { new: true, runValidators: true }
     ).select('-password');
 
@@ -65,8 +114,8 @@ export async function PUT(req: NextRequest) {
       return errorResponse('Usuário não encontrado', 404);
     }
 
-    if (typeof sanitizedData?.preferences?.newsletter === 'boolean') {
-      try { await syncNewsletterPreference(updatedUser.email, sanitizedData.preferences.newsletter) } catch {}
+    if (typeof (profileUpdate.preferences as { newsletter?: boolean } | undefined)?.newsletter === 'boolean') {
+      try { await syncNewsletterPreference(updatedUser.email, (profileUpdate.preferences as { newsletter: boolean }).newsletter) } catch {}
     }
 
     try {
@@ -75,7 +124,7 @@ export async function PUT(req: NextRequest) {
         type: 'profile_update',
         ip: req.headers.get('x-forwarded-for') || undefined,
         userAgent: req.headers.get('user-agent') || undefined,
-        metadata: Object.keys(sanitizedData)
+        metadata: Object.keys(profileUpdate)
       })
     } catch {}
 

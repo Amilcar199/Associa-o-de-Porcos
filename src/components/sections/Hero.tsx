@@ -253,7 +253,7 @@ const Hero = () => {
                     {isEn ? 'Strong Community' : 'Comunidade Forte'}
                   </h3>
                   <p className="text-gray-200 text-sm">
-                    {isEn ? 'Over 500 associated farmers sharing knowledge and experiences.' : 'Mais de 500 criadores associados compartilhando conhecimento e experiências.'}
+                    {isEn ? 'More than 100 associated producers sharing knowledge and experience.' : 'Mais de 100 produtores associados a partilhar conhecimento e experiência.'}
                   </p>
                 </div>
                 

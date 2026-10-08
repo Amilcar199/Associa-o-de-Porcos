@@ -72,7 +72,7 @@ export default async function NoticiasPage() {
       <div className="bg-gradient-to-r from-primary-50 to-white border-b border-gray-100">
         <div className="container-custom py-10">
           <h1 className="text-3xl font-heading font-bold text-primary-800">{isEn ? 'News' : 'Notícias'}</h1>
-          <p className="text-gray-600 mt-2 max-w-2xl">{isEn ? 'Follow news from the sector and the association. Illustrative images.' : 'Acompanhe novidades do setor e da associação. Imagens ilustrativas.'}</p>
+          <p className="text-gray-600 mt-2 max-w-2xl">{isEn ? 'Public knowledge from the association: news, events and guidance for the sector.' : 'O conhecimento público da associação: notícias, eventos e orientações do setor.'}</p>
         </div>
       </div>
 

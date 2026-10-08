@@ -67,7 +67,7 @@ export default function InteractiveMapSection({ isEn = false }: InteractiveMapSe
   const totals = data?.totals
 
   return (
-    <div className="bg-white py-12 lg:py-16">
+    <div id="mapa" className="scroll-mt-28 bg-white py-12 lg:py-16">
       <div className="container-custom">
         <div className="mx-auto mb-8 max-w-3xl text-center">
           <span className="mb-3 inline-block rounded-full bg-primary-100 px-3 py-1 text-sm font-medium text-primary-800">
@@ -78,8 +78,8 @@ export default function InteractiveMapSection({ isEn = false }: InteractiveMapSe
           </h3>
           <p className="mx-auto mt-2 max-w-2xl text-gray-600">
             {isEn
-              ? 'Explore the provinces in one click. Hover a province to see local pig-farming figures, or click it to register a farm.'
-              : 'Conheça as províncias e saiba mais sobre a suinocultura em Angola em apenas um clique!'}
+              ? 'Hover a province to see the figures. In Luanda, a click opens the municipalities and their producers. Elsewhere, it opens the summary and the farm form.'
+              : 'Passe o rato sobre uma província para ver os números. Em Luanda, o clique abre os municípios e os produtores. Nas restantes, abre o resumo e o cadastro da fazenda.'}
           </p>
         </div>
 

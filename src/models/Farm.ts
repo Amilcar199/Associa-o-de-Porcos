@@ -74,6 +74,25 @@ const FarmSchema = new Schema<IFarm>({
     trim: true,
     maxlength: [500, 'Observações não podem ter mais que 500 caracteres'],
   },
+  capacity: {
+    type: Number,
+    min: [0, 'Capacidade não pode ser negativa'],
+    max: [1000000, 'Capacidade inválida'],
+  },
+  description: {
+    type: String,
+    trim: true,
+    maxlength: [1000, 'Descrição não pode ter mais que 1000 caracteres'],
+  },
+  photos: {
+    type: [String],
+    default: [],
+  },
+  production: {
+    sows: { type: Number, min: 0, default: 0 },
+    boars: { type: Number, min: 0, default: 0 },
+    fattening: { type: Number, min: 0, default: 0 },
+  },
   status: {
     type: String,
     enum: ['pending', 'approved', 'rejected'],

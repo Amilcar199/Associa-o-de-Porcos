@@ -49,6 +49,11 @@ const userSchema = new mongoose.Schema({
     trim: true,
     maxlength: [100, 'Localização não pode ter mais de 100 caracteres']
   },
+  specialty: {
+    type: String,
+    trim: true,
+    maxlength: [120, 'Especialidade não pode ter mais de 120 caracteres']
+  },
   website: {
     type: String,
     trim: true,

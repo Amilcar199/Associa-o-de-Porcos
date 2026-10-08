@@ -38,8 +38,7 @@ export default function LoginPage() {
       const session = await getSession();
       const role = session?.user?.role as string | undefined;
       if (role === 'admin') router.push('/admin');
-      else if (role === 'member') router.push('/membros');
-      else router.push('/perfil');
+      else router.push('/painel');
     } catch (error) {
       setError(dict.auth.errorLogin);
     } finally {

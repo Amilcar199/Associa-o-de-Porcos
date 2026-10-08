@@ -1,6 +1,7 @@
 import { Metadata } from 'next'
 import { BRAND_NAME } from '@/lib/brand'
 import Hero from '@/components/sections/Hero'
+import HomeGuide from '@/components/sections/HomeGuide'
 import FeaturedProducts from '@/components/sections/FeaturedProducts'
 import AboutPreview from '@/components/sections/AboutPreview'
 import BolsaPreview from '@/components/sections/BolsaPreview'
@@ -26,7 +27,8 @@ export default function HomePage() {
     <div className="animate-fade-in">
       {/* Hero Section */}
       <Hero />
-      
+      <HomeGuide />
+
       {/* About Preview */}
       <AboutPreview />
       

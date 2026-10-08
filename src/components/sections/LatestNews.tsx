@@ -145,8 +145,8 @@ const LatestNews = () => {
           </h2>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
             {isEn
-              ? 'Follow the latest trends, innovations, and key information from the Angolan and global pig market.'
-              : 'Acompanhe as últimas tendências, inovações e informações importantes do mercado suinícola angolano e mundial.'}
+              ? 'News and public knowledge: what is happening in the sector and inside the association.'
+              : 'Notícias e conhecimento público: o que se passa no setor e dentro da associação.'}
           </p>
         </motion.div>
 

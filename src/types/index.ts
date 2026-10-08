@@ -17,6 +17,9 @@ export interface User extends Document {
     country: string
   }
   company?: string
+  bio?: string
+  location?: string
+  specialty?: string
   isActive: boolean
   createdAt: Date
   updatedAt: Date
@@ -205,6 +208,12 @@ export interface FarmHerd {
   forBreeding: number // disponíveis para fertilização/reprodução
 }
 
+export interface FarmProduction {
+  sows: number // matrizes
+  boars: number // reprodutores
+  fattening: number // animais de engorda
+}
+
 export interface Farm extends Document {
   _id: string
   producerName: string // nome do produtor
@@ -216,6 +225,10 @@ export interface Farm extends Document {
   email?: string
   herd: FarmHerd
   notes?: string
+  capacity?: number
+  description?: string
+  photos?: string[]
+  production?: FarmProduction
   status: 'pending' | 'approved' | 'rejected'
   owner?: string
   isActive: boolean
