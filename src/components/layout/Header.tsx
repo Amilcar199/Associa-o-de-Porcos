@@ -31,6 +31,7 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const [isAboutMenuOpen, setIsAboutMenuOpen] = useState(false)
+  const [isProductsMenuOpen, setIsProductsMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const { config: siteConfig } = useSiteConfig()
   const { data: session, status } = useSession()
@@ -51,7 +52,7 @@ const Header = () => {
 
   // Prefetch programático das rotas mais acessadas
   useEffect(() => {
-    const routesToPrefetch = ['/', '/sobre', '/colaboradores', '/servicos', '/produtos', '/bolsa', '/noticias', '/contato', '/login', '/registro']
+    const routesToPrefetch = ['/', '/sobre', '/colaboradores', '/servicos', '/produtos', '/produtores', '/bolsa', '/noticias', '/contato', '/login', '/registro']
     routesToPrefetch.forEach((route) => {
       try { router.prefetch(route) } catch {}
     })
@@ -80,6 +81,8 @@ const Header = () => {
   useEffect(() => {
     setIsMenuOpen(false)
     setIsUserMenuOpen(false)
+    setIsProductsMenuOpen(false)
+    setIsAboutMenuOpen(false)
   }, [pathname])
 
   const navItems = [
@@ -274,6 +277,50 @@ const Header = () => {
                     </div>
                   )
                 }
+                if (item.name === dict.nav.products) {
+                  const productsActive = pathname.includes('/produtos') || pathname.includes('/produtores')
+                  return (
+                    <div
+                      key={item.name}
+                      className="relative"
+                      onMouseEnter={() => setIsProductsMenuOpen(true)}
+                      onMouseLeave={() => setIsProductsMenuOpen(false)}
+                    >
+                      <button
+                        className={`font-medium lg:text-lg transition-colors relative flex items-center gap-1 ${
+                          productsActive ? 'text-white' : 'text-white/80 hover:text-white'
+                        }`}
+                        onClick={() => setIsProductsMenuOpen((v: boolean) => !v)}
+                        aria-haspopup="menu"
+                        aria-expanded={isProductsMenuOpen}
+                      >
+                        {item.name}
+                        <span className={`transition-transform ${isProductsMenuOpen ? 'rotate-180' : ''}`}>▾</span>
+                        {productsActive && (
+                          <motion.div
+                            layoutId="activeLink"
+                            className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary-300"
+                            initial={false}
+                            transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                          />
+                        )}
+                      </button>
+                      <AnimatePresence>
+                        {isProductsMenuOpen && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 10 }}
+                            className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2"
+                          >
+                            <Link href="/produtos" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">{dict.nav.products}</Link>
+                            <Link href="/produtores" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">{dict.nav.producers}</Link>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  )
+                }
                 return (
                   <Link
                     key={item.name}
@@ -453,6 +500,12 @@ const Header = () => {
                           <Link href="/sobre" className="block py-1 text-sm text-gray-600 hover:text-primary-600">{dict.nav.about}</Link>
                           <Link href="/colaboradores" className="block py-1 text-sm text-gray-600 hover:text-primary-600">{dict.nav.team}</Link>
                           <Link href="/juridico-legal" className="block py-1 text-sm text-gray-600 hover:text-primary-600">{dict.footer.legal}</Link>
+                        </div>
+                      )}
+                      {item.name === dict.nav.products && (
+                        <div className="ml-4 border-l border-gray-200 pl-4 space-y-1">
+                          <Link href="/produtos" className="block py-1 text-sm text-gray-600 hover:text-primary-600">{dict.nav.products}</Link>
+                          <Link href="/produtores" className="block py-1 text-sm text-gray-600 hover:text-primary-600">{dict.nav.producers}</Link>
                         </div>
                       )}
                     </div>

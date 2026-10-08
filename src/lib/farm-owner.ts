@@ -24,16 +24,26 @@ function text(value: unknown, max: number): string {
   return value.trim().slice(0, max)
 }
 
+export function parseFarmPhotos(value: unknown): { photos: string[]; error?: string } {
+  if (value == null || value === '') return { photos: [] }
+  if (!Array.isArray(value)) return { photos: [], error: 'As fotos têm de ser uma lista' }
+  if (value.length > 6) return { photos: [], error: 'Pode enviar no máximo 6 fotos' }
+  const photos: string[] = []
+  for (const item of value) {
+    if (typeof item !== 'string') return { photos: [], error: 'Cada foto tem de ser um endereço de imagem' }
+    const url = item.trim()
+    if (!url) continue
+    const allowed = url.startsWith('/api/images/') || url.startsWith('http://') || url.startsWith('https://')
+    if (url.length > 300 || url.includes('..') || !allowed) {
+      return { photos: [], error: 'Cada foto tem de ser uma imagem enviada pelo site (JPEG, PNG, GIF ou WebP, até 5 MB)' }
+    }
+    photos.push(url)
+  }
+  return { photos }
+}
+
 export function cleanFarmPhotos(value: unknown): string[] {
-  if (!Array.isArray(value)) return []
-  return value
-    .filter((item): item is string => typeof item === 'string')
-    .map((item) => item.trim())
-    .filter((item) => {
-      if (!item || item.length > 300 || item.includes('..')) return false
-      return item.startsWith('/api/images/') || item.startsWith('http://') || item.startsWith('https://')
-    })
-    .slice(0, 6)
+  return parseFarmPhotos(value).photos
 }
 
 export function parseOwnerFarm(input: Record<string, any>): { data?: Record<string, unknown>; error?: string } {
@@ -70,6 +80,9 @@ export function parseOwnerFarm(input: Record<string, any>): { data?: Record<stri
   const email = text(input.email, 120)
   if (email && !/^\S+@\S+\.\S+$/.test(email)) return { error: 'Email inválido' }
 
+  const parsedPhotos = parseFarmPhotos(input.photos)
+  if (parsedPhotos.error) return { error: parsedPhotos.error }
+
   return {
     data: {
       producerName,
@@ -82,7 +95,7 @@ export function parseOwnerFarm(input: Record<string, any>): { data?: Record<stri
       notes: text(input.notes, 500) || undefined,
       capacity: capacityValue,
       description: text(input.description, 1000) || undefined,
-      photos: cleanFarmPhotos(input.photos),
+      photos: parsedPhotos.photos,
       production: { sows, boars, fattening },
     },
   }

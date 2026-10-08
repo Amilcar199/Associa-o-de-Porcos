@@ -42,12 +42,12 @@ const HomeGuide = () => {
   const paths = isEn
     ? [
         { icon: Wrench, title: 'Services', text: 'What the association does for the farm, from routine to biosecurity.', href: '/servicos', label: 'See services' },
-        { icon: Map, title: 'Pig-farming map', text: 'Where producers are, and the figures for each province.', href: '/sobre#mapa', label: 'Open the map' },
+        { icon: Map, title: 'Pig-farming map', text: 'Where producers are, and the figures for each province.', href: '/produtores#mapa', label: 'Open the map' },
         { icon: BookOpen, title: 'Knowledge', text: 'Sector news, events and the training the association offers.', href: '/noticias', label: 'Read the news' },
       ]
     : [
         { icon: Wrench, title: 'Serviços', text: 'O que a associação faz pela granja, da rotina à biossegurança.', href: '/servicos', label: 'Ver serviços' },
-        { icon: Map, title: 'Mapa da suinocultura', text: 'Onde estão os produtores e os números de cada província.', href: '/sobre#mapa', label: 'Abrir o mapa' },
+        { icon: Map, title: 'Mapa da suinocultura', text: 'Onde estão os produtores e os números de cada província.', href: '/produtores#mapa', label: 'Abrir o mapa' },
         { icon: BookOpen, title: 'Conhecimento', text: 'Notícias do setor, eventos e a formação que a associação oferece.', href: '/noticias', label: 'Ler notícias' },
       ]
 

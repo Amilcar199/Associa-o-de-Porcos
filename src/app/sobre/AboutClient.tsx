@@ -10,7 +10,6 @@ import { motion } from 'framer-motion'
 import { Award, Leaf, Users, Target, ShieldCheck, Sparkles, ArrowRight, Recycle, LineChart, Flag, Milestone, TrendingUp } from 'lucide-react'
 import { useLanguage } from '@/components/providers/LanguageProvider'
 import { useSession } from 'next-auth/react'
-import InteractiveMapSection from '@/components/sections/PigMap/InteractiveMapSection'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -246,8 +245,11 @@ export default function AboutClient() {
         </div>
       </div>
 
-      {/* Mapa Interativo de Suinocultura */}
-      <InteractiveMapSection isEn={isEn} />
+      <div className="container-custom pb-4">
+        <Link href="/produtores" className="inline-flex font-medium text-primary-700">
+          {isEn ? 'See producers and the national map' : 'Ver os produtores e o mapa nacional'}
+        </Link>
+      </div>
 
       {/* CTA Final */}
       <div className="container-custom py-12 lg:py-16">

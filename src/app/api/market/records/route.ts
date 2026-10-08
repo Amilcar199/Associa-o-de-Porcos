@@ -34,10 +34,15 @@ export async function GET(req: NextRequest) {
       { $match: matchStage },
       { $addFields: {
         pricePerKg: {
-          $cond: [
-            { $and: [ { $gt: ['$price', 0] }, { $gt: ['$weight', 0] } ] },
-            { $divide: ['$price', '$weight'] },
-            null
+          $ifNull: [
+            '$pricePerKg',
+            {
+              $cond: [
+                { $and: [ { $gt: ['$price', 0] }, { $gt: ['$weight', 0] } ] },
+                { $divide: ['$price', '$weight'] },
+                null
+              ]
+            }
           ]
         },
         value: { $cond: [ { $eq: [unit, 'kg'] }, '$pricePerKg', '$price' ] }
@@ -58,7 +63,8 @@ export async function GET(req: NextRequest) {
         breed: '$breed',
         unit: { $literal: unit },
         value: '$value',
-        saleForm: '$saleForm'
+        saleForm: '$saleForm',
+        source: { $literal: 'Anúncio publicado' }
       }
     })
 
@@ -86,6 +92,7 @@ export async function GET(req: NextRequest) {
         unit,
         value: d.value ?? null,
         saleForm: d.saleForm || saleFormParam || null,
+        source: 'Anúncio publicado',
         outOfBand: cleanOutliers ? false : outOfBand
       }
     })

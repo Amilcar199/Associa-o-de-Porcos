@@ -4,6 +4,7 @@ export default {
 		about: 'Quem Somos',
 		services: 'Serviços',
 		products: 'Produtos',
+		producers: 'Produtores',
 		news: 'Notícias',
 		contact: 'Contactos',
 			team: 'Conselho Administrativo',

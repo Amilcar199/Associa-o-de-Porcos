@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import connectDB from '@/lib/mongodb'
 import Farm from '@/models/Farm'
 import { validateSession, errorResponse, successResponse, isValidObjectId, sanitizeInput } from '@/lib/api-utils'
+import { parseFarmPhotos } from '@/lib/farm-owner'
 
 interface RouteParams {
   params: { id: string }
@@ -51,6 +52,11 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     if (data.province) farm.province = data.province
     if (data.municipality !== undefined) farm.municipality = data.municipality
     if (data.notes !== undefined) farm.notes = data.notes
+    if (data.photos !== undefined) {
+      const parsedPhotos = parseFarmPhotos(data.photos)
+      if (parsedPhotos.error) return errorResponse(parsedPhotos.error)
+      farm.photos = parsedPhotos.photos
+    }
 
     await farm.save()
 

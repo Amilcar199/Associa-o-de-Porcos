@@ -315,7 +315,7 @@ export default function ProducerPanel() {
               {t('Dados produtivos', 'Production notes')}
               <textarea className="input-field" rows={3} value={farmForm.notes} onChange={(event) => setFarmForm({ ...farmForm, notes: event.target.value })} />
             </label>
-            <ImageUpload label={t('Foto da fazenda', 'Farm photo')} onImageUploaded={(url) => setFarmForm((current) => ({ ...current, photos: [...current.photos, url].slice(0, 6) }))} />
+            <ImageUpload category="farm" label={t('Foto da fazenda', 'Farm photo')} onImageUploaded={(url) => setFarmForm((current) => ({ ...current, photos: [...current.photos, url].slice(0, 6) }))} />
             {farmForm.photos.length > 0 && <p className="text-sm text-gray-500">{farmForm.photos.length} {t('foto(s)', 'photo(s)')}</p>}
             <button className="btn-primary" disabled={saving}>{t('Guardar fazenda', 'Save farm')}</button>
           </form>

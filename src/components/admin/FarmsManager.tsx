@@ -1,10 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { CheckCircle, XCircle, Trash } from 'lucide-react'
+import Link from 'next/link'
+import { CheckCircle, ImageIcon, XCircle, Trash } from 'lucide-react'
 import toast from 'react-hot-toast'
 import DataTable, { Column } from './ui/DataTable'
 import ConfirmDialog from './ui/ConfirmDialog'
+import ImageUpload from './ui/ImageUpload'
 
 interface FarmRow {
   _id: string
@@ -16,6 +18,7 @@ interface FarmRow {
   status: 'pending' | 'approved' | 'rejected'
   phone?: string
   email?: string
+  photos?: string[]
   createdAt: string
 }
 
@@ -38,6 +41,9 @@ const FarmsManager = () => {
   const [pagination, setPagination] = useState({ page: 1, limit: 10, total: 0, pages: 0 })
   const [deleteTarget, setDeleteTarget] = useState<FarmRow | null>(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
+  const [photoTarget, setPhotoTarget] = useState<FarmRow | null>(null)
+  const [photoDraft, setPhotoDraft] = useState<string[]>([])
+  const [photoSaving, setPhotoSaving] = useState(false)
 
   const fetchFarms = async (page = 1, status = statusFilter) => {
     try {
@@ -107,10 +113,43 @@ const FarmsManager = () => {
     }
   }
 
+  const openPhotos = (farm: FarmRow) => {
+    setPhotoTarget(farm)
+    setPhotoDraft(farm.photos || [])
+  }
+
+  const savePhotos = async () => {
+    if (!photoTarget) return
+    setPhotoSaving(true)
+    try {
+      const res = await fetch(`/api/admin/farms/${photoTarget._id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ photos: photoDraft }),
+      })
+      const json = await res.json()
+      if (res.ok && json.success) {
+        toast.success('Fotos atualizadas')
+        setPhotoTarget(null)
+        fetchFarms(pagination.page, statusFilter)
+      } else {
+        toast.error(json.error || 'Não foi possível guardar as fotos')
+      }
+    } catch {
+      toast.error('Erro de rede ao guardar as fotos')
+    } finally {
+      setPhotoSaving(false)
+    }
+  }
+
   const columns: Column[] = [
-    { key: 'producerName', title: 'Produtor', render: (v, row) => (
+    { key: 'producerName', title: 'Produtor', render: (v, row: FarmRow) => (
       <div>
-        <p className="font-medium text-gray-900">{v}</p>
+        {row.status === 'approved' ? (
+          <Link href={`/produtores/${row._id}`} className="font-medium text-primary-700 hover:underline">{v}</Link>
+        ) : (
+          <p className="font-medium text-gray-900">{v}</p>
+        )}
         {row.farmName && <p className="text-xs text-gray-500">{row.farmName}</p>}
       </div>
     ) },
@@ -148,6 +187,9 @@ const FarmsManager = () => {
             <XCircle size={18} />
           </button>
         )}
+        <button title="Fotos" onClick={() => openPhotos(row)} className="p-1.5 rounded-lg text-primary-700 hover:bg-primary-50">
+          <ImageIcon size={18} />
+        </button>
         <button title="Remover" onClick={() => setDeleteTarget(row)} className="p-1.5 rounded-lg text-gray-500 hover:bg-gray-100">
           <Trash size={18} />
         </button>
@@ -177,6 +219,35 @@ const FarmsManager = () => {
         onPageChange={(page) => fetchFarms(page, statusFilter)}
         emptyMessage="Nenhum cadastro de fazenda encontrado"
       />
+
+      {photoTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6">
+            <h3 className="font-heading text-lg font-semibold">Fotos de {photoTarget.producerName}</h3>
+            <p className="mt-1 text-sm text-gray-500">JPEG, PNG, GIF ou WebP, até 5 MB. No máximo 6. As fotos aparecem no perfil público depois da aprovação.</p>
+            <div className="mt-4">
+              <ImageUpload
+                category="farm"
+                label="Adicionar foto"
+                onImageUploaded={(url) => setPhotoDraft((current) => current.includes(url) ? current : [...current, url].slice(0, 6))}
+              />
+            </div>
+            <ul className="mt-3 space-y-2">
+              {photoDraft.map((url) => (
+                <li key={url} className="flex items-center justify-between gap-3 text-sm">
+                  <img src={url} alt="" className="h-12 w-12 rounded object-cover" />
+                  <button type="button" className="text-red-600" onClick={() => setPhotoDraft((current) => current.filter((item) => item !== url))}>Remover</button>
+                </li>
+              ))}
+              {photoDraft.length === 0 && <li className="text-sm text-gray-500">Sem fotos.</li>}
+            </ul>
+            <div className="mt-4 flex justify-end gap-2">
+              <button type="button" className="rounded-lg px-3 py-2 text-sm text-gray-600" onClick={() => setPhotoTarget(null)}>Cancelar</button>
+              <button type="button" className="btn-primary" disabled={photoSaving} onClick={savePhotos}>{photoSaving ? 'A guardar...' : 'Guardar fotos'}</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <ConfirmDialog
         isOpen={!!deleteTarget}

@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
     const regions = await (Product as any).distinct('location', { $or: [ { isActive: true }, { isActive: { $exists: false } } ] })
     const breeds = await (Product as any).distinct('breed', { $or: [ { isActive: true }, { isActive: { $exists: false } } ] })
 
-    const methodologyPT = 'Os indicadores usam média simples ou ponderada (quando habilitado) do preço por kg (AOA/kg) para "carcaça" e AOA/cabeça para "vivo". Outliers podem ser limpos por banda (±X%) em torno da cotação oficial por região/forma, quando disponível.'
+    const methodologyPT = 'A média, o mínimo e o máximo saem dos anúncios públicos de suínos disponíveis, na forma de venda escolhida. Cada anúncio conta uma vez. Carcaça usa AOA/kg e vivo usa AOA/cabeça. A referência oficial é uma cotação aprovada pela associação e não substitui a média dos anúncios.'
     const methodologyEN = 'Indicators use simple or weighted averages (when enabled): AOA/kg for "carcass" and AOA/head for "live". Outliers may be cleaned using a band (±X%) around the official quote by region/form, when available.'
 
     return NextResponse.json(successResponse({

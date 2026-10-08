@@ -10,14 +10,16 @@ interface ImageUploadProps {
   label?: string;
   accept?: string;
   maxSize?: number; // em bytes
+  category?: string;
 }
 
 export default function ImageUpload({
   onImageUploaded,
   className = '',
   label = 'Upload de Imagem',
-  accept = 'image/*',
-  maxSize = 5 * 1024 * 1024 // 5MB
+  accept = 'image/jpeg,image/png,image/gif,image/webp',
+  maxSize = 5 * 1024 * 1024, // 5MB
+  category,
 }: ImageUploadProps) {
   const { locale } = useLanguage()
   const isEn = String(locale).startsWith('en')
@@ -31,8 +33,9 @@ export default function ImageUpload({
     if (!file) return;
 
     // Validar tipo de arquivo
-    if (!file.type.startsWith('image/')) {
-      setError(isEn ? 'Please select image files only.' : 'Por favor, selecione apenas arquivos de imagem.');
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
+    if (!allowedTypes.includes(file.type)) {
+      setError(isEn ? 'Use a JPEG, PNG, GIF or WebP image.' : 'Use uma imagem JPEG, PNG, GIF ou WebP.');
       return;
     }
 
@@ -56,6 +59,7 @@ export default function ImageUpload({
       // Upload da imagem
       const formData = new FormData();
       formData.append('file', file);
+      if (category) formData.append('category', category);
 
       const response = await fetch('/api/images/upload', {
         method: 'POST',

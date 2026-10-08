@@ -26,6 +26,11 @@ export async function GET() {
         females: 0,
         forSlaughter: 0,
         forBreeding: 0,
+        capacity: 0,
+        sows: 0,
+        boars: 0,
+        fattening: 0,
+        municipalities: 0,
       }
     ))
 
@@ -36,8 +41,14 @@ export async function GET() {
         females: acc.females + p.females,
         forSlaughter: acc.forSlaughter + p.forSlaughter,
         forBreeding: acc.forBreeding + p.forBreeding,
+        capacity: acc.capacity + (p.capacity || 0),
+        sows: acc.sows + (p.sows || 0),
+        boars: acc.boars + (p.boars || 0),
+        fattening: acc.fattening + (p.fattening || 0),
+        municipalities: acc.municipalities + (p.municipalities || 0),
+        provincesWithFarms: acc.provincesWithFarms + (p.farmersCount > 0 ? 1 : 0),
       }),
-      { farmersCount: 0, totalPigs: 0, females: 0, forSlaughter: 0, forBreeding: 0 }
+      { farmersCount: 0, totalPigs: 0, females: 0, forSlaughter: 0, forBreeding: 0, capacity: 0, sows: 0, boars: 0, fattening: 0, municipalities: 0, provincesWithFarms: 0 }
     )
 
     return NextResponse.json(successResponse({ provinces: full, totals }))

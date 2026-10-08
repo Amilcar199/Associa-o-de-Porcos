@@ -262,6 +262,11 @@ export interface ProvinceStats {
   females: number
   forSlaughter: number
   forBreeding: number
+  capacity?: number
+  sows?: number
+  boars?: number
+  fattening?: number
+  municipalities?: number
 }
 
 export interface PaginatedResponse<T> extends ApiResponse<T[]> {

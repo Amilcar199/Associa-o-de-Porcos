@@ -149,6 +149,11 @@ FarmSchema.statics.getProvinceStats = async function (): Promise<ProvinceStats[]
         females: { $sum: '$herd.females' },
         forSlaughter: { $sum: '$herd.forSlaughter' },
         forBreeding: { $sum: '$herd.forBreeding' },
+        capacity: { $sum: { $ifNull: ['$capacity', 0] } },
+        sows: { $sum: { $ifNull: ['$production.sows', 0] } },
+        boars: { $sum: { $ifNull: ['$production.boars', 0] } },
+        fattening: { $sum: { $ifNull: ['$production.fattening', 0] } },
+        municipalitySet: { $addToSet: '$municipality' },
       }
     },
     {
@@ -160,6 +165,19 @@ FarmSchema.statics.getProvinceStats = async function (): Promise<ProvinceStats[]
         females: 1,
         forSlaughter: 1,
         forBreeding: 1,
+        capacity: 1,
+        sows: 1,
+        boars: 1,
+        fattening: 1,
+        municipalities: {
+          $size: {
+            $filter: {
+              input: '$municipalitySet',
+              as: 'name',
+              cond: { $gt: [{ $strLenCP: { $ifNull: ['$$name', ''] } }, 0] },
+            },
+          },
+        },
       }
     },
     { $sort: { province: 1 } }

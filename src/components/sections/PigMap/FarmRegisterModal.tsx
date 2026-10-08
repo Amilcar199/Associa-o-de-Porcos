@@ -3,6 +3,7 @@
 import { useCallback, useState } from 'react'
 import { X, Send, CheckCircle2 } from 'lucide-react'
 import { ANGOLA_PROVINCE_NAMES } from './angola-provinces'
+import ImageUpload from '@/components/admin/ui/ImageUpload'
 
 interface FarmRegisterModalProps {
   isOpen: boolean
@@ -16,6 +17,7 @@ export default function FarmRegisterModal({ isOpen, onClose, isEn = false, defau
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
+  const [photos, setPhotos] = useState<string[]>([])
 
   const onOverlayClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) onClose()
@@ -39,6 +41,7 @@ export default function FarmRegisterModal({ isOpen, onClose, isEn = false, defau
       phone: String(fd.get('phone') || ''),
       email: String(fd.get('email') || ''),
       notes: String(fd.get('notes') || ''),
+      photos,
       herd: {
         total: Number(fd.get('total') || 0),
         females: Number(fd.get('females') || 0),
@@ -57,6 +60,7 @@ export default function FarmRegisterModal({ isOpen, onClose, isEn = false, defau
       if (res.ok && json.success) {
         setSuccess(true)
         form.reset()
+        setPhotos([])
         onRegistered?.()
       } else {
         setError(json.error || (isEn ? 'Failed to submit, please try again.' : 'Falha ao enviar, tente novamente.'))
@@ -191,6 +195,25 @@ export default function FarmRegisterModal({ isOpen, onClose, isEn = false, defau
                     <input id="forBreeding" name="forBreeding" type="number" min={0} className="input-field px-3 py-2" placeholder="0" />
                   </div>
                 </div>
+              </div>
+
+              <div>
+                <ImageUpload
+                  category="farm"
+                  label={isEn ? 'Farm photo' : 'Foto da fazenda'}
+                  onImageUploaded={(url) => setPhotos((current) => current.includes(url) ? current : [...current, url].slice(0, 6))}
+                />
+                <p className="mt-1 text-xs text-gray-500">{photos.length}/6 · JPEG, PNG, GIF ou WebP, até 5 MB</p>
+                {photos.length > 0 && (
+                  <ul className="mt-2 space-y-1 text-sm text-gray-600">
+                    {photos.map((url) => (
+                      <li key={url} className="flex items-center justify-between gap-2">
+                        <span className="truncate">{isEn ? 'Photo added' : 'Foto adicionada'}</span>
+                        <button type="button" className="text-red-600" onClick={() => setPhotos((current) => current.filter((item) => item !== url))}>{isEn ? 'Remove' : 'Remover'}</button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
 
               <div>

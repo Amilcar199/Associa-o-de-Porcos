@@ -15,6 +15,7 @@ import {
 } from '@/lib/api-utils'
 import { rateLimitOrNull } from '@/lib/rate-limit'
 import { ANGOLA_PROVINCE_NAMES } from '@/components/sections/PigMap/angola-provinces'
+import { parseFarmPhotos } from '@/lib/farm-owner'
 
 // GET /api/farms - Lista pública de fazendas aprovadas (opcionalmente filtradas por província)
 // Usado, por exemplo, para listar produtores de uma província no popup do mapa.
@@ -42,6 +43,9 @@ export async function GET(req: NextRequest) {
       province: farm.province,
       municipality: farm.municipality,
       herd: farm.herd,
+      capacity: farm.capacity,
+      production: farm.production,
+      description: farm.description,
       createdAt: farm.createdAt,
     }))
 
@@ -93,6 +97,9 @@ export async function POST(req: NextRequest) {
       return errorResponse('Email inválido')
     }
 
+    const parsedPhotos = parseFarmPhotos(data.photos)
+    if (parsedPhotos.error) return errorResponse(parsedPhotos.error)
+
     let coordinates: { lat: number; lng: number } | undefined
     if (data.coordinates && typeof data.coordinates === 'object') {
       const lat = Number(data.coordinates.lat)
@@ -116,6 +123,7 @@ export async function POST(req: NextRequest) {
       email: data.email || undefined,
       herd: { total, females, forSlaughter, forBreeding },
       notes: data.notes || undefined,
+      photos: parsedPhotos.photos,
       status: 'pending',
       owner: owner || undefined,
     })

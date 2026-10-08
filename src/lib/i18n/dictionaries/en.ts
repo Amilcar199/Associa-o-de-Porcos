@@ -4,6 +4,7 @@ export default {
 		about: 'About Us',
 		services: 'Services',
 		products: 'Products',
+		producers: 'Producers',
 		news: 'News',
 		contact: 'Contact',
 		team: 'Team',

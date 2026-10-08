@@ -12,15 +12,16 @@ export async function POST(request: NextRequest) {
 
   try {
     // Verificar autenticação (qualquer usuário logado pode enviar avatar)
-    const session: any = await getServerSession(authOptions as any);
-    if (!session || !session.user) {
-      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
-    }
-
     const formData = await request.formData();
     const file = formData.get('file') as File;
     const category = (formData.get('category') as string) || ''
     const replaceId = (formData.get('replaceId') as string) || ''
+
+    const session: any = await getServerSession(authOptions as any);
+    const farmPhoto = category === 'farm'
+    if ((!session || !session.user) && !farmPhoto) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    }
 
     if (!file) {
       return NextResponse.json(
@@ -47,7 +48,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (replaceId && session.user?.role !== 'admin') {
+    if (replaceId && session?.user?.role !== 'admin') {
       return NextResponse.json({ error: 'Apenas administradores podem substituir ficheiros existentes' }, { status: 403 });
     }
 
