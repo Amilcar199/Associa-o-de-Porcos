@@ -8,6 +8,7 @@ import Modal from './ui/Modal';
 import ConfirmDialog from './ui/ConfirmDialog';
 import ImageUpload from './ui/ImageUpload';
 import MediaUploader from './ui/MediaUploader';
+import { KNOWLEDGE_CATEGORIES } from '@/lib/knowledge';
 
 interface News {
   _id: string;
@@ -55,12 +56,7 @@ export default function NewsManager() {
     videos: []
   });
  
-  const allowedCategories = [
-    { value: 'news', label: 'Notícias' },
-    { value: 'events', label: 'Eventos' },
-    { value: 'tips', label: 'Dicas' },
-    { value: 'market', label: 'Mercado' }
-  ]
+  const allowedCategories = KNOWLEDGE_CATEGORIES.map((item) => ({ value: item.id, label: item.pt }))
 
   useEffect(() => {
     fetchNews();

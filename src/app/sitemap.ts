@@ -73,6 +73,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Páginas dinâmicas base
   const dynamicPages: MetadataRoute.Sitemap = [
     {
+      url: `${baseUrl}/conhecimento`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.8,
+    },
+    {
       url: `${baseUrl}/noticias`,
       lastModified: new Date(),
       changeFrequency: 'weekly' as const,

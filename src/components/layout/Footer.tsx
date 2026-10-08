@@ -33,6 +33,7 @@ const Footer = () => {
     { name: dict.nav.home, href: '/' },
     { name: dict.nav.about, href: '/sobre' },
     { name: dict.nav.products, href: '/produtos' },
+    { name: dict.nav.knowledge, href: '/conhecimento' },
     { name: dict.nav.news, href: '/noticias' },
     { name: dict.nav.contact, href: '/contato' },
   ]

@@ -6,6 +6,7 @@ export default {
 		products: 'Produtos',
 		producers: 'Produtores',
 		news: 'Notícias',
+		knowledge: 'Conhecimento',
 		contact: 'Contactos',
 			team: 'Conselho Administrativo',
 			market: 'Bolsa',

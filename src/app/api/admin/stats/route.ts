@@ -11,6 +11,7 @@ import {
   errorResponse,
   validateSession
 } from '@/lib/api-utils'
+import { knowledgeLabel } from '@/lib/knowledge'
 
 export const dynamic = 'force-dynamic'
 
@@ -192,10 +193,7 @@ export async function GET(req: NextRequest) {
           value: item.count
         })),
         newsByCategory: newsByCategory.map(item => ({
-          name: item._id === 'news' ? 'Notícias' : 
-                item._id === 'events' ? 'Eventos' :
-                item._id === 'tips' ? 'Dicas' :
-                item._id === 'market' ? 'Mercado' : item._id,
+          name: knowledgeLabel(String(item._id)),
           value: item.count
         })),
         topNews: topNews.map(news => ({

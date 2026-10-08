@@ -105,7 +105,7 @@ export default withAuth(
     callbacks: {
       authorized: ({ token, req }) => {
         const pathname = stripLocalePrefix(req.nextUrl.pathname)
-        const publicPages = ['/sobre', '/servicos', '/produtos', '/produtores', '/noticias', '/colaboradores', '/contato', '/login', '/registro', '/esqueci-senha', '/redefinir-senha', '/privacidade', '/termos', '/cookies']
+        const publicPages = ['/sobre', '/servicos', '/produtos', '/produtores', '/conhecimento', '/noticias', '/colaboradores', '/contato', '/login', '/registro', '/esqueci-senha', '/redefinir-senha', '/privacidade', '/termos', '/cookies']
 
         if (
           pathname === '/' ||

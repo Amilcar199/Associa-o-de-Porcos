@@ -15,6 +15,7 @@ import {
   validateSession,
   generateSlug
 } from '@/lib/api-utils'
+import { isKnowledgeCategory } from '@/lib/knowledge'
 
 // GET /api/news - Listar notícias com paginação e filtros
 export async function GET(req: NextRequest) {
@@ -24,10 +25,17 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url)
     const pagination = getPaginationParams(searchParams)
     const filters = getSearchFilters(searchParams)
+    if (filters.category && !isKnowledgeCategory(filters.category)) {
+      delete filters.category
+    }
 
     // Filtros específicos para notícias
     const newsFilters: any = {}
     
+    const category = searchParams.get('category')
+    if (category && isKnowledgeCategory(category)) {
+      newsFilters.category = category
+    }
     if (searchParams.get('author')) {
       newsFilters.author = searchParams.get('author')
     }

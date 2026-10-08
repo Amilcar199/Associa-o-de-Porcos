@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { Eye, Calendar } from 'lucide-react'
  
 import NewsModal from '@/components/modals/NewsModal'
+import { knowledgeLabel } from '@/lib/knowledge'
 
 interface NewsItem {
   _id: string
@@ -104,7 +105,8 @@ export default function NewsClient({ news, isEn }: { news: NewsItem[]; isEn: boo
               />
             </div>
             <div className="p-4">
-              <h3 className="font-semibold text-gray-900 text-lg line-clamp-2">{n.title}</h3>
+              <p className="text-xs font-medium uppercase tracking-wide text-primary-700">{knowledgeLabel(n.category || 'news', isEn)}</p>
+              <h3 className="font-semibold text-gray-900 text-lg line-clamp-2 mt-1">{n.title}</h3>
               {(n.publishedAtFormatted || n.publishedAt) && (
                 <div className="mt-2 flex items-center gap-2 text-xs text-gray-500">
                   <Calendar size={12} className="text-primary-600" aria-hidden />

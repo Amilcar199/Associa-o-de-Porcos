@@ -6,6 +6,7 @@ export default {
 		products: 'Products',
 		producers: 'Producers',
 		news: 'News',
+		knowledge: 'Knowledge',
 		contact: 'Contact',
 		team: 'Team',
 		market: 'Pig Market',

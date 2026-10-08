@@ -6,6 +6,7 @@ import Image from 'next/image'
 import Placeholder from '@/components/assets/Foto Suino.webp'
 import { calculateReadTime } from '@/lib/utils'
 import { useLanguage } from '@/components/providers/LanguageProvider'
+import { knowledgeLabel } from '@/lib/knowledge'
 
 interface NewsModalProps {
   isOpen: boolean
@@ -124,7 +125,7 @@ export default function NewsModal({
           {/* Categoria */}
           <div className="absolute top-4 left-4">
             <span className="px-3 py-1 text-sm font-medium rounded-full bg-primary-600 text-white">
-              {news.category}
+              {knowledgeLabel(String(news.category || ''), isEn)}
             </span>
           </div>
         </div>

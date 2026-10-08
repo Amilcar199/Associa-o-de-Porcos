@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import NewsModal from '@/components/modals/NewsModal'
 import { useLanguage } from '@/components/providers/LanguageProvider'
+import { knowledgeLabel } from '@/lib/knowledge'
 
 interface LatestNewsItem {
   _id: string
@@ -20,7 +21,7 @@ interface LatestNewsItem {
   excerpt: string
   featuredImage: string
   author?: { name?: string; avatar?: string }
-  category: 'news' | 'events' | 'tips' | 'market'
+  category: string
   publishedAt: string
   views?: number
   tags?: string[]
@@ -52,20 +53,10 @@ const LatestNews = () => {
     fetchLatestNews()
   }, [])
 
-  const getCategoryInfo = (category: string) => {
-    switch (category) {
-      case 'news':
-        return { label: isEn ? 'News' : 'Notícias', color: 'bg-blue-100 text-blue-800' }
-      case 'market':
-        return { label: isEn ? 'Market' : 'Mercado', color: 'bg-green-100 text-green-800' }
-      case 'tips':
-        return { label: isEn ? 'Tips' : 'Dicas', color: 'bg-yellow-100 text-yellow-800' }
-      case 'events':
-        return { label: isEn ? 'Events' : 'Eventos', color: 'bg-purple-100 text-purple-800' }
-      default:
-        return { label: isEn ? 'General' : 'Geral', color: 'bg-gray-100 text-gray-800' }
-    }
-  }
+  const getCategoryInfo = (category: string) => ({
+    label: knowledgeLabel(category, isEn),
+    color: 'bg-primary-100 text-primary-800',
+  })
 
   const formatDate = (dateISO: string) => {
     const date = new Date(dateISO)

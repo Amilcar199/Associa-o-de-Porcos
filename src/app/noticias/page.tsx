@@ -5,6 +5,7 @@ import { BRAND_NAME } from '@/lib/brand'
 import { headers } from 'next/headers'
  
 import { cookies } from 'next/headers'
+import Link from 'next/link'
 import NewsClient from '@/app/noticias/NewsClient'
 import { localizeNews } from '@/lib/i18n/content'
 
@@ -44,16 +45,6 @@ async function getNews(locale: string) {
           : undefined)
     }))
 
-    if (enriched.length === 0) {
-      return [
-        {
-          title: 'Programa de Boas Práticas na Suinocultura',
-          excerpt: 'Iniciativa reforça capacitações e padrões de qualidade para elevar produtividade e bem‑estar animal.',
-          publishedAtFormatted: new Date().toLocaleDateString('pt-AO', { day: '2-digit', month: 'short', year: 'numeric' }),
-          imageUrl: placeholderImages[0]
-        }
-      ]
-    }
     return enriched
   } catch (e) {
     console.error('Falha ao carregar notícias:', e)
@@ -72,7 +63,8 @@ export default async function NoticiasPage() {
       <div className="bg-gradient-to-r from-primary-50 to-white border-b border-gray-100">
         <div className="container-custom py-10">
           <h1 className="text-3xl font-heading font-bold text-primary-800">{isEn ? 'News' : 'Notícias'}</h1>
-          <p className="text-gray-600 mt-2 max-w-2xl">{isEn ? 'Public knowledge from the association: news, events and guidance for the sector.' : 'O conhecimento público da associação: notícias, eventos e orientações do setor.'}</p>
+          <p className="text-gray-600 mt-2 max-w-2xl">{isEn ? 'News published by the association. Guides, manuals and the other technical themes are in the knowledge centre.' : 'Notícias publicadas pela associação. Guias, manuais e os outros temas técnicos estão no centro de conhecimento.'}</p>
+          <p className="mt-3 text-sm"><Link href="/conhecimento" className="font-medium text-primary-700 underline">{isEn ? 'Open the knowledge centre' : 'Abrir o centro de conhecimento'}</Link></p>
         </div>
       </div>
 

@@ -1,5 +1,6 @@
 import mongoose, { Schema, model, models } from 'mongoose'
 import { News as INews } from '@/types'
+import { KNOWLEDGE_CATEGORIES, knowledgeLabel } from '@/lib/knowledge'
 
 const NewsSchema = new Schema<INews>({
   title: {
@@ -74,7 +75,7 @@ const NewsSchema = new Schema<INews>({
   category: {
     type: String,
     required: [true, 'Categoria é obrigatória'],
-    enum: ['news', 'events', 'tips', 'market'],
+    enum: KNOWLEDGE_CATEGORIES.map((item) => item.id),
     default: 'news',
   },
   tags: {
@@ -123,13 +124,7 @@ NewsSchema.index({ createdAt: -1 })
 
 // Virtual para categoria em português
 NewsSchema.virtual('categoryText').get(function (this: INews) {
-  const categoryMap = {
-    news: 'Notícias',
-    events: 'Eventos',
-    tips: 'Dicas',
-    market: 'Mercado'
-  }
-  return categoryMap[this.category]
+  return knowledgeLabel(this.category)
 })
 
 // Virtual para tempo de leitura estimado
@@ -249,6 +244,11 @@ NewsSchema.statics.findRelated = function (newsId: string, tags: string[], limit
 NewsSchema.methods.incrementViews = function () {
   this.views += 1
   return this.save()
+}
+
+const cachedCategory = models.News?.schema.path('category') as { enumValues?: string[] } | undefined
+if (models.News && !cachedCategory?.enumValues?.includes('guide')) {
+  delete models.News
 }
 
 const News = models.News || model<INews>('News', NewsSchema)

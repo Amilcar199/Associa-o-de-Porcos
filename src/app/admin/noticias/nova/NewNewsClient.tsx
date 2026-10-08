@@ -4,12 +4,9 @@ import React, { useState } from 'react'
 // Icons removed to avoid lucide-react export issues
 import MediaUploader from '@/components/admin/ui/MediaUploader'
 
-const categories = [
-  { value: 'news', label: 'Notícias' },
-  { value: 'events', label: 'Eventos' },
-  { value: 'tips', label: 'Dicas' },
-  { value: 'market', label: 'Mercado' }
-]
+import { KNOWLEDGE_CATEGORIES } from '@/lib/knowledge'
+
+const categories = KNOWLEDGE_CATEGORIES.map((item) => ({ value: item.id, label: item.pt }))
 
 type NewNewsForm = {
   title: string

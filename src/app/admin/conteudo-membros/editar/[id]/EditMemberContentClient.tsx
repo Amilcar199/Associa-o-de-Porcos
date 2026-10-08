@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 // Icons removed to avoid lucide-react export mismatches
 import { useToast } from '@/components/Toast'
 import MediaUploader from '@/components/admin/ui/MediaUploader'
+import { memberCategoryOptions } from '@/lib/knowledge'
 
 interface MemberContentFormData {
   title: string
@@ -205,7 +206,7 @@ export default function EditMemberContentClient({ contentId }: EditMemberContent
               required
             >
               <option value="">Selecione uma categoria</option>
-              {(categories[formData.type as MemberContentFormData['type']] ?? []).map(category => (
+              {memberCategoryOptions(categories[formData.type as MemberContentFormData['type']] ?? [], formData.category).map(category => (
                 <option key={category} value={category}>{category}</option>
               ))}
             </select>

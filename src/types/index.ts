@@ -1,4 +1,5 @@
 import { Document } from 'mongoose'
+import type { KnowledgeCategoryId } from '@/lib/knowledge'
 
 // Tipos de usuário
 export interface User extends Document {
@@ -84,7 +85,7 @@ export interface News extends Document {
   images?: string[]
   videos?: string[]
   author: User | string
-  category: 'news' | 'events' | 'tips' | 'market'
+  category: KnowledgeCategoryId
   tags: string[]
   published: boolean
   featured: boolean
@@ -309,7 +310,7 @@ export interface NewsFormData {
   title: string
   content: string
   excerpt: string
-  category: 'news' | 'events' | 'tips' | 'market'
+  category: KnowledgeCategoryId
   tags: string[]
   published: boolean
   featured: boolean
@@ -344,7 +345,7 @@ export interface ProductFilters {
 }
 
 export interface NewsFilters {
-  category?: 'news' | 'events' | 'tips' | 'market'
+  category?: KnowledgeCategoryId
   author?: string
   published?: boolean
   featured?: boolean

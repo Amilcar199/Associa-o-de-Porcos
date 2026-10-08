@@ -6,6 +6,7 @@ import { BRAND_NAME } from '@/lib/brand'
 import ViewCounter from './ViewCounter'
 import { cookies } from 'next/headers'
 import { localizeNews } from '@/lib/i18n/content'
+import { knowledgeLabel } from '@/lib/knowledge'
 
 interface RouteParams {
   params: {
@@ -111,10 +112,7 @@ export default async function NewsPage({ params }: RouteParams) {
         <header className="mb-8">
           <div className="mb-4">
             <span className="inline-block px-3 py-1 bg-primary-100 text-primary-800 text-sm font-medium rounded-full">
-              {news.category === 'news' ? (isEn ? 'News' : 'Notícias') :
-               news.category === 'events' ? (isEn ? 'Events' : 'Eventos') :
-               news.category === 'tips' ? (isEn ? 'Tips' : 'Dicas') :
-               news.category === 'market' ? (isEn ? 'Market' : 'Mercado') : news.category}
+              {knowledgeLabel(news.category, isEn)}
             </span>
           </div>
           <h1 className="text-4xl font-bold text-gray-900 mb-4">{news.title}</h1>
