@@ -79,7 +79,7 @@ export default function InteractiveMapSection({ isEn = false }: InteractiveMapSe
           <p className="mx-auto mt-2 max-w-2xl text-gray-600">
             {isEn
               ? 'Hover a province to see the figures. In Luanda, a click opens the municipalities and their producers. Elsewhere, it opens the summary and the farm form.'
-              : 'Passe o rato sobre uma província para ver os números. Em Luanda, o clique abre os municípios e os produtores. Nas restantes, abre o resumo e o cadastro da fazenda.'}
+              : 'Passe o mouse sobre uma província para ver os números. Em Luanda, o clique abre os municípios e os produtores. Nas restantes, abre o resumo e o cadastro da fazenda.'}
           </p>
         </div>
 
@@ -183,10 +183,10 @@ export default function InteractiveMapSection({ isEn = false }: InteractiveMapSe
           {luandaOpen
             ? (isEn
               ? 'Hover a municipality to see the producers registered there.'
-              : 'Passe o rato sobre um município para ver os produtores cadastrados ali.')
+              : 'Passe o mouse sobre um município para ver os produtores cadastrados ali.')
             : (isEn
               ? 'Hover a province to preview the figures. Click Luanda to open its municipalities.'
-              : 'Passe o rato sobre uma província para ver os números. Clique em Luanda para ver os municípios.')}
+              : 'Passe o mouse sobre uma província para ver os números. Clique em Luanda para ver os municípios.')}
         </p>
       </div>
 
