@@ -13,6 +13,7 @@ import {
   User, 
   Users,
   LayoutGrid,
+  ShoppingBag,
   LogOut, 
   Settings,
   Phone,
@@ -434,7 +435,14 @@ const Header = () => {
                           className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
                         >
                           <LayoutGrid size={16} />
-                          <span>{locale.startsWith('en') ? 'My area' : 'A minha área'}</span>
+                          <span>{locale.startsWith('en') ? 'Producer area' : 'Área do produtor'}</span>
+                        </Link>
+                        <Link
+                          href="/comprador"
+                          className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
+                        >
+                          <ShoppingBag size={16} />
+                          <span>{locale.startsWith('en') ? 'Buyer area' : 'Área do comprador'}</span>
                         </Link>
                         <Link
                           href="/perfil"
@@ -596,7 +604,14 @@ const Header = () => {
                         className="flex items-center space-x-2 py-2 text-gray-700 hover:text-primary-600 transition-colors"
                       >
                         <LayoutGrid size={20} />
-                        <span>{locale.startsWith('en') ? 'My area' : 'A minha área'}</span>
+                        <span>{locale.startsWith('en') ? 'Producer area' : 'Área do produtor'}</span>
+                      </Link>
+                      <Link
+                        href="/comprador"
+                        className="flex items-center space-x-2 py-2 text-gray-700 hover:text-primary-600 transition-colors"
+                      >
+                        <ShoppingBag size={20} />
+                        <span>{locale.startsWith('en') ? 'Buyer area' : 'Área do comprador'}</span>
                       </Link>
                       <Link
                         href="/perfil"

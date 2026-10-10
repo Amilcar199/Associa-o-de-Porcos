@@ -9,7 +9,7 @@ import { ANGOLA_PROVINCE_NAMES } from '@/components/sections/PigMap/angola-provi
 import PigOffers from '@/components/producer/PigOffers'
 import { useLanguage } from '@/components/providers/LanguageProvider'
 
-type SectionId = 'inicio' | 'perfil' | 'fazenda' | 'animais' | 'anuncios' | 'pedidos' | 'contactos' | 'cotacoes' | 'conteudos' | 'notificacoes'
+type SectionId = 'inicio' | 'perfil' | 'fazenda' | 'animais' | 'anuncios' | 'procura' | 'pedidos' | 'contactos' | 'cotacoes' | 'conteudos' | 'notificacoes'
 
 const emptyFarm = {
   producerName: '',
@@ -40,6 +40,7 @@ export default function ProducerPanel() {
   const [farmForm, setFarmForm] = useState(emptyFarm)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [quote, setQuote] = useState<any>(null)
+  const [demand, setDemand] = useState<any[]>([])
   const [saving, setSaving] = useState(false)
 
   const t = (pt: string, en: string) => (isEn ? en : pt)
@@ -79,6 +80,14 @@ export default function ProducerPanel() {
   }, [status, load, router])
 
   useEffect(() => {
+    if (section !== 'procura') return
+    fetch('/api/quote-requests', { cache: 'no-store' })
+      .then((response) => response.json())
+      .then((json) => setDemand(Array.isArray(json.data) ? json.data : []))
+      .catch(() => setDemand([]))
+  }, [section])
+
+  useEffect(() => {
     if (section !== 'cotacoes') return
     fetch('/api/market/summary?unit=kg&saleForm=carcaça', { cache: 'no-store' })
       .then((response) => response.json())
@@ -92,6 +101,7 @@ export default function ProducerPanel() {
     { id: 'fazenda', label: t('Fazenda', 'Farm') },
     { id: 'animais', label: t('Animais', 'Animals') },
     { id: 'anuncios', label: t('Anúncios', 'Listings') },
+    { id: 'procura', label: t('Procura', 'Demand') },
     { id: 'pedidos', label: t('Pedidos', 'Requests') },
     { id: 'contactos', label: t('Contactos', 'Contacts') },
     { id: 'cotacoes', label: t('Cotações', 'Prices') },
@@ -324,6 +334,31 @@ export default function ProducerPanel() {
 
       {section === 'animais' && <AnimalList items={animals} empty={t('Nenhum animal está ligado a esta conta. Os anúncios públicos são publicados pela associação.', 'No animals are linked to this account. Public listings are published by the association.')} />}
       {section === 'anuncios' && <PigOffers />}
+
+      {section === 'procura' && (
+        <div className="space-y-3">
+          <p className="max-w-2xl text-sm text-gray-600">
+            {t(
+              'Pedidos abertos por compradores: quantidade, forma, raça e província. A resposta à cotação entra na etapa seguinte.',
+              'Open requests from buyers: quantity, form, breed and province. The quote reply comes in the next stage.'
+            )}
+          </p>
+          {profile?.role === 'visitor' && (
+            <p className="text-sm text-gray-500">
+              {t('Esta lista é dos produtores associados. Para publicar uma procura, use a ', 'This list is for member producers. To publish demand, use the ')}
+              <Link href="/comprador" className="font-medium text-primary-700 underline">{t('área do comprador', 'buyer area')}</Link>.
+            </p>
+          )}
+          {profile?.role !== 'visitor' && demand.length === 0 && <p className="text-sm text-gray-500">{t('Não há procura aberta.', 'There is no open demand.')}</p>}
+          {profile?.role !== 'visitor' && demand.map((item: any) => (
+            <article key={item._id} className="rounded-2xl border border-gray-100 bg-white p-4">
+              <p className="font-medium text-gray-900">{item.quantity} · {item.saleForm} · {item.breed || t('qualquer raça', 'any breed')} · {item.province}</p>
+              <p className="mt-1 text-sm text-gray-500">{item.buyer?.name || t('Comprador', 'Buyer')} · {item.phone}</p>
+              {item.note && <p className="mt-2 text-sm text-gray-600">{item.note}</p>}
+            </article>
+          ))}
+        </div>
+      )}
 
       {section === 'pedidos' && (
         <div className="space-y-4">

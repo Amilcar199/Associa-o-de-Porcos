@@ -84,6 +84,11 @@ const AdminSidebar = () => {
       ]
     },
     {
+      name: 'Cotações',
+      href: '/admin/cotacoes',
+      icon: MessageSquare
+    },
+    {
       name: 'Contatos',
       href: '/admin/contatos',
       icon: MessageSquare,
