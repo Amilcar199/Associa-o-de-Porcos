@@ -47,11 +47,6 @@ const TYPE_META: Record<string, { icon: any; badge: string }> = {
   event: { icon: Calendar, badge: 'bg-orange-100 text-orange-800' },
 }
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 16 },
-  show: { opacity: 1, y: 0 }
-}
-
 export default function MembersArea() {
   const { locale } = useLanguage();
   const isEn = locale.startsWith('en');
@@ -161,37 +156,29 @@ export default function MembersArea() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-primary-700 to-primary-600 text-white">
-        <div className="absolute -right-16 -top-16 w-64 h-64 rounded-full bg-white/10" />
-        <div className="absolute -left-10 bottom-0 w-40 h-40 rounded-full bg-white/10" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-14">
-          <motion.div initial="hidden" animate="show" variants={fadeUp} transition={{ duration: 0.5 }} className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-            <div>
-              <span className="inline-flex items-center gap-2 bg-white/15 backdrop-blur px-3 py-1 rounded-full text-sm mb-3">
+      <div className="bg-primary-700 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-xs text-primary-100 flex items-center gap-1.5">
                 <ShieldCheck size={14} /> {isEn ? 'Members Area' : 'Área de Membros'}
-              </span>
-              <h1 className="text-3xl lg:text-4xl font-heading font-bold">
+              </p>
+              <h1 className="text-lg sm:text-xl font-heading font-bold leading-tight truncate">
                 {isEn ? 'Welcome back' : 'Bem-vindo(a) de volta'}{session.user?.name ? `, ${session.user.name.split(' ')[0]}` : ''}
               </h1>
-              <p className="text-primary-100 mt-2 max-w-xl">
-                {isEn ? 'Exclusive content for association members' : 'Conteúdo exclusivo para membros da associação'}
-              </p>
             </div>
-            <div className="flex items-center gap-3 bg-white/10 backdrop-blur rounded-2xl px-5 py-4 self-start">
-              <div className="w-12 h-12 bg-white/15 rounded-full flex items-center justify-center">
-                <Users size={22} />
-              </div>
-              <div>
-                <p className="text-xs text-primary-100">{isEn ? 'Membership Level' : 'Nível de Associação'}</p>
-                <p className="text-lg font-semibold">{stats.membershipLevel}</p>
+            <div className="flex items-center gap-2 bg-white/10 rounded-xl px-3 py-2 shrink-0">
+              <Users size={16} />
+              <div className="leading-tight">
+                <p className="text-[11px] text-primary-100">{isEn ? 'Membership Level' : 'Nível de Associação'}</p>
+                <p className="text-sm font-semibold">{stats.membershipLevel}</p>
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 pb-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-12">
         {/* Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {statCards.map((card, idx) => {

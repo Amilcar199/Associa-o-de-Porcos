@@ -19,7 +19,7 @@ export async function GET() {
     if (!session?.user || !userId) return errorResponse('Não autorizado', 401)
 
     await connectDB()
-    const user = await User.findById(userId).select('name email phone company bio location specialty role preferences')
+    const user = await User.findById(userId).select('name email phone company bio location specialty role preferences plan planExpiresAt verificationStatus')
     if (!user) return errorResponse('Usuário não encontrado', 404)
 
     const [farms, animals, contacts, requests, contentCount] = await Promise.all([

@@ -63,6 +63,7 @@ export interface Product extends Document {
   tags: string[]
   translations?: { en?: ProductTranslation }
   isActive: boolean
+  highlighted?: boolean
   createdAt: Date
   updatedAt: Date
 }

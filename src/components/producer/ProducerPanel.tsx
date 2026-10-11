@@ -9,7 +9,7 @@ import { ANGOLA_PROVINCE_NAMES } from '@/components/sections/PigMap/angola-provi
 import PigOffers from '@/components/producer/PigOffers'
 import { useLanguage } from '@/components/providers/LanguageProvider'
 
-type SectionId = 'inicio' | 'perfil' | 'fazenda' | 'animais' | 'anuncios' | 'procura' | 'pedidos' | 'contactos' | 'cotacoes' | 'conteudos' | 'notificacoes'
+type SectionId = 'inicio' | 'perfil' | 'fazenda' | 'animais' | 'anuncios' | 'procura' | 'pedidos' | 'contactos' | 'cotacoes' | 'conteudos' | 'plano' | 'notificacoes'
 
 const emptyFarm = {
   producerName: '',
@@ -41,6 +41,7 @@ export default function ProducerPanel() {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [quote, setQuote] = useState<any>(null)
   const [demand, setDemand] = useState<any[]>([])
+  const [notices, setNotices] = useState<any[]>([])
   const [saving, setSaving] = useState(false)
 
   const t = (pt: string, en: string) => (isEn ? en : pt)
@@ -88,6 +89,33 @@ export default function ProducerPanel() {
   }, [section])
 
   useEffect(() => {
+    if (section !== 'notificacoes') return
+    fetch('/api/me/notifications', { cache: 'no-store' })
+      .then((response) => response.json())
+      .then((json) => setNotices(Array.isArray(json.data) ? json.data : []))
+      .catch(() => setNotices([]))
+  }, [section])
+
+  async function refreshDemand() {
+    const refreshed = await fetch('/api/quote-requests', { cache: 'no-store' })
+    const body = await refreshed.json()
+    setDemand(Array.isArray(body.data) ? body.data : [])
+  }
+
+  async function requestVerification() {
+    setError('')
+    setMessage('')
+    const response = await fetch('/api/me/verification', { method: 'POST' })
+    const json = await response.json()
+    if (!response.ok) {
+      setError(json.error || t('Não foi possível pedir a verificação.', 'Could not request verification.'))
+      return
+    }
+    setMessage(t('Pedido de verificação enviado.', 'Verification request sent.'))
+    load()
+  }
+
+  useEffect(() => {
     if (section !== 'cotacoes') return
     fetch('/api/market/summary?unit=kg&saleForm=carcaça', { cache: 'no-store' })
       .then((response) => response.json())
@@ -106,6 +134,7 @@ export default function ProducerPanel() {
     { id: 'contactos', label: t('Contactos', 'Contacts') },
     { id: 'cotacoes', label: t('Cotações', 'Prices') },
     { id: 'conteudos', label: t('Conteúdos', 'Content') },
+    { id: 'plano', label: t('Plano', 'Plan') },
     { id: 'notificacoes', label: t('Notificações', 'Notifications') },
   ]
 
@@ -339,8 +368,8 @@ export default function ProducerPanel() {
         <div className="space-y-3">
           <p className="max-w-2xl text-sm text-gray-600">
             {t(
-              'Pedidos abertos por compradores: quantidade, forma, raça e província. A resposta à cotação entra na etapa seguinte.',
-              'Open requests from buyers: quantity, form, breed and province. The quote reply comes in the next stage.'
+              'Pedidos abertos por compradores. Responda com a quantidade que pode fornecer, o preço e o telefone.',
+              'Open requests from buyers. Reply with the quantity you can supply, the price and a phone number.'
             )}
           </p>
           {profile?.role === 'visitor' && (
@@ -355,8 +384,45 @@ export default function ProducerPanel() {
               <p className="font-medium text-gray-900">{item.quantity} · {item.saleForm} · {item.breed || t('qualquer raça', 'any breed')} · {item.province}</p>
               <p className="mt-1 text-sm text-gray-500">{item.buyer?.name || t('Comprador', 'Buyer')} · {item.phone}</p>
               {item.note && <p className="mt-2 text-sm text-gray-600">{item.note}</p>}
+              {item.myResponse ? (
+                <p className="mt-2 text-sm text-primary-800">{t('A sua resposta', 'Your reply')}: {item.myResponse.quantity} · {item.myResponse.price} AOA</p>
+              ) : (
+                <ReplyForm
+                  id={item._id}
+                  isEn={isEn}
+                  onDone={(text) => { setMessage(text); refreshDemand() }}
+                  onError={setError}
+                />
+              )}
             </article>
           ))}
+        </div>
+      )}
+
+      {section === 'plano' && (
+        <div className="grid gap-4 lg:grid-cols-2">
+          <article className="rounded-2xl border border-gray-100 bg-white p-6">
+            <h2 className="font-heading text-xl font-semibold">{t('Plano gratuito', 'Free plan')}</h2>
+            <p className="mt-2 text-sm text-gray-600">{t('Publicar suínos, ver a procura e responder às cotações.', 'Publish pigs, see demand and reply to quotes.')}</p>
+            <p className="mt-3 text-sm font-medium text-gray-900">{t('O seu plano', 'Your plan')}: {profile?.plan === 'pro' ? 'Pro' : t('Gratuito', 'Free')}</p>
+          </article>
+          <article className="rounded-2xl border border-primary-100 bg-primary-50 p-6">
+            <h2 className="font-heading text-xl font-semibold">Plano Pro</h2>
+            <p className="mt-2 text-sm text-gray-700">{t('Inclui o destaque dos anúncios aprovados no marketplace. O pagamento fica para a etapa seguinte; até lá a associação activa o plano.', 'Includes highlighting approved listings in the marketplace. Payment comes in the next stage; until then the association activates the plan.')}</p>
+          </article>
+          <article className="rounded-2xl border border-gray-100 bg-white p-6 lg:col-span-2">
+            <h2 className="font-heading text-xl font-semibold">{t('Verificação', 'Verification')}</h2>
+            <p className="mt-2 text-sm text-gray-600">
+              {profile?.verificationStatus === 'verified'
+                ? t('A sua conta está verificada. O perfil público pode mostrar o selo.', 'Your account is verified. The public profile can show the badge.')
+                : profile?.verificationStatus === 'pending'
+                  ? t('O pedido de verificação está com a associação.', 'The verification request is with the association.')
+                  : t('Peça a verificação da conta. A associação confirma antes de o selo aparecer no perfil.', 'Request account verification. The association confirms it before the badge appears on the profile.')}
+            </p>
+            {profile?.verificationStatus !== 'verified' && profile?.verificationStatus !== 'pending' && (
+              <button type="button" className="btn-primary mt-4" onClick={requestVerification}>{t('Pedir verificação', 'Request verification')}</button>
+            )}
+          </article>
         </div>
       )}
 
@@ -410,14 +476,65 @@ export default function ProducerPanel() {
       )}
 
       {section === 'notificacoes' && overview?.profile && (
-        <form onSubmit={saveNotifications} className="max-w-xl space-y-3 rounded-2xl border border-gray-100 bg-white p-6">
+        <div className="max-w-xl space-y-4">
+          <div className="space-y-2">
+            {notices.length === 0 && <p className="text-sm text-gray-500">{t('Sem avisos.', 'No alerts.')}</p>}
+            {notices.map((notice) => (
+              <article key={notice._id} className="rounded-xl border border-gray-100 bg-white p-4">
+                <p className="font-medium text-gray-900">{notice.title}</p>
+                <p className="mt-1 text-sm text-gray-600">{notice.body}</p>
+                <Link href={notice.href} className="mt-2 inline-flex text-sm font-medium text-primary-700">{t('Abrir', 'Open')}</Link>
+              </article>
+            ))}
+            {notices.some((notice) => !notice.read) && (
+              <button type="button" className="text-sm text-gray-600" onClick={() => fetch('/api/me/notifications', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ all: true }) }).then(() => setNotices((current) => current.map((notice) => ({ ...notice, read: true }))))}>
+                {t('Marcar como lidas', 'Mark as read')}
+              </button>
+            )}
+          </div>
+        <form onSubmit={saveNotifications} className="space-y-3 rounded-2xl border border-gray-100 bg-white p-6">
           <Toggle label={t('Email', 'Email')} checked={Boolean(overview.profile.preferences?.emailNotifications)} onChange={(checked) => setOverview({ ...overview, profile: { ...overview.profile, preferences: { ...overview.profile.preferences, emailNotifications: checked } } })} />
           <Toggle label="SMS" checked={Boolean(overview.profile.preferences?.smsNotifications)} onChange={(checked) => setOverview({ ...overview, profile: { ...overview.profile, preferences: { ...overview.profile.preferences, smsNotifications: checked } } })} />
           <Toggle label={t('Newsletter', 'Newsletter')} checked={Boolean(overview.profile.preferences?.newsletter)} onChange={(checked) => setOverview({ ...overview, profile: { ...overview.profile, preferences: { ...overview.profile.preferences, newsletter: checked } } })} />
           <button className="btn-primary" disabled={saving}>{t('Guardar', 'Save')}</button>
         </form>
+        </div>
       )}
     </section>
+  )
+}
+
+function ReplyForm({ id, isEn, onDone, onError }: { id: string; isEn: boolean; onDone: (text: string) => void; onError: (text: string) => void }) {
+  const [form, setForm] = useState({ price: '', quantity: '1', phone: '', message: '' })
+  const [savingReply, setSavingReply] = useState(false)
+  const t = (pt: string, en: string) => (isEn ? en : pt)
+
+  async function submit(event: FormEvent) {
+    event.preventDefault()
+    setSavingReply(true)
+    onError('')
+    const response = await fetch(`/api/quote-requests/${id}/responses`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...form, quantity: Number(form.quantity) }),
+    })
+    const json = await response.json()
+    setSavingReply(false)
+    if (!response.ok) {
+      onError(json.error || t('Não foi possível responder.', 'Could not send the reply.'))
+      return
+    }
+    onDone(t('Resposta enviada ao comprador.', 'Reply sent to the buyer.'))
+  }
+
+  return (
+    <form className="mt-3 grid gap-2 sm:grid-cols-2" onSubmit={submit}>
+      <input className="input-field" inputMode="numeric" placeholder={t('Quantidade', 'Quantity')} value={form.quantity} onChange={(event) => setForm({ ...form, quantity: event.target.value })} />
+      <input className="input-field" inputMode="numeric" placeholder={t('Preço (AOA)', 'Price (AOA)')} value={form.price} onChange={(event) => setForm({ ...form, price: event.target.value })} />
+      <input className="input-field" placeholder={t('Telefone', 'Phone')} value={form.phone} onChange={(event) => setForm({ ...form, phone: event.target.value })} />
+      <input className="input-field" placeholder={t('Mensagem', 'Message')} value={form.message} onChange={(event) => setForm({ ...form, message: event.target.value })} />
+      <button className="btn-primary sm:col-span-2" disabled={savingReply}>{t('Responder', 'Reply')}</button>
+    </form>
   )
 }
 

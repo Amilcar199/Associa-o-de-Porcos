@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
         .sort({ [sort]: order === 'asc' ? 1 : -1 })
         .skip(skip)
         .limit(limit)
-        .select('name email role isActive createdAt company location')
+        .select('name email role isActive plan verificationStatus createdAt company location')
         .lean(),
       User.countDocuments(query)
     ])

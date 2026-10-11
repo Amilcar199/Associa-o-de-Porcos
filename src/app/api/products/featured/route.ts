@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
 
     const products = await Product.find(publicListingFilter())
     .select('-contactPhone -whatsapp')
-    .sort({ createdAt: -1 })
+    .sort({ highlighted: -1, createdAt: -1 })
     .limit(Math.min(limit, 20))
     .lean()
 

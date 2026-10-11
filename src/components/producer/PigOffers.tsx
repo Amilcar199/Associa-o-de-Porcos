@@ -42,6 +42,7 @@ export default function PigOffers() {
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
+  const [pro, setPro] = useState(false)
 
   async function load() {
     const response = await fetch('/api/products?mine=1', { cache: 'no-store' })
@@ -50,7 +51,13 @@ export default function PigOffers() {
     setOffers(json.data || [])
   }
 
-  useEffect(() => { load() }, [])
+  useEffect(() => {
+    load()
+    fetch('/api/me/plan', { cache: 'no-store' })
+      .then((response) => response.json())
+      .then((json) => setPro(Boolean(json.data?.pro)))
+      .catch(() => setPro(false))
+  }, [])
 
   async function save(event: FormEvent) {
     event.preventDefault()
@@ -83,6 +90,21 @@ export default function PigOffers() {
     if (response.ok) load()
   }
 
+  async function toggleHighlight(id: string, highlighted: boolean) {
+    setError('')
+    const response = await fetch(`/api/me/offers/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ highlighted }),
+    })
+    const json = await response.json()
+    if (!response.ok) {
+      setError(json.error || (isEn ? 'Could not update the highlight.' : 'Não foi possível actualizar o destaque.'))
+      return
+    }
+    load()
+  }
+
   return (
     <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
       <div className="space-y-3">
@@ -94,6 +116,11 @@ export default function PigOffers() {
             <div className="mt-2 flex gap-2">
               <button type="button" className="text-sm font-medium text-primary-700" onClick={() => { setEditingId(offer._id); setForm({ ...emptyOffer, ...offer, price: offer.price ?? '', pricePerKg: offer.pricePerKg ?? '', images: offer.images || [] }) }}>{isEn ? 'Edit' : 'Editar'}</button>
               {offer.listingStatus !== 'sold' && <button type="button" className="text-sm text-gray-600" onClick={() => markSold(offer._id)}>{isEn ? 'Mark sold' : 'Marcar vendido'}</button>}
+              {pro && offer.listingStatus === 'approved' && (
+                <button type="button" className="text-sm text-primary-700" onClick={() => toggleHighlight(offer._id, !offer.highlighted)}>
+                  {offer.highlighted ? (isEn ? 'Remove highlight' : 'Retirar destaque') : (isEn ? 'Highlight' : 'Destacar')}
+                </button>
+              )}
             </div>
           </article>
         ))}

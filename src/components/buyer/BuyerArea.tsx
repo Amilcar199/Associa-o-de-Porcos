@@ -7,6 +7,15 @@ import { useLanguage } from '@/components/providers/LanguageProvider'
 import { ANGOLA_PROVINCE_NAMES } from '@/components/sections/PigMap/angola-provinces'
 import { PIG_BREEDS } from '@/lib/pig-listings'
 
+type QuoteReply = {
+  _id: string
+  price: number
+  quantity: number
+  phone: string
+  message?: string
+  producer?: { name?: string }
+}
+
 type QuoteItem = {
   _id: string
   quantity: number
@@ -17,6 +26,7 @@ type QuoteItem = {
   note?: string
   status: string
   createdAt: string
+  responses?: QuoteReply[]
 }
 
 const emptyForm = {
@@ -88,6 +98,21 @@ export default function BuyerArea() {
     load()
   }
 
+  async function closeRequest(id: string) {
+    setError('')
+    const response = await fetch(`/api/me/quote-requests/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'closed' }),
+    })
+    const json = await response.json()
+    if (!response.ok) {
+      setError(json.error || t('Não foi possível fechar o pedido.', 'Could not close the request.'))
+      return
+    }
+    load()
+  }
+
   if (loading) {
     return <section className="container-custom py-16 text-gray-600">{t('A abrir a área do comprador…', 'Opening the buyer area…')}</section>
   }
@@ -98,8 +123,8 @@ export default function BuyerArea() {
       <h1 className="mt-1 font-heading text-3xl font-bold text-primary-800">{t('Pedidos de cotação', 'Quote requests')}</h1>
       <p className="mt-2 max-w-2xl text-gray-600">
         {t(
-          'Publique o que precisa: quantos suínos, vivo ou carcaça, raça e província. O pedido fica aberto para os produtores associados. A resposta deles entra na etapa seguinte.',
-          'Publish what you need: how many pigs, live or carcass, breed and province. The request stays open for member producers. Their reply comes in the next stage.'
+          'Publique o que precisa: quantos suínos, vivo ou carcaça, raça e província. Os produtores associados recebem o aviso e podem responder com preço e quantidade.',
+          'Publish what you need: how many pigs, live or carcass, breed and province. Member producers are notified and can reply with a price and quantity.'
         )}
       </p>
 
@@ -107,7 +132,7 @@ export default function BuyerArea() {
         {[
           t('1. O comprador publica a procura', '1. The buyer publishes the demand'),
           t('2. O pedido aparece na área do produtor', '2. The request shows in the producer area'),
-          t('3. A resposta à cotação vem a seguir', '3. The quote reply comes next'),
+          t('3. As respostas aparecem aqui', '3. Replies show up here'),
         ].map((step) => (
           <li key={step} className="rounded-2xl border border-gray-100 bg-white p-4 text-sm text-gray-700">{step}</li>
         ))}
@@ -161,8 +186,19 @@ export default function BuyerArea() {
             <p className="font-medium text-gray-900">
               {item.quantity} · {item.saleForm} · {item.breed || t('qualquer raça', 'any breed')} · {item.province}
             </p>
-            <p className="mt-1 text-sm text-gray-500">{item.phone} · {t('aberto', 'open')}</p>
+            <p className="mt-1 text-sm text-gray-500">{item.phone} · {item.status === 'closed' ? t('fechado', 'closed') : t('aberto', 'open')}</p>
             {item.note && <p className="mt-2 text-sm text-gray-600">{item.note}</p>}
+            {(item.responses || []).map((reply) => (
+              <p key={reply._id} className="mt-2 rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-700">
+                {reply.producer?.name || t('Produtor', 'Producer')}: {reply.quantity} · {reply.price} AOA · {reply.phone}
+                {reply.message ? ` · ${reply.message}` : ''}
+              </p>
+            ))}
+            {item.status === 'open' && (
+              <button type="button" className="mt-3 text-sm font-medium text-primary-700" onClick={() => closeRequest(item._id)}>
+                {t('Fechar pedido', 'Close request')}
+              </button>
+            )}
           </article>
         ))}
       </div>

@@ -18,7 +18,7 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     if (!isValidObjectId(id)) return errorResponse('ID inválido')
 
     const user = await User.findById(id)
-      .select('name email role isActive createdAt updatedAt company bio location phone website socialMedia avatar')
+      .select('name email role isActive plan verificationStatus createdAt updatedAt company bio location phone website socialMedia avatar')
       .lean()
 
     if (!user) return errorResponse('Usuário não encontrado', 404)
@@ -45,6 +45,13 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     
     // Campos que podem ser atualizados
     if (body.role && ['admin', 'member', 'visitor'].includes(body.role)) update.role = body.role
+    if (body.plan && ['free', 'pro'].includes(body.plan)) {
+      update.plan = body.plan
+      if (body.plan === 'free') update.planExpiresAt = null
+    }
+    if (body.verificationStatus && ['none', 'pending', 'verified'].includes(body.verificationStatus)) {
+      update.verificationStatus = body.verificationStatus
+    }
     if (typeof body.isActive === 'boolean') update.isActive = body.isActive
     if (body.name && body.name.trim()) update.name = body.name.trim()
     if (body.company !== undefined) update.company = body.company?.trim() || null
@@ -55,7 +62,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     if (body.socialMedia) update.socialMedia = body.socialMedia
 
     const user = await User.findByIdAndUpdate(id, update, { new: true })
-      .select('name email role isActive createdAt updatedAt company bio location phone website socialMedia avatar')
+      .select('name email role isActive plan verificationStatus createdAt updatedAt company bio location phone website socialMedia avatar')
     
     if (!user) return errorResponse('Usuário não encontrado', 404)
 

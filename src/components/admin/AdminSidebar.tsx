@@ -18,7 +18,8 @@ import {
   Bell,
   MapPin,
   ChevronDown,
-  ChevronRight
+  ChevronRight,
+  BadgeCheck
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import ContactBadge from './ContactBadge'
@@ -87,6 +88,11 @@ const AdminSidebar = () => {
       name: 'Cotações',
       href: '/admin/cotacoes',
       icon: MessageSquare
+    },
+    {
+      name: 'Planos',
+      href: '/admin/planos',
+      icon: BadgeCheck
     },
     {
       name: 'Contatos',

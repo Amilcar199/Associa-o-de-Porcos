@@ -58,6 +58,7 @@ interface Product {
   quantity?: number
   contactPhone?: string
   whatsapp?: string
+  highlighted?: boolean
 }
 
 interface ProductsClientProps {
@@ -253,7 +254,7 @@ export default function ProductsClient({ products }: ProductsClientProps) {
             {isEn ? 'No pigs are published for these criteria.' : 'Não há suínos publicados com estes critérios.'}
           </p>
         )}
-        {filtered.map((product: Product, idx: number) => (
+        {[...filtered].sort((a, b) => Number(Boolean(b.highlighted)) - Number(Boolean(a.highlighted))).map((product: Product, idx: number) => (
           <div
             key={product._id || idx} 
             onClick={() => openProductModal(product)}
@@ -266,6 +267,11 @@ export default function ProductsClient({ products }: ProductsClientProps) {
             {/* Imagem */}
             <div className="relative h-48">
               <ProductThumb src={product.imageUrl} alt={product.name || (isEn ? 'Product' : 'Produto')} />
+              {product.highlighted && (
+                <div className="absolute top-3 left-3 rounded-full bg-primary-700 px-3 py-1 text-xs font-semibold text-white shadow">
+                  {isEn ? 'Highlight' : 'Destaque'}
+                </div>
+              )}
               {/* Badge de preço */}
               {(typeof product.price === 'number' && product.price > 0) || (typeof product.pricePerKg === 'number' && product.pricePerKg > 0) ? (
                 <div className="absolute top-3 right-3 flex flex-col items-end gap-1">

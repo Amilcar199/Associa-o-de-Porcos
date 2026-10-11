@@ -189,6 +189,10 @@ const ProductSchema = new Schema<IProduct>({
     type: Boolean,
     default: true,
   },
+  highlighted: {
+    type: Boolean,
+    default: false,
+  },
 }, {
   timestamps: true,
   collection: 'products',
@@ -332,6 +336,10 @@ interface ProductModel extends Model<IProduct> {
   findWithFilters(filters: any): Promise<IProduct[]>
   findFeatured(limit?: number): Promise<IProduct[]>
   generateCode(breed: string): Promise<string>
+}
+
+if (models.Product && !models.Product.schema.path('highlighted')) {
+  delete models.Product
 }
 
 const Product = (models.Product as unknown as ProductModel) || model<IProduct, ProductModel>('Product', ProductSchema)

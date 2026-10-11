@@ -30,7 +30,7 @@ export default function AdminQuoteRequestsPage() {
     <div className="space-y-6">
       <div className="border-b border-gray-200 pb-4">
         <h1 className="text-2xl font-bold text-gray-900">Pedidos de cotação</h1>
-        <p className="mt-1 text-gray-600">Procura publicada pelos compradores. As respostas dos produtores entram na etapa seguinte.</p>
+        <p className="mt-1 text-gray-600">Procura publicada pelos compradores. As respostas ficam na área do comprador.</p>
       </div>
       {error && <p className="text-sm text-red-600">{error}</p>}
       {rows.length === 0 && !error && <p className="text-sm text-gray-500">Ainda não há pedidos.</p>}

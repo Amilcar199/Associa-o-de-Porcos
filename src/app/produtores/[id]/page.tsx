@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation'
 import { cookies } from 'next/headers'
 import connectDB from '@/lib/mongodb'
 import Farm from '@/models/Farm'
+import User from '@/models/User'
 
 function formatCount(value: number) {
   return new Intl.NumberFormat('pt-AO').format(value || 0)
@@ -27,6 +28,10 @@ export default async function ProducerProfilePage({ params }: { params: { id: st
   const farm = await Farm.findOne({ _id: params.id, status: 'approved', isActive: true }).lean()
   if (!farm) notFound()
 
+  const owner = farm.owner
+    ? await User.findById(farm.owner).select('verificationStatus').lean() as { verificationStatus?: string } | null
+    : null
+  const verified = owner?.verificationStatus === 'verified'
   const photos = Array.isArray(farm.photos) ? farm.photos.filter((item) => typeof item === 'string') : []
   const figures = [
     { label: isEn ? 'Pigs' : 'Suínos', value: farm.herd?.total || 0 },
@@ -41,6 +46,7 @@ export default async function ProducerProfilePage({ params }: { params: { id: st
     <section className="container-custom py-10">
       <Link href="/produtores" className="text-sm font-medium text-primary-700">{isEn ? 'Back to producers' : 'Voltar aos produtores'}</Link>
       <h1 className="mt-3 font-heading text-3xl font-bold text-gray-900">{farm.producerName}</h1>
+      {verified && <p className="mt-2 inline-flex rounded-full bg-primary-100 px-3 py-1 text-sm font-medium text-primary-800">{isEn ? 'Verified producer' : 'Produtor verificado'}</p>}
       <p className="mt-1 text-gray-600">{farm.farmName || (isEn ? 'Farm' : 'Fazenda')} · {farm.province}{farm.municipality ? ` · ${farm.municipality}` : ''}</p>
       {farm.description && <p className="mt-4 max-w-3xl leading-relaxed text-gray-700">{farm.description}</p>}
 

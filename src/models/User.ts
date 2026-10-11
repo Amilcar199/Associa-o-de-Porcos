@@ -105,7 +105,18 @@ const userSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
-  lockUntil: Date
+  lockUntil: Date,
+  plan: {
+    type: String,
+    enum: ['free', 'pro'],
+    default: 'free'
+  },
+  planExpiresAt: Date,
+  verificationStatus: {
+    type: String,
+    enum: ['none', 'pending', 'verified'],
+    default: 'none'
+  }
 }, {
   timestamps: true
 });
@@ -237,5 +248,9 @@ userSchema.statics.getStats = async function() {
   
   return stats[0] || { total: 0, active: 0, admins: 0, members: 0, visitors: 0 };
 };
+
+if (mongoose.models.User && !mongoose.models.User.schema.path('plan')) {
+  delete mongoose.models.User
+}
 
 export default mongoose.models.User || mongoose.model('User', userSchema);

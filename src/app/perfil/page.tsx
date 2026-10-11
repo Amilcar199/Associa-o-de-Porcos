@@ -292,32 +292,27 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-primary-700 to-primary-600 text-white">
-        <div className="absolute -right-16 -top-16 w-64 h-64 rounded-full bg-white/10" />
-        <div className="absolute -left-10 bottom-0 w-40 h-40 rounded-full bg-white/10" />
-        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-12">
-          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="flex items-center gap-4">
-            <div className="relative shrink-0">
-              <img
-                className="h-16 w-16 rounded-full object-cover ring-4 ring-white/20"
-                src={profile?.avatar || defaultAvatar}
-                alt="Avatar"
-                onError={(event) => {
-                  event.currentTarget.onerror = null;
-                  event.currentTarget.src = defaultAvatar;
-                }}
-              />
+      <div className="bg-primary-700 text-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
+          <div className="flex items-center gap-3">
+            <img
+              className="h-10 w-10 rounded-full object-cover ring-2 ring-white/20 shrink-0"
+              src={profile?.avatar || defaultAvatar}
+              alt="Avatar"
+              onError={(event) => {
+                event.currentTarget.onerror = null;
+                event.currentTarget.src = defaultAvatar;
+              }}
+            />
+            <div className="min-w-0">
+              <h1 className="text-lg sm:text-xl font-heading font-bold leading-tight truncate">{dict.profile.pageTitle}</h1>
+              <p className="text-primary-100 text-sm truncate">{dict.profile.pageSubtitle}</p>
             </div>
-            <div>
-              <h1 className="text-2xl lg:text-3xl font-heading font-bold">{dict.profile.pageTitle}</h1>
-              <p className="text-primary-100 mt-1">{dict.profile.pageSubtitle}</p>
-            </div>
-          </motion.div>
+          </div>
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 pb-12">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-12">
         {/* Upgrade Banner for Visitors */}
         {showVisitorBanner && (
           <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-4 shadow-sm">

@@ -7,6 +7,8 @@ import connectDB from '@/lib/mongodb'
 import Product from '@/models/Product'
 import { errorResponse, sanitizeInput, successResponse } from '@/lib/api-utils'
 import { parsePigOffer } from '@/lib/pig-listings'
+import User from '@/models/User'
+import { hasProPlan } from '@/lib/notify-users'
 
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   try {
@@ -21,6 +23,19 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     if (product.listingStatus === 'sold') return errorResponse('Um anúncio vendido não pode ser editado')
 
     const body = sanitizeInput(await req.json())
+    if (typeof body.highlighted === 'boolean' && Object.keys(body).length === 1) {
+      if (body.highlighted) {
+        const owner = await User.findById(userId).select('plan planExpiresAt').lean() as { plan?: string; planExpiresAt?: Date | null } | null
+        if (!hasProPlan(owner)) return errorResponse('O destaque faz parte do Plano Pro', 403)
+        if (product.listingStatus && product.listingStatus !== 'approved') {
+          return errorResponse('O anúncio precisa de estar aprovado para ficar em destaque')
+        }
+      }
+      product.highlighted = body.highlighted
+      await product.save()
+      return NextResponse.json(successResponse(product, body.highlighted ? 'Anúncio em destaque' : 'Destaque retirado'))
+    }
+
     if (body.listingStatus === 'sold') {
       product.listingStatus = 'sold'
       product.availability = 'sold'
