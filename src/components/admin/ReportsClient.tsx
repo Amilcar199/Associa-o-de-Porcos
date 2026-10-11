@@ -31,13 +31,18 @@ export default function ReportsClient() {
     load()
   }, [])
 
-  const exportCsv = (kind: 'products' | 'news' | 'contacts' | 'users') => {
+  const exportCsv = (kind: 'products' | 'news' | 'contacts' | 'users' | 'resumo') => {
     if (!stats) return
     let rows: any[] = []
     if (kind === 'products') rows = stats.charts?.productsByBreed?.map((x: any)=>({ breed: x.name, count: x.value })) || []
     if (kind === 'news') rows = stats.charts?.newsByCategory?.map((x: any)=>({ category: x.name, count: x.value })) || []
     if (kind === 'contacts') rows = (stats.contacts || []).map((x: any)=>({ status: x._id, count: x.count }))
     if (kind === 'users') rows = [{ total: stats.overview?.totalUsers, active: stats.overview?.activeUsers }]
+    if (kind === 'resumo') {
+      rows = (stats.reports || []).flatMap((group: { title: string; items: { label: string; value: number }[] }) =>
+        group.items.map((item) => ({ grupo: group.title, indicador: item.label, valor: item.value }))
+      )
+    }
     const csv = toCsv(rows)
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
@@ -57,9 +62,29 @@ export default function ReportsClient() {
           <button onClick={()=>exportCsv('products')} className="px-3 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded">Produtos por Raça</button>
           <button onClick={()=>exportCsv('news')} className="px-3 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded">Notícias por Categoria</button>
           <button onClick={()=>exportCsv('contacts')} className="px-3 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded">Contatos por Status</button>
+          <button onClick={()=>exportCsv('resumo')} className="px-3 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded">Resumo</button>
           <button onClick={()=>exportCsv('users')} className="px-3 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded">Usuários</button>
         </div>
       </div>
+
+      {loading && <p className="text-sm text-gray-500">A carregar relatórios…</p>}
+      {stats?.reports && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {stats.reports.map((group: { title: string; items: { label: string; value: number }[] }) => (
+            <section key={group.title} className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+              <h3 className="text-base font-semibold text-gray-900 mb-3">{group.title}</h3>
+              <dl className="grid grid-cols-2 gap-3">
+                {group.items.map((item) => (
+                  <div key={item.label}>
+                    <dt className="text-xs text-gray-500">{item.label}</dt>
+                    <dd className="text-xl font-semibold text-gray-900">{item.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
+          ))}
+        </div>
+      )}
 
       {/* Reusar gráficos existentes */}
       <DashboardCharts />

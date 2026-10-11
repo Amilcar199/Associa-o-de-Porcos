@@ -8,6 +8,7 @@ import Product from '@/models/Product'
 import { errorResponse, sanitizeInput, successResponse } from '@/lib/api-utils'
 import { parsePigOffer } from '@/lib/pig-listings'
 import { rateLimitOrNull } from '@/lib/rate-limit'
+import { recordAudit } from '@/lib/record-audit'
 
 async function ownerId() {
   const session = await getServerSession(authOptions)
@@ -35,6 +36,14 @@ export async function POST(req: NextRequest) {
       availability: 'reserved',
       isActive: true,
       expiresAt: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
+    })
+    await recordAudit({
+      actorId: userId,
+      action: 'offer.create',
+      entity: 'product',
+      entityId: String(product._id),
+      summary: product.name,
+      changes: { price: { to: product.price ?? product.pricePerKg }, quantity: { to: product.quantity } },
     })
     return NextResponse.json(successResponse(product, 'Anúncio enviado para aprovação'), { status: 201 })
   } catch (error: any) {

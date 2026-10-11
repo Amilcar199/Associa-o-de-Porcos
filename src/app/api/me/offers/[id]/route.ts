@@ -9,6 +9,8 @@ import { errorResponse, sanitizeInput, successResponse } from '@/lib/api-utils'
 import { parsePigOffer } from '@/lib/pig-listings'
 import User from '@/models/User'
 import { hasProPlan } from '@/lib/notify-users'
+import { PRODUCT_AUDIT_FIELDS, changedFields } from '@/lib/audit'
+import { recordAudit } from '@/lib/record-audit'
 
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   try {
@@ -31,8 +33,17 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
           return errorResponse('O anúncio precisa de estar aprovado para ficar em destaque')
         }
       }
+      const beforeHighlight = product.highlighted
       product.highlighted = body.highlighted
       await product.save()
+      await recordAudit({
+        actorId: String(userId),
+        action: 'offer.highlight',
+        entity: 'product',
+        entityId: String(product._id),
+        summary: product.name,
+        changes: { highlighted: { from: beforeHighlight, to: product.highlighted } },
+      })
       return NextResponse.json(successResponse(product, body.highlighted ? 'Anúncio em destaque' : 'Destaque retirado'))
     }
 
@@ -40,16 +51,32 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
       product.listingStatus = 'sold'
       product.availability = 'sold'
       await product.save()
+      await recordAudit({
+        actorId: String(userId),
+        action: 'offer.sold',
+        entity: 'product',
+        entityId: String(product._id),
+        summary: product.name,
+      })
       return NextResponse.json(successResponse(product, 'Anúncio marcado como vendido'))
     }
 
     const parsed = parsePigOffer(body)
     if (!parsed.data) return errorResponse(parsed.error || 'Dados inválidos')
+    const before = product.toObject()
     Object.assign(product, parsed.data)
     product.listingStatus = 'pending'
     product.availability = 'reserved'
     product.rejectionNote = undefined
     await product.save()
+    await recordAudit({
+      actorId: String(userId),
+      action: 'offer.update',
+      entity: 'product',
+      entityId: String(product._id),
+      summary: product.name,
+      changes: changedFields(before, product.toObject(), PRODUCT_AUDIT_FIELDS),
+    })
     return NextResponse.json(successResponse(product, 'Anúncio actualizado e reenviado para aprovação'))
   } catch (error: any) {
     console.error('Erro ao editar anúncio de suíno:', error)

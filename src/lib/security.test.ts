@@ -6,6 +6,7 @@ import { hasPermission, isAdminRole, isMemberRole } from './permissions.ts'
 import { safeSortField } from './query-guards.ts'
 import { checkRateLimit } from './rate-limit-core.ts'
 import { isInsideDirectory } from './safe-path.ts'
+import { backupUser, changedFields } from './audit.ts'
 
 describe('permissões', () => {
   it('só trata admin como administrador', () => {
@@ -54,6 +55,30 @@ describe('token de recuperação', () => {
     assert.notEqual(hashed, token)
     assert.match(hashed, /^[a-f0-9]{64}$/)
     assert.equal(hashResetToken(token), hashed)
+  })
+})
+
+describe('registo e cópia', () => {
+  it('guarda só os campos que mudaram', () => {
+    const changes = changedFields(
+      { price: 1000, breed: 'Large White', password: 'segredo' },
+      { price: 1500, breed: 'Large White' },
+      ['price', 'breed'],
+    )
+    assert.deepEqual(changes, { price: { from: 1000, to: 1500 } })
+  })
+
+  it('tira senha e token da cópia de uma conta', () => {
+    const copy = backupUser({
+      name: 'Admin',
+      email: 'a@assuino.com',
+      password: 'hash',
+      passwordResetToken: 'token',
+      role: 'admin',
+    })
+    assert.equal(copy.name, 'Admin')
+    assert.equal('password' in copy, false)
+    assert.equal('passwordResetToken' in copy, false)
   })
 })
 

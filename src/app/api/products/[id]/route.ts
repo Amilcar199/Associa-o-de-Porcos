@@ -5,6 +5,8 @@ import connectDB from '@/lib/mongodb'
 import Product from '@/models/Product'
 import { validateSession, errorResponse, successResponse, isValidObjectId, sanitizeInput } from '@/lib/api-utils'
 import { publicListingFilter } from '@/lib/pig-listings'
+import { PRODUCT_AUDIT_FIELDS, changedFields } from '@/lib/audit'
+import { recordAudit } from '@/lib/record-audit'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 
@@ -113,9 +115,21 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
       updateData.availability = sanitizedData.availability
     }
 
-    // Atualizar produto
+    const before = product.toObject()
     Object.assign(product, updateData)
     await product.save()
+
+    const changes = changedFields(before, product.toObject(), PRODUCT_AUDIT_FIELDS)
+    if (Object.keys(changes).length > 0) {
+      await recordAudit({
+        actorId: (authResult.user as { id?: string }).id,
+        action: 'product.update',
+        entity: 'product',
+        entityId: String(product._id),
+        summary: product.name,
+        changes,
+      })
+    }
 
     return NextResponse.json(
       successResponse(product, 'Produto atualizado com sucesso')
@@ -154,7 +168,13 @@ export async function DELETE(req: NextRequest, { params }: RouteParams) {
       return errorResponse('Produto não encontrado', 404)
     }
 
-    // Deletar produto permanentemente
+    await recordAudit({
+      actorId: (authResult.user as { id?: string }).id,
+      action: 'product.delete',
+      entity: 'product',
+      entityId: String(product._id),
+      summary: product.name,
+    })
     await Product.findByIdAndDelete(id)
 
     return NextResponse.json(

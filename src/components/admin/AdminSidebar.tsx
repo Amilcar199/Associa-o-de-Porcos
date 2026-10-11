@@ -19,7 +19,9 @@ import {
   MapPin,
   ChevronDown,
   ChevronRight,
-  BadgeCheck
+  BadgeCheck,
+  ClipboardList,
+  Archive
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import ContactBadge from './ContactBadge'
@@ -93,6 +95,16 @@ const AdminSidebar = () => {
       name: 'Planos',
       href: '/admin/planos',
       icon: BadgeCheck
+    },
+    {
+      name: 'Registos',
+      href: '/admin/registos',
+      icon: ClipboardList
+    },
+    {
+      name: 'Cópias',
+      href: '/admin/copias',
+      icon: Archive
     },
     {
       name: 'Contatos',

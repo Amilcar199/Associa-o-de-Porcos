@@ -8,6 +8,7 @@ import { validateSession, errorResponse, successResponse, sanitizeInput, getPagi
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { publicListingFilter } from '@/lib/pig-listings'
+import { recordAudit } from '@/lib/record-audit'
 
 // GET /api/products - Listar produtos
 export async function GET(req: NextRequest) {
@@ -124,6 +125,15 @@ export async function POST(req: NextRequest) {
     // Criar produto
     const product = new Product(productData)
     await product.save()
+
+    await recordAudit({
+      actorId: (authResult.user as { id?: string }).id,
+      action: 'product.create',
+      entity: 'product',
+      entityId: String(product._id),
+      summary: product.name,
+      changes: { price: { to: product.price ?? product.pricePerKg }, breed: { to: product.breed } },
+    })
 
     return NextResponse.json(
       successResponse(product, 'Produto criado com sucesso'),

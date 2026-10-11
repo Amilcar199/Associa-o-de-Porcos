@@ -6,6 +6,9 @@ import News from '@/models/News'
 import Contact from '@/models/Contact'
 import Collaborator from '@/models/Collaborator'
 import MemberContent from '@/models/MemberContent'
+import Farm from '@/models/Farm'
+import QuoteRequest from '@/models/QuoteRequest'
+import QuoteResponse from '@/models/QuoteResponse'
 import {
   successResponse,
   errorResponse,
@@ -170,6 +173,91 @@ export async function GET(req: NextRequest) {
       .lean()
       .catch(() => [])
 
+    const [
+      adminUsers,
+      memberUsers,
+      visitorUsers,
+      proUsers,
+      freeUsers,
+      verifiedUsers,
+      farmsApproved,
+      farmsPending,
+      farmsRejected,
+      listingsPending,
+      listingsApproved,
+      listingsSold,
+      quotesOpen,
+      quotesClosed,
+      quoteResponses,
+      quoteBuyers,
+    ] = await Promise.all([
+      User.countDocuments({ role: 'admin', isActive: true }),
+      User.countDocuments({ role: 'member', isActive: true }),
+      User.countDocuments({ role: 'visitor', isActive: true }),
+      User.countDocuments({ plan: 'pro', isActive: true }),
+      User.countDocuments({ isActive: true, $or: [{ plan: 'free' }, { plan: { $exists: false } }, { plan: null }] }),
+      User.countDocuments({ verificationStatus: 'verified', isActive: true }),
+      Farm.countDocuments({ status: 'approved', isActive: true }),
+      Farm.countDocuments({ status: 'pending' }),
+      Farm.countDocuments({ status: 'rejected' }),
+      Product.countDocuments({ listingStatus: 'pending', isActive: true }),
+      Product.countDocuments({ listingStatus: 'approved', isActive: true }),
+      Product.countDocuments({ isActive: true, $or: [{ listingStatus: 'sold' }, { availability: 'sold' }] }),
+      QuoteRequest.countDocuments({ status: 'open' }),
+      QuoteRequest.countDocuments({ status: 'closed' }),
+      QuoteResponse.countDocuments(),
+      QuoteRequest.distinct('buyer'),
+    ])
+
+    const contactLabel: Record<string, string> = {
+      new: 'Novos',
+      read: 'Lidos',
+      replied: 'Respondidos',
+      archived: 'Arquivados',
+    }
+    const contactTotal = contactStats.reduce((sum: number, item: { count: number }) => sum + item.count, 0)
+
+    const reports = [
+      { title: 'Utilizadores', items: [
+        { label: 'Activos', value: totalUsers },
+        { label: 'Administradores', value: adminUsers },
+        { label: 'Membros', value: memberUsers },
+        { label: 'Visitantes', value: visitorUsers },
+      ]},
+      { title: 'Produtores', items: [
+        { label: 'Fazendas aprovadas', value: farmsApproved },
+        { label: 'Fazendas pendentes', value: farmsPending },
+        { label: 'Fazendas recusadas', value: farmsRejected },
+        { label: 'Contas verificadas', value: verifiedUsers },
+      ]},
+      { title: 'Compradores', items: [
+        { label: 'Contas de visitante', value: visitorUsers },
+        { label: 'Com pedido de cotação', value: quoteBuyers.length },
+      ]},
+      { title: 'Produtos', items: [
+        { label: 'Activos', value: totalProducts },
+        { label: 'Disponíveis', value: activeProducts },
+        { label: 'Anúncios pendentes', value: listingsPending },
+        { label: 'Anúncios aprovados', value: listingsApproved },
+        { label: 'Vendidos', value: listingsSold },
+      ]},
+      { title: 'Pedidos de cotação', items: [
+        { label: 'Abertos', value: quotesOpen },
+        { label: 'Fechados', value: quotesClosed },
+      ]},
+      { title: 'Respostas', items: [
+        { label: 'Respostas de produtores', value: quoteResponses },
+      ]},
+      { title: 'Contactos', items: [
+        { label: 'Total', value: contactTotal },
+        ...contactStats.map((item: { _id: string; count: number }) => ({ label: contactLabel[item._id] || item._id || 'Sem estado', value: item.count })),
+      ]},
+      { title: 'Planos', items: [
+        { label: 'Gratuito', value: freeUsers },
+        { label: 'Pro', value: proUsers },
+      ]},
+    ]
+
     const stats = {
       overview: {
         totalUsers,
@@ -202,7 +290,8 @@ export async function GET(req: NextRequest) {
           publishedAt: news.publishedAt
         }))
       },
-      recentActivity
+      recentActivity,
+      reports,
     }
 
     return NextResponse.json(successResponse(stats))

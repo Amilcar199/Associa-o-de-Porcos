@@ -4,6 +4,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import connectDB from '@/lib/mongodb'
 import User from '@/models/User'
 import { validateSession, errorResponse, successResponse, isValidObjectId } from '@/lib/api-utils'
+import { ACCOUNT_AUDIT_FIELDS, changedFields } from '@/lib/audit'
+import { recordAudit } from '@/lib/record-audit'
 
 interface RouteParams { params: { id: string } }
 
@@ -40,6 +42,9 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     const { id } = params
     if (!isValidObjectId(id)) return errorResponse('ID inválido')
 
+    const before = await User.findById(id).select('role plan planExpiresAt verificationStatus isActive name').lean()
+    if (!before) return errorResponse('Usuário não encontrado', 404)
+
     const body = await req.json()
     const update: any = {}
     
@@ -65,6 +70,18 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
       .select('name email role isActive plan verificationStatus createdAt updatedAt company bio location phone website socialMedia avatar')
     
     if (!user) return errorResponse('Usuário não encontrado', 404)
+
+    const changes = changedFields(before as Record<string, unknown>, user.toObject(), ACCOUNT_AUDIT_FIELDS)
+    if (Object.keys(changes).length > 0) {
+      await recordAudit({
+        actorId: (auth.user as { id?: string }).id,
+        action: 'account.update',
+        entity: 'user',
+        entityId: String(user._id),
+        summary: user.name,
+        changes,
+      })
+    }
 
     return NextResponse.json(successResponse(user, 'Usuário atualizado'))
   } catch (error) {
