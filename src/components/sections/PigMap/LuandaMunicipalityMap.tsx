@@ -2,18 +2,9 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { ArrowLeft } from 'lucide-react'
-import {
-  LUANDA_MUNICIPALITIES,
-  LUANDA_MUNICIPALITIES_VIEWBOX,
-  municipalityIdFor,
-  type MapProducer,
-} from './luanda-municipalities'
-import {
-  MUNICIPALITIES_BY_PROVINCE,
-  layoutMunicipalities,
-  matchMunicipalityId,
-  type MunicipalityShape,
-} from './province-municipalities'
+import { municipalityIdFor, type MapProducer } from './luanda-municipalities'
+import { matchMunicipalityId } from './province-municipalities'
+import { MUNICIPALITY_MAPS } from './municipality-map-paths'
 
 const BASE_FILL = '#ffa500'
 const HOVER_FILL = '#D7181E'
@@ -55,9 +46,12 @@ function clamp(value: number, min: number, max: number) {
 
 export default function LuandaMunicipalityMap({ province = 'Luanda', isEn = false, onBack }: LuandaMunicipalityMapProps) {
   const isLuanda = province === 'Luanda'
-  const generated = isLuanda ? null : layoutMunicipalities(MUNICIPALITIES_BY_PROVINCE[province] || [])
-  const municipalities: MunicipalityShape[] = isLuanda ? LUANDA_MUNICIPALITIES : generated?.items || []
-  const viewBox = isLuanda ? LUANDA_MUNICIPALITIES_VIEWBOX : generated?.viewBox || '0 0 100 100'
+  const map = MUNICIPALITY_MAPS[province]
+  const municipalities = map?.items || []
+  const viewBox = map?.viewBox || '0 0 100 100'
+  const [viewWidth = 100, viewHeight = 100] = viewBox.split(' ').slice(2).map(Number)
+  const stroke = Math.max(viewWidth, viewHeight) / 150
+  const clipId = `municipality-outline-${province.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/gi, '-').toLowerCase()}`
   const wrapperRef = useRef<HTMLDivElement>(null)
   const tooltipRef = useRef<HTMLDivElement>(null)
   const [producers, setProducers] = useState<MapProducer[]>([])
@@ -166,44 +160,55 @@ export default function LuandaMunicipalityMap({ province = 'Luanda', isEn = fals
         </p>
       </div>
 
-      <div ref={wrapperRef} className={`relative mx-auto w-full ${isLuanda ? 'max-w-[650px]' : 'max-w-5xl'}`}>
+      <div ref={wrapperRef} className="relative mx-auto w-full max-w-5xl">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox={viewBox}
-          className="block h-auto w-full overflow-visible"
+          className="mx-auto block h-auto max-h-[72vh] w-auto max-w-full overflow-visible"
           role="img"
           aria-label={isEn ? `Municipalities of ${province}` : `Municípios de ${province}`}
         >
-          {municipalities.map((municipality) => {
-            const isActive = hoveredId === municipality.id
-            return (
-              <path
-                key={municipality.id}
-                data-municipality={municipality.id}
-                d={municipality.d}
-                tabIndex={0}
-                role="button"
-                aria-label={municipality.label}
-                fill={isActive ? HOVER_FILL : BASE_FILL}
-                stroke="#ffffff"
-                strokeWidth={4}
-                strokeLinejoin="round"
-                className="cursor-pointer outline-none transition-[fill] duration-200"
-                onMouseEnter={() => showMunicipality(municipality.id)}
-                onMouseLeave={hideMunicipality}
-                onFocus={() => showMunicipality(municipality.id)}
-                onBlur={hideMunicipality}
-              />
-            )
-          })}
+          {map?.outline && (
+            <defs>
+              <clipPath id={clipId}>
+                <path d={map.outline} />
+              </clipPath>
+            </defs>
+          )}
+          <g clipPath={map?.outline ? `url(#${clipId})` : undefined}>
+            {municipalities.map((municipality) => {
+              const isActive = hoveredId === municipality.id
+              return (
+                <path
+                  key={municipality.id}
+                  data-municipality={municipality.id}
+                  d={municipality.d}
+                  tabIndex={0}
+                  role="button"
+                  aria-label={municipality.label}
+                  fill={isActive ? HOVER_FILL : BASE_FILL}
+                  fillRule="evenodd"
+                  stroke="#ffffff"
+                  strokeWidth={stroke}
+                  strokeLinejoin="round"
+                  className="cursor-pointer outline-none transition-[fill] duration-200"
+                  onMouseEnter={() => showMunicipality(municipality.id)}
+                  onMouseLeave={hideMunicipality}
+                  onFocus={() => showMunicipality(municipality.id)}
+                  onBlur={hideMunicipality}
+                />
+              )
+            })}
+          </g>
+          {map?.outline && (
+            <path d={map.outline} fill="none" stroke="#ffffff" strokeWidth={stroke * 1.4} pointerEvents="none" />
+          )}
 
           {municipalities.map((municipality) => {
             const isActive = hoveredId === municipality.id
-            const lines = isLuanda ? [municipality.label] : labelLines(municipality.label)
-            const fontSize = isLuanda
-              ? (municipality.label.length > 10 ? 22 : 26)
-              : (lines.length > 1 ? 20 : municipality.label.length > 14 ? 18 : 24)
-            const lineHeight = fontSize + 6
+            const lines = labelLines(municipality.label)
+            const fontSize = municipality.labelSize * (lines.length > 1 ? 0.78 : 1)
+            const lineHeight = fontSize * 1.15
             const shared = {
               x: municipality.labelX,
               textAnchor: 'middle' as const,
@@ -219,7 +224,7 @@ export default function LuandaMunicipalityMap({ province = 'Luanda', isEn = fals
                   const y = municipality.labelY + (index - (lines.length - 1) / 2) * lineHeight
                   return (
                     <g key={`${municipality.id}-${index}`}>
-                      <text {...shared} y={y} fill="none" stroke={isActive ? HOVER_FILL : BASE_FILL} strokeWidth={5} strokeLinejoin="round">
+                      <text {...shared} y={y} fill="none" stroke={isActive ? HOVER_FILL : BASE_FILL} strokeWidth={fontSize * 0.18} strokeLinejoin="round">
                         {line}
                       </text>
                       <text {...shared} y={y} fill="#FFFFFF">
