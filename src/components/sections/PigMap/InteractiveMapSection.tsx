@@ -6,7 +6,6 @@ import { Users, PiggyBank, Heart, Beef, Sprout, PlusCircle } from 'lucide-react'
 import FarmRegisterModal from './FarmRegisterModal'
 import AngolaSvgMap from './AngolaSvgMap'
 import LuandaMunicipalityMap from './LuandaMunicipalityMap'
-import { getProvinceMeta } from './angola-map-meta'
 import type { ProvinceStats } from '@/types'
 
 interface InteractiveMapSectionProps {
@@ -30,8 +29,7 @@ export default function InteractiveMapSection({ isEn = false }: InteractiveMapSe
   const [error, setError] = useState<string | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedProvince, setSelectedProvince] = useState<string | undefined>(undefined)
-  const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [luandaOpen, setLuandaOpen] = useState(false)
+  const [openProvince, setOpenProvince] = useState<string | null>(null)
 
   const loadStats = useCallback(async () => {
     setLoading(true)
@@ -60,10 +58,6 @@ export default function InteractiveMapSection({ isEn = false }: InteractiveMapSe
     setModalOpen(true)
   }
 
-  const selectedMeta = selectedId ? getProvinceMeta(selectedId) : undefined
-  const selectedStats = selectedMeta
-    ? data?.provinces.find((item) => item.province === selectedMeta.dataName)
-    : undefined
   const totals = data?.totals
 
   return (
@@ -78,8 +72,8 @@ export default function InteractiveMapSection({ isEn = false }: InteractiveMapSe
           </h3>
           <p className="mx-auto mt-2 max-w-2xl text-gray-600">
             {isEn
-              ? 'Hover a province to see the figures. In Luanda, a click opens the municipalities and their producers. Elsewhere, it opens the summary and the farm form.'
-              : 'Passe o mouse sobre uma província para ver os números. Em Luanda, o clique abre os municípios e os produtores. Nas restantes, abre o resumo e o cadastro da fazenda.'}
+              ? 'Hover a province to see the figures. A click opens its municipalities and the producers registered there.'
+              : 'Passe o mouse sobre uma província para ver os números. O clique abre os municípios e os produtores cadastrados.'}
           </p>
         </div>
 
@@ -132,61 +126,32 @@ export default function InteractiveMapSection({ isEn = false }: InteractiveMapSe
               </div>
             </div>
           )}
-          {!loading && !error && (luandaOpen ? (
-            <LuandaMunicipalityMap isEn={isEn} onBack={() => setLuandaOpen(false)} />
+          {!loading && !error && (openProvince ? (
+            <LuandaMunicipalityMap
+              province={openProvince}
+              isEn={isEn}
+              onBack={() => setOpenProvince(null)}
+            />
           ) : (
             <AngolaSvgMap
               provinces={data?.provinces}
               isEn={isEn}
-              selectedId={selectedId}
-              onProvinceClick={(dataName, id) => {
-                if (id === 'luanda') {
-                  setLuandaOpen(true)
-                  setSelectedId(null)
-                  setSelectedProvince('Luanda')
-                  return
-                }
+              onProvinceClick={(dataName) => {
                 setSelectedProvince(dataName)
-                setSelectedId(id)
+                setOpenProvince(dataName)
               }}
             />
           ))}
         </motion.div>
 
-        {!luandaOpen && selectedMeta && (
-          <div className="mx-auto mt-4 max-w-xl rounded-xl border border-gray-100 bg-gray-50 p-4 text-sm text-gray-700">
-            <p className="mb-2 text-base font-semibold text-gray-900">{selectedMeta.label}</p>
-            {selectedStats && selectedStats.farmersCount > 0 ? (
-              <ul className="space-y-1">
-                <li><strong>{selectedStats.farmersCount}</strong> {isEn ? 'registered producer(s)' : 'produtor(es) cadastrado(s)'}</li>
-                <li><strong>{selectedStats.totalPigs}</strong> {isEn ? 'total pigs' : 'porcos no total'}</li>
-                <li>{isEn ? 'Females' : 'Fêmeas'}: <strong>{selectedStats.females}</strong></li>
-                <li>{isEn ? 'For slaughter' : 'P/ abate'}: <strong>{selectedStats.forSlaughter}</strong></li>
-                <li>{isEn ? 'For breeding' : 'P/ reprodução'}: <strong>{selectedStats.forBreeding}</strong></li>
-              </ul>
-            ) : (
-              <p className="text-gray-500">
-                {isEn ? 'No producers registered yet in this province.' : 'Nenhum produtor cadastrado nesta província ainda.'}
-              </p>
-            )}
-            <button
-              type="button"
-              onClick={() => openModal(selectedMeta.dataName)}
-              className="mt-3 font-medium text-primary-700 underline hover:text-primary-800"
-            >
-              {isEn ? 'Register a farm here' : 'Cadastrar fazenda nesta província'}
-            </button>
-          </div>
-        )}
-
         <p className="mt-4 text-center text-xs text-gray-400">
-          {luandaOpen
+          {openProvince
             ? (isEn
               ? 'Hover a municipality to see the producers registered there.'
               : 'Passe o mouse sobre um município para ver os produtores cadastrados ali.')
             : (isEn
-              ? 'Hover a province to preview the figures. Click Luanda to open its municipalities.'
-              : 'Passe o mouse sobre uma província para ver os números. Clique em Luanda para ver os municípios.')}
+              ? 'Hover a province to preview the figures. Click one to open its municipalities.'
+              : 'Passe o mouse sobre uma província para ver os números. Clique para abrir os municípios.')}
         </p>
       </div>
 

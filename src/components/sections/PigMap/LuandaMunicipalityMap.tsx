@@ -5,9 +5,15 @@ import { ArrowLeft } from 'lucide-react'
 import {
   LUANDA_MUNICIPALITIES,
   LUANDA_MUNICIPALITIES_VIEWBOX,
-  producersInMunicipality,
+  municipalityIdFor,
   type MapProducer,
 } from './luanda-municipalities'
+import {
+  MUNICIPALITIES_BY_PROVINCE,
+  layoutMunicipalities,
+  matchMunicipalityId,
+  type MunicipalityShape,
+} from './province-municipalities'
 
 const BASE_FILL = '#ffa500'
 const HOVER_FILL = '#D7181E'
@@ -20,15 +26,38 @@ interface TooltipState {
 }
 
 interface LuandaMunicipalityMapProps {
+  province?: string
   isEn?: boolean
   onBack: () => void
+}
+
+function labelLines(label: string) {
+  if (label.length <= 14) return [label]
+  const words = label.split(' ')
+  if (words.length < 2) return [label]
+  let best = [label]
+  let bestGap = Number.POSITIVE_INFINITY
+  for (let index = 1; index < words.length; index += 1) {
+    const left = words.slice(0, index).join(' ')
+    const right = words.slice(index).join(' ')
+    const gap = Math.abs(left.length - right.length)
+    if (gap < bestGap) {
+      bestGap = gap
+      best = [left, right]
+    }
+  }
+  return best
 }
 
 function clamp(value: number, min: number, max: number) {
   return Math.max(min, Math.min(value, max))
 }
 
-export default function LuandaMunicipalityMap({ isEn = false, onBack }: LuandaMunicipalityMapProps) {
+export default function LuandaMunicipalityMap({ province = 'Luanda', isEn = false, onBack }: LuandaMunicipalityMapProps) {
+  const isLuanda = province === 'Luanda'
+  const generated = isLuanda ? null : layoutMunicipalities(MUNICIPALITIES_BY_PROVINCE[province] || [])
+  const municipalities: MunicipalityShape[] = isLuanda ? LUANDA_MUNICIPALITIES : generated?.items || []
+  const viewBox = isLuanda ? LUANDA_MUNICIPALITIES_VIEWBOX : generated?.viewBox || '0 0 100 100'
   const wrapperRef = useRef<HTMLDivElement>(null)
   const tooltipRef = useRef<HTMLDivElement>(null)
   const [producers, setProducers] = useState<MapProducer[]>([])
@@ -46,7 +75,7 @@ export default function LuandaMunicipalityMap({ isEn = false, onBack }: LuandaMu
         let page = 1
         let pages = 1
         while (page <= pages && page <= 20) {
-          const res = await fetch(`/api/farms?province=${encodeURIComponent('Luanda')}&limit=100&page=${page}`, { cache: 'no-store' })
+          const res = await fetch(`/api/farms?province=${encodeURIComponent(province)}&limit=100&page=${page}`, { cache: 'no-store' })
           const json = await res.json()
           if (!res.ok) break
           const batch = Array.isArray(json.data) ? json.data : []
@@ -69,7 +98,7 @@ export default function LuandaMunicipalityMap({ isEn = false, onBack }: LuandaMu
 
     load()
     return () => { cancel = true }
-  }, [])
+  }, [province])
 
   const placeTooltip = (id: string) => {
     const shape = wrapperRef.current?.querySelector<SVGGraphicsElement>(`[data-municipality="${id}"]`)
@@ -111,8 +140,15 @@ export default function LuandaMunicipalityMap({ isEn = false, onBack }: LuandaMu
     setTooltip(null)
   }
 
-  const active = LUANDA_MUNICIPALITIES.find((item) => item.id === tooltip?.id)
-  const activeProducers = active ? producersInMunicipality(producers, active.id) : []
+  const active = municipalities.find((item) => item.id === tooltip?.id)
+  const activeProducers = active
+    ? producers.filter((producer) => {
+        const id = isLuanda
+          ? municipalityIdFor(producer.municipality)
+          : matchMunicipalityId(municipalities, producer.municipality)
+        return id === active.id
+      })
+    : []
 
   return (
     <div>
@@ -126,19 +162,19 @@ export default function LuandaMunicipalityMap({ isEn = false, onBack }: LuandaMu
           {isEn ? 'Back to provinces' : 'Voltar às províncias'}
         </button>
         <p className="text-sm font-semibold text-gray-800">
-          {isEn ? 'Municipalities of Luanda' : 'Municípios de Luanda'}
+          {isEn ? `Municipalities of ${province}` : `Municípios de ${province}`}
         </p>
       </div>
 
-      <div ref={wrapperRef} className="relative mx-auto w-full max-w-[650px]">
+      <div ref={wrapperRef} className={`relative mx-auto w-full ${isLuanda ? 'max-w-[650px]' : 'max-w-5xl'}`}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          viewBox={LUANDA_MUNICIPALITIES_VIEWBOX}
+          viewBox={viewBox}
           className="block h-auto w-full overflow-visible"
           role="img"
-          aria-label={isEn ? 'Municipalities of Luanda' : 'Municípios de Luanda'}
+          aria-label={isEn ? `Municipalities of ${province}` : `Municípios de ${province}`}
         >
-          {LUANDA_MUNICIPALITIES.map((municipality) => {
+          {municipalities.map((municipality) => {
             const isActive = hoveredId === municipality.id
             return (
               <path
@@ -161,27 +197,37 @@ export default function LuandaMunicipalityMap({ isEn = false, onBack }: LuandaMu
             )
           })}
 
-          {LUANDA_MUNICIPALITIES.map((municipality) => {
+          {municipalities.map((municipality) => {
             const isActive = hoveredId === municipality.id
-            const longName = municipality.label.length > 10
+            const lines = isLuanda ? [municipality.label] : labelLines(municipality.label)
+            const fontSize = isLuanda
+              ? (municipality.label.length > 10 ? 22 : 26)
+              : (lines.length > 1 ? 20 : municipality.label.length > 14 ? 18 : 24)
+            const lineHeight = fontSize + 6
             const shared = {
               x: municipality.labelX,
-              y: municipality.labelY,
               textAnchor: 'middle' as const,
               dominantBaseline: 'middle' as const,
-              fontSize: longName ? 22 : 26,
+              fontSize,
               fontWeight: 600,
               fontFamily: 'Arial, Helvetica, sans-serif',
               pointerEvents: 'none' as const,
             }
             return (
               <g key={`${municipality.id}-label`}>
-                <text {...shared} fill="none" stroke={isActive ? HOVER_FILL : BASE_FILL} strokeWidth={5} strokeLinejoin="round">
-                  {municipality.label}
-                </text>
-                <text {...shared} fill="#FFFFFF">
-                  {municipality.label}
-                </text>
+                {lines.map((line, index) => {
+                  const y = municipality.labelY + (index - (lines.length - 1) / 2) * lineHeight
+                  return (
+                    <g key={`${municipality.id}-${index}`}>
+                      <text {...shared} y={y} fill="none" stroke={isActive ? HOVER_FILL : BASE_FILL} strokeWidth={5} strokeLinejoin="round">
+                        {line}
+                      </text>
+                      <text {...shared} y={y} fill="#FFFFFF">
+                        {line}
+                      </text>
+                    </g>
+                  )
+                })}
               </g>
             )
           })}
