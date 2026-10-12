@@ -89,10 +89,10 @@ export function buildApprovedFarmQuery(input: {
     })
   }
 
-  const categoryOr = (input.categories || [])
-    .map((category) => CATEGORY_FIELDS.get(category as ProducerCategoryId))
-    .filter((field): field is string => Boolean(field))
-    .map((field) => ({ [field]: { $gt: 0 } }))
+  const categoryOr = (input.categories || []).flatMap((category) => {
+    const field = CATEGORY_FIELDS.get(category as ProducerCategoryId)
+    return field ? [{ [field]: { $gt: 0 } }] : []
+  })
   if (categoryOr.length) clauses.push({ $or: categoryOr })
   if (clauses.length) query.$and = clauses
 
