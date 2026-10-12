@@ -42,13 +42,17 @@ export default async function ProducerProfilePage({ params }: { params: { id: st
   const verified = owner?.verificationStatus === 'verified'
   const photos = Array.isArray(farm.photos) ? farm.photos.filter((item) => typeof item === 'string') : []
   const figures = [
-    { label: isEn ? 'Pigs' : 'Suínos', value: farm.herd?.total || 0 },
-    { label: isEn ? 'Sows' : 'Matrizes', value: farm.production?.sows || 0 },
-    { label: isEn ? 'Boars' : 'Reprodutores', value: farm.production?.boars || 0 },
-    { label: isEn ? 'Fattening' : 'Engorda', value: farm.production?.fattening || 0 },
+    { label: isEn ? 'Total pigs' : 'Total de porcos', value: farm.herd?.total || 0 },
+    { label: isEn ? 'Females' : 'Fêmeas', value: farm.herd?.females || 0 },
     { label: isEn ? 'For slaughter' : 'Para abate', value: farm.herd?.forSlaughter || 0 },
-    { label: isEn ? 'Capacity' : 'Capacidade', value: farm.capacity || 0 },
+    { label: isEn ? 'For breeding' : 'Para reprodução', value: farm.herd?.forBreeding || 0 },
   ]
+  const extras = [
+    farm.production?.sows ? { label: isEn ? 'Sows' : 'Matrizes', value: farm.production.sows } : null,
+    farm.production?.boars ? { label: isEn ? 'Boars' : 'Reprodutores', value: farm.production.boars } : null,
+    farm.production?.fattening ? { label: isEn ? 'Fattening' : 'Engorda', value: farm.production.fattening } : null,
+    farm.capacity ? { label: isEn ? 'Capacity' : 'Capacidade', value: farm.capacity } : null,
+  ].filter((item): item is { label: string; value: number } => Boolean(item))
 
   return (
     <section className="container-custom py-10">
@@ -84,16 +88,42 @@ export default async function ProducerProfilePage({ params }: { params: { id: st
         )}
       </div>
 
-      {farm.description && <p className="mt-4 max-w-3xl leading-relaxed text-gray-700">{farm.description}</p>}
+      {(farm.notes || farm.description) && (
+        <div className="mt-6 max-w-3xl space-y-4">
+          {farm.notes && (
+            <div>
+              <h2 className="font-heading text-lg font-semibold text-gray-900">{isEn ? 'Notes' : 'Observações'}</h2>
+              <p className="mt-2 leading-relaxed text-gray-700">{farm.notes}</p>
+            </div>
+          )}
+          {farm.description && (
+            <div>
+              <h2 className="font-heading text-lg font-semibold text-gray-900">{isEn ? 'Description' : 'Descrição'}</h2>
+              <p className="mt-2 leading-relaxed text-gray-700">{farm.description}</p>
+            </div>
+          )}
+        </div>
+      )}
 
-      <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <h2 className="mt-8 font-heading text-lg font-semibold text-gray-900">{isEn ? 'Herd' : 'Rebanho'}</h2>
+      <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {figures.map((item) => (
           <div key={item.label} className="rounded-2xl border border-gray-100 bg-white p-4">
             <p className="text-xs uppercase tracking-wide text-gray-500">{item.label}</p>
-            <p className="mt-1 text-2xl font-bold text-gray-900">{item.label === (isEn ? 'Capacity' : 'Capacidade') && !farm.capacity ? '—' : formatCount(item.value)}</p>
+            <p className="mt-1 text-2xl font-bold text-gray-900">{formatCount(item.value)}</p>
           </div>
         ))}
       </div>
+      {extras.length > 0 && (
+        <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {extras.map((item) => (
+            <div key={item.label} className="rounded-2xl border border-gray-100 bg-white p-4">
+              <p className="text-xs uppercase tracking-wide text-gray-500">{item.label}</p>
+              <p className="mt-1 text-2xl font-bold text-gray-900">{formatCount(item.value)}</p>
+            </div>
+          ))}
+        </div>
+      )}
 
       <h2 className="mt-10 font-heading text-xl font-semibold text-gray-900">{isEn ? 'Photos' : 'Fotos'}</h2>
       {photos.length === 0 ? (

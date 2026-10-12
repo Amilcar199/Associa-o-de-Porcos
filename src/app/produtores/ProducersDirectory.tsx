@@ -326,12 +326,10 @@ export default function ProducersDirectory() {
             {farm.description && <p className="mt-2 text-sm leading-relaxed text-gray-700">{farm.description}</p>}
             <p className="mt-3 text-sm font-medium text-primary-700">{isEn ? 'View contact' : 'Ver contacto'}</p>
             <dl className="mt-3 grid grid-cols-2 gap-2 text-sm text-gray-700">
-              <div><dt className="text-xs text-gray-500">{isEn ? 'Pigs' : 'Suínos'}</dt><dd>{formatCount(farm.herd?.total || 0)}</dd></div>
-              <div><dt className="text-xs text-gray-500">{isEn ? 'Sows' : 'Matrizes'}</dt><dd>{formatCount(farm.production?.sows || 0)}</dd></div>
-              <div><dt className="text-xs text-gray-500">{isEn ? 'Boars' : 'Reprodutores'}</dt><dd>{formatCount(farm.production?.boars || 0)}</dd></div>
-              <div><dt className="text-xs text-gray-500">{isEn ? 'Fattening' : 'Engorda'}</dt><dd>{formatCount(farm.production?.fattening || 0)}</dd></div>
+              <div><dt className="text-xs text-gray-500">{isEn ? 'Total pigs' : 'Total de porcos'}</dt><dd>{formatCount(farm.herd?.total || 0)}</dd></div>
+              <div><dt className="text-xs text-gray-500">{isEn ? 'Females' : 'Fêmeas'}</dt><dd>{formatCount(farm.herd?.females || 0)}</dd></div>
               <div><dt className="text-xs text-gray-500">{isEn ? 'For slaughter' : 'Para abate'}</dt><dd>{formatCount(farm.herd?.forSlaughter || 0)}</dd></div>
-              <div><dt className="text-xs text-gray-500">{isEn ? 'Capacity' : 'Capacidade'}</dt><dd>{farm.capacity ? formatCount(farm.capacity) : '—'}</dd></div>
+              <div><dt className="text-xs text-gray-500">{isEn ? 'For breeding' : 'Para reprodução'}</dt><dd>{formatCount(farm.herd?.forBreeding || 0)}</dd></div>
             </dl>
           </Link>
           )
