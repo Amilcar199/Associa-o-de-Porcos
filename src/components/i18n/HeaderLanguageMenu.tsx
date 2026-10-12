@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { getFlag, Locale } from '@/lib/i18n/config'
+import { Locale } from '@/lib/i18n/config'
 import { useLanguage } from '@/components/providers/LanguageProvider'
 
 const OPTIONS: { label: string; value: Locale }[] = [
@@ -12,7 +12,7 @@ const OPTIONS: { label: string; value: Locale }[] = [
 
 const MENU_WIDTH = 192
 
-export default function HeaderLanguageMenu() {
+export default function HeaderLanguageMenu({ tone = 'light' }: { tone?: 'light' | 'dark' }) {
   const { locale, setLocale } = useLanguage()
   const [open, setOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
@@ -65,7 +65,7 @@ export default function HeaderLanguageMenu() {
     }
   }, [open])
 
-  const code = locale.startsWith('en') ? 'EN' : locale === 'pt-BR' ? 'BR' : locale === 'pt-PT' ? 'PT' : 'AO'
+  const code = locale.startsWith('en') ? 'EN' : 'PT'
 
   return (
     <>
@@ -73,15 +73,16 @@ export default function HeaderLanguageMenu() {
         ref={buttonRef}
         type="button"
         onClick={() => setOpen((value) => !value)}
-        className="inline-flex items-center gap-2 rounded-md border border-gray-200 bg-white px-2.5 py-1.5 text-sm shadow-sm hover:bg-gray-50 cursor-pointer"
+        className={tone === 'dark'
+          ? 'inline-flex items-center gap-1 rounded-md border border-white/30 bg-white/10 px-2 py-1.5 text-xs font-semibold text-white hover:bg-white/20 cursor-pointer'
+          : 'inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 cursor-pointer'}
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={current.label}
         title={current.label}
       >
-        <span className="text-lg leading-none" aria-hidden>{getFlag(locale)}</span>
-        <span className="text-xs font-semibold text-gray-700 leading-none">{code}</span>
-        <span className={`text-[10px] text-gray-500 leading-none ${open ? 'rotate-180' : ''}`} aria-hidden>▾</span>
+        <span className="leading-none">{code}</span>
+        <span className={`text-[10px] leading-none ${open ? 'rotate-180' : ''} ${tone === 'dark' ? 'text-white/80' : 'text-gray-500'}`} aria-hidden>▾</span>
       </button>
       {open && mounted && createPortal(
         <div
@@ -102,7 +103,7 @@ export default function HeaderLanguageMenu() {
                     setOpen(false)
                   }}
                 >
-                  <span className="text-base leading-none" aria-hidden>{getFlag(opt.value)}</span>
+                  <span className="w-8 text-xs font-semibold">{opt.value.startsWith('en') ? 'EN' : 'PT'}</span>
                   <span>{opt.label}</span>
                 </button>
               </li>

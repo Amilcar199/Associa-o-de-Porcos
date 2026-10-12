@@ -165,7 +165,7 @@ const Header = () => {
                   </Link>
                 </div>
               )}
-              <div className="ml-2 shrink-0"><HeaderLanguageMenu /></div>
+              <div className="ml-2 shrink-0"><HeaderLanguageMenu tone="dark" /></div>
             </div>
           </div>
         </div>
@@ -502,17 +502,18 @@ const Header = () => {
               )}
             </div>
 
-            <div className="md:hidden shrink-0">
-              <HeaderLanguageMenu />
+            <div className="flex shrink-0 items-center gap-1">
+              <div className="md:hidden">
+                <HeaderLanguageMenu tone="dark" />
+              </div>
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="lg:hidden p-2 rounded-lg text-white hover:bg-white/10 transition-colors"
+                aria-label={isMenuOpen ? 'Fechar menu' : 'Abrir menu'}
+              >
+                {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
             </div>
-
-            {/* Botão Menu Mobile */}
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="lg:hidden p-2 rounded-lg text-white hover:bg-white/10 transition-colors"
-            >
-              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
           </div>
         </div>
 
