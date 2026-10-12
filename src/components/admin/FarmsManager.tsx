@@ -7,6 +7,7 @@ import toast from 'react-hot-toast'
 import DataTable, { Column } from './ui/DataTable'
 import ConfirmDialog from './ui/ConfirmDialog'
 import ImageUpload from './ui/ImageUpload'
+import { FARM_PHOTO_LIMIT } from '@/lib/farm-owner'
 
 interface FarmRow {
   _id: string
@@ -224,15 +225,15 @@ const FarmsManager = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6">
             <h3 className="font-heading text-lg font-semibold">Fotos de {photoTarget.producerName}</h3>
-            <p className="mt-1 text-sm text-gray-500">JPEG, PNG, GIF ou WebP, até 5 MB. No máximo 6. As fotos aparecem no perfil público depois da aprovação.</p>
+            <p className="mt-1 text-sm text-gray-500">JPEG, PNG, GIF ou WebP, até 5 MB. No máximo {FARM_PHOTO_LIMIT}. As fotos aparecem no perfil público depois da aprovação.</p>
             <div className="mt-4">
               <ImageUpload
                 multiple
-                maxCount={6}
+                maxCount={FARM_PHOTO_LIMIT}
                 currentCount={photoDraft.length}
                 category="farm"
                 label="Adicionar fotos"
-                onImageUploaded={(url) => setPhotoDraft((current) => current.includes(url) ? current : [...current, url].slice(0, 6))}
+                onImageUploaded={(url) => setPhotoDraft((current) => current.includes(url) ? current : [...current, url].slice(0, FARM_PHOTO_LIMIT))}
               />
             </div>
             <ul className="mt-3 space-y-2">

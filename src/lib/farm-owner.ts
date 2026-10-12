@@ -36,10 +36,12 @@ export function officialMunicipality(province: string, value: unknown) {
   return list.find((item) => placeKey(item) === placeKey(name)) || ''
 }
 
+export const FARM_PHOTO_LIMIT = 8
+
 export function parseFarmPhotos(value: unknown): { photos: string[]; error?: string } {
   if (value == null || value === '') return { photos: [] }
   if (!Array.isArray(value)) return { photos: [], error: 'As fotos têm de ser uma lista' }
-  if (value.length > 6) return { photos: [], error: 'Pode enviar no máximo 6 fotos' }
+  if (value.length > FARM_PHOTO_LIMIT) return { photos: [], error: `Pode enviar no máximo ${FARM_PHOTO_LIMIT} fotos` }
   const photos: string[] = []
   for (const item of value) {
     if (typeof item !== 'string') return { photos: [], error: 'Cada foto tem de ser um endereço de imagem' }

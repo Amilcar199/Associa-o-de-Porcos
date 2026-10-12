@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import ImageUpload from '@/components/admin/ui/ImageUpload'
+import { FARM_PHOTO_LIMIT } from '@/lib/farm-owner'
 import { ANGOLA_PROVINCE_NAMES } from '@/components/sections/PigMap/angola-provinces'
 import { MUNICIPALITIES_BY_PROVINCE } from '@/components/sections/PigMap/province-municipalities'
 import PigOffers from '@/components/producer/PigOffers'
@@ -363,11 +364,11 @@ export default function ProducerPanel() {
             </label>
             <ImageUpload
               multiple
-              maxCount={6}
+              maxCount={FARM_PHOTO_LIMIT}
               currentCount={farmForm.photos.length}
               category="farm"
               label={t('Fotos da fazenda', 'Farm photos')}
-              onImageUploaded={(url) => setFarmForm((current) => ({ ...current, photos: current.photos.includes(url) ? current.photos : [...current.photos, url].slice(0, 6) }))}
+              onImageUploaded={(url) => setFarmForm((current) => ({ ...current, photos: current.photos.includes(url) ? current.photos : [...current.photos, url].slice(0, FARM_PHOTO_LIMIT) }))}
             />
             {farmForm.photos.length > 0 && (
               <ul className="grid grid-cols-3 gap-2 sm:grid-cols-6">

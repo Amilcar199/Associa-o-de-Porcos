@@ -24,7 +24,7 @@ export default function ImageUpload({
   maxSize = 5 * 1024 * 1024, // 5MB
   category,
   multiple = false,
-  maxCount = 6,
+  maxCount = 8,
   currentCount = 0,
 }: ImageUploadProps) {
   const { locale } = useLanguage()

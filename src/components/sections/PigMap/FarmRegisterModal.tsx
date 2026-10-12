@@ -5,6 +5,7 @@ import { X, Send, CheckCircle2 } from 'lucide-react'
 import { ANGOLA_PROVINCE_NAMES } from './angola-provinces'
 import { MUNICIPALITIES_BY_PROVINCE } from './province-municipalities'
 import ImageUpload from '@/components/admin/ui/ImageUpload'
+import { FARM_PHOTO_LIMIT } from '@/lib/farm-owner'
 
 interface FarmRegisterModalProps {
   isOpen: boolean
@@ -236,13 +237,13 @@ export default function FarmRegisterModal({ isOpen, onClose, isEn = false, defau
               <div>
                 <ImageUpload
                   multiple
-                  maxCount={6}
+                  maxCount={FARM_PHOTO_LIMIT}
                   currentCount={photos.length}
                   category="farm"
                   label={isEn ? 'Farm photos' : 'Fotos da fazenda'}
-                  onImageUploaded={(url) => setPhotos((current) => current.includes(url) ? current : [...current, url].slice(0, 6))}
+                  onImageUploaded={(url) => setPhotos((current) => current.includes(url) ? current : [...current, url].slice(0, FARM_PHOTO_LIMIT))}
                 />
-                <p className="mt-1 text-xs text-gray-500">{photos.length}/6 · JPEG, PNG, GIF ou WebP, até 5 MB cada</p>
+                <p className="mt-1 text-xs text-gray-500">{photos.length}/{FARM_PHOTO_LIMIT} · JPEG, PNG, GIF ou WebP, até 5 MB cada</p>
                 {photos.length > 0 && (
                   <ul className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-6">
                     {photos.map((url, index) => (
