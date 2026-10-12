@@ -12,6 +12,14 @@ function formatCount(value: number) {
   return new Intl.NumberFormat('pt-AO').format(value || 0)
 }
 
+function whatsappNumber(phone?: string) {
+  const digits = String(phone || '').replace(/\D/g, '')
+  if (digits.startsWith('00')) return digits.slice(2)
+  if (digits.startsWith('244') && digits.length >= 12) return digits
+  if (digits.length === 9) return `244${digits}`
+  return digits.length >= 10 ? digits : ''
+}
+
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   if (!/^[a-f\d]{24}$/i.test(params.id)) return { title: 'Produtor' }
   await connectDB()
@@ -48,6 +56,34 @@ export default async function ProducerProfilePage({ params }: { params: { id: st
       <h1 className="mt-3 font-heading text-3xl font-bold text-gray-900">{farm.producerName}</h1>
       {verified && <p className="mt-2 inline-flex rounded-full bg-primary-100 px-3 py-1 text-sm font-medium text-primary-800">{isEn ? 'Verified producer' : 'Produtor verificado'}</p>}
       <p className="mt-1 text-gray-600">{farm.farmName || (isEn ? 'Farm' : 'Fazenda')} · {farm.province}{farm.municipality ? ` · ${farm.municipality}` : ''}</p>
+
+      <div className="mt-6 max-w-3xl rounded-2xl border border-gray-100 bg-white p-5">
+        <h2 className="font-heading text-lg font-semibold text-gray-900">{isEn ? 'Contact' : 'Contacto'}</h2>
+        {farm.phone || farm.email ? (
+          <div className="mt-3 flex flex-wrap gap-3">
+            {farm.phone && (
+              <a href={`tel:${farm.phone}`} className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700">
+                {isEn ? 'Call' : 'Ligar'} · {farm.phone}
+              </a>
+            )}
+            {whatsappNumber(farm.phone) && (
+              <a href={`https://wa.me/${whatsappNumber(farm.phone)}`} target="_blank" rel="noopener noreferrer" className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700">
+                WhatsApp
+              </a>
+            )}
+            {farm.email && (
+              <a href={`mailto:${farm.email}`} className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-800 hover:border-primary-200">
+                {farm.email}
+              </a>
+            )}
+          </div>
+        ) : (
+          <p className="mt-2 text-sm text-gray-500">
+            {isEn ? 'This producer has not published a phone number or email yet.' : 'Este produtor ainda não publicou telefone nem email.'}
+          </p>
+        )}
+      </div>
+
       {farm.description && <p className="mt-4 max-w-3xl leading-relaxed text-gray-700">{farm.description}</p>}
 
       <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

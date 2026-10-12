@@ -32,6 +32,7 @@ export const LUANDA_MUNICIPALITIES: LuandaMunicipality[] = [
 ]
 
 export interface MapProducer {
+  id?: string
   producerName: string
   farmName?: string
   municipality?: string

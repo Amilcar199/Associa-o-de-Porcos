@@ -324,6 +324,7 @@ export default function ProducersDirectory() {
               </div>
             )}
             {farm.description && <p className="mt-2 text-sm leading-relaxed text-gray-700">{farm.description}</p>}
+            <p className="mt-3 text-sm font-medium text-primary-700">{isEn ? 'View contact' : 'Ver contacto'}</p>
             <dl className="mt-3 grid grid-cols-2 gap-2 text-sm text-gray-700">
               <div><dt className="text-xs text-gray-500">{isEn ? 'Pigs' : 'Suínos'}</dt><dd>{formatCount(farm.herd?.total || 0)}</dd></div>
               <div><dt className="text-xs text-gray-500">{isEn ? 'Sows' : 'Matrizes'}</dt><dd>{formatCount(farm.production?.sows || 0)}</dd></div>

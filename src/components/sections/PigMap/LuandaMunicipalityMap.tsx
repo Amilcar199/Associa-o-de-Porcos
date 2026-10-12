@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import { municipalityIdFor, PRODUCER_SCALES, producerScale, type MapProducer, type ProducerScale } from './luanda-municipalities'
 import { matchMunicipalityId } from './province-municipalities'
@@ -77,7 +78,8 @@ export default function LuandaMunicipalityMap({ province = 'Luanda', isEn = fals
           const json = await res.json()
           if (!res.ok) break
           const batch = Array.isArray(json.data) ? json.data : []
-          collected.push(...batch.map((farm: MapProducer & { herd?: { total?: number } }) => ({
+          collected.push(...batch.map((farm: MapProducer & { _id?: string; herd?: { total?: number } }) => ({
+            id: farm._id ? String(farm._id) : farm.id,
             producerName: farm.producerName,
             farmName: farm.farmName,
             municipality: farm.municipality,
@@ -290,12 +292,21 @@ export default function LuandaMunicipalityMap({ province = 'Luanda', isEn = fals
               visibleProducers.length > 0 ? (
                 <ul className="mt-4 divide-y divide-gray-100">
                   {visibleProducers.map((producer, index) => (
-                    <li key={`${producer.producerName}-${producer.farmName}-${index}`} className="flex items-baseline justify-between gap-3 py-2 text-sm">
-                      <span>
-                        <span className="font-semibold text-gray-900">{producer.producerName}</span>
-                        {producer.farmName ? <span className="text-gray-600"> — {producer.farmName}</span> : null}
-                      </span>
-                      <span className="shrink-0 text-gray-500">{producer.herdTotal || 0} {isEn ? 'pigs' : 'suínos'}</span>
+                    <li key={producer.id || `${producer.producerName}-${producer.farmName}-${index}`}>
+                      {producer.id ? (
+                        <Link href={`/produtores/${producer.id}`} className="flex items-baseline justify-between gap-3 py-2 text-sm hover:text-primary-700">
+                          <span>
+                            <span className="font-semibold text-gray-900">{producer.producerName}</span>
+                            {producer.farmName ? <span className="text-gray-600"> — {producer.farmName}</span> : null}
+                          </span>
+                          <span className="shrink-0 text-primary-700">{isEn ? 'View contact' : 'Ver contacto'}</span>
+                        </Link>
+                      ) : (
+                        <div className="flex items-baseline justify-between gap-3 py-2 text-sm">
+                          <span className="font-semibold text-gray-900">{producer.producerName}</span>
+                          <span className="shrink-0 text-gray-500">{producer.herdTotal || 0} {isEn ? 'pigs' : 'suínos'}</span>
+                        </div>
+                      )}
                     </li>
                   ))}
                 </ul>
