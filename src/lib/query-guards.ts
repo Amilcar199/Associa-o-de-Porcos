@@ -9,6 +9,9 @@ const ALLOWED_SORT_FIELDS = new Set([
   'views',
   'featured',
   'breed',
+  'producerName',
+  'herd.total',
+  'capacity',
 ])
 
 export function safeSortField(sort: string | undefined, fallback = 'createdAt'): string {

@@ -16,23 +16,31 @@ import {
 import { rateLimitOrNull } from '@/lib/rate-limit'
 import { ANGOLA_PROVINCE_NAMES } from '@/components/sections/PigMap/angola-provinces'
 import { parseFarmPhotos } from '@/lib/farm-owner'
+import { buildApprovedFarmQuery, farmListSort } from '@/lib/producer-filters'
 
-// GET /api/farms - Lista pública de fazendas aprovadas (opcionalmente filtradas por província)
-// Usado, por exemplo, para listar produtores de uma província no popup do mapa.
+// GET /api/farms - Lista pública de fazendas aprovadas.
+// O mapa filtra por província. O diretório também filtra por região, município, categoria e efectivo.
 export async function GET(req: NextRequest) {
   try {
     await connectDB()
 
     const { searchParams } = new URL(req.url)
     const pagination = getPaginationParams(searchParams)
-    const province = searchParams.get('province')
-
-    const query: any = { status: 'approved', isActive: true }
-    if (province) query.province = province
+    const sorting = farmListSort(searchParams.get('sort'))
+    const minHerd = Number(searchParams.get('minHerd') || 0)
+    const query = buildApprovedFarmQuery({
+      q: searchParams.get('q') || '',
+      region: searchParams.get('region') || '',
+      province: searchParams.get('province') || '',
+      municipality: searchParams.get('municipality') || '',
+      categories: searchParams.getAll('category'),
+      minHerd: Number.isFinite(minHerd) ? minHerd : 0,
+    })
 
     const result = await paginateResults(Farm, query, {
       ...pagination,
-      sort: pagination.sort || 'createdAt',
+      sort: sorting.sort,
+      order: sorting.order,
     })
 
     // Nunca expor dados de contacto publicamente na listagem
