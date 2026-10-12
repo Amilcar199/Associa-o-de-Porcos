@@ -114,7 +114,7 @@ const Header = () => {
       <div className="bg-primary-800 text-white py-1 hidden md:block relative z-[200] overflow-visible">
         <div className="container-custom">
           <div className="flex justify-between items-center text-sm">
-            <div className="flex items-center space-x-6">
+            <div className="flex min-w-0 flex-1 items-center space-x-6 overflow-hidden">
               <div className="flex items-center space-x-2">
                 <Phone size={14} />
                 <span>{siteConfig?.contactPhone || '+244 923 221 950'}</span>
@@ -131,9 +131,7 @@ const Header = () => {
               </div>
             </div>
             
-            <div className="flex items-center space-x-4">
-
-              {/* Seletor de idioma removido do header conforme solicitação */}
+            <div className="flex shrink-0 items-center space-x-4">
 
               {status === 'loading' ? (
                 <div className="animate-pulse">{dict.user.loading}</div>
@@ -167,7 +165,7 @@ const Header = () => {
                   </Link>
                 </div>
               )}
-              <div className="ml-2"><HeaderLanguageMenu /></div>
+              <div className="ml-2 shrink-0"><HeaderLanguageMenu /></div>
             </div>
           </div>
         </div>
@@ -504,6 +502,10 @@ const Header = () => {
               )}
             </div>
 
+            <div className="md:hidden shrink-0">
+              <HeaderLanguageMenu />
+            </div>
+
             {/* Botão Menu Mobile */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -665,10 +667,6 @@ const Header = () => {
                     </div>
                   )}
 
-                  {/* Seletor de idioma apenas no mobile (evitar duplicar com Top Bar em md+) */}
-                  <div className="pt-4 border-t border-gray-200 md:hidden">
-                    <HeaderLanguageMenu />
-                  </div>
                 </nav>
               </div>
             </motion.div>

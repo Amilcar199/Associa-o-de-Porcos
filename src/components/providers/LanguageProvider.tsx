@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useEffect, useMemo, useState, ReactNode } from 'react'
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, ReactNode } from 'react'
 import Cookies from 'js-cookie'
 import { DEFAULT_LOCALE, Locale, languageToRouteSegment, normalizeLocale, parseAcceptLanguage } from '@/lib/i18n/config'
 import { usePathname, useRouter } from 'next/navigation'
@@ -17,6 +17,10 @@ const LanguageContext = createContext<LanguageContextValue | undefined>(undefine
 export function LanguageProvider({ children }: { children: ReactNode }) {
 	const router = useRouter()
 	const pathname = usePathname()
+	const pathnameRef = useRef(pathname)
+	const routerRef = useRef(router)
+	pathnameRef.current = pathname
+	routerRef.current = router
 	const [locale, setLocaleState] = useState<Locale>(DEFAULT_LOCALE)
 
 	useEffect(() => {
@@ -33,30 +37,26 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 		setLocaleState(resolved)
 	}, [])
 
-	const setLocale = (next: Locale, options?: { updateRoute?: boolean }) => {
+	const setLocale = useCallback((next: Locale, options?: { updateRoute?: boolean }) => {
 		Cookies.set(LOCALE_COOKIE_KEY, next, { expires: 365, sameSite: 'lax', path: '/' })
 		setLocaleState(next)
-		const parts = (pathname || '/').split('/').filter(Boolean)
+		const parts = (pathnameRef.current || '/').split('/').filter(Boolean)
 		const first = parts[0]
 		const hasLangPrefix = first === 'pt' || first === 'en'
 		const rest = hasLangPrefix ? parts.slice(1).join('/') : parts.join('/')
-		const normalized = normalizeLocale(next)
-		const segment = languageToRouteSegment(normalized)
-		const newPath = `/${segment}/${rest}`.replace(/\/$/, '')
+		const segment = languageToRouteSegment(normalizeLocale(next))
+		const newPath = `/${segment}${rest ? `/${rest}` : ''}`
+		const currentPath = pathnameRef.current || '/'
 
-		if (options?.updateRoute === false) {
-			// Force server components to re-read cookies
-			router.refresh()
+		if (options?.updateRoute === false || newPath === currentPath) {
+			routerRef.current.refresh()
 			return
 		}
 
-		// Replace URL to avoid stacking history and ensure middleware sets cookie prefix
-		router.replace(newPath || `/${segment}`)
-		// Ensure a refresh so server-rendered parts (layout, RSC) re-read cookie immediately
-		setTimeout(() => { try { router.refresh() } catch {} }, 0)
-	}
+		routerRef.current.replace(newPath)
+	}, [])
 
-	const value = useMemo(() => ({ locale, setLocale }), [locale])
+	const value = useMemo(() => ({ locale, setLocale }), [locale, setLocale])
 	return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>
 }
 
