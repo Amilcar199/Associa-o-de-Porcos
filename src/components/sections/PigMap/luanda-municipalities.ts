@@ -35,6 +35,21 @@ export interface MapProducer {
   producerName: string
   farmName?: string
   municipality?: string
+  herdTotal?: number
+}
+
+export type ProducerScale = 'small' | 'medium' | 'large'
+
+export const PRODUCER_SCALES: { id: ProducerScale; maxExclusive?: number; min?: number; label: string; labelEn: string; hint: string; hintEn: string }[] = [
+  { id: 'small', maxExclusive: 50, label: 'Pequenos', labelEn: 'Small', hint: 'Até 49 suínos', hintEn: 'Up to 49 pigs' },
+  { id: 'medium', min: 50, maxExclusive: 200, label: 'Médios', labelEn: 'Medium', hint: '50 a 199 suínos', hintEn: '50 to 199 pigs' },
+  { id: 'large', min: 200, label: 'Grandes', labelEn: 'Large', hint: '200 ou mais suínos', hintEn: '200 pigs or more' },
+]
+
+export function producerScale(total = 0): ProducerScale {
+  if (total >= 200) return 'large'
+  if (total >= 50) return 'medium'
+  return 'small'
 }
 
 function normalizePlace(value: string) {

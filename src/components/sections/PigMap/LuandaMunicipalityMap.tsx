@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { ArrowLeft } from 'lucide-react'
-import { municipalityIdFor, type MapProducer } from './luanda-municipalities'
+import { municipalityIdFor, PRODUCER_SCALES, producerScale, type MapProducer, type ProducerScale } from './luanda-municipalities'
 import { matchMunicipalityId } from './province-municipalities'
 import { MUNICIPALITY_MAPS } from './municipality-map-paths'
 
@@ -57,10 +57,14 @@ export default function LuandaMunicipalityMap({ province = 'Luanda', isEn = fals
   const [producers, setProducers] = useState<MapProducer[]>([])
   const [loading, setLoading] = useState(true)
   const [hoveredId, setHoveredId] = useState<string | null>(null)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [selectedScale, setSelectedScale] = useState<ProducerScale | null>(null)
   const [tooltip, setTooltip] = useState<TooltipState | null>(null)
 
   useEffect(() => {
     let cancel = false
+    setSelectedId(null)
+    setSelectedScale(null)
 
     async function load() {
       setLoading(true)
@@ -73,10 +77,11 @@ export default function LuandaMunicipalityMap({ province = 'Luanda', isEn = fals
           const json = await res.json()
           if (!res.ok) break
           const batch = Array.isArray(json.data) ? json.data : []
-          collected.push(...batch.map((farm: MapProducer) => ({
+          collected.push(...batch.map((farm: MapProducer & { herd?: { total?: number } }) => ({
             producerName: farm.producerName,
             farmName: farm.farmName,
             municipality: farm.municipality,
+            herdTotal: farm.herd?.total || 0,
           })))
           pages = json.pagination?.pages || 1
           page += 1
@@ -134,6 +139,18 @@ export default function LuandaMunicipalityMap({ province = 'Luanda', isEn = fals
     setTooltip(null)
   }
 
+  const selected = municipalities.find((item) => item.id === selectedId) || null
+  const producersHere = (municipalityId: string) => producers.filter((producer) => {
+    const id = isLuanda
+      ? municipalityIdFor(producer.municipality)
+      : matchMunicipalityId(municipalities, producer.municipality)
+    return id === municipalityId
+  })
+  const selectedProducers = selected ? producersHere(selected.id) : []
+  const visibleProducers = selectedScale
+    ? selectedProducers.filter((producer) => producerScale(producer.herdTotal) === selectedScale)
+    : []
+
   const active = municipalities.find((item) => item.id === tooltip?.id)
   const activeProducers = active
     ? producers.filter((producer) => {
@@ -177,7 +194,7 @@ export default function LuandaMunicipalityMap({ province = 'Luanda', isEn = fals
           )}
           <g clipPath={map?.outline ? `url(#${clipId})` : undefined}>
             {municipalities.map((municipality) => {
-              const isActive = hoveredId === municipality.id
+              const isActive = hoveredId === municipality.id || selectedId === municipality.id
               return (
                 <path
                   key={municipality.id}
@@ -186,12 +203,17 @@ export default function LuandaMunicipalityMap({ province = 'Luanda', isEn = fals
                   tabIndex={0}
                   role="button"
                   aria-label={municipality.label}
+                  aria-pressed={selectedId === municipality.id}
                   fill={isActive ? HOVER_FILL : BASE_FILL}
                   fillRule="evenodd"
                   stroke="#ffffff"
                   strokeWidth={stroke}
                   strokeLinejoin="round"
                   className="cursor-pointer outline-none transition-[fill] duration-200"
+                  onClick={() => {
+                    setSelectedId(municipality.id)
+                    setSelectedScale(null)
+                  }}
                   onMouseEnter={() => showMunicipality(municipality.id)}
                   onMouseLeave={hideMunicipality}
                   onFocus={() => showMunicipality(municipality.id)}
@@ -237,6 +259,54 @@ export default function LuandaMunicipalityMap({ province = 'Luanda', isEn = fals
             )
           })}
         </svg>
+
+        {selected && (
+          <div className="mt-4 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+            <h3 className="font-heading text-lg font-semibold text-gray-900">{selected.label}</h3>
+            <p className="mt-1 text-sm text-gray-500">
+              {isEn
+                ? 'Choose the farm size. The list shows the producers registered in this municipality.'
+                : 'Escolha o porte. A lista mostra os produtores cadastrados neste município.'}
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {PRODUCER_SCALES.map((scale) => {
+                const count = selectedProducers.filter((producer) => producerScale(producer.herdTotal) === scale.id).length
+                const pressed = selectedScale === scale.id
+                return (
+                  <button
+                    key={scale.id}
+                    type="button"
+                    aria-pressed={pressed}
+                    onClick={() => setSelectedScale(scale.id)}
+                    className={`rounded-full border px-3 py-1.5 text-sm ${pressed ? 'border-primary-600 bg-primary-600 text-white' : 'border-gray-200 bg-gray-50 text-gray-700 hover:border-primary-200'}`}
+                  >
+                    {isEn ? scale.labelEn : scale.label}
+                    <span className={pressed ? 'text-white/80' : 'text-gray-500'}> · {count} · {isEn ? scale.hintEn : scale.hint}</span>
+                  </button>
+                )
+              })}
+            </div>
+            {selectedScale && (
+              visibleProducers.length > 0 ? (
+                <ul className="mt-4 divide-y divide-gray-100">
+                  {visibleProducers.map((producer, index) => (
+                    <li key={`${producer.producerName}-${producer.farmName}-${index}`} className="flex items-baseline justify-between gap-3 py-2 text-sm">
+                      <span>
+                        <span className="font-semibold text-gray-900">{producer.producerName}</span>
+                        {producer.farmName ? <span className="text-gray-600"> — {producer.farmName}</span> : null}
+                      </span>
+                      <span className="shrink-0 text-gray-500">{producer.herdTotal || 0} {isEn ? 'pigs' : 'suínos'}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-4 text-sm text-gray-500">
+                  {isEn ? `No producers of this size are registered in ${selected.label}.` : `Nenhum produtor deste porte está cadastrado em ${selected.label}.`}
+                </p>
+              )
+            )}
+          </div>
+        )}
 
         <div
           ref={tooltipRef}

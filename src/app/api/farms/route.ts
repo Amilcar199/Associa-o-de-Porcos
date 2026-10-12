@@ -15,7 +15,7 @@ import {
 } from '@/lib/api-utils'
 import { rateLimitOrNull } from '@/lib/rate-limit'
 import { ANGOLA_PROVINCE_NAMES } from '@/components/sections/PigMap/angola-provinces'
-import { parseFarmPhotos } from '@/lib/farm-owner'
+import { officialMunicipality, parseFarmPhotos } from '@/lib/farm-owner'
 import { buildApprovedFarmQuery, farmListSort } from '@/lib/producer-filters'
 
 // GET /api/farms - Lista pública de fazendas aprovadas.
@@ -79,8 +79,15 @@ export async function POST(req: NextRequest) {
     if (!data.producerName) {
       return errorResponse('Nome do produtor é obrigatório')
     }
+    if (!String(data.farmName || '').trim()) {
+      return errorResponse('Nome da fazenda é obrigatório')
+    }
     if (!data.province || !ANGOLA_PROVINCE_NAMES.includes(data.province)) {
       return errorResponse('Selecione uma província válida de Angola')
+    }
+    const municipality = officialMunicipality(data.province, data.municipality)
+    if (!municipality) {
+      return errorResponse('Selecione um município dessa província')
     }
     if (!data.herd || typeof data.herd !== 'object') {
       return errorResponse('Informe os dados do rebanho (total, fêmeas, abate, reprodução)')
@@ -123,9 +130,9 @@ export async function POST(req: NextRequest) {
 
     const farm = new Farm({
       producerName: data.producerName,
-      farmName: data.farmName || undefined,
+      farmName: String(data.farmName).trim(),
       province: data.province,
-      municipality: data.municipality || undefined,
+      municipality,
       coordinates,
       phone: data.phone || undefined,
       email: data.email || undefined,

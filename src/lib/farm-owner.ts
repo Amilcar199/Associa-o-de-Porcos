@@ -1,4 +1,5 @@
 import { ANGOLA_PROVINCE_NAMES } from '@/components/sections/PigMap/angola-provinces'
+import { MUNICIPALITIES_BY_PROVINCE } from '@/components/sections/PigMap/province-municipalities'
 
 export interface OwnerHerd {
   total: number
@@ -22,6 +23,17 @@ function count(value: unknown, max = 1_000_000): number | null {
 function text(value: unknown, max: number): string {
   if (typeof value !== 'string') return ''
   return value.trim().slice(0, max)
+}
+
+function placeKey(value: string) {
+  return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+}
+
+export function officialMunicipality(province: string, value: unknown) {
+  const name = text(value, 120)
+  if (!name) return ''
+  const list = MUNICIPALITIES_BY_PROVINCE[province] || []
+  return list.find((item) => placeKey(item) === placeKey(name)) || ''
 }
 
 export function parseFarmPhotos(value: unknown): { photos: string[]; error?: string } {
@@ -49,8 +61,12 @@ export function cleanFarmPhotos(value: unknown): string[] {
 export function parseOwnerFarm(input: Record<string, any>): { data?: Record<string, unknown>; error?: string } {
   const producerName = text(input.producerName, 120)
   const province = text(input.province, 80)
+  const farmName = text(input.farmName, 120)
+  const municipality = officialMunicipality(province, input.municipality)
   if (!producerName) return { error: 'Nome do produtor é obrigatório' }
+  if (!farmName) return { error: 'Nome da fazenda é obrigatório' }
   if (!province || !ANGOLA_PROVINCE_NAMES.includes(province)) return { error: 'Selecione uma província válida de Angola' }
+  if (!municipality) return { error: 'Selecione um município dessa província' }
 
   const herdInput = input.herd && typeof input.herd === 'object' ? input.herd : {}
   const total = count(herdInput.total)
@@ -86,9 +102,9 @@ export function parseOwnerFarm(input: Record<string, any>): { data?: Record<stri
   return {
     data: {
       producerName,
-      farmName: text(input.farmName, 120) || undefined,
+      farmName,
       province,
-      municipality: text(input.municipality, 120) || undefined,
+      municipality,
       phone: text(input.phone, 30) || undefined,
       email: email || undefined,
       herd: { total, females, forSlaughter, forBreeding },

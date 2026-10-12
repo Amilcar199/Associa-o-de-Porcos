@@ -1,8 +1,9 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { X, Send, CheckCircle2 } from 'lucide-react'
 import { ANGOLA_PROVINCE_NAMES } from './angola-provinces'
+import { MUNICIPALITIES_BY_PROVINCE } from './province-municipalities'
 import ImageUpload from '@/components/admin/ui/ImageUpload'
 
 interface FarmRegisterModalProps {
@@ -18,6 +19,17 @@ export default function FarmRegisterModal({ isOpen, onClose, isEn = false, defau
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const [photos, setPhotos] = useState<string[]>([])
+  const [province, setProvince] = useState(defaultProvince || '')
+  const [municipality, setMunicipality] = useState('')
+  const municipalities = MUNICIPALITIES_BY_PROVINCE[province] || []
+
+  useEffect(() => {
+    if (!isOpen) return
+    setProvince(defaultProvince || '')
+    setMunicipality('')
+    setSuccess(false)
+    setError(null)
+  }, [isOpen, defaultProvince])
 
   const onOverlayClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) onClose()
@@ -128,9 +140,9 @@ export default function FarmRegisterModal({ isOpen, onClose, isEn = false, defau
                 </div>
                 <div>
                   <label htmlFor="farmName" className="block text-sm text-gray-700 mb-1">
-                    {isEn ? 'Farm name' : 'Nome da fazenda'}
+                    {isEn ? 'Farm name' : 'Nome da fazenda'} *
                   </label>
-                  <input id="farmName" name="farmName" maxLength={120} className="input-field px-3 py-2" placeholder={isEn ? 'Optional' : 'Opcional'} />
+                  <input id="farmName" name="farmName" required maxLength={120} className="input-field px-3 py-2" placeholder={isEn ? 'Farm name' : 'Nome da fazenda'} />
                 </div>
               </div>
 
@@ -139,7 +151,17 @@ export default function FarmRegisterModal({ isOpen, onClose, isEn = false, defau
                   <label htmlFor="province" className="block text-sm text-gray-700 mb-1">
                     {isEn ? 'Province' : 'Província'} *
                   </label>
-                  <select id="province" name="province" required defaultValue={defaultProvince || ''} className="input-field px-3 py-2">
+                  <select
+                    id="province"
+                    name="province"
+                    required
+                    value={province}
+                    onChange={(event) => {
+                      setProvince(event.target.value)
+                      setMunicipality('')
+                    }}
+                    className="input-field px-3 py-2"
+                  >
                     <option value="" disabled>{isEn ? 'Select a province' : 'Selecione uma província'}</option>
                     {ANGOLA_PROVINCE_NAMES.map((p) => (
                       <option key={p} value={p}>{p}</option>
@@ -148,9 +170,22 @@ export default function FarmRegisterModal({ isOpen, onClose, isEn = false, defau
                 </div>
                 <div>
                   <label htmlFor="municipality" className="block text-sm text-gray-700 mb-1">
-                    {isEn ? 'Municipality' : 'Município'}
+                    {isEn ? 'Municipality' : 'Município'} *
                   </label>
-                  <input id="municipality" name="municipality" maxLength={120} className="input-field px-3 py-2" placeholder={isEn ? 'Optional' : 'Opcional'} />
+                  <select
+                    id="municipality"
+                    name="municipality"
+                    required
+                    value={municipality}
+                    disabled={!province}
+                    onChange={(event) => setMunicipality(event.target.value)}
+                    className="input-field px-3 py-2 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    <option value="">{province ? (isEn ? 'Select a municipality' : 'Selecione um município') : (isEn ? 'Select a province first' : 'Selecione primeiro a província')}</option>
+                    {municipalities.map((name) => (
+                      <option key={name} value={name}>{name}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
 

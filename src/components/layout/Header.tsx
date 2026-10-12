@@ -238,7 +238,7 @@ const Header = () => {
                         {item.name}
                         <span className={`transition-transform ${isAboutMenuOpen ? 'rotate-180' : ''}`}>▾</span>
                         {isActiveLink(item.href) && (
-                          <motion.div
+                          <motion.span
                             layoutId="activeLink"
                             className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary-300"
                             initial={false}
@@ -298,7 +298,7 @@ const Header = () => {
                         {item.name}
                         <span className={`transition-transform ${isProductsMenuOpen ? 'rotate-180' : ''}`}>▾</span>
                         {productsActive && (
-                          <motion.div
+                          <motion.span
                             layoutId="activeLink"
                             className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary-300"
                             initial={false}
@@ -342,7 +342,7 @@ const Header = () => {
                         {item.name}
                         <span className={`transition-transform ${isKnowledgeMenuOpen ? 'rotate-180' : ''}`}>▾</span>
                         {knowledgeActive && (
-                          <motion.div
+                          <motion.span
                             layoutId="activeLink"
                             className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary-300"
                             initial={false}
@@ -380,7 +380,7 @@ const Header = () => {
                   >
                     {item.name}
                     {isActiveLink(item.href) && (
-                      <motion.div
+                      <motion.span
                         layoutId="activeLink"
                         className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary-300"
                         initial={false}

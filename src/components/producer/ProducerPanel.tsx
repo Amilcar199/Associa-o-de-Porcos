@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import ImageUpload from '@/components/admin/ui/ImageUpload'
 import { ANGOLA_PROVINCE_NAMES } from '@/components/sections/PigMap/angola-provinces'
+import { MUNICIPALITIES_BY_PROVINCE } from '@/components/sections/PigMap/province-municipalities'
 import PigOffers from '@/components/producer/PigOffers'
 import { useLanguage } from '@/components/providers/LanguageProvider'
 
@@ -323,15 +324,21 @@ export default function ProducerPanel() {
           <form onSubmit={saveFarm} className="space-y-4 rounded-2xl border border-gray-100 bg-white p-6">
             <h2 className="font-heading text-xl font-semibold">{editingId ? t('Editar fazenda', 'Edit farm') : t('Registar fazenda', 'Register farm')}</h2>
             <p className="text-sm text-gray-500">{t('Uma fazenda nova fica pendente até a associação aprovar. Os números do mapa usam o rebanho; matrizes, reprodutores e engorda descrevem a exploração.', 'A new farm stays pending until the association approves it. Map figures use the herd; sows, boars and fattening describe the farm.')}</p>
-            <Field label={t('Produtor', 'Producer')} value={farmForm.producerName} onChange={(value) => setFarmForm({ ...farmForm, producerName: value })} />
-            <Field label={t('Nome da fazenda', 'Farm name')} value={farmForm.farmName} onChange={(value) => setFarmForm({ ...farmForm, farmName: value })} />
+            <Field label={t('Produtor', 'Producer')} required value={farmForm.producerName} onChange={(value) => setFarmForm({ ...farmForm, producerName: value })} />
+            <Field label={t('Nome da fazenda', 'Farm name')} required value={farmForm.farmName} onChange={(value) => setFarmForm({ ...farmForm, farmName: value })} />
             <label className="block text-sm text-gray-700">
               {t('Província', 'Province')}
-              <select className="input-field" value={farmForm.province} onChange={(event) => setFarmForm({ ...farmForm, province: event.target.value })}>
+              <select className="input-field" value={farmForm.province} onChange={(event) => setFarmForm({ ...farmForm, province: event.target.value, municipality: '' })}>
                 {ANGOLA_PROVINCE_NAMES.map((name) => <option key={name}>{name}</option>)}
               </select>
             </label>
-            <Field label={t('Município', 'Municipality')} value={farmForm.municipality} onChange={(value) => setFarmForm({ ...farmForm, municipality: value })} />
+            <label className="block text-sm text-gray-700">
+              {t('Município', 'Municipality')} *
+              <select className="input-field" required value={farmForm.municipality} onChange={(event) => setFarmForm({ ...farmForm, municipality: event.target.value })}>
+                <option value="">{t('Selecione um município', 'Select a municipality')}</option>
+                {(MUNICIPALITIES_BY_PROVINCE[farmForm.province] || []).map((name) => <option key={name} value={name}>{name}</option>)}
+              </select>
+            </label>
             <div className="grid gap-3 sm:grid-cols-2">
               <Field label={t('Telefone', 'Phone')} value={farmForm.phone} onChange={(value) => setFarmForm({ ...farmForm, phone: value })} />
               <Field label="Email" value={farmForm.email} onChange={(value) => setFarmForm({ ...farmForm, email: value })} />
@@ -538,11 +545,11 @@ function ReplyForm({ id, isEn, onDone, onError }: { id: string; isEn: boolean; o
   )
 }
 
-function Field({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
+function Field({ label, value, onChange, required = false }: { label: string; value: string; onChange: (value: string) => void; required?: boolean }) {
   return (
     <label className="block text-sm text-gray-700">
-      {label}
-      <input className="input-field" value={value} onChange={(event) => onChange(event.target.value)} />
+      {label}{required ? ' *' : ''}
+      <input required={required} className="input-field" value={value} onChange={(event) => onChange(event.target.value)} />
     </label>
   )
 }
