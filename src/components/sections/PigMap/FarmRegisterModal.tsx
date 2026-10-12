@@ -27,6 +27,7 @@ export default function FarmRegisterModal({ isOpen, onClose, isEn = false, defau
     if (!isOpen) return
     setProvince(defaultProvince || '')
     setMunicipality('')
+    setPhotos([])
     setSuccess(false)
     setError(null)
   }, [isOpen, defaultProvince])
@@ -234,17 +235,26 @@ export default function FarmRegisterModal({ isOpen, onClose, isEn = false, defau
 
               <div>
                 <ImageUpload
+                  multiple
+                  maxCount={6}
+                  currentCount={photos.length}
                   category="farm"
-                  label={isEn ? 'Farm photo' : 'Foto da fazenda'}
+                  label={isEn ? 'Farm photos' : 'Fotos da fazenda'}
                   onImageUploaded={(url) => setPhotos((current) => current.includes(url) ? current : [...current, url].slice(0, 6))}
                 />
-                <p className="mt-1 text-xs text-gray-500">{photos.length}/6 · JPEG, PNG, GIF ou WebP, até 5 MB</p>
+                <p className="mt-1 text-xs text-gray-500">{photos.length}/6 · JPEG, PNG, GIF ou WebP, até 5 MB cada</p>
                 {photos.length > 0 && (
-                  <ul className="mt-2 space-y-1 text-sm text-gray-600">
-                    {photos.map((url) => (
-                      <li key={url} className="flex items-center justify-between gap-2">
-                        <span className="truncate">{isEn ? 'Photo added' : 'Foto adicionada'}</span>
-                        <button type="button" className="text-red-600" onClick={() => setPhotos((current) => current.filter((item) => item !== url))}>{isEn ? 'Remove' : 'Remover'}</button>
+                  <ul className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-6">
+                    {photos.map((url, index) => (
+                      <li key={url} className="relative">
+                        <img src={url} alt={isEn ? `Farm photo ${index + 1}` : `Foto ${index + 1} da fazenda`} className="h-20 w-full rounded-lg object-cover" />
+                        <button
+                          type="button"
+                          className="absolute right-1 top-1 rounded bg-white/90 px-1.5 py-0.5 text-xs text-red-600"
+                          onClick={() => setPhotos((current) => current.filter((item) => item !== url))}
+                        >
+                          {isEn ? 'Remove' : 'Remover'}
+                        </button>
                       </li>
                     ))}
                   </ul>

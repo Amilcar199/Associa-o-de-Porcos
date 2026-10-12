@@ -227,8 +227,11 @@ const FarmsManager = () => {
             <p className="mt-1 text-sm text-gray-500">JPEG, PNG, GIF ou WebP, até 5 MB. No máximo 6. As fotos aparecem no perfil público depois da aprovação.</p>
             <div className="mt-4">
               <ImageUpload
+                multiple
+                maxCount={6}
+                currentCount={photoDraft.length}
                 category="farm"
-                label="Adicionar foto"
+                label="Adicionar fotos"
                 onImageUploaded={(url) => setPhotoDraft((current) => current.includes(url) ? current : [...current, url].slice(0, 6))}
               />
             </div>

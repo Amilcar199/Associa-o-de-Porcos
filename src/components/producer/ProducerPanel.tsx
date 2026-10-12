@@ -361,8 +361,30 @@ export default function ProducerPanel() {
               {t('Dados produtivos', 'Production notes')}
               <textarea className="input-field" rows={3} value={farmForm.notes} onChange={(event) => setFarmForm({ ...farmForm, notes: event.target.value })} />
             </label>
-            <ImageUpload category="farm" label={t('Foto da fazenda', 'Farm photo')} onImageUploaded={(url) => setFarmForm((current) => ({ ...current, photos: [...current.photos, url].slice(0, 6) }))} />
-            {farmForm.photos.length > 0 && <p className="text-sm text-gray-500">{farmForm.photos.length} {t('foto(s)', 'photo(s)')}</p>}
+            <ImageUpload
+              multiple
+              maxCount={6}
+              currentCount={farmForm.photos.length}
+              category="farm"
+              label={t('Fotos da fazenda', 'Farm photos')}
+              onImageUploaded={(url) => setFarmForm((current) => ({ ...current, photos: current.photos.includes(url) ? current.photos : [...current.photos, url].slice(0, 6) }))}
+            />
+            {farmForm.photos.length > 0 && (
+              <ul className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+                {farmForm.photos.map((url, index) => (
+                  <li key={url} className="relative">
+                    <img src={url} alt={t(`Foto ${index + 1} da fazenda`, `Farm photo ${index + 1}`)} className="h-20 w-full rounded-lg object-cover" />
+                    <button
+                      type="button"
+                      className="absolute right-1 top-1 rounded bg-white/90 px-1.5 py-0.5 text-xs text-red-600"
+                      onClick={() => setFarmForm((current) => ({ ...current, photos: current.photos.filter((item) => item !== url) }))}
+                    >
+                      {t('Remover', 'Remove')}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
             <button className="btn-primary" disabled={saving}>{t('Guardar fazenda', 'Save farm')}</button>
           </form>
         </div>

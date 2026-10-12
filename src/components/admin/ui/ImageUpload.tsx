@@ -11,6 +11,9 @@ interface ImageUploadProps {
   accept?: string;
   maxSize?: number; // em bytes
   category?: string;
+  multiple?: boolean;
+  maxCount?: number;
+  currentCount?: number;
 }
 
 export default function ImageUpload({
@@ -20,6 +23,9 @@ export default function ImageUpload({
   accept = 'image/jpeg,image/png,image/gif,image/webp',
   maxSize = 5 * 1024 * 1024, // 5MB
   category,
+  multiple = false,
+  maxCount = 6,
+  currentCount = 0,
 }: ImageUploadProps) {
   const { locale } = useLanguage()
   const isEn = String(locale).startsWith('en')
@@ -27,72 +33,83 @@ export default function ImageUpload({
   const [error, setError] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const slotsLeft = multiple ? Math.max(0, maxCount - currentCount) : 1
+  const full = multiple && slotsLeft === 0
+  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
 
-  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  const uploadFiles = async (files: File[]) => {
+    if (files.length === 0 || full) return
 
-    // Validar tipo de arquivo
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
-    if (!allowedTypes.includes(file.type)) {
-      setError(isEn ? 'Use a JPEG, PNG, GIF or WebP image.' : 'Use uma imagem JPEG, PNG, GIF ou WebP.');
-      return;
+    const batch = files.slice(0, slotsLeft)
+    const notices: string[] = []
+    if (multiple && files.length > slotsLeft) {
+      notices.push(isEn
+        ? `Only ${slotsLeft} more photo${slotsLeft === 1 ? '' : 's'} can be added. The limit is ${maxCount}.`
+        : `Só entram mais ${slotsLeft} foto${slotsLeft === 1 ? '' : 's'}. O limite é ${maxCount}.`)
     }
 
-    // Validar tamanho
-    if (file.size > maxSize) {
-      setError(isEn ? `File too large. Max size: ${Math.round(maxSize / 1024 / 1024)}MB` : `Arquivo muito grande. Tamanho máximo: ${Math.round(maxSize / 1024 / 1024)}MB`);
-      return;
-    }
-
-    setError(null);
-    setIsUploading(true);
+    setError(null)
+    setIsUploading(true)
 
     try {
-      // Criar preview
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setPreview(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
+      for (const file of batch) {
+        if (!allowedTypes.includes(file.type)) {
+          notices.push(isEn ? 'Use a JPEG, PNG, GIF or WebP image.' : 'Use uma imagem JPEG, PNG, GIF ou WebP.')
+          continue
+        }
+        if (file.size > maxSize) {
+          notices.push(isEn
+            ? `File too large. Max size: ${Math.round(maxSize / 1024 / 1024)}MB`
+            : `Arquivo muito grande. Tamanho máximo: ${Math.round(maxSize / 1024 / 1024)}MB`)
+          continue
+        }
 
-      // Upload da imagem
-      const formData = new FormData();
-      formData.append('file', file);
-      if (category) formData.append('category', category);
+        if (!multiple) {
+          const reader = new FileReader()
+          reader.onload = (e) => setPreview(e.target?.result as string)
+          reader.readAsDataURL(file)
+        }
 
-      const response = await fetch('/api/images/upload', {
-        method: 'POST',
-        body: formData,
-        credentials: 'include'
-      });
+        const formData = new FormData()
+        formData.append('file', file)
+        if (category) formData.append('category', category)
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || (isEn ? 'Upload error' : 'Erro no upload'));
+        const response = await fetch('/api/images/upload', {
+          method: 'POST',
+          body: formData,
+          credentials: 'include'
+        })
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}))
+          notices.push(errorData.error || (isEn ? 'Upload error' : 'Erro no upload'))
+          if (!multiple) setPreview(null)
+          continue
+        }
+
+        const result = await response.json()
+        onImageUploaded(result.data.url)
       }
-
-      const result = await response.json();
-      onImageUploaded(result.data.url);
     } catch (err) {
-      setError(err instanceof Error ? err.message : (isEn ? 'Image upload error' : 'Erro no upload da imagem'));
-      setPreview(null);
+      notices.push(err instanceof Error ? err.message : (isEn ? 'Image upload error' : 'Erro no upload da imagem'))
+      if (!multiple) setPreview(null)
     } finally {
-      setIsUploading(false);
+      setIsUploading(false)
+      if (fileInputRef.current) fileInputRef.current.value = ''
+      if (notices.length > 0) setError(notices[0])
     }
-  };
+  }
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || [])
+    void uploadFiles(files)
+  }
 
   const handleDrop = (event: React.DragEvent) => {
-    event.preventDefault();
-    const file = event.dataTransfer.files[0];
-    if (file) {
-      const input = fileInputRef.current;
-      if (input) {
-        input.files = event.dataTransfer.files;
-        input.dispatchEvent(new Event('change', { bubbles: true }));
-      }
-    }
-  };
+    event.preventDefault()
+    if (full || isUploading) return
+    void uploadFiles(Array.from(event.dataTransfer.files || []))
+  }
 
   const handleDragOver = (event: React.DragEvent) => {
     event.preventDefault();
@@ -125,12 +142,13 @@ export default function ImageUpload({
           ref={fileInputRef}
           type="file"
           accept={accept}
+          multiple={multiple}
           onChange={handleFileSelect}
           className="hidden"
-          disabled={isUploading}
+          disabled={isUploading || full}
         />
 
-        {preview ? (
+        {!multiple && preview ? (
           <div className="relative">
             <img
               src={preview}
@@ -156,17 +174,28 @@ export default function ImageUpload({
               <>
                 <ImageIcon className="mx-auto h-12 w-12 text-gray-400" />
                 <div className="text-sm text-gray-600">
-                  <p>{isEn ? 'Drag an image here or' : 'Arraste uma imagem aqui ou'}</p>
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="text-green-600 hover:text-green-500 font-medium"
-                  >
-                    {isEn ? 'click to select' : 'clique para selecionar'}
-                  </button>
+                  {full ? (
+                    <p>{isEn ? `Limit of ${maxCount} photos reached.` : `Limite de ${maxCount} fotos atingido.`}</p>
+                  ) : (
+                    <>
+                      <p>{multiple
+                        ? (isEn ? 'Drag photos here or' : 'Arraste as fotos aqui ou')
+                        : (isEn ? 'Drag an image here or' : 'Arraste uma imagem aqui ou')}</p>
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="text-green-600 hover:text-green-500 font-medium"
+                      >
+                        {multiple
+                          ? (isEn ? 'click to select several' : 'clique para selecionar várias')
+                          : (isEn ? 'click to select' : 'clique para selecionar')}
+                      </button>
+                    </>
+                  )}
                 </div>
                 <p className="text-xs text-gray-500">
                   {isEn ? 'PNG, JPG, GIF up to' : 'PNG, JPG, GIF até'} {Math.round(maxSize / 1024 / 1024)}MB
+                  {multiple ? (isEn ? ` · up to ${maxCount} photos` : ` · até ${maxCount} fotos`) : ''}
                 </p>
               </>
             )}
