@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useLanguage } from '@/components/providers/LanguageProvider'
 import { ANGOLA_PROVINCE_NAMES } from '@/components/sections/PigMap/angola-provinces'
@@ -59,6 +59,10 @@ export default function ProducersDirectory() {
   const [pages, setPages] = useState(1)
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const scrollerRef = useRef<HTMLDivElement>(null)
+  const sentinelRef = useRef<HTMLDivElement>(null)
+  const loadingLock = useRef(false)
 
   const provinceOptions = useMemo(() => {
     const names = provincesForRegion(region)
@@ -88,32 +92,63 @@ export default function ProducersDirectory() {
   }, [query])
 
   useEffect(() => {
-    const params = new URLSearchParams({ limit: '24', page: String(page), sort })
+    scrollerRef.current?.scrollTo({ top: 0 })
+  }, [debouncedQuery, region, province, municipality, categories, minHerd, sort])
+
+  useEffect(() => {
+    const params = new URLSearchParams({ limit: '4', page: String(page), sort })
     if (debouncedQuery) params.set('q', debouncedQuery)
     if (region) params.set('region', region)
     if (province) params.set('province', province)
     if (municipality) params.set('municipality', municipality)
     if (minHerd) params.set('minHerd', minHerd)
     categories.forEach((category) => params.append('category', category))
-    setLoading(true)
+    const replace = page === 1
+    if (replace) setLoading(true)
+    else setLoadingMore(true)
+    loadingLock.current = true
     const controller = new AbortController()
     fetch(`/api/farms?${params}`, { cache: 'no-store', signal: controller.signal })
       .then((response) => response.json())
       .then((json) => {
-        setFarms(json?.data || [])
+        const next = Array.isArray(json?.data) ? json.data as FarmCard[] : []
+        setFarms((current) => {
+          if (replace) return next
+          const seen = new Set(current.map((farm) => farm._id))
+          return [...current, ...next.filter((farm) => !seen.has(farm._id))]
+        })
         setPages(json?.pagination?.pages || 1)
         setTotal(json?.pagination?.total || 0)
       })
       .catch((error) => {
         if (error?.name === 'AbortError') return
-        setFarms([])
-        setTotal(0)
+        if (replace) {
+          setFarms([])
+          setTotal(0)
+        }
       })
       .finally(() => {
-        if (!controller.signal.aborted) setLoading(false)
+        if (controller.signal.aborted) return
+        setLoading(false)
+        setLoadingMore(false)
+        loadingLock.current = false
       })
     return () => controller.abort()
   }, [debouncedQuery, region, province, municipality, categories, minHerd, sort, page])
+
+  useEffect(() => {
+    const root = scrollerRef.current
+    const sentinel = sentinelRef.current
+    if (!root || !sentinel) return
+    const observer = new IntersectionObserver((entries) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return
+      if (loadingLock.current || page >= pages) return
+      loadingLock.current = true
+      setPage((current) => current + 1)
+    }, { root, rootMargin: '160px' })
+    observer.observe(sentinel)
+    return () => observer.disconnect()
+  }, [page, pages, farms.length])
 
   const clearFilters = () => {
     setQuery('')
@@ -294,59 +329,62 @@ export default function ProducersDirectory() {
             {isEn ? 'Clear filters' : 'Limpar filtros'}
           </button>
           <span className="ml-auto text-sm text-gray-500">
-            {loading
+            {loading && farms.length === 0
               ? (isEn ? 'Loading producers...' : 'A carregar produtores...')
               : `${formatCount(total)} ${isEn ? (total === 1 ? 'producer' : 'producers') : (total === 1 ? 'produtor' : 'produtores')}`}
           </span>
         </div>
       </div>
 
-      <div className="mt-6 grid gap-4 md:grid-cols-2">
-        {farms.map((farm) => {
-          const tags = PRODUCER_CATEGORIES.filter((category) => {
-            if (category.id === 'sows') return (farm.production?.sows || 0) > 0
-            if (category.id === 'boars') return (farm.production?.boars || 0) > 0
-            if (category.id === 'fattening') return (farm.production?.fattening || 0) > 0
-            if (category.id === 'slaughter') return (farm.herd?.forSlaughter || 0) > 0
-            return (farm.herd?.forBreeding || 0) > 0
-          })
-          return (
-          <Link key={farm._id} href={`/produtores/${farm._id}`} className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition hover:border-primary-200 hover:shadow-md">
-            <h2 className="font-heading text-lg font-semibold text-gray-900">{farm.producerName}</h2>
-            <p className="text-sm text-gray-600">{farm.farmName || (isEn ? 'Farm' : 'Fazenda')} · {farm.province}{farm.municipality ? ` · ${farm.municipality}` : ''}</p>
-            {tags.length > 0 && (
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                {tags.map((tag) => (
-                  <span key={tag.id} className="rounded-full bg-primary-50 px-2 py-0.5 text-xs font-medium text-primary-700">
-                    {isEn ? tag.labelEn : tag.label}
-                  </span>
-                ))}
-              </div>
-            )}
-            {farm.description && <p className="mt-2 text-sm leading-relaxed text-gray-700">{farm.description}</p>}
-            <p className="mt-3 text-sm font-medium text-primary-700">{isEn ? 'View contact' : 'Ver contacto'}</p>
-            <dl className="mt-3 grid grid-cols-2 gap-2 text-sm text-gray-700">
-              <div><dt className="text-xs text-gray-500">{isEn ? 'Total pigs' : 'Total de porcos'}</dt><dd>{formatCount(farm.herd?.total || 0)}</dd></div>
-              <div><dt className="text-xs text-gray-500">{isEn ? 'Females' : 'Fêmeas'}</dt><dd>{formatCount(farm.herd?.females || 0)}</dd></div>
-              <div><dt className="text-xs text-gray-500">{isEn ? 'For slaughter' : 'Para abate'}</dt><dd>{formatCount(farm.herd?.forSlaughter || 0)}</dd></div>
-              <div><dt className="text-xs text-gray-500">{isEn ? 'For breeding' : 'Para reprodução'}</dt><dd>{formatCount(farm.herd?.forBreeding || 0)}</dd></div>
-            </dl>
-          </Link>
-          )
-        })}
-      </div>
-      {!loading && farms.length === 0 && (
-        <p className="mt-6 rounded-2xl border border-dashed border-gray-200 bg-white p-8 text-center text-sm text-gray-500">
-          {isEn ? 'No approved farms match these filters.' : 'Nenhuma fazenda aprovada corresponde a estes filtros.'}
-        </p>
-      )}
-      {pages > 1 && (
-        <div className="mt-6 flex items-center justify-center gap-3">
-          <button type="button" className="btn-secondary" disabled={page <= 1} onClick={() => setPage((current) => Math.max(1, current - 1))}>{isEn ? 'Previous' : 'Anterior'}</button>
-          <span className="text-sm text-gray-600">{page} / {pages}</span>
-          <button type="button" className="btn-secondary" disabled={page >= pages} onClick={() => setPage((current) => current + 1)}>{isEn ? 'Next' : 'Seguinte'}</button>
+      <div
+        ref={scrollerRef}
+        className="mt-6 max-h-[32rem] overflow-y-auto rounded-2xl border border-gray-200 bg-gray-50 p-3 shadow-inner"
+        aria-label={isEn ? 'Producer list' : 'Lista de produtores'}
+      >
+        <div className="grid gap-4 md:grid-cols-2">
+          {farms.map((farm) => {
+            const tags = PRODUCER_CATEGORIES.filter((category) => {
+              if (category.id === 'sows') return (farm.production?.sows || 0) > 0
+              if (category.id === 'boars') return (farm.production?.boars || 0) > 0
+              if (category.id === 'fattening') return (farm.production?.fattening || 0) > 0
+              if (category.id === 'slaughter') return (farm.herd?.forSlaughter || 0) > 0
+              return (farm.herd?.forBreeding || 0) > 0
+            })
+            return (
+            <Link key={farm._id} href={`/produtores/${farm._id}`} className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition hover:border-primary-200 hover:shadow-md">
+              <h2 className="font-heading text-lg font-semibold text-gray-900">{farm.producerName}</h2>
+              <p className="text-sm text-gray-600">{farm.farmName || (isEn ? 'Farm' : 'Fazenda')} · {farm.province}{farm.municipality ? ` · ${farm.municipality}` : ''}</p>
+              {tags.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {tags.map((tag) => (
+                    <span key={tag.id} className="rounded-full bg-primary-50 px-2 py-0.5 text-xs font-medium text-primary-700">
+                      {isEn ? tag.labelEn : tag.label}
+                    </span>
+                  ))}
+                </div>
+              )}
+              {farm.description && <p className="mt-2 text-sm leading-relaxed text-gray-700">{farm.description}</p>}
+              <p className="mt-3 text-sm font-medium text-primary-700">{isEn ? 'View contact' : 'Ver contacto'}</p>
+              <dl className="mt-3 grid grid-cols-2 gap-2 text-sm text-gray-700">
+                <div><dt className="text-xs text-gray-500">{isEn ? 'Total pigs' : 'Total de porcos'}</dt><dd>{formatCount(farm.herd?.total || 0)}</dd></div>
+                <div><dt className="text-xs text-gray-500">{isEn ? 'Females' : 'Fêmeas'}</dt><dd>{formatCount(farm.herd?.females || 0)}</dd></div>
+                <div><dt className="text-xs text-gray-500">{isEn ? 'For slaughter' : 'Para abate'}</dt><dd>{formatCount(farm.herd?.forSlaughter || 0)}</dd></div>
+                <div><dt className="text-xs text-gray-500">{isEn ? 'For breeding' : 'Para reprodução'}</dt><dd>{formatCount(farm.herd?.forBreeding || 0)}</dd></div>
+              </dl>
+            </Link>
+            )
+          })}
         </div>
-      )}
+        {!loading && farms.length === 0 && (
+          <p className="rounded-2xl border border-dashed border-gray-200 bg-white p-8 text-center text-sm text-gray-500">
+            {isEn ? 'No approved farms match these filters.' : 'Nenhuma fazenda aprovada corresponde a estes filtros.'}
+          </p>
+        )}
+        <div ref={sentinelRef} className="h-4" />
+        {loadingMore && (
+          <p className="pb-2 text-center text-sm text-gray-500">{isEn ? 'Loading more producers...' : 'A carregar mais produtores...'}</p>
+        )}
+      </div>
     </div>
   )
 }

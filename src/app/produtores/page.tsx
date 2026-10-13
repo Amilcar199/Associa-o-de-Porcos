@@ -32,8 +32,8 @@ export default function ProdutoresPage() {
           </p>
         </div>
       </div>
-      <ProducersDirectory />
       <InteractiveMapSection isEn={isEn} />
+      <ProducersDirectory />
     </section>
   )
 }
