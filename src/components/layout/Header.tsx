@@ -399,7 +399,7 @@ const Header = () => {
                     onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                     className="flex items-center space-x-2 p-2 rounded-lg hover:bg-white/10 transition-colors"
                   >
-                    <div className="w-12 h-12 rounded-full bg-primary-600 flex items-center justify-center text-white font-medium overflow-hidden relative">
+                    <span className="relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-primary-600 font-medium text-white">
                       {session.user?.avatar ? (
                         <Image
                           src={session.user.avatar}
@@ -411,7 +411,7 @@ const Header = () => {
                       ) : (
                         session.user?.name?.charAt(0).toUpperCase()
                       )}
-                    </div>
+                    </span>
                     <span className="font-medium">
                       {session.user?.name}
                     </span>

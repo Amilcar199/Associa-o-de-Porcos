@@ -38,10 +38,10 @@ export default function AdminNav({ onNavigate }: { onNavigate?: () => void }) {
               active ? activeClasses : idleClasses
             }`}
           >
-            <div className="flex items-center space-x-3">
+            <span className="flex items-center space-x-3">
               <item.icon size={20} className={active ? 'text-primary-600' : 'text-gray-500'} />
               <span>{item.name}</span>
-            </div>
+            </span>
             {isExpanded ? (
               <ChevronDown size={16} className="text-gray-400" />
             ) : (

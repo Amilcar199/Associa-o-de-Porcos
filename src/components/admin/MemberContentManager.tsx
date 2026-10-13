@@ -449,9 +449,9 @@ export default function MemberContentManager() {
                           title={item.isActive ? 'Desativar' : 'Ativar'}
                         >
                           {item.isActive ? (
-                            <div className="w-4 h-4 bg-red-600 rounded-full" />
+                            <span className="block h-4 w-4 rounded-full bg-red-600" />
                           ) : (
-                            <div className="w-4 h-4 bg-green-600 rounded-full" />
+                            <span className="block h-4 w-4 rounded-full bg-green-600" />
                           )}
                         </button>
                         

@@ -159,8 +159,14 @@ export default function PigOffers() {
           {isEn ? 'Vaccinated' : 'Vacinado'}
         </label>
         <textarea className="input-field" rows={3} placeholder={isEn ? 'Describe the pigs' : 'Descreva os suínos'} value={form.description} onChange={(event) => setForm({ ...form, description: event.target.value })} />
-        <ImageUpload label={isEn ? 'Photo' : 'Foto'} onImageUploaded={(url) => setForm((current) => ({ ...current, images: [...current.images, url].slice(0, 6) }))} />
-        <p className="text-sm text-gray-500">{form.images.length} {isEn ? 'photo(s)' : 'foto(s)'}</p>
+        <ImageUpload
+          multiple
+          maxCount={6}
+          currentCount={form.images.length}
+          label={isEn ? 'Photos' : 'Fotos'}
+          onImageUploaded={(url) => setForm((current) => ({ ...current, images: current.images.includes(url) ? current.images : [...current.images, url].slice(0, 6) }))}
+        />
+        <p className="text-sm text-gray-500">{form.images.length}/6 {isEn ? 'photo(s)' : 'foto(s)'}</p>
         <button className="btn-primary" disabled={saving}>{isEn ? 'Submit for approval' : 'Enviar para aprovação'}</button>
       </form>
     </div>

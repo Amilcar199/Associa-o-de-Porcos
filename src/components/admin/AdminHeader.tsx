@@ -260,7 +260,7 @@ const AdminHeader = ({ user }: AdminHeaderProps) => {
                 aria-expanded={isProfileMenuOpen}
                 className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 transition-colors"
               >
-                <div className="w-8 h-8 rounded-full bg-primary-600 flex items-center justify-center text-white font-medium">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-600 font-medium text-white">
                   {user.avatar ? (
                     <Image
                       src={user.avatar}
@@ -272,15 +272,15 @@ const AdminHeader = ({ user }: AdminHeaderProps) => {
                   ) : (
                     user.name?.charAt(0).toUpperCase()
                   )}
-                </div>
-                <div className="hidden sm:block text-left">
-                  <p className="text-sm font-medium text-gray-900">
+                </span>
+                <span className="hidden text-left sm:block">
+                  <span className="block text-sm font-medium text-gray-900">
                     {user.name}
-                  </p>
-                  <p className="text-xs text-gray-500">
+                  </span>
+                  <span className="block text-xs text-gray-500">
                     Administrador
-                  </p>
-                </div>
+                  </span>
+                </span>
               </button>
 
               <AnimatePresence>

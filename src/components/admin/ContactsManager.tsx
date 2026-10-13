@@ -212,7 +212,7 @@ const ContactsManager = () => {
           className="max-w-xs text-left hover:underline"
           title="Abrir mensagem"
         >
-          <div className="font-medium text-gray-900 truncate">{value}</div>
+          <span className="block truncate font-medium text-gray-900">{value}</span>
         </button>
       )
     },

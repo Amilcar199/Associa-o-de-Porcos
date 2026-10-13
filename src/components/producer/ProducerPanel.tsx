@@ -285,8 +285,8 @@ export default function ProducerPanel() {
             [t('Conteúdos de membro', 'Member content'), overview?.contentCount || 0, 'conteudos'],
           ].map(([label, value, id]) => (
             <button key={String(id)} type="button" onClick={() => setSection(id as SectionId)} className="rounded-2xl border border-gray-100 bg-white p-5 text-left shadow-sm">
-              <div className="text-sm text-gray-500">{label}</div>
-              <div className="mt-1 font-heading text-3xl font-bold text-gray-900">{value}</div>
+              <span className="block text-sm text-gray-500">{label}</span>
+              <span className="mt-1 block font-heading text-3xl font-bold text-gray-900">{value}</span>
             </button>
           ))}
         </div>
@@ -316,8 +316,8 @@ export default function ProducerPanel() {
             </button>
             {farms.map((farm: any) => (
               <button key={farm._id} type="button" onClick={() => editFarm(farm)} className="block w-full rounded-xl border border-gray-100 bg-white p-4 text-left">
-                <div className="font-medium text-gray-900">{farm.farmName || farm.producerName}</div>
-                <div className="text-sm text-gray-500">{farm.province} · {farm.status}</div>
+                <span className="block font-medium text-gray-900">{farm.farmName || farm.producerName}</span>
+                <span className="block text-sm text-gray-500">{farm.province} · {farm.status}</span>
               </button>
             ))}
             {farms.length === 0 && <p className="text-sm text-gray-500">{t('Ainda não há fazendas ligadas a esta conta.', 'No farms are linked to this account yet.')}</p>}
