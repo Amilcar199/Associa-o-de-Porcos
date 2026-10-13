@@ -5,6 +5,7 @@ import ImageUpload from '@/components/admin/ui/ImageUpload'
 import { ANGOLA_PROVINCE_NAMES } from '@/components/sections/PigMap/angola-provinces'
 import { PIG_BREEDS } from '@/lib/pig-listings'
 import { useLanguage } from '@/components/providers/LanguageProvider'
+import PaymentBox from '@/components/producer/PaymentBox'
 
 const emptyOffer = {
   name: '',
@@ -116,10 +117,13 @@ export default function PigOffers() {
             <div className="mt-2 flex gap-2">
               <button type="button" className="text-sm font-medium text-primary-700" onClick={() => { setEditingId(offer._id); setForm({ ...emptyOffer, ...offer, price: offer.price ?? '', pricePerKg: offer.pricePerKg ?? '', images: offer.images || [] }) }}>{isEn ? 'Edit' : 'Editar'}</button>
               {offer.listingStatus !== 'sold' && <button type="button" className="text-sm text-gray-600" onClick={() => markSold(offer._id)}>{isEn ? 'Mark sold' : 'Marcar vendido'}</button>}
-              {pro && offer.listingStatus === 'approved' && (
-                <button type="button" className="text-sm text-primary-700" onClick={() => toggleHighlight(offer._id, !offer.highlighted)}>
-                  {offer.highlighted ? (isEn ? 'Remove highlight' : 'Retirar destaque') : (isEn ? 'Highlight' : 'Destacar')}
+              {pro && offer.listingStatus === 'approved' && offer.highlighted && (
+                <button type="button" className="text-sm text-primary-700" onClick={() => toggleHighlight(offer._id, false)}>
+                  {isEn ? 'Remove highlight' : 'Retirar destaque'}
                 </button>
+              )}
+              {pro && offer.listingStatus === 'approved' && !offer.highlighted && (
+                <PaymentBox purpose="highlight" productId={offer._id} isEn={isEn} onPaid={load} />
               )}
             </div>
           </article>

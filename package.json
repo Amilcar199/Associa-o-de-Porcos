@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
-    "test": "node --experimental-strip-types --test src/lib/security.test.ts",
+    "test": "node --experimental-strip-types --test src/lib/security.test.ts src/lib/payments.test.ts",
     "setup": "node scripts/setup.js",
     "seed:admin": "node scripts/create-admin.js"
   },

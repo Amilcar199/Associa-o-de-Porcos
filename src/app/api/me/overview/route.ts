@@ -11,6 +11,7 @@ import Contact from '@/models/Contact'
 import ActivityLog from '@/models/ActivityLog'
 import MemberContent from '@/models/MemberContent'
 import { errorResponse, successResponse } from '@/lib/api-utils'
+import { expireDuePayments } from '@/lib/settle-payment'
 
 export async function GET() {
   try {
@@ -19,6 +20,7 @@ export async function GET() {
     if (!session?.user || !userId) return errorResponse('Não autorizado', 401)
 
     await connectDB()
+    await expireDuePayments()
     const user = await User.findById(userId).select('name email phone company bio location specialty role preferences plan planExpiresAt verificationStatus')
     if (!user) return errorResponse('Usuário não encontrado', 404)
 

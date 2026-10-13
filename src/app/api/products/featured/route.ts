@@ -3,6 +3,7 @@ import connectDB from '@/lib/mongodb'
 import Product from '@/models/Product'
 import { successResponse, errorResponse } from '@/lib/api-utils'
 import { publicListingFilter } from '@/lib/pig-listings'
+import { expireDuePayments } from '@/lib/settle-payment'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,6 +11,7 @@ export const dynamic = 'force-dynamic'
 export async function GET(req: NextRequest) {
   try {
     await connectDB()
+    await expireDuePayments()
 
     const { searchParams } = new URL(req.url)
     const limit = parseInt(searchParams.get('limit') || '6')

@@ -46,7 +46,7 @@ export default function AdminPlansPage() {
     <div className="space-y-6">
       <div className="border-b border-gray-200 pb-4">
         <h1 className="text-2xl font-bold text-gray-900">Planos e verificação</h1>
-        <p className="mt-1 text-gray-600">O plano gratuito é o de origem. O Plano Pro activa o destaque. O pagamento do plano entra na etapa seguinte.</p>
+        <p className="mt-1 text-gray-600">O plano gratuito é o de origem. O Plano Pro também pode ser pago na área do produtor. Enquanto o MULTICAIXA não está ligado, esse pagamento é simulado.</p>
       </div>
       {error && <p className="text-sm text-red-600">{error}</p>}
       <div className="space-y-3">

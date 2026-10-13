@@ -7,6 +7,7 @@ import connectDB from '@/lib/mongodb'
 import User from '@/models/User'
 import { errorResponse, successResponse } from '@/lib/api-utils'
 import { hasProPlan } from '@/lib/notify-users'
+import { expireDuePayments } from '@/lib/settle-payment'
 
 export async function GET() {
   try {
@@ -14,6 +15,7 @@ export async function GET() {
     const userId = (session as any)?.user?.id
     if (!session?.user || !userId) return errorResponse('Não autorizado', 401)
     await connectDB()
+    await expireDuePayments()
     const user = await User.findById(userId).select('plan planExpiresAt verificationStatus role').lean() as {
       plan?: string
       planExpiresAt?: Date | null

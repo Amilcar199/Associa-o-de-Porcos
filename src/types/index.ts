@@ -64,6 +64,7 @@ export interface Product extends Document {
   translations?: { en?: ProductTranslation }
   isActive: boolean
   highlighted?: boolean
+  highlightExpiresAt?: Date
   createdAt: Date
   updatedAt: Date
 }

@@ -9,6 +9,7 @@ import { FARM_PHOTO_LIMIT } from '@/lib/farm-owner'
 import { ANGOLA_PROVINCE_NAMES } from '@/components/sections/PigMap/angola-provinces'
 import { MUNICIPALITIES_BY_PROVINCE } from '@/components/sections/PigMap/province-municipalities'
 import PigOffers from '@/components/producer/PigOffers'
+import PaymentBox from '@/components/producer/PaymentBox'
 import { useLanguage } from '@/components/providers/LanguageProvider'
 
 type SectionId = 'inicio' | 'perfil' | 'fazenda' | 'animais' | 'anuncios' | 'procura' | 'pedidos' | 'contactos' | 'cotacoes' | 'conteudos' | 'plano' | 'notificacoes'
@@ -434,11 +435,17 @@ export default function ProducerPanel() {
           <article className="rounded-2xl border border-gray-100 bg-white p-6">
             <h2 className="font-heading text-xl font-semibold">{t('Plano gratuito', 'Free plan')}</h2>
             <p className="mt-2 text-sm text-gray-600">{t('Publicar suínos, ver a procura e responder às cotações.', 'Publish pigs, see demand and reply to quotes.')}</p>
-            <p className="mt-3 text-sm font-medium text-gray-900">{t('O seu plano', 'Your plan')}: {profile?.plan === 'pro' ? 'Pro' : t('Gratuito', 'Free')}</p>
+            <p className="mt-3 text-sm font-medium text-gray-900">
+              {t('O seu plano', 'Your plan')}: {profile?.plan === 'pro' ? 'Pro' : t('Gratuito', 'Free')}
+              {profile?.planExpiresAt ? ` · ${t('até', 'until')} ${new Date(profile.planExpiresAt).toLocaleDateString(isEn ? 'en' : 'pt-AO')}` : ''}
+            </p>
           </article>
           <article className="rounded-2xl border border-primary-100 bg-primary-50 p-6">
             <h2 className="font-heading text-xl font-semibold">Plano Pro</h2>
-            <p className="mt-2 text-sm text-gray-700">{t('Inclui o destaque dos anúncios aprovados no marketplace. O pagamento fica para a etapa seguinte; até lá a associação activa o plano.', 'Includes highlighting approved listings in the marketplace. Payment comes in the next stage; until then the association activates the plan.')}</p>
+            <p className="mt-2 text-sm text-gray-700">{t('Permite pagar o destaque de cada anúncio aprovado. Este pagamento é simulado até o MULTICAIXA estar ligado.', 'Lets you pay to highlight each approved listing. This payment is simulated until MULTICAIXA is connected.')}</p>
+            <div className="mt-4">
+              <PaymentBox purpose="pro" showHistory isEn={isEn} onPaid={() => window.location.reload()} />
+            </div>
           </article>
           <article className="rounded-2xl border border-gray-100 bg-white p-6 lg:col-span-2">
             <h2 className="font-heading text-xl font-semibold">{t('Verificação', 'Verification')}</h2>

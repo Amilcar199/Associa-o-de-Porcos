@@ -193,6 +193,7 @@ const ProductSchema = new Schema<IProduct>({
     type: Boolean,
     default: false,
   },
+  highlightExpiresAt: Date,
 }, {
   timestamps: true,
   collection: 'products',
@@ -338,7 +339,7 @@ interface ProductModel extends Model<IProduct> {
   generateCode(breed: string): Promise<string>
 }
 
-if (models.Product && !models.Product.schema.path('highlighted')) {
+if (models.Product && (!models.Product.schema.path('highlighted') || !models.Product.schema.path('highlightExpiresAt'))) {
   delete models.Product
 }
 
