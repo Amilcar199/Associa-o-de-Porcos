@@ -19,6 +19,7 @@ import {
   CheckCheck
 } from 'lucide-react'
 import { ThemeToggle } from './AdminTheme'
+import AdminMobileDrawer from './AdminMobileDrawer'
 import { motion, AnimatePresence } from 'framer-motion'
 
 interface AdminHeaderProps {
@@ -70,38 +71,6 @@ const AdminHeader = ({ user }: AdminHeaderProps) => {
     }
   }, [])
 
-  // Mobile menu items
-  const mobileMenuItems: Array<{ name: string; href: string; children?: Array<{ name: string; href: string }> }> = [
-    { name: 'Dashboard', href: '/admin' },
-    { name: 'Solicitações', href: '/admin/solicitacoes' },
-    { name: 'Usuários', href: '/admin/usuarios' },
-    { name: 'Produtos', href: '#', children: [
-      { name: 'Todos os Produtos', href: '/admin/produtos' },
-      { name: 'Adicionar Produto', href: '/admin/produtos/novo' },
-      { name: 'Categorias', href: '/admin/produtos/categorias' }
-    ]},
-    { name: 'Conteúdo', href: '#', children: [
-      { name: 'Notícias', href: '/admin/noticias' },
-      { name: 'Nova Notícia', href: '/admin/noticias/nova' },
-      { name: 'Colaboradores', href: '/admin/colaboradores' },
-      { name: 'Conteúdo de Membros', href: '/admin/conteudo-membros' },
-      { name: 'Novo Conteúdo', href: '/admin/conteudo-membros/novo' },
-      { name: 'Bolsa', href: '/admin/bolsa' },
-      { name: 'Jurídico & Legal', href: '/admin/juridico-legal' },
-      { name: 'Gestão Jurídico & Legal', href: '/admin/juridico-legal/gestao' }
-    ]},
-    { name: 'Cotações', href: '/admin/cotacoes' },
-    { name: 'Planos', href: '/admin/planos' },
-    { name: 'Registos', href: '/admin/registos' },
-    { name: 'Cópias', href: '/admin/copias' },
-    { name: 'Contatos', href: '/admin/contatos' },
-    { name: 'Suinocultura', href: '/admin/suinocultura' },
-    { name: 'Notificações', href: '/admin/notificacoes' },
-    { name: 'Mídia', href: '/admin/imagens' },
-    { name: 'Relatórios', href: '/admin/relatorios' },
-    { name: 'Configurações', href: '/admin/configuracoes' }
-  ]
-
   const refreshNotifs = async () => {
     try {
       const res = await fetch('/api/admin/stats')
@@ -134,7 +103,10 @@ const AdminHeader = ({ user }: AdminHeaderProps) => {
   }
 
   return (
-    <header className="bg-white/95 backdrop-blur border-b border-gray-200 shadow-sm fixed top-0 left-0 right-0 z-50">
+    <header className="border-b border-gray-200 shadow-sm fixed top-0 left-0 right-0 z-50">
+      {/* O blur fica numa camada própria: aplicado no header, tornava-o o bloco de
+          contenção de todos os descendentes `fixed`. */}
+      <div aria-hidden className="absolute inset-0 -z-10 bg-white/95 backdrop-blur" />
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           {/* Left Side */}
@@ -237,7 +209,7 @@ const AdminHeader = ({ user }: AdminHeaderProps) => {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 8, scale: 0.98 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50"
+                    className="fixed left-3 right-3 top-[4.5rem] bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50 sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-80"
                   >
                     <div className="px-4 py-3 flex items-center justify-between border-b border-gray-100 bg-gray-50">
                       <span className="text-sm font-semibold text-gray-800">Notificações</span>
@@ -364,63 +336,7 @@ const AdminHeader = ({ user }: AdminHeaderProps) => {
         </div>
       </div>
 
-      {/* Mobile menu overlay */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
-            onClick={() => setIsMobileMenuOpen(false)}
-          />
-        )}
-      </AnimatePresence>
-
-      {/* Mobile drawer */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <motion.aside
-            initial={{ x: -320, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: -320, opacity: 0 }}
-            transition={{ type: 'tween', duration: 0.2 }}
-            className="lg:hidden fixed top-16 bottom-0 left-0 w-72 bg-white border-r border-gray-200 z-50 overflow-y-auto"
-          >
-            <nav className="p-4 space-y-2">
-              {mobileMenuItems.map((item) => (
-                <div key={item.name}>
-                  {item.children ? (
-                    <div className="mb-2">
-                      <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide">{item.name}</div>
-                      <div className="ml-2 space-y-1">
-                        {item.children.map((child) => (
-                          <Link
-                            key={child.name}
-                            href={child.href}
-                            onClick={() => setIsMobileMenuOpen(false)}
-                            className="block px-3 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                          >
-                            {child.name}
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
-                  ) : (
-                    <Link
-                      href={item.href}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="block px-3 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                    >
-                      {item.name}
-                    </Link>
-                  )}
-                </div>
-              ))}
-            </nav>
-          </motion.aside>
-        )}
-      </AnimatePresence>
+      <AdminMobileDrawer isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
     </header>
   )
 }

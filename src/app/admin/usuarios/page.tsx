@@ -153,32 +153,32 @@ export default function AdminUsersPage() {
 
   return (
     <div className="space-y-6">
-      <div className="border-b border-gray-200 pb-4 flex items-end justify-between">
+      <div className="border-b border-gray-200 pb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Usuários</h1>
           <p className="text-gray-600 mt-1">Gerencie permissões e perfis de usuários</p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="relative">
+          <div className="relative flex-1 sm:flex-none">
             <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" aria-hidden />
             <input
               placeholder="Buscar usuário..."
-              className="pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
               value={query}
               onChange={e => setQuery(e.target.value)}
             />
           </div>
           <button 
             onClick={() => setCreateModalOpen(true)} 
-            className="inline-flex items-center bg-primary-600 hover:bg-primary-700 text-white px-3 py-2 rounded-lg text-sm"
+            className="inline-flex shrink-0 items-center bg-primary-600 hover:bg-primary-700 text-white px-3 py-2 rounded-lg text-sm"
           >
             <Plus className="w-4 h-4 mr-2" aria-hidden /> Novo usuário
           </button>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <table className="w-full text-sm">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
+        <table className="w-full min-w-[56rem] text-sm">
           <thead className="bg-gray-50 text-gray-600">
             <tr>
               <th className="text-left font-medium px-4 py-3">Nome</th>
@@ -202,9 +202,11 @@ export default function AdminUsersPage() {
                       )}
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-gray-700 flex items-center gap-2">
-                    <Mail className="w-4 h-4 text-gray-400" aria-hidden />
-                    {u.email}
+                  <td className="px-4 py-3 text-gray-700">
+                    <div className="flex items-center gap-2">
+                      <Mail className="w-4 h-4 shrink-0 text-gray-400" aria-hidden />
+                      {u.email}
+                    </div>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">

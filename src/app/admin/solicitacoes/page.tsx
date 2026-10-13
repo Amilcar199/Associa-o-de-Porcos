@@ -41,16 +41,16 @@ export default function AdminRequestsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Solicitações de Associação</h1>
           <p className="text-gray-600">Aprove ou rejeite pedidos para virar Membro</p>
         </div>
-        <button onClick={load} className="px-3 py-1.5 text-sm rounded-md border hover:bg-gray-50">Recarregar</button>
+        <button onClick={load} className="self-start px-3 py-1.5 text-sm rounded-md border hover:bg-gray-50 sm:self-auto">Recarregar</button>
       </div>
 
-      <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
-        <table className="w-full text-sm">
+      <div className="bg-white border rounded-xl shadow-sm overflow-x-auto">
+        <table className="w-full min-w-[48rem] text-sm">
           <thead className="bg-gray-50 text-gray-600">
             <tr>
               <th className="text-left font-medium px-4 py-3">Usuário</th>
