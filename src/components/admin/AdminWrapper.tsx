@@ -1,5 +1,7 @@
 'use client'
 
+import { AdminThemeProvider } from './AdminTheme'
+
 export default function AdminWrapper({ children }: { children: React.ReactNode }) {
-  return <>{children}</>
+  return <AdminThemeProvider>{children}</AdminThemeProvider>
 }

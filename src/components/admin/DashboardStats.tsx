@@ -1,54 +1,18 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import {
   Users,
   ShoppingCart,
   Newspaper,
   MessageSquare,
-  TrendingUp,
-  TrendingDown,
-  Eye,
-  Calendar
+  TrendingUp
 } from 'lucide-react'
-
-interface StatsData {
-  overview: {
-    totalUsers: number
-    totalProducts: number
-    totalNews: number
-    totalContacts: number
-    newContactsThisMonth: number
-    usersThisMonth: number
-    productsThisMonth: number
-    newsThisMonth: number
-    activeProducts: number
-    publishedNews: number
-  }
-}
+import { useAdminStats } from './useAdminStats'
 
 const DashboardStats = () => {
-  const [stats, setStats] = useState<StatsData | null>(null)
-  const [loading, setLoading] = useState(true)
-
-  const fetchStats = async () => {
-    try {
-      const response = await fetch('/api/admin/stats')
-      if (response.ok) {
-        const data = await response.json()
-        setStats(data.data)
-      }
-    } catch (error) {
-      console.error('Erro ao buscar estatísticas:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    fetchStats()
-  }, [])
+  const { stats, loading } = useAdminStats()
 
   const statsCards = [
     {
@@ -58,7 +22,7 @@ const DashboardStats = () => {
       changeText: 'novos este mês',
       icon: Users,
       color: 'blue',
-      trend: 'up'
+      href: '/admin/usuarios'
     },
     {
       title: 'Produtos Ativos',
@@ -67,7 +31,7 @@ const DashboardStats = () => {
       changeText: 'novos este mês',
       icon: ShoppingCart,
       color: 'green',
-      trend: 'up'
+      href: '/admin/produtos'
     },
     {
       title: 'Notícias Publicadas',
@@ -76,7 +40,7 @@ const DashboardStats = () => {
       changeText: 'novas este mês',
       icon: Newspaper,
       color: 'purple',
-      trend: 'up'
+      href: '/admin/noticias'
     },
     {
       title: 'Contatos Recebidos',
@@ -85,7 +49,7 @@ const DashboardStats = () => {
       changeText: 'novos este mês',
       icon: MessageSquare,
       color: 'orange',
-      trend: 'up'
+      href: '/admin/contatos'
     }
   ]
 
@@ -136,43 +100,28 @@ const DashboardStats = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: index * 0.1 }}
-            className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow"
           >
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className={`w-11 h-11 ${colors.light} rounded-xl flex items-center justify-center`}>
-                  <card.icon className={`w-5 h-5 ${colors.text}`} />
+            <Link
+              href={card.href}
+              className="block bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md hover:-translate-y-0.5 transition-all"
+            >
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className={`w-11 h-11 ${colors.light} rounded-xl flex items-center justify-center`}>
+                    <card.icon className={`w-5 h-5 ${colors.text}`} />
+                  </div>
+                </div>
+                <div className="ml-4 w-0 flex-1">
+                  <p className="text-sm font-medium text-gray-500 truncate">{card.title}</p>
+                  <p className="text-2xl font-bold text-gray-900">{card.value.toLocaleString('pt-AO')}</p>
                 </div>
               </div>
-              <div className="ml-4 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">
-                    {card.title}
-                  </dt>
-                  <dd className="flex items-baseline">
-                    <div className="text-2xl font-bold text-gray-900">
-                      {card.value.toLocaleString()}
-                    </div>
-                  </dd>
-                </dl>
+              <div className="mt-4 pt-4 border-t border-gray-50 flex items-center text-sm">
+                <TrendingUp className={`w-4 h-4 mr-1 ${card.change > 0 ? 'text-green-500' : 'text-gray-400'}`} />
+                <span className={`font-medium ${card.change > 0 ? 'text-green-600' : 'text-gray-500'}`}>{card.change}</span>
+                <span className="text-gray-500 ml-1">{card.changeText}</span>
               </div>
-            </div>
-            
-            <div className="mt-4 pt-4 border-t border-gray-50">
-              <div className="flex items-center text-sm">
-                {card.trend === 'up' ? (
-                  <TrendingUp className="w-4 h-4 text-green-500 mr-1" />
-                ) : (
-                  <TrendingDown className="w-4 h-4 text-red-500 mr-1" />
-                )}
-                <span className={`font-medium ${card.trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
-                  {card.change}
-                </span>
-                <span className="text-gray-500 ml-1">
-                  {card.changeText}
-                </span>
-              </div>
-            </div>
+            </Link>
           </motion.div>
         )
       })}

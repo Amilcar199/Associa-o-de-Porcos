@@ -18,6 +18,7 @@ import {
   Clock,
   CheckCheck
 } from 'lucide-react'
+import { ThemeToggle } from './AdminTheme'
 import { motion, AnimatePresence } from 'framer-motion'
 
 interface AdminHeaderProps {
@@ -89,7 +90,13 @@ const AdminHeader = ({ user }: AdminHeaderProps) => {
       { name: 'Jurídico & Legal', href: '/admin/juridico-legal' },
       { name: 'Gestão Jurídico & Legal', href: '/admin/juridico-legal/gestao' }
     ]},
+    { name: 'Cotações', href: '/admin/cotacoes' },
+    { name: 'Planos', href: '/admin/planos' },
+    { name: 'Registos', href: '/admin/registos' },
+    { name: 'Cópias', href: '/admin/copias' },
     { name: 'Contatos', href: '/admin/contatos' },
+    { name: 'Suinocultura', href: '/admin/suinocultura' },
+    { name: 'Notificações', href: '/admin/notificacoes' },
     { name: 'Mídia', href: '/admin/imagens' },
     { name: 'Relatórios', href: '/admin/relatorios' },
     { name: 'Configurações', href: '/admin/configuracoes' }
@@ -190,6 +197,8 @@ const AdminHeader = ({ user }: AdminHeaderProps) => {
             </div>
 
             {/* Seletor de idioma removido do header admin conforme solicitação */}
+
+            <ThemeToggle />
 
             {/* Notifications */}
             <div className="relative" ref={notifRef}>

@@ -1,36 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { BarChart3, PieChart, TrendingUp } from 'lucide-react'
-
-interface ChartData {
-  productsByBreed: Array<{ name: string; value: number }>
-  newsByCategory: Array<{ name: string; value: number }>
-  topNews: Array<{ title: string; views: number; publishedAt: Date }>
-}
+import { useAdminStats } from './useAdminStats'
 
 const DashboardCharts = () => {
-  const [chartData, setChartData] = useState<ChartData | null>(null)
-  const [loading, setLoading] = useState(true)
-
-  const fetchChartData = async () => {
-    try {
-      const response = await fetch('/api/admin/stats')
-      if (response.ok) {
-        const data = await response.json()
-        setChartData(data.data.charts)
-      }
-    } catch (error) {
-      console.error('Erro ao buscar dados dos gráficos:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    fetchChartData()
-  }, [])
+  const { stats, loading } = useAdminStats()
+  const chartData = stats?.charts
 
   if (loading) {
     return (
@@ -136,23 +112,30 @@ const DashboardCharts = () => {
           </h3>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-4">
           {chartData?.newsByCategory && chartData.newsByCategory.length > 0 ? (
-            chartData.newsByCategory.map((item, index) => (
-              <div key={item.name} className="flex items-center space-x-3">
-                <div className={`w-4 h-4 rounded-full ${getCategoryColor(item.name)}`} />
-                <div className="flex-1">
-                  <div className="text-sm font-medium text-gray-900">
-                    {item.name}
+            chartData.newsByCategory.map((item, index) => {
+              const total = chartData.newsByCategory.reduce((sum, entry) => sum + entry.value, 0) || 1
+              const percentage = Math.round((item.value / total) * 100)
+              return (
+                <div key={item.name}>
+                  <div className="mb-1 flex items-center justify-between text-sm">
+                    <span className="font-medium text-gray-900">{item.name}</span>
+                    <span className="text-gray-500">{item.value} · {percentage}%</span>
                   </div>
-                  <div className="text-xs text-gray-500">
-                    {item.value} artigos
+                  <div className="h-2.5 rounded-full bg-gray-200">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${percentage}%` }}
+                      transition={{ duration: 0.8, delay: index * 0.08 }}
+                      className={`h-2.5 rounded-full ${getCategoryColor(item.name)}`}
+                    />
                   </div>
                 </div>
-              </div>
-            ))
+              )
+            })
           ) : (
-            <div className="col-span-2 text-center py-8 text-gray-500 text-sm">
+            <div className="text-center py-8 text-gray-500 text-sm">
               Nenhuma notícia encontrada para exibir estatísticas
             </div>
           )}

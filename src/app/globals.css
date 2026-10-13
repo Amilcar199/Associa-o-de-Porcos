@@ -94,6 +94,103 @@
   }
 }
 
+/* Tema escuro do painel admin. O site público fica de fora: a classe .dark só existe dentro de .admin-shell. */
+.admin-shell.dark {
+  color-scheme: dark;
+  background-color: #020617;
+  color: #e2e8f0;
+}
+
+.admin-shell.dark .bg-white,
+.admin-shell.dark .bg-white\/95,
+.admin-shell.dark .focus\:bg-white:focus {
+  background-color: #0f172a;
+}
+
+.admin-shell.dark .bg-gray-50,
+.admin-shell.dark .hover\:bg-gray-50:hover {
+  background-color: #0b1220;
+}
+
+.admin-shell.dark .bg-gray-100,
+.admin-shell.dark .hover\:bg-gray-100:hover,
+.admin-shell.dark .hover\:bg-white:hover {
+  background-color: #111827;
+}
+
+.admin-shell.dark .bg-gray-200 {
+  background-color: #1e293b;
+}
+
+.admin-shell.dark .bg-primary-50,
+.admin-shell.dark .bg-primary-100 {
+  background-color: rgba(22, 163, 74, 0.16);
+}
+
+.admin-shell.dark .bg-blue-50 { background-color: rgba(59, 130, 246, 0.16); }
+.admin-shell.dark .bg-green-50,
+.admin-shell.dark .bg-emerald-50 { background-color: rgba(16, 185, 129, 0.16); }
+.admin-shell.dark .bg-purple-50,
+.admin-shell.dark .bg-indigo-50 { background-color: rgba(99, 102, 241, 0.16); }
+.admin-shell.dark .bg-orange-50,
+.admin-shell.dark .bg-amber-50,
+.admin-shell.dark .bg-yellow-50 { background-color: rgba(245, 158, 11, 0.16); }
+.admin-shell.dark .bg-red-50,
+.admin-shell.dark .hover\:bg-red-50:hover { background-color: rgba(239, 68, 68, 0.16); }
+
+.admin-shell.dark .text-gray-900,
+.admin-shell.dark .text-gray-800 {
+  color: #f8fafc;
+}
+
+.admin-shell.dark .text-gray-700 {
+  color: #e2e8f0;
+}
+
+.admin-shell.dark .text-gray-600 {
+  color: #cbd5e1;
+}
+
+.admin-shell.dark .text-gray-500 {
+  color: #94a3b8;
+}
+
+.admin-shell.dark .text-gray-400 {
+  color: #64748b;
+}
+
+.admin-shell.dark .text-primary-700,
+.admin-shell.dark .text-primary-600 {
+  color: #86efac;
+}
+
+.admin-shell.dark .border-gray-50,
+.admin-shell.dark .border-gray-100,
+.admin-shell.dark .border-gray-200,
+.admin-shell.dark .border-gray-300,
+.admin-shell.dark .divide-gray-50 > :not([hidden]) ~ :not([hidden]),
+.admin-shell.dark .divide-gray-100 > :not([hidden]) ~ :not([hidden]),
+.admin-shell.dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
+  border-color: #1e293b;
+}
+
+.admin-shell.dark input,
+.admin-shell.dark textarea,
+.admin-shell.dark select {
+  background-color: #020617;
+  color: #f8fafc;
+  border-color: #334155;
+}
+
+.admin-shell.dark input::placeholder,
+.admin-shell.dark textarea::placeholder {
+  color: #64748b;
+}
+
+.admin-shell.dark hr {
+  border-color: #1e293b;
+}
+
 /* Animações customizadas */
 @keyframes fadeIn {
   from {
