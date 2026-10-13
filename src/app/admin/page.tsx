@@ -7,6 +7,7 @@ import RecentActivity from '@/components/admin/RecentActivity'
 import AdminSearch from '@/components/admin/AdminSearch'
 import DashboardGreeting from '@/components/admin/DashboardGreeting'
 import DashboardAttention from '@/components/admin/DashboardAttention'
+import DashboardComposition from '@/components/admin/DashboardComposition'
 
 export const metadata: Metadata = {
   title: 'Dashboard - Painel Administrativo',
@@ -23,6 +24,7 @@ export default async function AdminDashboard() {
       <AdminSearch />
       <DashboardAttention />
       <DashboardStats />
+      <DashboardComposition />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">

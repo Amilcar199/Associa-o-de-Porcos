@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import DashboardCharts from '@/components/admin/DashboardCharts'
+import { BarChart } from '@/components/admin/StatVisuals'
 
 function toCsv(rows: any[], headers?: string[]) {
   if (!rows || rows.length === 0) return ''
@@ -54,6 +55,8 @@ export default function ReportsClient() {
     URL.revokeObjectURL(url)
   }
 
+  const palette = ['#16a34a', '#2563eb', '#f59e0b', '#ef4444', '#7c3aed', '#64748b']
+
   return (
     <div className="space-y-6">
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -71,9 +74,22 @@ export default function ReportsClient() {
       {loading && <p className="text-sm text-gray-500">A carregar relatórios…</p>}
       {stats?.reports && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {stats.reports.map((group: { title: string; items: { label: string; value: number }[] }) => (
+          {stats.reports.map((group: { title: string; items: { label: string; value: number }[] }) => {
+            const parts = group.items.filter((item) => item.label !== 'Total' && item.label !== 'Activos')
+            const source = parts.length >= 2 ? parts : group.items
+            const slices = source.map((item, index) => ({
+              label: item.label,
+              value: item.value,
+              color: palette[index % palette.length],
+            }))
+            return (
             <section key={group.title} className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
               <h3 className="text-base font-semibold text-gray-900 mb-3">{group.title}</h3>
+              {slices.length >= 2 && (
+                <div className="mb-4">
+                  <BarChart slices={slices} />
+                </div>
+              )}
               <dl className="grid grid-cols-2 gap-3">
                 {group.items.map((item) => (
                   <div key={item.label}>
@@ -83,7 +99,8 @@ export default function ReportsClient() {
                 ))}
               </dl>
             </section>
-          ))}
+            )
+          })}
         </div>
       )}
 
