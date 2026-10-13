@@ -105,7 +105,7 @@ export default function AdminBolsaClient(){
         weight: prod.weight ?? null,
         saleForm: row.saleForm || saleForm,
         features: prod.features || [],
-        healthStatus: prod.healthStatus || 'healthy',
+        healthStatus: prod.healthStatus || 'good',
         vaccinated: typeof prod.vaccinated === 'boolean' ? prod.vaccinated : false,
         location: prod.location || '',
         tags: prod.tags || [],

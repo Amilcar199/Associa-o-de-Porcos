@@ -93,7 +93,9 @@ export default {
 		breeders: 'Breeding Pigs',
 		piglets: 'Piglets',
 		fattening: 'Fattening Pigs',
-		sows: 'Sows'
+		sows: 'Sows',
+		finished: 'Finished Pigs',
+		all: 'All Pigs'
 	},
 	site: {
 		titleLine1: 'Pig Farmers Association',

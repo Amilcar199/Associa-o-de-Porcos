@@ -204,7 +204,12 @@ export default function CollaboratorsManager() {
                 await fetch(`/api/collaborators/${row._id}`, {
                   method: 'PUT',
                   headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ order: Math.max(0, (row.order || 0) - 1) })
+                  body: JSON.stringify({
+                    name: row.name,
+                    role: row.role,
+                    company: row.company,
+                    order: Math.max(0, (row.order || 0) - 1)
+                  })
                 })
                 fetchCollaborators()
               } catch {}
@@ -221,7 +226,12 @@ export default function CollaboratorsManager() {
                 await fetch(`/api/collaborators/${row._id}`, {
                   method: 'PUT',
                   headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ order: (row.order || 0) + 1 })
+                  body: JSON.stringify({
+                    name: row.name,
+                    role: row.role,
+                    company: row.company,
+                    order: (row.order || 0) + 1
+                  })
                 })
                 fetchCollaborators()
               } catch {}

@@ -4,7 +4,12 @@ const nextConfig = {
     // appDir: true // Removido pois é padrão no Next.js 14
   },
   images: {
-    domains: ['localhost', 'images.unsplash.com', 'source.unsplash.com', 'picsum.photos'],
+    remotePatterns: [
+      { protocol: 'http', hostname: 'localhost' },
+      { protocol: 'https', hostname: 'images.unsplash.com' },
+      { protocol: 'https', hostname: 'source.unsplash.com' },
+      { protocol: 'https', hostname: 'picsum.photos' },
+    ],
   },
   async headers() {
     return [

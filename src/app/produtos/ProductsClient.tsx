@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
+import { useSearchParams } from 'next/navigation'
 import Placeholder from '@/components/assets/Foto Suino.webp'
 
 import ProductModal from '@/components/modals/ProductModal'
@@ -65,9 +66,21 @@ interface ProductsClientProps {
   products: Product[]
 }
 
+// As categorias do mercado derivam do peso do animal, por isso o rótulo
+// mostrado no cartão e o filtro da query string usam a mesma fonte.
+type CategoryKey = 'leitoes' | 'engorda' | 'abate'
+
+const categoryKeyForWeight = (weight?: number): CategoryKey | null => {
+  if (weight === undefined || weight === null) return null
+  if (weight <= 30) return 'leitoes'
+  if (weight < 80) return 'engorda'
+  return 'abate'
+}
+
 export default function ProductsClient({ products }: ProductsClientProps) {
   const { locale } = useLanguage()
   const isEn = locale.startsWith('en')
+  const searchParams = useSearchParams()
   const [selectedProduct, setSelectedProduct] = useState(null as Product | null)
   const [currency, setCurrency] = useState('AOA')
   const [showConverted, setShowConverted] = useState(false)
@@ -84,7 +97,16 @@ export default function ProductsClient({ products }: ProductsClientProps) {
   const [priceType, setPriceType] = useState('head' as 'head' | 'kg')
   const [saleForm, setSaleForm] = useState('')
   const [location, setLocation] = useState('')
-  const activeFilterCount = [query, health, vaccinated, minPrice, maxPrice, minWeight, maxAge, saleForm, location, priceType !== 'head' ? priceType : ''].filter(Boolean).length
+  const [category, setCategory] = useState('' as '' | CategoryKey)
+  const activeFilterCount = [query, health, vaccinated, minPrice, maxPrice, minWeight, maxAge, saleForm, location, category, priceType !== 'head' ? priceType : ''].filter(Boolean).length
+
+  // Permite chegar à página já filtrado, ex. /produtos?categoria=leitoes
+  useEffect(() => {
+    const fromUrl = searchParams.get('categoria')
+    if (fromUrl === 'leitoes' || fromUrl === 'engorda' || fromUrl === 'abate') {
+      setCategory(fromUrl)
+    }
+  }, [searchParams])
 
   const openProductModal = (product: Product) => {
     setSelectedProduct(product)
@@ -179,14 +201,19 @@ export default function ProductsClient({ products }: ProductsClientProps) {
     if (maxAge && typeof p.age === 'number' && p.age > Number(maxAge)) return false
     if (saleForm && p.saleForm !== saleForm) return false
     if (location && !String(p.location || '').toLowerCase().includes(location.toLowerCase())) return false
+    if (category && categoryKeyForWeight(p.weight) !== category) return false
     return true
   })
 
-  const getCategory = (w?: number) => {
-    if (w === undefined || w === null) return '—'
-    if (w <= 30) return isEn ? 'Piglet' : 'Leitão'
-    if (w < 80) return isEn ? 'Grower/Fattener' : 'Engorda'
+  const categoryLabel = (key: CategoryKey) => {
+    if (key === 'leitoes') return isEn ? 'Piglet' : 'Leitão'
+    if (key === 'engorda') return isEn ? 'Grower/Fattener' : 'Engorda'
     return isEn ? 'Finished' : 'Pronto para Abate'
+  }
+
+  const getCategory = (w?: number) => {
+    const key = categoryKeyForWeight(w)
+    return key ? categoryLabel(key) : '—'
   }
 
   const getPriceDisplay = (p: Product) => {
@@ -229,13 +256,19 @@ export default function ProductsClient({ products }: ProductsClientProps) {
             <option value="vivo">{isEn ? 'Live' : 'Vivo'}</option>
             <option value="carcaça">{isEn ? 'Carcass' : 'Carcaça'}</option>
           </select></label>
+          <label className="text-xs font-medium text-gray-600">{isEn ? 'Category' : 'Categoria'}<select id="product-category" value={category} onChange={e=>setCategory(e.target.value as '' | CategoryKey)} className="input-field px-3 py-2">
+            <option value="">{isEn ? 'Category (all)' : 'Categoria (todas)'}</option>
+            <option value="leitoes">{categoryLabel('leitoes')}</option>
+            <option value="engorda">{categoryLabel('engorda')}</option>
+            <option value="abate">{categoryLabel('abate')}</option>
+          </select></label>
         </div>
         <div className="mt-3 flex flex-wrap gap-2">
           {(() => {
-            const hasActiveFilters = !!(query || health || vaccinated || minPrice || maxPrice || minWeight || maxAge || saleForm || location || priceType !== 'head')
+            const hasActiveFilters = !!(query || health || vaccinated || minPrice || maxPrice || minWeight || maxAge || saleForm || location || category || priceType !== 'head')
             return (
               <button
-                onClick={()=>{ setQuery(''); setHealth(''); setVaccinated(''); setMinPrice(''); setMaxPrice(''); setMinWeight(''); setMaxAge(''); setSaleForm(''); setLocation(''); setPriceType('head') }}
+                onClick={()=>{ setQuery(''); setHealth(''); setVaccinated(''); setMinPrice(''); setMaxPrice(''); setMinWeight(''); setMaxAge(''); setSaleForm(''); setLocation(''); setCategory(''); setPriceType('head') }}
                 disabled={!hasActiveFilters}
                 type="button"
                 className={`rounded-lg border px-3 py-1.5 text-sm ${hasActiveFilters ? 'text-gray-700 hover:bg-gray-50' : 'cursor-not-allowed bg-gray-50 text-gray-400'}`}

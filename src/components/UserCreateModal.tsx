@@ -77,7 +77,7 @@ export default function UserCreateModal({ isOpen, onClose, onUserCreated }: User
 
     try {
       setLoading(true)
-      const response = await fetch('/api/auth/register', {
+      const response = await fetch('/api/admin/users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -89,6 +89,9 @@ export default function UserCreateModal({ isOpen, onClose, onUserCreated }: User
           phone: formData.phone || undefined,
           company: formData.company || undefined,
           bio: formData.bio || undefined,
+          location: formData.location || undefined,
+          website: formData.website || undefined,
+          socialMedia: formData.socialMedia,
           role: formData.role,
           isActive: formData.isActive
         })
@@ -118,8 +121,8 @@ export default function UserCreateModal({ isOpen, onClose, onUserCreated }: User
         })
         setErrors({})
       } else {
-        const error = await response.json()
-        alert(`Erro ao criar usuário: ${error.message || 'Erro desconhecido'}`)
+        const error = await response.json().catch(() => ({}))
+        alert(`Erro ao criar usuário: ${error.error || error.message || 'Erro desconhecido'}`)
       }
     } catch (error) {
       console.error('Erro ao criar usuário:', error)

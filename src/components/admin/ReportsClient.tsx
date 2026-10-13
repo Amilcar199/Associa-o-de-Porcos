@@ -37,7 +37,8 @@ export default function ReportsClient() {
     if (kind === 'products') rows = stats.charts?.productsByBreed?.map((x: any)=>({ breed: x.name, count: x.value })) || []
     if (kind === 'news') rows = stats.charts?.newsByCategory?.map((x: any)=>({ category: x.name, count: x.value })) || []
     if (kind === 'contacts') rows = (stats.contacts || []).map((x: any)=>({ status: x._id, count: x.count }))
-    if (kind === 'users') rows = [{ total: stats.overview?.totalUsers, active: stats.overview?.activeUsers }]
+    // A API conta apenas utilizadores com isActive: true, por isso não há coluna separada de inactivos.
+    if (kind === 'users') rows = [{ activos: stats.overview?.totalUsers ?? 0, novos_este_mes: stats.overview?.usersThisMonth ?? 0 }]
     if (kind === 'resumo') {
       rows = (stats.reports || []).flatMap((group: { title: string; items: { label: string; value: number }[] }) =>
         group.items.map((item) => ({ grupo: group.title, indicador: item.label, valor: item.value }))

@@ -170,8 +170,8 @@ export default function NewsManager() {
   };
 
   const filteredNews = news.filter(newsItem => {
-    const matchesSearch = newsItem.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         newsItem.content.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = (newsItem.title ?? '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (newsItem.content ?? '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter = !filterCategory || newsItem.category === filterCategory;
     return matchesSearch && matchesFilter;
   });

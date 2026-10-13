@@ -46,10 +46,10 @@ const Footer = () => {
   ]
 
   const productCategories = [
-    { name: dict.categories?.breeders || 'Suínos Reprodutores', href: '/produtos?categoria=reprodutores' },
     { name: dict.categories?.piglets || 'Leitões', href: '/produtos?categoria=leitoes' },
     { name: dict.categories?.fattening || 'Suínos de Engorda', href: '/produtos?categoria=engorda' },
-    { name: dict.categories?.sows || 'Matrizes', href: '/produtos?categoria=matrizes' },
+    { name: dict.categories?.finished || 'Pronto para Abate', href: '/produtos?categoria=abate' },
+    { name: dict.categories?.all || 'Todos os Suínos', href: '/produtos' },
   ]
 
   const NewsletterForm = () => {
@@ -156,8 +156,7 @@ const Footer = () => {
               <div>
 
                 <h2 className="text-xl font-heading font-bold">
-                  Associação de suínocultores do norte
-
+                  {BRAND_NAME}
                 </h2>
                 <p className="text-sm text-gray-400">
                   {dict.site?.tagline || 'Criação Sustentável'}

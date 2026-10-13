@@ -102,7 +102,7 @@ export default function MediaUploader({ label = 'Uploads', accept, maxSizeBytes,
           {(values||[]).map((url, idx) => (
             <div key={idx} className="relative group">
               {accept.startsWith('image') ? (
-                <img src={url} className="w-full h-20 object-cover rounded" />
+                <img src={url} alt={`Pré-visualização ${idx + 1}`} className="w-full h-20 object-cover rounded" />
               ) : (
                 <div className="aspect-video bg-black/5 rounded flex items-center justify-center text-xs text-gray-600">vídeo {idx+1}</div>
               )}

@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { Eye, Calendar } from 'lucide-react'
  
 import NewsModal from '@/components/modals/NewsModal'
+import Placeholder from '@/components/assets/Foto Suino.webp'
 import { knowledgeLabel } from '@/lib/knowledge'
 
 interface NewsItem {
@@ -97,7 +98,7 @@ export default function NewsClient({ news, isEn }: { news: NewsItem[]; isEn: boo
           >
             <div className="relative h-44">
               <Image
-                src={n.featuredImage || n.imageUrl || ''}
+                src={n.featuredImage || n.imageUrl || Placeholder}
                 alt={n.title || (isEn ? 'News' : 'Notícia')}
                 fill
                 className="object-cover"

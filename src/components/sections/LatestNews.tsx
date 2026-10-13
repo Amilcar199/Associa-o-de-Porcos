@@ -11,6 +11,7 @@ import {
   Clock
 } from 'lucide-react'
 import NewsModal from '@/components/modals/NewsModal'
+import Placeholder from '@/components/assets/Foto Suino.webp'
 import { useLanguage } from '@/components/providers/LanguageProvider'
 import { knowledgeLabel } from '@/lib/knowledge'
 
@@ -175,7 +176,7 @@ const LatestNews = () => {
                   <div className="card overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 h-full">
                     <div className="relative h-64 lg:h-80 overflow-hidden">
                       <Image
-                        src={news[0]?.featuredImage || ''}
+                        src={news[0]?.featuredImage || Placeholder}
                         alt={news[0]?.title || ''}
                         fill
                         className="object-cover group-hover:scale-110 transition-transform duration-300"

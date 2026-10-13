@@ -66,11 +66,6 @@ export default function MemberContentManager() {
   const [selectedContent, setSelectedContent] = useState<MemberContent | null>(null)
   const { showSuccess, showError } = useToast()
 
-  // Debug: verificar estado do modal
-  useEffect(() => {
-    console.log('Estado do modal:', { viewModalOpen, selectedContent: selectedContent?.title })
-  }, [viewModalOpen, selectedContent])
-
   useEffect(() => {
     fetchContent()
   }, [pagination.page, searchTerm, filterType, filterCategory, filterStatus])

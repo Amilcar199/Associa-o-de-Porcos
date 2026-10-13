@@ -107,8 +107,8 @@ export default function UserEditModal({ isOpen, onClose, userId, onUserUpdated }
         onUserUpdated()
         onClose()
       } else {
-        const error = await response.json()
-        alert(`Erro ao atualizar usuário: ${error.message || 'Erro desconhecido'}`)
+        const error = await response.json().catch(() => ({}))
+        alert(`Erro ao atualizar usuário: ${error.error || error.message || 'Erro desconhecido'}`)
       }
     } catch (error) {
       console.error('Erro ao atualizar usuário:', error)

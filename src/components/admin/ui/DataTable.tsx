@@ -6,7 +6,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Search,
-  Filter,
   MoreVertical,
   Edit,
   Trash,
@@ -157,12 +156,6 @@ const DataTable = ({
                 onChange={(e) => handleSearch(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               />
-            </div>
-            <div className="flex items-center space-x-2 ml-4">
-              <button className="flex items-center space-x-2 px-3 py-2 text-gray-600 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50">
-                <Filter size={16} />
-                <span>Filtros</span>
-              </button>
             </div>
           </div>
         </div>

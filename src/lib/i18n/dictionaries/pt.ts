@@ -93,7 +93,9 @@ export default {
 		breeders: 'Suínos Reprodutores',
 		piglets: 'Leitões',
 		fattening: 'Suínos de Engorda',
-		sows: 'Matrizes'
+		sows: 'Matrizes',
+		finished: 'Pronto para Abate',
+		all: 'Todos os Suínos'
 	},
 	site: {
 		titleLine1: 'Associação de Suinocultores',
