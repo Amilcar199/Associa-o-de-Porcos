@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { Mail, Phone, MessageCircle, Clock, MapPin, Send, ArrowLeft } from 'lucide-react'
 import { useLanguage } from '@/components/providers/LanguageProvider'
+import PageHeader from '@/components/ui/PageHeader'
 
 export default function ContatoPage() {
   const { locale } = useLanguage()
@@ -71,12 +72,10 @@ export default function ContatoPage() {
   return (
     <section className="">
       {/* Hero */}
-      <div className="bg-gradient-to-r from-primary-50 to-white border-b border-gray-100">
-        <div className="container-custom py-10">
-          <h1 className="text-3xl font-heading font-bold text-primary-800">{isEn ? 'Contact' : 'Contacto'}</h1>
-          <p className="text-gray-600 mt-2 max-w-2xl">{isEn ? 'The way to join, ask for support, or speak with the association.' : 'O canal para participar, pedir apoio ou falar com a associação.'}</p>
-        </div>
-      </div>
+      <PageHeader
+        title={isEn ? 'Contact' : 'Contacto'}
+        description={isEn ? 'Write to the association, or use the support button.' : 'Escreva à associação, ou use o botão de apoio.'}
+      />
 
       <div className="container-custom py-10 grid lg:grid-cols-3 gap-8">
         {/* Painel de informações */}

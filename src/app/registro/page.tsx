@@ -3,12 +3,12 @@
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
 import { Eye, EyeOff, Mail, Lock, User, Phone, Building, AlertCircle, CheckCircle, CheckCircle2, Circle, UserPlus } from 'lucide-react';
 import { useLanguage } from '@/components/providers/LanguageProvider';
 import pt from '@/lib/i18n/dictionaries/pt';
 import en from '@/lib/i18n/dictionaries/en';
 import Link from 'next/link';
+import AuthShell from '@/components/ui/AuthShell';
 
 export default function RegisterPage() {
   const { locale } = useLanguage();
@@ -118,289 +118,262 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-600 text-xl font-bold text-white shadow-lg shadow-primary-600/20">AS</div>
-          <h2 className="text-3xl font-heading font-bold text-gray-900">
-            {dict.auth.registerTitle}
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            {dict.auth.registerSubtitle}
-          </p>
+    <AuthShell
+      title={dict.auth.registerTitle}
+      subtitle={dict.auth.registerSubtitle}
+      footer={
+        <p>
+          {dict.auth.haveAccount}{' '}
+          <Link href="/login" className="font-medium text-primary-700 hover:text-primary-800">
+            {dict.auth.loginHere}
+          </Link>
+        </p>
+      }
+    >
+      <form className="space-y-5" onSubmit={handleSubmit}>
+        {error && (
+          <div role="alert" className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 p-4">
+            <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-500" />
+            <p className="text-sm text-red-800">{error}</p>
+          </div>
+        )}
+
+        {success && (
+          <div role="status" className="flex items-start gap-2 rounded-xl border border-green-200 bg-green-50 p-4">
+            <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-green-600" />
+            <p className="text-sm text-green-800">{success}</p>
+          </div>
+        )}
+
+        <div>
+          <label id="account-type-label" className="block text-sm font-medium text-gray-700">
+            {dict.auth.accountType}
+          </label>
+          <div className="mt-2 grid grid-cols-2 gap-3" role="radiogroup" aria-labelledby="account-type-label">
+            <button
+              type="button"
+              onClick={() => setFormData(prev => ({ ...prev, accountType: 'cliente', company: '' }))}
+              aria-pressed={formData.accountType === 'cliente'}
+              className={`rounded-xl border p-3 text-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${formData.accountType === 'cliente' ? 'border-primary-600 bg-primary-50 text-primary-700' : 'border-gray-200 text-gray-700 hover:border-primary-300'}`}
+            >
+              {dict.auth.accountTypeClient}
+            </button>
+            <button
+              type="button"
+              onClick={() => setFormData(prev => ({ ...prev, accountType: 'membro' }))}
+              aria-pressed={formData.accountType === 'membro'}
+              className={`rounded-xl border p-3 text-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${formData.accountType === 'membro' ? 'border-primary-600 bg-primary-50 text-primary-700' : 'border-gray-200 text-gray-700 hover:border-primary-300'}`}
+            >
+              {dict.auth.accountTypeMember}
+            </button>
+          </div>
+          <p className="mt-1 text-xs text-gray-500">{dict.auth.accountTypeHint}</p>
         </div>
-      </motion.div>
 
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }} className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="rounded-2xl border border-white/80 bg-white/95 py-8 px-4 shadow-xl shadow-gray-900/5 backdrop-blur sm:px-10">
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            {error && (
-              <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4">
-                <div className="flex">
-                  <AlertCircle className="h-5 w-5 text-red-400" />
-                  <div className="ml-3">
-                    <p className="text-sm text-red-800">{error}</p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {success && (
-              <div role="status" className="rounded-xl border border-green-200 bg-green-50 p-4">
-                <div className="flex">
-                  <CheckCircle className="h-5 w-5 text-green-400" />
-                  <div className="ml-3">
-                    <p className="text-sm text-green-800">{success}</p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <div>
-              <label id="account-type-label" className="block text-sm font-medium text-gray-700">
-                {dict.auth.accountType}
-              </label>
-              <div className="mt-2 grid grid-cols-2 gap-3" role="radiogroup" aria-labelledby="account-type-label">
-                <button
-                  type="button"
-                  onClick={() => setFormData(prev => ({ ...prev, accountType: 'cliente', company: '' }))}
-                  aria-pressed={formData.accountType === 'cliente'}
-                  className={`rounded-xl border p-3 text-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${formData.accountType === 'cliente' ? 'border-primary-600 bg-primary-50 text-primary-700' : 'border-gray-200 text-gray-700 hover:border-primary-300'}`}
-                >
-                  {dict.auth.accountTypeClient}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setFormData(prev => ({ ...prev, accountType: 'membro' }))}
-                  aria-pressed={formData.accountType === 'membro'}
-                  className={`rounded-xl border p-3 text-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${formData.accountType === 'membro' ? 'border-primary-600 bg-primary-50 text-primary-700' : 'border-gray-200 text-gray-700 hover:border-primary-300'}`}
-                >
-                  {dict.auth.accountTypeMember}
-                </button>
-              </div>
-              <p className="mt-1 text-xs text-gray-500">{dict.auth.accountTypeHint}</p>
+        <div>
+          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+            {dict.auth.name}
+          </label>
+          <div className="relative mt-1">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <User className="h-5 w-5 text-gray-400" />
             </div>
-
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                {dict.auth.name}
-              </label>
-              <div className="mt-1 relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  autoComplete="name"
-                  required
-                  value={formData.name}
-                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                  className="input-field pl-10 pr-3"
-                  placeholder={dict.auth.name}
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                {dict.auth.email}
-              </label>
-              <div className="mt-1 relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={formData.email}
-                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  className="input-field pl-10 pr-3"
-                  placeholder={dict.auth.placeholderEmail}
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
-                {dict.auth.phoneOptional}
-              </label>
-              <div className="mt-1 relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Phone className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  id="phone"
-                  name="phone"
-                  type="tel"
-                  autoComplete="tel"
-                  value={formData.phone}
-                  onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                  className="input-field pl-10 pr-3"
-                  placeholder="(+244) 9xx xxx xxx"
-                />
-              </div>
-            </div>
-
-            {formData.accountType === 'membro' && (
-            <div>
-              <label htmlFor="company" className="block text-sm font-medium text-gray-700">
-                {dict.auth.companyOptional}
-              </label>
-              <div className="mt-1 relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Building className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  id="company"
-                  name="company"
-                  type="text"
-                  value={formData.company}
-                  onChange={(e) => setFormData(prev => ({ ...prev, company: e.target.value }))}
-                  className="input-field pl-10 pr-3"
-                  placeholder={dict.auth.companyOptional}
-                />
-              </div>
-            </div>
-            )}
-
-            {formData.accountType === 'membro' && (
-            <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-                {dict.auth.description}
-              </label>
-              <div className="mt-1">
-                <textarea
-                  id="description"
-                  name="description"
-                  rows={4}
-                  value={formData.description}
-                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  className="input-field pr-3"
-                  placeholder={dict.auth.description}
-                />
-              </div>
-            </div>
-            )}
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                {dict.auth.password}
-              </label>
-              <div className="mt-1 relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? 'text' : 'password'}
-                  autoComplete="new-password"
-                  required
-                  value={formData.password}
-                  onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                  className="input-field pl-10 pr-10"
-                  placeholder={dict.auth.passwordMin}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
-                  className="absolute inset-y-0 right-0 flex items-center pr-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-                  ) : (
-                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-                  )}
-                </button>
-              </div>
-              <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs" aria-live="polite">
-                <span className={`inline-flex items-center gap-1 ${passwordHasLength ? 'text-green-700' : 'text-gray-500'}`}>
-                  {passwordHasLength ? <CheckCircle2 size={13} /> : <Circle size={13} />} {locale.startsWith('en') ? '8+ characters' : '8+ caracteres'}
-                </span>
-                <span className={`inline-flex items-center gap-1 ${passwordHasUpper ? 'text-green-700' : 'text-gray-500'}`}>
-                  {passwordHasUpper ? <CheckCircle2 size={13} /> : <Circle size={13} />} {locale.startsWith('en') ? 'Uppercase letter' : 'Letra maiúscula'}
-                </span>
-                <span className={`inline-flex items-center gap-1 ${passwordHasLower ? 'text-green-700' : 'text-gray-500'}`}>
-                  {passwordHasLower ? <CheckCircle2 size={13} /> : <Circle size={13} />} {locale.startsWith('en') ? 'Lowercase letter' : 'Letra minúscula'}
-                </span>
-                <span className={`inline-flex items-center gap-1 ${passwordHasNumber ? 'text-green-700' : 'text-gray-500'}`}>
-                  {passwordHasNumber ? <CheckCircle2 size={13} /> : <Circle size={13} />} {locale.startsWith('en') ? 'One number' : 'Um número'}
-                </span>
-                <span className={`inline-flex items-center gap-1 ${passwordHasSpecial ? 'text-green-700' : 'text-gray-500'}`}>
-                  {passwordHasSpecial ? <CheckCircle2 size={13} /> : <Circle size={13} />} {locale.startsWith('en') ? 'Special character' : 'Caractere especial'}
-                </span>
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                {dict.auth.confirmPassword}
-              </label>
-              <div className="mt-1 relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  autoComplete="new-password"
-                  required
-                  value={formData.confirmPassword}
-                  onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                  className="input-field pl-10 pr-10"
-                  placeholder={dict.auth.confirmPassword}
-                />
-                <button
-                  type="button"
-                  aria-label={showConfirmPassword ? 'Ocultar confirmação de senha' : 'Mostrar confirmação de senha'}
-                  className="absolute inset-y-0 right-0 flex items-center pr-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                >
-                  {showConfirmPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-                  ) : (
-                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-                  )}
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="btn-primary w-full disabled:cursor-not-allowed disabled:opacity-50 inline-flex items-center justify-center gap-2"
-              >
-                {loading ? (
-                  <span className="h-4 w-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                ) : (
-                  <UserPlus size={18} />
-                )}
-                {loading ? dict.auth.creatingAccount : dict.auth.createAccount}
-              </button>
-            </div>
-
-          </form>
-
-          {/* Seção de registro social removida */}
-
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
-              {dict.auth.haveAccount}{' '}
-              <Link href="/login" className="font-medium text-primary-700 hover:text-primary-800">
-                {dict.auth.loginHere}
-              </Link>
-            </p>
+            <input
+              id="name"
+              name="name"
+              type="text"
+              autoComplete="name"
+              required
+              value={formData.name}
+              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+              className="input-field pl-10 pr-3"
+              placeholder={dict.auth.name}
+            />
           </div>
         </div>
-      </motion.div>
-    </div>
+
+        <div>
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+            {dict.auth.email}
+          </label>
+          <div className="relative mt-1">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <Mail className="h-5 w-5 text-gray-400" />
+            </div>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              required
+              value={formData.email}
+              onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+              className="input-field pl-10 pr-3"
+              placeholder={dict.auth.placeholderEmail}
+            />
+          </div>
+        </div>
+
+        <div>
+          <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+            {dict.auth.phoneOptional}
+          </label>
+          <div className="relative mt-1">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <Phone className="h-5 w-5 text-gray-400" />
+            </div>
+            <input
+              id="phone"
+              name="phone"
+              type="tel"
+              autoComplete="tel"
+              value={formData.phone}
+              onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+              className="input-field pl-10 pr-3"
+              placeholder="(+244) 9xx xxx xxx"
+            />
+          </div>
+        </div>
+
+        {formData.accountType === 'membro' && (
+          <div>
+            <label htmlFor="company" className="block text-sm font-medium text-gray-700">
+              {dict.auth.companyOptional}
+            </label>
+            <div className="relative mt-1">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                <Building className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                id="company"
+                name="company"
+                type="text"
+                value={formData.company}
+                onChange={(e) => setFormData(prev => ({ ...prev, company: e.target.value }))}
+                className="input-field pl-10 pr-3"
+                placeholder={dict.auth.companyOptional}
+              />
+            </div>
+          </div>
+        )}
+
+        {formData.accountType === 'membro' && (
+          <div>
+            <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+              {dict.auth.description}
+            </label>
+            <div className="mt-1">
+              <textarea
+                id="description"
+                name="description"
+                rows={4}
+                value={formData.description}
+                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                className="input-field pr-3"
+                placeholder={dict.auth.description}
+              />
+            </div>
+          </div>
+        )}
+
+        <div>
+          <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            {dict.auth.password}
+          </label>
+          <div className="relative mt-1">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <Lock className="h-5 w-5 text-gray-400" />
+            </div>
+            <input
+              id="password"
+              name="password"
+              type={showPassword ? 'text' : 'password'}
+              autoComplete="new-password"
+              required
+              value={formData.password}
+              onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+              className="input-field pl-10 pr-10"
+              placeholder={dict.auth.passwordMin}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+              className="absolute inset-y-0 right-0 flex items-center pr-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+            >
+              {showPassword ? (
+                <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+              ) : (
+                <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+              )}
+            </button>
+          </div>
+          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs" aria-live="polite">
+            <span className={`inline-flex items-center gap-1 ${passwordHasLength ? 'text-green-700' : 'text-gray-500'}`}>
+              {passwordHasLength ? <CheckCircle2 size={13} /> : <Circle size={13} />} {locale.startsWith('en') ? '8+ characters' : '8+ caracteres'}
+            </span>
+            <span className={`inline-flex items-center gap-1 ${passwordHasUpper ? 'text-green-700' : 'text-gray-500'}`}>
+              {passwordHasUpper ? <CheckCircle2 size={13} /> : <Circle size={13} />} {locale.startsWith('en') ? 'Uppercase letter' : 'Letra maiúscula'}
+            </span>
+            <span className={`inline-flex items-center gap-1 ${passwordHasLower ? 'text-green-700' : 'text-gray-500'}`}>
+              {passwordHasLower ? <CheckCircle2 size={13} /> : <Circle size={13} />} {locale.startsWith('en') ? 'Lowercase letter' : 'Letra minúscula'}
+            </span>
+            <span className={`inline-flex items-center gap-1 ${passwordHasNumber ? 'text-green-700' : 'text-gray-500'}`}>
+              {passwordHasNumber ? <CheckCircle2 size={13} /> : <Circle size={13} />} {locale.startsWith('en') ? 'One number' : 'Um número'}
+            </span>
+            <span className={`inline-flex items-center gap-1 ${passwordHasSpecial ? 'text-green-700' : 'text-gray-500'}`}>
+              {passwordHasSpecial ? <CheckCircle2 size={13} /> : <Circle size={13} />} {locale.startsWith('en') ? 'Special character' : 'Caractere especial'}
+            </span>
+          </div>
+        </div>
+
+        <div>
+          <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+            {dict.auth.confirmPassword}
+          </label>
+          <div className="relative mt-1">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <Lock className="h-5 w-5 text-gray-400" />
+            </div>
+            <input
+              id="confirmPassword"
+              name="confirmPassword"
+              type={showConfirmPassword ? 'text' : 'password'}
+              autoComplete="new-password"
+              required
+              value={formData.confirmPassword}
+              onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+              className="input-field pl-10 pr-10"
+              placeholder={dict.auth.confirmPassword}
+            />
+            <button
+              type="button"
+              aria-label={showConfirmPassword ? 'Ocultar confirmação de senha' : 'Mostrar confirmação de senha'}
+              className="absolute inset-y-0 right-0 flex items-center pr-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+            >
+              {showConfirmPassword ? (
+                <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+              ) : (
+                <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+              )}
+            </button>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="btn-primary inline-flex w-full items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {loading ? (
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+          ) : (
+            <UserPlus size={18} />
+          )}
+          {loading ? dict.auth.creatingAccount : dict.auth.createAccount}
+        </button>
+      </form>
+    </AuthShell>
   );
 }

@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic'
 import type { Metadata } from 'next'
 import { cookies } from 'next/headers'
 import ProductsClient from '@/app/produtos/ProductsClient'
+import PageHeader from '@/components/ui/PageHeader'
 import { localizeProduct } from '@/lib/i18n/content'
 
 export function generateMetadata(): Metadata {
@@ -80,12 +81,10 @@ export default async function ProdutosPage() {
   return (
     <section className="">
       {/* Hero simples */}
-      <div className="bg-gradient-to-r from-primary-50 to-white border-b border-gray-100">
-        <div className="container-custom py-10">
-          <h1 className="text-3xl font-heading font-bold text-primary-800">{isEn ? 'Products' : 'Produtos'}</h1>
-          <p className="text-gray-600 mt-2 max-w-2xl">{isEn ? 'The association market is for pigs: live animals or carcass, with origin, price and a way to reach the seller.' : 'O mercado da associação é de suínos: animais vivos ou carcaça, com procedência, preço e forma de falar com quem anuncia.'}</p>
-        </div>
-      </div>
+      <PageHeader
+        title={isEn ? 'Products' : 'Produtos'}
+        description={isEn ? 'Live animals or carcass, with origin, price and a way to reach the seller.' : 'Animais vivos ou carcaça, com origem, preço e forma de falar com quem anuncia.'}
+      />
 
       <div className="container-custom py-10">
         <ProductsClient products={normalizedProducts} />

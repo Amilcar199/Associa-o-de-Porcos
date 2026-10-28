@@ -7,6 +7,7 @@ import { headers } from 'next/headers'
 import { cookies } from 'next/headers'
 import Link from 'next/link'
 import NewsClient from '@/app/noticias/NewsClient'
+import PageHeader from '@/components/ui/PageHeader'
 import { localizeNews } from '@/lib/i18n/content'
 
 export function generateMetadata(): Metadata {
@@ -60,13 +61,11 @@ export default async function NoticiasPage() {
   return (
     <section className="">
       {/* Hero */}
-      <div className="bg-gradient-to-r from-primary-50 to-white border-b border-gray-100">
-        <div className="container-custom py-10">
-          <h1 className="text-3xl font-heading font-bold text-primary-800">{isEn ? 'News' : 'Notícias'}</h1>
-          <p className="text-gray-600 mt-2 max-w-2xl">{isEn ? 'News published by the association. Guides, manuals and the other technical themes are in the knowledge centre.' : 'Notícias publicadas pela associação. Guias, manuais e os outros temas técnicos estão no centro de conhecimento.'}</p>
-          <p className="mt-3 text-sm"><Link href="/conhecimento" className="font-medium text-primary-700 underline">{isEn ? 'Open the knowledge centre' : 'Abrir o centro de conhecimento'}</Link></p>
-        </div>
-      </div>
+      <PageHeader
+        title={isEn ? 'News' : 'Notícias'}
+        description={isEn ? 'What the association has just published.' : 'O que a associação acabou de publicar.'}
+        actions={<Link href="/conhecimento" className="text-sm font-semibold text-primary-700">{isEn ? 'Knowledge centre' : 'Centro de conhecimento'}</Link>}
+      />
 
       <div className="container-custom py-10">
         {news.length === 0 ? (

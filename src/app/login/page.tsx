@@ -2,13 +2,13 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
 import { Mail, Lock, Eye, EyeOff, AlertCircle, LogIn } from 'lucide-react';
 import { useLanguage } from '@/components/providers/LanguageProvider';
 import pt from '@/lib/i18n/dictionaries/pt';
 import en from '@/lib/i18n/dictionaries/en';
 import Link from 'next/link';
 import { signIn, getSession } from 'next-auth/react';
+import AuthShell from '@/components/ui/AuthShell';
 
 export default function LoginPage() {
   const { locale } = useLanguage();
@@ -47,126 +47,101 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-600 text-xl font-bold text-white shadow-lg shadow-primary-600/20">AS</div>
-          <h2 className="text-3xl font-heading font-bold text-gray-900">
-            {dict.auth.loginTitle}
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            {dict.auth.loginSubtitle}
-          </p>
-        </div>
-      </motion.div>
+    <AuthShell
+      title={dict.auth.loginTitle}
+      subtitle={dict.auth.loginSubtitle}
+      footer={
+        <p>
+          {dict.auth.noAccount}{' '}
+          <Link href="/registro" className="font-medium text-primary-700 hover:text-primary-800">
+            {dict.auth.registerHere}
+          </Link>
+        </p>
+      }
+    >
+      <form className="space-y-5" onSubmit={handleSubmit}>
+        {error && (
+          <div role="alert" className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 p-4">
+            <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-500" />
+            <p className="text-sm text-red-800">{error}</p>
+          </div>
+        )}
 
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }} className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="rounded-2xl border border-white/80 bg-white/95 py-8 px-4 shadow-xl shadow-gray-900/5 backdrop-blur sm:px-10">
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            {error && (
-              <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4">
-                <div className="flex">
-                  <AlertCircle className="h-5 w-5 text-red-500 mr-2" />
-                  <div className="ml-1">
-                    <p className="text-sm text-red-800">{error}</p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                {dict.auth.email}
-              </label>
-              <div className="mt-1 relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={formData.email}
-                  onChange={(e) => setFormData((prev: LoginForm) => ({ ...prev, email: e.target.value }))}
-                  className="input-field pl-10 pr-3"
-                  placeholder={dict.auth.placeholderEmail}
-                />
-              </div>
+        <div>
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+            {dict.auth.email}
+          </label>
+          <div className="relative mt-1">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <Mail className="h-5 w-5 text-gray-400" />
             </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                {dict.auth.password}
-              </label>
-              <div className="mt-1 relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? 'text' : 'password'}
-                  autoComplete="current-password"
-                  required
-                  value={formData.password}
-                  onChange={(e) => setFormData((prev: LoginForm) => ({ ...prev, password: e.target.value }))}
-                  className="input-field pl-10 pr-10"
-                  placeholder={dict.auth.placeholderPassword}
-                />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 right-0 flex items-center pr-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
-                  onClick={() => setShowPassword(!showPassword)}
-                  aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-                  ) : (
-                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-                  )}
-                </button>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-end">
-              <div className="text-sm">
-                <Link href="/esqueci-senha" className="font-medium text-primary-700 hover:text-primary-800">
-                  {dict.auth.forgotPassword}
-                </Link>
-              </div>
-            </div>
-
-            <div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="btn-primary w-full disabled:cursor-not-allowed disabled:opacity-50 inline-flex items-center justify-center gap-2"
-              >
-                {loading ? (
-                  <span className="h-4 w-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                ) : (
-                  <LogIn size={18} />
-                )}
-                {loading ? dict.auth.loggingIn : dict.auth.login}
-              </button>
-            </div>
-          </form>
-          
-
-          {/* Seção de login social removida */}
-
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
-              {dict.auth.noAccount}{' '}
-              <Link href="/registro" className="font-medium text-primary-700 hover:text-primary-800">
-                {dict.auth.registerHere}
-              </Link>
-            </p>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              required
+              value={formData.email}
+              onChange={(e) => setFormData((prev: LoginForm) => ({ ...prev, email: e.target.value }))}
+              className="input-field pl-10 pr-3"
+              placeholder={dict.auth.placeholderEmail}
+            />
           </div>
         </div>
-      </motion.div>
-    </div>
+
+        <div>
+          <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            {dict.auth.password}
+          </label>
+          <div className="relative mt-1">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <Lock className="h-5 w-5 text-gray-400" />
+            </div>
+            <input
+              id="password"
+              name="password"
+              type={showPassword ? 'text' : 'password'}
+              autoComplete="current-password"
+              required
+              value={formData.password}
+              onChange={(e) => setFormData((prev: LoginForm) => ({ ...prev, password: e.target.value }))}
+              className="input-field pl-10 pr-10"
+              placeholder={dict.auth.placeholderPassword}
+            />
+            <button
+              type="button"
+              className="absolute inset-y-0 right-0 flex items-center pr-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+              onClick={() => setShowPassword(!showPassword)}
+              aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+            >
+              {showPassword ? (
+                <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+              ) : (
+                <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+              )}
+            </button>
+          </div>
+        </div>
+
+        <div className="flex justify-end">
+          <Link href="/esqueci-senha" className="text-sm font-medium text-primary-700 hover:text-primary-800">
+            {dict.auth.forgotPassword}
+          </Link>
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="btn-primary inline-flex w-full items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {loading ? (
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+          ) : (
+            <LogIn size={18} />
+          )}
+          {loading ? dict.auth.loggingIn : dict.auth.login}
+        </button>
+      </form>
+    </AuthShell>
   );
 }

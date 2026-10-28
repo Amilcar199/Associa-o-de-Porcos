@@ -6,6 +6,8 @@ import fs from 'fs'
 import path from 'path'
 import { headers } from 'next/headers'
 import dynamicImport from 'next/dynamic'
+import PageHeader from '@/components/ui/PageHeader'
+import LegalTabs from '@/components/ui/LegalTabs'
 
 export function generateMetadata() {
   const locale = cookies().get('locale')?.value || 'pt-AO'
@@ -61,17 +63,17 @@ export default async function ConstitutionDocsPage() {
   })
 
   return (
-    <section className="container-custom section-padding">
-      <h1 className="text-3xl font-heading font-bold text-primary-800 mb-6">
-        {isEn ? 'Constitution Documentation' : 'Documentação de constituição'}
-      </h1>
+    <>
+      <PageHeader
+        eyebrow={isEn ? 'Legal & Compliance' : 'Jurídico e Legal'}
+        title={isEn ? 'Constitution Documentation' : 'Documentação de constituição'}
+        description={isEn
+          ? 'Click an image to open the full file.'
+          : 'Clique numa imagem para abrir o ficheiro completo.'}
+      />
 
-      <div className="prose prose-green max-w-none">
-        <p>
-          {isEn
-            ? 'Click an image to open the full file.'
-            : 'Clique numa imagem para abrir o ficheiro completo.'}
-        </p>
+      <section className="container-custom py-10 md:py-12">
+        <LegalTabs active="constituicao" isEn={isEn} className="mb-8" />
 
         {urls.length > 0 ? (
           <DocsGrid urls={urls} />
@@ -79,8 +81,8 @@ export default async function ConstitutionDocsPage() {
           // Fallback: load from assets via client-side context if public folder is empty
           <ConstitutionDocsFromAssets />
         )}
-      </div>
-    </section>
+      </section>
+    </>
   )
 }
 
@@ -93,17 +95,18 @@ function DocsGrid({ urls }: { urls: string[] }) {
     )
   }
   return (
-    <div className="not-prose">
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
-        {urls.map((src) => (
-          <div key={src} className="relative aspect-[3/4] bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
-            <img src={src} alt="Documento de constituição" className="w-full h-full object-cover" />
-            <a href={src} target="_blank" rel="noopener noreferrer" className="absolute inset-0 group">
-              <span className="sr-only">Abrir documento</span>
-            </a>
-          </div>
-        ))}
-      </div>
+    <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+      {urls.map((src) => (
+        <div
+          key={src}
+          className="relative aspect-[3/4] overflow-hidden rounded-2xl border border-gray-200 bg-gray-50 shadow-sm transition-shadow hover:shadow-md"
+        >
+          <img src={src} alt="Documento de constituição" className="h-full w-full object-cover" />
+          <a href={src} target="_blank" rel="noopener noreferrer" className="absolute inset-0">
+            <span className="sr-only">Abrir documento</span>
+          </a>
+        </div>
+      ))}
     </div>
   )
 }

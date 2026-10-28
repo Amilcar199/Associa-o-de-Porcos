@@ -4,6 +4,7 @@ import type { Metadata } from 'next'
 import { cookies, headers } from 'next/headers'
 import Link from 'next/link'
 import KnowledgeCenter from './KnowledgeCenter'
+import PageHeader from '@/components/ui/PageHeader'
 
 export function generateMetadata(): Metadata {
   const locale = cookies().get('locale')?.value || 'pt-AO'
@@ -37,25 +38,11 @@ export default async function ConhecimentoPage() {
 
   return (
     <section>
-      <div className="border-b border-gray-100 bg-gradient-to-r from-primary-50 to-white">
-        <div className="container-custom py-10">
-          <h1 className="font-heading text-3xl font-bold text-primary-800">
-            {isEn ? 'Knowledge centre' : 'Centro de conhecimento'}
-          </h1>
-          <p className="mt-2 max-w-2xl text-gray-600">
-            {isEn
-              ? 'Public material from the association: news, articles, technical guides, manuals, studies, legislation and the themes of nutrition, health, reproduction, biosecurity, management and training.'
-              : 'O material público da associação: notícias, artigos, guias técnicos, manuais, estudos, legislação e os temas de nutrição, sanidade, reprodução, biossegurança, gestão e formação.'}
-          </p>
-          <p className="mt-3 text-sm text-gray-600">
-            {isEn ? 'Manuals, videos and files reserved for members stay in the ' : 'Manuais, vídeos e ficheiros reservados aos membros ficam na '}
-            <Link href="/membros" className="font-medium text-primary-700 underline">
-              {isEn ? 'members area' : 'área de membros'}
-            </Link>
-            .
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        title={isEn ? 'Knowledge centre' : 'Centro de conhecimento'}
+        description={isEn ? 'Guides, manuals and public technical themes.' : 'Guias, manuais e temas técnicos públicos.'}
+        actions={<Link href="/membros" className="text-sm font-semibold text-primary-700">{isEn ? 'Members area' : 'Área de membros'}</Link>}
+      />
       <KnowledgeCenter items={items} isEn={isEn} />
     </section>
   )

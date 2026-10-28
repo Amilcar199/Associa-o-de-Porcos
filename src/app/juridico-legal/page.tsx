@@ -2,7 +2,8 @@ export const dynamic = 'force-dynamic'
 // @ts-nocheck
 import React from 'react'
 import { cookies, headers } from 'next/headers'
-import Link from 'next/link'
+import PageHeader from '@/components/ui/PageHeader'
+import LegalTabs from '@/components/ui/LegalTabs'
 
 export function generateMetadata() {
   const locale = cookies().get('locale')?.value || 'pt-AO'
@@ -32,81 +33,51 @@ export default async function LegalCompliancePage() {
   const isEn = String(locale).startsWith('en')
   const siteConfig: any = await getSiteConfig()
   return (
-    <section className="container-custom section-padding">
-      <h1 className="text-3xl font-heading font-bold text-primary-800 mb-6">
-        {isEn ? 'Legal & Compliance' : 'Jurídico e Legal'}
-      </h1>
+    <>
+      <PageHeader
+        eyebrow={isEn ? 'Institutional' : 'Institucional'}
+        title={isEn ? 'Legal & Compliance' : 'Jurídico e Legal'}
+        description={isEn
+          ? 'Statutes, founding documents and the policies of the association.'
+          : 'Estatutos, documentos de constituição e as políticas da associação.'}
+      />
 
-      {/* Tabs */}
-      <div className="not-prose mb-6">
-        <div role="tablist" className="flex border-b border-gray-200">
-          <Link
-            href="/juridico-legal"
-            role="tab"
-            aria-selected
-            className="px-4 py-2 -mb-px border-b-2 border-primary-600 text-primary-700 font-medium"
-          >
-            {isEn ? 'Overview' : 'Geral'}
-          </Link>
-          <Link
-            href="/juridico-legal/documentacao-de-constituicao"
-            role="tab"
-            className="px-4 py-2 -mb-px border-b-2 border-transparent text-gray-600 hover:text-primary-700 hover:border-primary-300"
-          >
-            {isEn ? 'Constitution Documentation' : 'Documentação de constituição'}
-          </Link>
-          <Link
-            href="/juridico-legal/corpo-administrativo"
-            role="tab"
-            className="px-4 py-2 -mb-px border-b-2 border-transparent text-gray-600 hover:text-primary-700 hover:border-primary-300"
-          >
-            {isEn ? 'Administrative Body' : 'Corpo administrativo'}
-          </Link>
+      <section className="container-custom py-10 md:py-12">
+        <LegalTabs active="geral" isEn={isEn} className="mb-8" />
+
+        <div className="prose prose-green max-w-3xl">
+          <h2>{isEn ? 'Policies' : 'Políticas'}</h2>
+          <ul>
+            <li>
+              <a className="text-primary-700 hover:underline" href="/privacidade">
+                {isEn ? 'Privacy Policy' : 'Política de Privacidade'}
+              </a>
+            </li>
+            <li>
+              <a className="text-primary-700 hover:underline" href="/termos">
+                {isEn ? 'Terms of Use' : 'Termos de Uso'}
+              </a>
+            </li>
+            <li>
+              <a className="text-primary-700 hover:underline" href="/cookies">
+                {isEn ? 'Cookie Policy' : 'Política de Cookies'}
+              </a>
+            </li>
+          </ul>
+
+          <h2>{isEn ? 'Contact for Legal Matters' : 'Contato para Assuntos Jurídicos'}</h2>
+          <p>
+            {isEn
+              ? 'For legal requests, contact us at '
+              : 'Para requerimentos jurídicos, contacte-nos em '}
+            <a className="text-primary-700 hover:underline" href={`mailto:${siteConfig?.contactEmail || 'Paulobaptista18@hotmail.com'}`}>
+              {siteConfig?.contactEmail || 'Paulobaptista18@hotmail.com'}
+            </a>
+            .
+          </p>
         </div>
-      </div>
-
-      <div className="prose prose-green max-w-none">
-        <p>
-          {isEn
-            ? 'Institutional information: statutes, founding documents and the policies of the association.'
-            : 'A informação institucional: estatutos, documentos de constituição e as políticas da associação.'}
-        </p>
-
-        {/* Conteúdo geral sem documentos específicos */}
-
-        <h2>{isEn ? 'Policies' : 'Políticas'}</h2>
-        <ul>
-          <li>
-            <a className="text-primary-700 hover:underline" href="/privacidade">
-              {isEn ? 'Privacy Policy' : 'Política de Privacidade'}
-            </a>
-          </li>
-          <li>
-            <a className="text-primary-700 hover:underline" href="/termos">
-              {isEn ? 'Terms of Use' : 'Termos de Uso'}
-            </a>
-          </li>
-          <li>
-            <a className="text-primary-700 hover:underline" href="/cookies">
-              {isEn ? 'Cookie Policy' : 'Política de Cookies'}
-            </a>
-          </li>
-        </ul>
-
-        {/* A documentação de constituição foi movida para a aba dedicada. */}
-
-        <h2>{isEn ? 'Contact for Legal Matters' : 'Contato para Assuntos Jurídicos'}</h2>
-        <p>
-          {isEn
-            ? 'For legal requests, contact us at '
-            : 'Para requerimentos jurídicos, contacte-nos em '}
-          <a className="text-primary-700 hover:underline" href={`mailto:${siteConfig?.contactEmail || 'Paulobaptista18@hotmail.com'}`}>
-            {siteConfig?.contactEmail || 'Paulobaptista18@hotmail.com'}
-          </a>
-          .
-        </p>
-      </div>
-    </section>
+      </section>
+    </>
   )
 }
 

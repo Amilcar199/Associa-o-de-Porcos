@@ -53,7 +53,7 @@ const PartnersSection = () => {
   }
 
   return (
-    <section className="section-padding bg-white">
+    <section className="bg-gray-50 py-10 md:py-14">
       <div className="container-custom">
         <div className="text-center mb-12">
           <span className="inline-block bg-primary-100 text-primary-800 px-3 py-1 rounded-full text-sm font-medium mb-4">

@@ -4,6 +4,7 @@ import type { Metadata } from 'next'
 import { cookies } from 'next/headers'
 import InteractiveMapSection from '@/components/sections/PigMap/InteractiveMapSection'
 import ProducersDirectory from './ProducersDirectory'
+import PageHeader from '@/components/ui/PageHeader'
 
 export function generateMetadata(): Metadata {
   const locale = cookies().get('locale')?.value || 'pt-AO'
@@ -22,16 +23,10 @@ export default function ProdutoresPage() {
 
   return (
     <section>
-      <div className="border-b border-gray-100 bg-gradient-to-r from-primary-50 to-white">
-        <div className="container-custom py-10">
-          <h1 className="font-heading text-3xl font-bold text-primary-800">{isEn ? 'Producers' : 'Produtores'}</h1>
-          <p className="mt-2 max-w-2xl text-gray-600">
-            {isEn
-              ? 'The national pig-farming map: approved producers and farms, by province and municipality, with herd, sows, boars, fattening pigs and capacity.'
-              : 'O mapa nacional da suinocultura: produtores e fazendas aprovados, por província e município, com efectivo, matrizes, reprodutores, engorda e capacidade.'}
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        title={isEn ? 'Producers' : 'Produtores'}
+        description={isEn ? 'Approved farms on the map, by province and municipality.' : 'Fazendas aprovadas no mapa, por província e município.'}
+      />
       <InteractiveMapSection isEn={isEn} />
       <ProducersDirectory />
     </section>

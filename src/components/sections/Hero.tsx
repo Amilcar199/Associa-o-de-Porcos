@@ -3,8 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { motion } from 'framer-motion'
-import { ChevronRight, Users, Award, Leaf } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
 import Slide1 from '@/components/assets/Foto Slider1.jpg'
 import Slide2 from '@/components/assets/Foto slider2.jpg'
 import Slide3 from '@/components/assets/Foto slider 3.jpg'
@@ -127,19 +126,13 @@ const Hero = () => {
   }
 
   return (
-    <section className="relative min-h-[80vh] lg:min-h-screen overflow-hidden">
+    <section className="relative min-h-[68vh] overflow-hidden lg:min-h-[72vh]">
       {/* Background Slides */}
       <div className="absolute inset-0">
         {slides.map((slide, index) => (
-          <motion.div
+          <div
             key={slide.id}
-            initial={{ opacity: 0 }}
-            animate={{ 
-              opacity: index === currentSlide ? 1 : 0,
-              scale: index === currentSlide ? 1 : 1.1
-            }}
-            transition={{ duration: 1, ease: 'easeInOut' }}
-            className="absolute inset-0"
+            className={`absolute inset-0 transition-opacity duration-700 ${index === currentSlide ? 'opacity-100' : 'opacity-0'}`}
           >
             <Image
               src={slide.image as any}
@@ -153,131 +146,41 @@ const Hero = () => {
               }}
             />
             <div className="absolute inset-0 bg-black/40" />
-          </motion.div>
+          </div>
         ))}
       </div>
 
       {/* Content */}
-      <div className="relative z-10 container-custom h-full min-h-[80vh] lg:min-h-screen flex items-center">
-        <div className="w-full">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            {/* Text Content */}
-            <motion.div
-              key={currentSlide}
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-white"
+      <div className="relative z-10 container-custom flex h-full min-h-[68vh] items-center lg:min-h-[72vh]">
+        <div key={currentSlide} className="max-w-xl text-white">
+          <h1 className="font-heading text-3xl font-bold leading-tight sm:text-5xl">
+            {slides[currentSlide].title}
+          </h1>
+          <p className="mt-3 text-base text-primary-100 sm:text-lg">
+            {slides[currentSlide].subtitle}
+          </p>
+          <p className="mt-3 hidden max-w-lg text-sm leading-relaxed text-gray-200 sm:block">
+            {slides[currentSlide].description}
+          </p>
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            <Link
+              href={slides[currentSlide].ctaLink}
+              className="inline-flex items-center justify-center rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-primary-800 transition-colors hover:bg-primary-50"
             >
-              <motion.h1 
-                className="text-4xl lg:text-6xl font-heading font-bold mb-6 leading-tight"
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.4 }}
-              >
-                {slides[currentSlide].title}
-              </motion.h1>
-              
-              <motion.h2 
-                className="text-xl lg:text-2xl text-primary-200 mb-6 font-medium"
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.6 }}
-              >
-                {slides[currentSlide].subtitle}
-              </motion.h2>
-              
-              <motion.p 
-                className="text-lg text-gray-200 mb-8 leading-relaxed max-w-2xl"
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.8 }}
-              >
-                {slides[currentSlide].description}
-              </motion.p>
-
-              {/* CTA Buttons */}
-              <motion.div 
-                className="flex flex-col sm:flex-row gap-4 mb-12"
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 1 }}
-              >
-                <Link
-                  href={slides[currentSlide].ctaLink}
-                  className="inline-flex items-center justify-center bg-primary-600 hover:bg-primary-700 text-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-[1.02] shadow-lg shadow-primary-900/30"
-                >
-                  {slides[currentSlide].cta}
-                  <ChevronRight size={20} className="ml-2" />
-                </Link>
-                
-                <Link
-                  href="/sobre"
-                  className="inline-flex items-center justify-center border-2 border-white/80 text-white hover:bg-white hover:text-gray-900 font-semibold py-4 px-8 rounded-xl transition-all duration-300 backdrop-blur-sm"
-                >
-                  {isEn ? 'About the Association' : 'Sobre a Associação'}
-                </Link>
-              </motion.div>
-
-              {/* Stats */}
-              <motion.div 
-                className="grid grid-cols-3 gap-8"
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 1.2 }}
-              >
-                {slides[currentSlide].stats.map((stat, index) => (
-                  <div key={index} className="text-center">
-                    <div className="text-3xl lg:text-4xl font-bold text-primary-300 mb-2">
-                      {stat.value}
-                    </div>
-                    <div className="text-sm text-gray-300">
-                      {stat.label}
-                    </div>
-                  </div>
-                ))}
-              </motion.div>
-            </motion.div>
-
-            {/* Features Cards */}
-            <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              className="hidden lg:block"
-            >
-              <div className="grid grid-cols-1 gap-6">
-                <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-6">
-                  <Users className="text-primary-300 mb-4" size={40} />
-                  <h3 className="text-xl font-semibold text-white mb-2">
-                    {isEn ? 'Strong Community' : 'Comunidade Forte'}
-                  </h3>
-                  <p className="text-gray-200 text-sm">
-                    {isEn ? 'More than 100 associated producers sharing knowledge and experience.' : 'Mais de 100 produtores associados a partilhar conhecimento e experiência.'}
-                  </p>
-                </div>
-                
-                <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-6">
-                  <Award className="text-primary-300 mb-4" size={40} />
-                  <h3 className="text-xl font-semibold text-white mb-2">
-                    {isEn ? 'Certified Quality' : 'Qualidade Certificada'}
-                  </h3>
-                  <p className="text-gray-200 text-sm">
-                    {isEn ? 'Products certified with high quality and animal welfare.' : 'Produtos com certificação de qualidade e bem-estar animal.'}
-                  </p>
-                </div>
-                
-                <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-6">
-                  <Leaf className="text-primary-300 mb-4" size={40} />
-                  <h3 className="text-xl font-semibold text-white mb-2">
-                    {isEn ? 'Sustainability' : 'Sustentabilidade'}
-                  </h3>
-                  <p className="text-gray-200 text-sm">
-                    {isEn ? 'Sustainable practices and environmental responsibility first.' : 'Práticas sustentáveis e responsabilidade ambiental em primeiro lugar.'}
-                  </p>
-                </div>
+              {slides[currentSlide].cta}
+              <ChevronRight size={18} className="ml-1" />
+            </Link>
+            <Link href="/sobre" className="text-sm font-medium text-white/90 underline-offset-4 hover:underline">
+              {isEn ? 'Who we are' : 'Quem somos'}
+            </Link>
+          </div>
+          <div className="mt-8 hidden grid-cols-3 gap-6 sm:grid">
+            {slides[currentSlide].stats.map((stat) => (
+              <div key={stat.label}>
+                <div className="text-2xl font-bold text-white">{stat.value}</div>
+                <div className="text-xs text-gray-300">{stat.label}</div>
               </div>
-            </motion.div>
+            ))}
           </div>
         </div>
       </div>
@@ -299,17 +202,6 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* Scroll Indicator */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1, delay: 2, repeat: Infinity, repeatType: 'reverse' }}
-        className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-20"
-      >
-        <div className="w-6 h-10 border-2 border-white rounded-full flex justify-center">
-          <div className="w-1 h-2 bg-white rounded-full mt-2" />
-        </div>
-      </motion.div>
     </section>
   )
 }

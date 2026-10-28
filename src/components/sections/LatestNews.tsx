@@ -119,7 +119,7 @@ const LatestNews = () => {
   }, [modalOpen, selectedNews?._id])
 
   return (
-    <section className="section-padding bg-gray-50">
+    <section className="bg-white py-10 md:py-14">
       <div className="container-custom">
         <motion.div
           initial={{ opacity: 0, y: 30 }}

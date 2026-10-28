@@ -18,7 +18,7 @@ function formatPct(v: number | null) {
 }
 function fmtDateISO(s?: string) { return s ? s.slice(0,10) : '—' }
 
-export default function BolsaPreview() {
+export default function BolsaPreview({ compact = false }: { compact?: boolean }) {
   const { locale } = useLanguage()
   const isEn = String(locale).startsWith('en')
   const [saleForm, setSaleForm] = useState('carcaça' as 'carcaça' | 'vivo')
@@ -53,13 +53,22 @@ export default function BolsaPreview() {
     } finally { setLoading(l => ({ ...l, overall: false })) }
   })() }, [params, isEn])
 
+  const monthly = summary?.variation?.monthly ?? null
+  const rising = monthly != null && monthly >= 0
+
   return (
-    <section className="py-10">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-6 flex items-center justify-between">
+    <section className={compact ? 'rounded-2xl border border-gray-200 bg-white p-4 shadow-sm' : 'py-10'}>
+      <div className={compact ? '' : 'mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'}>
+        <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">{isEn ? 'Market Preview' : 'Prévia da Bolsa'}</h2>
-            <p className="text-gray-600">{isEn ? 'The price reference of the association, before you buy or sell.' : 'A referência de preços da associação, antes de comprar ou vender.'}</p>
+            <h2 className="font-heading text-xl font-bold text-gray-900">{isEn ? 'Pig market' : 'Bolsa de suínos'}</h2>
+            <p className="mt-1 max-w-xl text-sm text-gray-600">
+              {loading.summary
+                ? (isEn ? 'Checking the latest price…' : 'A ver o preço mais recente…')
+                : rising
+                  ? (isEn ? 'The reference price is up. A good moment to look at what is for sale.' : 'O preço de referência está a valorizar. É um bom momento para ver o que está à venda.')
+                  : (isEn ? 'The association price reference, before you buy or sell.' : 'A referência de preço da associação, antes de comprar ou vender.')}
+            </p>
           </div>
           <div className="flex items-center gap-2">
             <label className="text-xs text-gray-500">
@@ -73,7 +82,7 @@ export default function BolsaPreview() {
           </div>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className={compact ? 'grid gap-3 sm:grid-cols-3' : 'grid gap-4 md:grid-cols-3'}>
           <div className="relative overflow-hidden rounded-xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-white p-5">
             <div className="text-xs text-emerald-700/80">{isEn ? 'Current average' : 'Média atual'} ({unit === 'kg' ? (isEn ? 'AOA/kg' : 'AOA/kg') : (isEn ? 'AOA/head' : 'AOA/cabeça')})</div>
             {loading.summary ? (

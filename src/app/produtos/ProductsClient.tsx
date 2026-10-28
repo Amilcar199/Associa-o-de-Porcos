@@ -98,6 +98,7 @@ export default function ProductsClient({ products }: ProductsClientProps) {
   const [saleForm, setSaleForm] = useState('')
   const [location, setLocation] = useState('')
   const [category, setCategory] = useState('' as '' | CategoryKey)
+  const [showFilters, setShowFilters] = useState(false)
   const activeFilterCount = [query, health, vaccinated, minPrice, maxPrice, minWeight, maxAge, saleForm, location, category, priceType !== 'head' ? priceType : ''].filter(Boolean).length
 
   // Permite chegar à página já filtrado, ex. /produtos?categoria=leitoes
@@ -228,9 +229,9 @@ export default function ProductsClient({ products }: ProductsClientProps) {
     <>
       {/* Filters */}
       <div className="mb-6 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-        <div className="mb-4 flex items-center justify-between"><div><h2 className="font-heading text-lg font-semibold text-gray-900">{isEn ? 'Find an animal' : 'Encontrar um animal'}</h2><p className="text-sm text-gray-500">{isEn ? 'Refine the list using the available criteria.' : 'Refine a lista usando os critérios disponíveis.'}</p></div><span className="rounded-full bg-primary-50 px-3 py-1 text-xs font-medium text-primary-700">{activeFilterCount} {isEn ? 'active filters' : 'filtros ativos'}</span></div>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <label className="text-xs font-medium text-gray-600">{isEn ? 'Search' : 'Pesquisa'}<input id="product-search" value={query} onChange={e=>setQuery(e.target.value)} placeholder={isEn ? 'Name, breed or description' : 'Nome, raça ou descrição'} className="input-field px-3 py-2" /></label>
+        <div className="mb-4 flex items-center justify-between gap-3"><div><h2 className="font-heading text-lg font-semibold text-gray-900">{isEn ? 'Find an animal' : 'Encontrar um animal'}</h2><p className="hidden text-sm text-gray-500 sm:block">{isEn ? 'Search first. Open the other filters only if you need them.' : 'Pesquise primeiro. Abra os outros filtros só se precisar.'}</p></div><button type="button" onClick={() => setShowFilters((value) => !value)} className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-700 md:hidden">{showFilters ? (isEn ? 'Hide filters' : 'Ocultar filtros') : (isEn ? 'Filters' : 'Filtros')}{activeFilterCount ? ` (${activeFilterCount})` : ''}</button></div>
+        <label className="mb-3 block text-xs font-medium text-gray-600">{isEn ? 'Search' : 'Pesquisa'}<input id="product-search" value={query} onChange={e=>setQuery(e.target.value)} placeholder={isEn ? 'Name, breed or description' : 'Nome, raça ou descrição'} className="input-field px-3 py-2" /></label>
+        <div className={`${showFilters ? 'grid' : 'hidden md:grid'} gap-3 sm:grid-cols-2 lg:grid-cols-4`}>
           <label className="text-xs font-medium text-gray-600">{isEn ? 'Health' : 'Saúde'}<select id="product-health" value={health} onChange={e=>setHealth(e.target.value)} className="input-field px-3 py-2">
             <option value="">{isEn ? 'Health (all)' : 'Saúde (todas)'}</option>
             <option value="excellent">{isEn ? 'Excellent' : 'Excelente'}</option>

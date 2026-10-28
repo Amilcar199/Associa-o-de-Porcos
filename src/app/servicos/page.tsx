@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { cookies } from 'next/headers'
-import { Wrench, GraduationCap, Stethoscope, Shield, BarChart3, Users, Leaf, CheckCircle, Sparkles, ArrowRight, PhoneCall, MessageCircle } from 'lucide-react'
+import { Wrench, GraduationCap, Stethoscope, Shield, BarChart3, Users, Leaf, CheckCircle, ArrowRight } from 'lucide-react'
+import PageHeader from '@/components/ui/PageHeader'
+import SurfaceCard from '@/components/ui/SurfaceCard'
 
 export function generateMetadata(): Metadata {
   const locale = cookies().get('locale')?.value || 'pt-AO'
@@ -117,117 +119,52 @@ export default function ServicosPage() {
   const locale = cookies().get('locale')?.value || 'pt-AO'
   const isEn = String(locale).startsWith('en')
   const services = getServices(isEn)
+
   return (
-    <section>
-      {/* Hero */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-primary-50 via-white to-white border-b border-gray-100">
-        <div className="container-custom py-12">
-          <div className="max-w-3xl">
-            <span className="inline-flex items-center gap-2 text-xs font-medium text-primary-700 bg-primary-100/70 rounded-full px-3 py-1">
-              <Sparkles size={14} /> {isEn ? 'What we do' : 'O que fazemos'}
-            </span>
-            <h1 className="mt-3 text-3xl md:text-4xl font-heading font-bold text-primary-800 leading-tight">{isEn ? 'Services & Specialties' : 'Serviços e Especialidades'}</h1>
-            <p className="text-gray-600 mt-3 md:text-lg">
-              {isEn
-                ? 'This is how the association delivers value: technical support, training and partnerships for a more productive and sustainable pig industry.'
-                : 'É assim que a associação entrega valor: suporte técnico, capacitação e parcerias para uma suinocultura mais produtiva e sustentável.'}
-            </p>
-          </div>
+    <>
+      <PageHeader
+        title={isEn ? 'Services' : 'Serviços'}
+        description={isEn
+          ? 'Technical support, training and partnerships for the farm.'
+          : 'Apoio técnico, formação e parcerias para a granja.'}
+      />
 
-          {/* Badges */}
-          <div className="mt-6 flex flex-wrap gap-2">
-            {(isEn ? ['Consulting', 'Training', 'Biosecurity', 'Quality', 'Management', 'Partnerships'] : ['Consultoria', 'Capacitação', 'Biossegurança', 'Qualidade', 'Gestão', 'Parcerias']).map(b => (
-              <span key={b} className="inline-flex items-center gap-2 text-sm text-primary-800 bg-primary-100/60 px-3 py-1.5 rounded-full border border-primary-200">
-                <CheckCircle size={14} className="text-primary-600" /> {b}
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Grid de serviços */}
-      <div className="container-custom py-10">
-        <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+      <section className="container-custom py-10 md:py-12">
+        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {services.map((service) => (
-            <div key={service.title} className="group relative bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition-all hover:-translate-y-0.5">
-              <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-primary-200 via-primary-400 to-primary-200 opacity-60" />
-              <div className="p-6">
-                <div className="inline-flex items-center justify-center rounded-xl bg-primary-50 text-primary-700 p-2 ring-1 ring-primary-200/50">
-                  <service.icon size={22} />
-                </div>
-                <h3 className="mt-4 text-lg font-semibold text-gray-900">{service.title}</h3>
-                <p className="mt-1.5 text-gray-600">{service.description}</p>
-                <ul className="mt-4 space-y-2 text-sm text-gray-700">
-                  {service.items.map((item) => (
-                    <li key={item} className="flex items-start gap-2">
-                      <CheckCircle size={16} className="mt-[2px] text-primary-600" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-                <div className="mt-5">
-                  <a href="/contato" className="inline-flex items-center gap-2 text-sm font-medium text-primary-700 hover:text-primary-800">
-                    {isEn ? 'Learn more' : 'Saber mais'} <ArrowRight size={16} />
-                  </a>
-                </div>
+            <SurfaceCard key={service.title} interactive>
+              <div className="inline-flex items-center justify-center rounded-xl bg-primary-50 p-2 text-primary-700">
+                <service.icon size={22} />
               </div>
-            </div>
+              <h3 className="mt-4 font-heading text-lg font-semibold text-gray-900">{service.title}</h3>
+              <p className="mt-1.5 text-sm text-gray-600">{service.description}</p>
+              <ul className="mt-4 space-y-2 text-sm text-gray-700">
+                {service.items.map((item) => (
+                  <li key={item} className="flex items-start gap-2">
+                    <CheckCircle size={16} className="mt-[2px] shrink-0 text-primary-600" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </SurfaceCard>
           ))}
         </div>
 
-        {/* Destaques */}
-        <div className="mt-12 grid md:grid-cols-3 gap-4">
-          <div className="rounded-2xl border border-primary-100 bg-gradient-to-br from-primary-50 to-white p-5">
-            <div className="flex items-start gap-3">
-              <Sparkles className="text-primary-600" size={20} />
-              <div>
-                <h4 className="font-semibold text-gray-900">{isEn ? 'Modern Practices' : 'Práticas Modernas'}</h4>
-                <p className="text-sm text-gray-600 mt-1">{isEn ? 'Constant updates in technology and management for consistent results.' : 'Atualização constante em tecnologia e gestão para resultados consistentes.'}</p>
-              </div>
-            </div>
+        <SurfaceCard className="mt-8 sm:flex sm:items-center sm:justify-between sm:gap-6">
+          <div>
+            <h2 className="font-heading text-lg font-semibold text-gray-900">
+              {isEn ? 'Need specialized support?' : 'Precisa de suporte especializado?'}
+            </h2>
+            <p className="mt-1 text-sm text-gray-600">
+              {isEn ? 'Talk to our team and build a tailored plan for your farm.' : 'Fale com a nossa equipa e monte um plano à medida da sua granja.'}
+            </p>
           </div>
-          <div className="rounded-2xl border border-primary-100 bg-gradient-to-br from-primary-50 to-white p-5">
-            <div className="flex items-start gap-3">
-              <Shield className="text-primary-600" size={20} />
-              <div>
-                <h4 className="font-semibold text-gray-900">{isEn ? 'Biosecurity' : 'Biossegurança'}</h4>
-                <p className="text-sm text-gray-600 mt-1">{isEn ? 'Clear protocols and practical support to protect your herd.' : 'Protocolos claros e apoio prático para proteger o seu rebanho.'}</p>
-              </div>
-            </div>
-          </div>
-          <div className="rounded-2xl border border-primary-100 bg-gradient-to-br from-primary-50 to-white p-5">
-            <div className="flex items-start gap-3">
-              <BarChart3 className="text-primary-600" size={20} />
-              <div>
-                <h4 className="font-semibold text-gray-900">{isEn ? 'Management by Indicators' : 'Gestão por Indicadores'}</h4>
-                <p className="text-sm text-gray-600 mt-1">{isEn ? 'Data‑driven decisions focused on productivity and quality.' : 'Decisões baseadas em dados com foco em produtividade e qualidade.'}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* CTA */}
-        <div className="mt-12">
-          <div className="bg-gradient-to-br from-primary-700 to-primary-600 text-white rounded-2xl p-6 md:p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-5">
-            <div>
-              <h4 className="text-xl md:text-2xl font-semibold">{isEn ? 'Need specialized support?' : 'Precisa de suporte especializado?'}</h4>
-              <p className="text-primary-100 mt-1 md:text-base">{isEn ? 'Talk to our team and build a tailored plan for your farm.' : 'Fale com nossa equipe e monte um plano sob medida para sua granja.'}</p>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <a href="/contato" className="inline-flex items-center gap-2 bg-white text-primary-700 hover:bg-primary-50 px-4 py-2 rounded-lg font-medium transition-colors">
-                {isEn ? 'Talk to the team' : 'Falar com a equipe'} <ArrowRight size={18} />
-              </a>
-              <a href="tel:+244923221950" className="inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-400 px-4 py-2 rounded-lg font-medium transition-colors">
-                <PhoneCall size={18} /> {isEn ? 'Call now' : 'Ligar agora'}
-              </a>
-              <a href="https://wa.me/244923221950" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 px-4 py-2 rounded-lg font-medium transition-colors">
-                <MessageCircle size={18} /> WhatsApp
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+          <a href="/contato" className="btn-primary mt-4 inline-flex items-center gap-2 sm:mt-0 sm:shrink-0">
+            {isEn ? 'Talk to the team' : 'Falar com a equipa'} <ArrowRight size={18} />
+          </a>
+        </SurfaceCard>
+      </section>
+    </>
   )
 }
 

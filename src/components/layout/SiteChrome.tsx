@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import CookieConsentProvider from '@/components/cookies/CookieConsentProvider'
+import SupportWidget from '@/components/support/SupportWidget'
 
 export default function SiteChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -19,6 +20,7 @@ export default function SiteChrome({ children }: { children: React.ReactNode }) 
         <Header />
         <main className="flex-grow">{children}</main>
         <Footer />
+        <SupportWidget />
       </div>
     </CookieConsentProvider>
   )

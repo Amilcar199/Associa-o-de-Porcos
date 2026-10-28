@@ -33,9 +33,9 @@ export default function CollaboratorsClient({ initial }: { initial: Collaborator
 
   if (loading && list.length === 0) {
     return (
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {[...Array(6)].map((_, i) => (
-          <div key={i} className="bg-white rounded-xl shadow p-6 animate-pulse h-40" />
+          <div key={i} className="h-40 animate-pulse rounded-2xl border border-gray-200 bg-white shadow-sm" />
         ))}
       </div>
     )
@@ -43,31 +43,29 @@ export default function CollaboratorsClient({ initial }: { initial: Collaborator
 
   if (list.length === 0) {
     return (
-      <div className="rounded-2xl border border-gray-100 bg-white p-8 text-center text-gray-600">Nenhum colaborador cadastrado ainda.</div>
+      <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center text-gray-600 shadow-sm">Nenhum colaborador cadastrado ainda.</div>
     )
   }
 
   return (
-    <div>
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {list.map((c: Collaborator) => (
-            <div key={c._id} className="bg-white rounded-2xl shadow hover:shadow-xl transition p-6 text-center">
-              <div className="mx-auto h-36 w-36 overflow-hidden rounded-full bg-primary-50 ring-4 ring-white shadow md:h-40 md:w-40">
-                <div className="relative w-full h-full">
-                  {(c as any)?.avatar && (
-                    <Image src={(c as any).avatar as string} alt={c.name} fill className="object-cover" />
-                  )}
-                  {!(c as any)?.avatar && <span className="flex h-full items-center justify-center text-3xl font-bold text-primary-700">{c.name.slice(0, 1).toUpperCase()}</span>}
-                </div>
-              </div>
-              <h3 className="mt-6 font-bold text-lg text-gray-900">{c.name}</h3>
-              <p className="text-sm text-gray-600">{c.role}{c.company ? ` • ${c.company}` : ''}</p>
-              {(c as any)?.description && (
-                <p className="text-sm text-gray-700 leading-relaxed mt-3 line-clamp-3">{(c as any).description}</p>
+    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {list.map((c: Collaborator) => (
+        <div key={c._id} className="rounded-2xl border border-gray-200 bg-white p-6 text-center shadow-sm transition-shadow hover:shadow-md">
+          <div className="mx-auto h-28 w-28 overflow-hidden rounded-full bg-primary-50 md:h-32 md:w-32">
+            <div className="relative h-full w-full">
+              {(c as any)?.avatar && (
+                <Image src={(c as any).avatar as string} alt={c.name} fill className="object-cover" />
               )}
+              {!(c as any)?.avatar && <span className="flex h-full items-center justify-center text-3xl font-bold text-primary-700">{c.name.slice(0, 1).toUpperCase()}</span>}
             </div>
-          ))}
+          </div>
+          <h3 className="mt-4 font-heading text-lg font-semibold text-gray-900">{c.name}</h3>
+          <p className="mt-1 text-sm text-gray-600">{c.role}{c.company ? ` • ${c.company}` : ''}</p>
+          {(c as any)?.description && (
+            <p className="mt-3 hidden text-sm leading-relaxed text-gray-600 line-clamp-3 sm:block">{(c as any).description}</p>
+          )}
         </div>
+      ))}
     </div>
   )
 }

@@ -1,9 +1,8 @@
 import { Metadata } from 'next'
 import { BRAND_NAME } from '@/lib/brand'
 import Hero from '@/components/sections/Hero'
-import FeaturedProducts from '@/components/sections/FeaturedProducts'
-import AboutPreview from '@/components/sections/AboutPreview'
 import BolsaPreview from '@/components/sections/BolsaPreview'
+import OfferRail from '@/components/sections/home/OfferRail'
 import LatestNews from '@/components/sections/LatestNews'
 import CallToAction from '@/components/sections/CallToAction'
 import PartnersSection from '@/components/sections/PartnersSection'
@@ -27,14 +26,16 @@ export default function HomePage() {
       {/* Hero Section */}
       <Hero />
 
-      {/* About Preview */}
-      <AboutPreview />
-      
-      {/* Featured Products */}
-      <FeaturedProducts />
-      
-      {/* Bolsa Preview */}
-      <BolsaPreview />
+      <section className="bg-gray-50 py-8 md:py-12">
+        <div className="container-custom grid items-start gap-4 lg:grid-cols-5">
+          <div className="lg:col-span-3">
+            <BolsaPreview compact />
+          </div>
+          <div className="lg:col-span-2">
+            <OfferRail />
+          </div>
+        </div>
+      </section>
 
       {/* Latest News */}
       <LatestNews />

@@ -7,6 +7,7 @@ import ViewCounter from './ViewCounter'
 import { cookies } from 'next/headers'
 import { localizeNews } from '@/lib/i18n/content'
 import { knowledgeLabel } from '@/lib/knowledge'
+import PageHeader from '@/components/ui/PageHeader'
 
 interface RouteParams {
   params: {
@@ -90,7 +91,7 @@ export default async function NewsPage({ params }: RouteParams) {
     const canonical = `${baseUrl}/noticias/${params.slug}`
 
     return (
-      <article className="max-w-4xl mx-auto px-4 py-8">
+      <>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -108,83 +109,86 @@ export default async function NewsPage({ params }: RouteParams) {
             })
           }}
         />
-        {/* Header da notícia */}
-        <header className="mb-8">
-          <div className="mb-4">
-            <span className="inline-block px-3 py-1 bg-primary-100 text-primary-800 text-sm font-medium rounded-full">
+        <PageHeader
+          backHref="/noticias"
+          backLabel={isEn ? 'Back to News' : 'Voltar às Notícias'}
+          eyebrow={
+            <>
               {knowledgeLabel(news.category, isEn)}
-            </span>
-          </div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">{news.title}</h1>
-          <div className="flex items-center space-x-4 text-gray-600 mb-6">
-            {news.publishedAt && (
-              <time dateTime={news.publishedAt.toISOString()}>{formatDate(news.publishedAt)}</time>
-            )}
-            <ViewCounter newsId={(news._id as any).toString()} initialViews={news.views || 0} />
-          </div>
-        </header>
+              {news.publishedAt && <> · <time dateTime={news.publishedAt.toISOString()}>{formatDate(news.publishedAt)}</time></>}
+            </>
+          }
+          title={news.title}
+          actions={
+            <div className="text-sm text-gray-500">
+              <ViewCounter newsId={(news._id as any).toString()} initialViews={news.views || 0} />
+            </div>
+          }
+        />
 
-        {/* Galeria de imagens */}
-        {(news.images && news.images.length > 0) ? (
-          <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-            {(news.images as string[]).map((url: string, idx: number) => (
-              <img key={idx} src={url} alt={`${news.title} ${idx+1}`} className="w-full h-64 object-cover rounded-lg" />
-            ))}
-          </div>
-        ) : (news.featuredImage && (
-          <div className="mb-8">
-            <img src={news.featuredImage} alt={news.title} className="w-full h-64 md:h-96 object-cover rounded-lg" />
-          </div>
-        ))}
-
-        {/* Conteúdo da notícia */}
-        <div className="prose prose-lg max-w-none">
-          <div dangerouslySetInnerHTML={{ __html: news.content }} />
-        </div>
-
-        {/* Vídeos */}
-        {Array.isArray((news as any).videos) && (news as any).videos.length > 0 && (
-          <div className="mt-8">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Vídeos</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {((news as any).videos as string[]).map((url: string, idx: number) => (
-                <div key={idx} className="aspect-video bg-black/5 rounded-lg overflow-hidden">
-                  {/^(https?:)?\/\//.test(url) && /youtube\.com|youtu\.be|vimeo\.com/.test(url) ? (
-                    <iframe
-                      src={url.includes('embed') ? url : url.replace('watch?v=', 'embed/')}
-                      className="w-full h-full"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                      title={`video-${idx}`}
-                    />
-                  ) : (
-                    <video src={url} controls className="w-full h-full" />
-                  )}
-                </div>
+        <article className="container-custom max-w-4xl py-10 md:py-12">
+          {/* Galeria de imagens */}
+          {(news.images && news.images.length > 0) ? (
+            <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2">
+              {(news.images as string[]).map((url: string, idx: number) => (
+                <img key={idx} src={url} alt={`${news.title} ${idx+1}`} className="h-64 w-full rounded-2xl border border-gray-200 object-cover" />
               ))}
             </div>
-          </div>
-        )}
-
-        {/* Tags */}
-        {news.tags && news.tags.length > 0 && (
-          <div className="mt-8 pt-8 border-t border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">{isEn ? 'Tags:' : 'Tags:'}</h3>
-            <div className="flex flex-wrap gap-2">
-              {(news.tags as string[] || []).map((tag: string, index: number) => (
-                <span key={index} className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full">{tag}</span>
-              ))}
+          ) : (news.featuredImage && (
+            <div className="mb-8">
+              <img src={news.featuredImage} alt={news.title} className="h-64 w-full rounded-2xl border border-gray-200 object-cover md:h-96" />
             </div>
-          </div>
-        )}
+          ))}
 
-        {/* Botão voltar */}
-        <div className="mt-8 pt-8 border-t border-gray-200">
-          <a href="/noticias" className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
-            ← {isEn ? 'Back to News' : 'Voltar para Notícias'}
-          </a>
-        </div>
-      </article>
+          {/* Conteúdo da notícia */}
+          <div className="prose prose-lg max-w-none">
+            <div dangerouslySetInnerHTML={{ __html: news.content }} />
+          </div>
+
+          {/* Vídeos */}
+          {Array.isArray((news as any).videos) && (news as any).videos.length > 0 && (
+            <div className="mt-10">
+              <h2 className="text-xs font-semibold uppercase tracking-widest text-gray-500">Vídeos</h2>
+              <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+                {((news as any).videos as string[]).map((url: string, idx: number) => (
+                  <div key={idx} className="aspect-video overflow-hidden rounded-2xl border border-gray-200 bg-gray-50">
+                    {/^(https?:)?\/\//.test(url) && /youtube\.com|youtu\.be|vimeo\.com/.test(url) ? (
+                      <iframe
+                        src={url.includes('embed') ? url : url.replace('watch?v=', 'embed/')}
+                        className="w-full h-full"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        title={`video-${idx}`}
+                      />
+                    ) : (
+                      <video src={url} controls className="w-full h-full" />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Tags */}
+          {news.tags && news.tags.length > 0 && (
+            <div className="mt-10 border-t border-gray-200 pt-8">
+              <h2 className="text-xs font-semibold uppercase tracking-widest text-gray-500">Tags</h2>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {(news.tags as string[] || []).map((tag: string, index: number) => (
+                  <span key={index} className="rounded-full border border-gray-200 px-3 py-1 text-sm text-gray-600">{tag}</span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Botão voltar */}
+          <div className="mt-10 border-t border-gray-200 pt-8">
+            <a href="/noticias" className="text-sm font-medium text-primary-700 hover:text-primary-800">
+              ← {isEn ? 'Back to News' : 'Voltar às Notícias'}
+            </a>
+          </div>
+        </article>
+      </>
     )
   } catch (error) {
     console.error('Erro ao carregar notícia:', error)

@@ -15,17 +15,14 @@ import {
   LayoutGrid,
   ShoppingBag,
   LogOut, 
-  Settings,
-  Phone,
-  Mail,
-  MapPin
+  Settings
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLanguage } from '@/components/providers/LanguageProvider'
 import pt from '@/lib/i18n/dictionaries/pt'
 import en from '@/lib/i18n/dictionaries/en'
 import HeaderLanguageMenu from '@/components/i18n/HeaderLanguageMenu'
-import { BRAND_NAME, BRAND_TITLE_LINE1, BRAND_TITLE_LINE2 } from '@/lib/brand'
+import { BRAND_NAME, BRAND_SHORT, BRAND_TITLE_LINE1, BRAND_TITLE_LINE2 } from '@/lib/brand'
 import { useSiteConfig } from '@/hooks/useSiteConfig'
 
 const Header = () => {
@@ -36,11 +33,13 @@ const Header = () => {
   const [isKnowledgeMenuOpen, setIsKnowledgeMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const { config: siteConfig } = useSiteConfig()
-  const { data: session, status } = useSession()
+  const { data: session } = useSession()
   const pathname = usePathname()
   const router = useRouter()
   const { locale } = useLanguage()
-  const dict = locale.startsWith('en') ? en : pt
+  const isEn = locale.startsWith('en')
+  const dict = isEn ? en : pt
+  const joinLabel = isEn ? 'Become a member' : 'Tornar-se associado'
 
   // Detectar scroll para adicionar sombra ao header
   useEffect(() => {
@@ -110,78 +109,15 @@ const Header = () => {
 
   return (
     <>
-      {/* Top Bar com informações de contato */}
-      <div className="bg-primary-800 text-white py-1 hidden md:block relative z-[200] overflow-visible">
-        <div className="container-custom">
-          <div className="flex justify-between items-center text-sm">
-            <div className="flex min-w-0 flex-1 items-center space-x-6 overflow-hidden">
-              <div className="flex items-center space-x-2">
-                <Phone size={14} />
-                <span>{siteConfig?.contactPhone || '+244 923 221 950'}</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Mail size={14} />
-                <span>{siteConfig?.contactEmail || 'Paulobaptista18@hotmail.com'}</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <MapPin size={14} />
-                <a href="https://maps.app.goo.gl/PUczChGSKeG7QjVU9" target="_blank" rel="noopener noreferrer" className="text-primary-200 hover:text-white transition-colors">
-                  {locale.startsWith('en') ? 'View on map' : 'Ver no mapa'}
-                </a>
-              </div>
-            </div>
-            
-            <div className="flex shrink-0 items-center space-x-4">
-
-              {status === 'loading' ? (
-                <div className="animate-pulse">{dict.user.loading}</div>
-              ) : session ? (
-                <div className="flex items-center space-x-2">
-                  <span>{dict.user.greeting}, {session.user?.name}</span>
-                  {session.user?.role === 'admin' && (
-                    <Link 
-                      href="/admin" 
-                      className="text-primary-200 hover:text-white transition-colors"
-                    >
-                      {dict.user.admin}
-                    </Link>
-                  )}
-                </div>
-              ) : (
-                <div className="flex items-center space-x-4">
-                  <Link 
-                    href="/login" 
-                    prefetch
-                    className="text-primary-200 hover:text-white transition-colors"
-                  >
-                    {dict.user.login}
-                  </Link>
-                  <Link 
-                    href="/registro" 
-                    prefetch
-                    className="btn-primary"
-                  >
-                    {dict.user.signup}
-                  </Link>
-                </div>
-              )}
-              <div className="ml-2 shrink-0"><HeaderLanguageMenu tone="dark" /></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Header Principal */}
       <header 
         className={`sticky top-0 z-[210] bg-primary-800 transition-all duration-300 overflow-visible ${
-          isScrolled ? 'shadow-md' : 'shadow-sm'
+          isScrolled ? 'shadow-md' : ''
         }`}
       >
         <div className="container-custom">
-          <div className="flex items-center justify-between h-24 md:h-28 lg:h-36">
-            {/* Logo */}
-            <Link href="/" className="flex items-center space-x-3 lg:space-x-5">
-              <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-36 lg:h-36 relative">
+          <div className="flex items-center justify-between h-16 md:h-[4.5rem]">
+            <Link href="/" className="flex min-w-0 items-center gap-2.5">
+              <div className="relative h-11 w-11 shrink-0 md:h-12 md:w-12">
                 {siteConfig?.publicLogoUrl || siteConfig?.logoUrl ? (
                   <img
                     src={siteConfig.publicLogoUrl || siteConfig.logoUrl}
@@ -198,22 +134,27 @@ const Header = () => {
                     alt={BRAND_NAME}
                     fill
                     className="object-contain"
-                    sizes="(max-width: 640px) 80px, (max-width: 768px) 96px, (max-width: 1024px) 112px, 144px"
+                    sizes="48px"
                     priority
                   />
                 )}
               </div>
-              <div className="hidden sm:block">
-                <h1 className="text-lg lg:text-3xl font-heading font-bold text-white leading-tight">
+              <div className="hidden min-w-0 sm:block lg:hidden">
+                <p className="font-heading text-sm font-bold leading-tight text-white">
                   {BRAND_TITLE_LINE1}
                   <span className="block">{BRAND_TITLE_LINE2}</span>
-                </h1>
-                <p className="text-xs lg:text-base text-primary-100">{dict.site?.tagline || 'Criação Sustentável'}</p>
+                </p>
               </div>
+              <p className="hidden max-w-[10rem] truncate font-heading text-sm font-bold text-white xl:max-w-none xl:overflow-visible xl:whitespace-normal lg:block">
+                <span className="xl:hidden">{BRAND_SHORT}</span>
+                <span className="hidden xl:inline">
+                  {BRAND_TITLE_LINE1}
+                  <span className="block">{BRAND_TITLE_LINE2}</span>
+                </span>
+              </p>
             </Link>
 
-            {/* Navegação Desktop */}
-            <nav className="hidden lg:flex items-center gap-10 xl:gap-12">
+            <nav className="hidden lg:flex items-center gap-4 xl:gap-5">
               {navItems.map((item) => {
                 if (item.name === dict.nav.about) {
                   return (
@@ -224,7 +165,7 @@ const Header = () => {
                       onMouseLeave={() => setIsAboutMenuOpen(false)}
                     >
                       <button
-                        className={`font-medium lg:text-lg transition-colors relative flex items-center gap-1 ${
+                        className={`relative flex items-center gap-1 text-sm font-medium transition-colors ${
                           isActiveLink(item.href)
                             ? 'text-white'
                             : 'text-white/80 hover:text-white'
@@ -286,7 +227,7 @@ const Header = () => {
                       onMouseLeave={() => setIsProductsMenuOpen(false)}
                     >
                       <button
-                        className={`font-medium lg:text-lg transition-colors relative flex items-center gap-1 ${
+                        className={`relative flex items-center gap-1 text-sm font-medium transition-colors ${
                           productsActive ? 'text-white' : 'text-white/80 hover:text-white'
                         }`}
                         onClick={() => setIsProductsMenuOpen((v: boolean) => !v)}
@@ -330,7 +271,7 @@ const Header = () => {
                       onMouseLeave={() => setIsKnowledgeMenuOpen(false)}
                     >
                       <button
-                        className={`font-medium lg:text-lg transition-colors relative flex items-center gap-1 ${
+                        className={`relative flex items-center gap-1 text-sm font-medium transition-colors ${
                           knowledgeActive ? 'text-white' : 'text-white/80 hover:text-white'
                         }`}
                         onClick={() => setIsKnowledgeMenuOpen((v: boolean) => !v)}
@@ -370,7 +311,7 @@ const Header = () => {
                     key={item.name}
                     href={item.href}
                     prefetch
-                    className={`font-medium lg:text-lg transition-colors relative ${
+                    className={`relative text-sm font-medium transition-colors ${
                       isActiveLink(item.href)
                         ? 'text-white'
                         : 'text-white/80 hover:text-white'
@@ -390,8 +331,7 @@ const Header = () => {
               })}
             </nav>
 
-            {/* User Menu Desktop */}
-            <div className="hidden lg:flex items-center gap-5 lg:ml-8 xl:ml-10 text-white">
+            <div className="hidden lg:flex items-center gap-3 text-white">
               {session ? (
                 <div className="flex items-center gap-5">
                   <div className="relative">
@@ -399,20 +339,20 @@ const Header = () => {
                     onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                     className="flex items-center space-x-2 p-2 rounded-lg hover:bg-white/10 transition-colors"
                   >
-                    <span className="relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-primary-600 font-medium text-white">
+                    <span className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-primary-600 text-sm font-medium text-white">
                       {session.user?.avatar ? (
                         <Image
                           src={session.user.avatar}
                           alt={session.user.name || 'Avatar'}
                           fill
                           className="rounded-full object-cover"
-                          sizes="48px"
+                          sizes="36px"
                         />
                       ) : (
                         session.user?.name?.charAt(0).toUpperCase()
                       )}
                     </span>
-                    <span className="font-medium">
+                    <span className="max-w-[8rem] truncate text-sm font-medium">
                       {session.user?.name}
                     </span>
                   </button>
@@ -481,29 +421,29 @@ const Header = () => {
                     )}
                   </AnimatePresence>
                   </div>
+                  <HeaderLanguageMenu tone="dark" />
                 </div>
               ) : (
-                <div className="flex items-center space-x-5">
+                <div className="flex items-center gap-3">
                   <Link
                     href="/login"
-                    className="text-white/90 hover:text-white font-medium transition-colors"
+                    className="text-sm font-medium text-white/90 transition-colors hover:text-white"
                   >
                     {dict.user.login}
                   </Link>
                   <Link
                     href="/registro"
-                    className="btn-primary"
+                    className="rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-primary-800 transition-colors hover:bg-primary-50"
                   >
-                    {dict.user.signup}
+                    {joinLabel}
                   </Link>
+                  <HeaderLanguageMenu tone="dark" />
                 </div>
               )}
             </div>
 
-            <div className="flex shrink-0 items-center gap-1">
-              <div className="md:hidden">
-                <HeaderLanguageMenu tone="dark" />
-              </div>
+            <div className="flex shrink-0 items-center gap-1 lg:hidden">
+              <HeaderLanguageMenu tone="dark" />
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className="lg:hidden p-2 rounded-lg text-white hover:bg-white/10 transition-colors"
@@ -523,7 +463,7 @@ const Header = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="lg:hidden fixed inset-0 z-40 bg-black/40"
+              className="lg:hidden fixed inset-x-0 top-16 bottom-0 z-40 bg-black/40 md:top-[4.5rem]"
               onClick={() => setIsMenuOpen(false)}
             />
           )}
@@ -535,10 +475,20 @@ const Header = () => {
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
-              className="lg:hidden fixed top-24 left-0 right-0 z-50 bg-white border-t border-gray-200 max-h-[calc(100dvh-6rem)] overflow-y-auto overscroll-contain shadow-lg"
+              className="lg:hidden fixed top-16 md:top-[4.5rem] left-0 right-0 z-50 bg-white border-t border-gray-200 max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain shadow-lg"
             >
               <div className="container-custom py-4">
-                <nav className="space-y-4">
+                <nav className="space-y-1">
+                  {!session ? (
+                    <div className="mb-3 flex gap-2 border-b border-gray-100 pb-3">
+                      <Link href="/login" className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-center text-sm font-medium text-gray-800">
+                        {dict.user.login}
+                      </Link>
+                      <Link href="/registro" className="flex-1 rounded-lg bg-primary-600 px-3 py-2 text-center text-sm font-semibold text-white">
+                        {joinLabel}
+                      </Link>
+                    </div>
+                  ) : null}
                   {navItems.map((item) => (
                     <div key={item.name}>
                       <Link
@@ -649,22 +599,7 @@ const Header = () => {
                         <span>{dict.user.logout}</span>
                       </button>
                     </div>
-                  ) : (
-                    <div className="pt-4 border-t border-gray-200 space-y-4">
-                      <Link
-                        href="/login"
-                        className="block py-2 text-gray-700 hover:text-primary-600 font-medium transition-colors"
-                      >
-                        {dict.user.login}
-                      </Link>
-                      <Link
-                        href="/registro"
-                        className="btn-primary"
-                      >
-                        {dict.user.signup}
-                      </Link>
-                    </div>
-                  )}
+                  ) : null}
 
                 </nav>
               </div>
