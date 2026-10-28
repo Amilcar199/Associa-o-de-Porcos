@@ -1,119 +1,78 @@
 'use client'
 
 import { useState, useMemo, useRef, useEffect } from 'react'
-import { createPortal } from 'react-dom'
-import { Locale } from '@/lib/i18n/config'
+import { Globe } from 'lucide-react'
+import { getFlag, Locale } from '@/lib/i18n/config'
 import { useLanguage } from '@/components/providers/LanguageProvider'
 
 const OPTIONS: { label: string; value: Locale }[] = [
-  { label: 'Português (AO)', value: 'pt-AO' },
-  { label: 'English (US)', value: 'en-US' },
+  { label: 'Português', value: 'pt-AO' },
+  { label: 'English', value: 'en-US' },
 ]
-
-const MENU_WIDTH = 192
 
 export default function HeaderLanguageMenu({ tone = 'light', compact = false }: { tone?: 'light' | 'dark'; compact?: boolean }) {
   const { locale, setLocale } = useLanguage()
   const [open, setOpen] = useState(false)
-  const [mounted, setMounted] = useState(false)
-  const [pos, setPos] = useState({ top: 0, left: 0 })
   const current = useMemo(() => OPTIONS.find(o => o.value === locale) || OPTIONS[0], [locale])
-  const buttonRef = useRef<HTMLButtonElement | null>(null)
-  const menuRef = useRef<HTMLDivElement | null>(null)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  const wrapRef = useRef<HTMLDivElement | null>(null)
+  const code = locale.startsWith('en') ? 'EN' : 'PT'
 
   useEffect(() => {
     if (!open) return
-
-    const place = () => {
-      const button = buttonRef.current
-      if (!button) return
-      const rect = button.getBoundingClientRect()
-      const menuHeight = OPTIONS.length * 40 + 8
-      let top = rect.bottom + 8
-      if (top + menuHeight > window.innerHeight - 8) {
-        top = Math.max(8, rect.top - menuHeight - 8)
-      }
-      let left = rect.right - MENU_WIDTH
-      left = Math.min(Math.max(8, left), window.innerWidth - MENU_WIDTH - 8)
-      setPos({ top, left })
-    }
-
-    place()
-
     const onPointerDown = (event: PointerEvent) => {
-      const target = event.target as Node
-      if (buttonRef.current?.contains(target) || menuRef.current?.contains(target)) return
-      setOpen(false)
+      if (!wrapRef.current?.contains(event.target as Node)) setOpen(false)
     }
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') setOpen(false)
     }
-
     document.addEventListener('pointerdown', onPointerDown)
     document.addEventListener('keydown', onKeyDown)
-    window.addEventListener('resize', place)
-    window.addEventListener('scroll', place, true)
     return () => {
       document.removeEventListener('pointerdown', onPointerDown)
       document.removeEventListener('keydown', onKeyDown)
-      window.removeEventListener('resize', place)
-      window.removeEventListener('scroll', place, true)
     }
   }, [open])
 
-  const code = locale.startsWith('en') ? 'EN' : 'PT'
-
   return (
-    <>
+    <div ref={wrapRef} className="relative">
       <button
-        ref={buttonRef}
         type="button"
         onClick={() => setOpen((value) => !value)}
         className={compact
-          ? `inline-flex items-center gap-0.5 rounded px-1 py-0.5 text-[10px] font-semibold leading-none cursor-pointer ${tone === 'dark' ? 'text-white/70 hover:text-white' : 'text-gray-500 hover:text-gray-800'}`
+          ? `inline-flex h-7 items-center gap-1 rounded-full px-1.5 ${tone === 'dark' ? 'text-white/90 hover:bg-white/10 hover:text-white' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'}`
           : tone === 'dark'
-            ? 'inline-flex items-center gap-1 rounded-md border border-white/30 bg-white/10 px-2 py-1.5 text-xs font-semibold text-white hover:bg-white/20 cursor-pointer'
-            : 'inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 cursor-pointer'}
+            ? 'inline-flex h-8 items-center gap-1.5 rounded-full px-2 text-white/90 hover:bg-white/10'
+            : 'inline-flex h-8 items-center gap-1.5 rounded-full px-2 text-gray-700 hover:bg-gray-100'}
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={current.label}
         title={current.label}
       >
-        <span className="leading-none">{code}</span>
-        <span className={`${compact ? 'text-[8px]' : 'text-[10px]'} leading-none ${open ? 'rotate-180' : ''} ${tone === 'dark' ? 'text-white/80' : 'text-gray-500'}`} aria-hidden>▾</span>
+        <Globe size={compact ? 14 : 16} strokeWidth={1.75} />
+        <span className={`${compact ? 'text-[10px]' : 'text-[11px]'} font-medium tracking-wide`}>{code}</span>
       </button>
-      {open && mounted && createPortal(
+      {open && (
         <div
-          ref={menuRef}
           role="menu"
-          style={{ position: 'fixed', top: pos.top, left: pos.left, width: MENU_WIDTH, zIndex: 400 }}
-          className="rounded-md border border-gray-200 bg-white shadow-lg"
+          className="absolute right-0 top-full z-[400] mt-1.5 w-40 overflow-hidden rounded-lg border border-gray-200 bg-white py-1 shadow-lg"
         >
-          <ul className="py-1 text-sm">
-            {OPTIONS.map((opt) => (
-              <li key={opt.value}>
-                <button
-                  type="button"
-                  role="menuitem"
-                  className={`flex w-full items-center gap-2 px-3 py-2 text-left hover:bg-gray-100 ${opt.value === locale ? 'text-primary-600' : 'text-gray-700'}`}
-                  onClick={() => {
-                    setLocale(opt.value)
-                    setOpen(false)
-                  }}
-                >
-                  <span className="w-8 text-xs font-semibold">{opt.value.startsWith('en') ? 'EN' : 'PT'}</span>
-                  <span>{opt.label}</span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>,
-        document.body
+          {OPTIONS.map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              role="menuitem"
+              className={`flex w-full items-center gap-2.5 px-3 py-2 text-left text-sm hover:bg-gray-50 ${opt.value === locale ? 'font-medium text-primary-700' : 'text-gray-700'}`}
+              onClick={() => {
+                setLocale(opt.value)
+                setOpen(false)
+              }}
+            >
+              <span className="text-base leading-none">{getFlag(opt.value)}</span>
+              <span>{opt.label}</span>
+            </button>
+          ))}
+        </div>
       )}
-    </>
+    </div>
   )
 }
