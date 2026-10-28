@@ -12,7 +12,7 @@ const OPTIONS: { label: string; value: Locale }[] = [
 
 const MENU_WIDTH = 192
 
-export default function HeaderLanguageMenu({ tone = 'light' }: { tone?: 'light' | 'dark' }) {
+export default function HeaderLanguageMenu({ tone = 'light', compact = false }: { tone?: 'light' | 'dark'; compact?: boolean }) {
   const { locale, setLocale } = useLanguage()
   const [open, setOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
@@ -73,16 +73,18 @@ export default function HeaderLanguageMenu({ tone = 'light' }: { tone?: 'light' 
         ref={buttonRef}
         type="button"
         onClick={() => setOpen((value) => !value)}
-        className={tone === 'dark'
-          ? 'inline-flex items-center gap-1 rounded-md border border-white/30 bg-white/10 px-2 py-1.5 text-xs font-semibold text-white hover:bg-white/20 cursor-pointer'
-          : 'inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 cursor-pointer'}
+        className={compact
+          ? `inline-flex items-center gap-0.5 rounded px-1 py-0.5 text-[10px] font-semibold leading-none cursor-pointer ${tone === 'dark' ? 'text-white/70 hover:text-white' : 'text-gray-500 hover:text-gray-800'}`
+          : tone === 'dark'
+            ? 'inline-flex items-center gap-1 rounded-md border border-white/30 bg-white/10 px-2 py-1.5 text-xs font-semibold text-white hover:bg-white/20 cursor-pointer'
+            : 'inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 cursor-pointer'}
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={current.label}
         title={current.label}
       >
         <span className="leading-none">{code}</span>
-        <span className={`text-[10px] leading-none ${open ? 'rotate-180' : ''} ${tone === 'dark' ? 'text-white/80' : 'text-gray-500'}`} aria-hidden>▾</span>
+        <span className={`${compact ? 'text-[8px]' : 'text-[10px]'} leading-none ${open ? 'rotate-180' : ''} ${tone === 'dark' ? 'text-white/80' : 'text-gray-500'}`} aria-hidden>▾</span>
       </button>
       {open && mounted && createPortal(
         <div

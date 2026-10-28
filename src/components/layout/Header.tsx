@@ -114,10 +114,13 @@ const Header = () => {
           isScrolled ? 'shadow-md' : ''
         }`}
       >
-        <div className="container-custom">
-          <div className="flex items-center justify-between h-16 md:h-[4.5rem]">
-            <Link href="/" className="flex min-w-0 items-center gap-2.5">
-              <div className="relative h-11 w-11 shrink-0 md:h-12 md:w-12">
+        <div className="absolute right-1.5 top-1 z-10">
+          <HeaderLanguageMenu tone="dark" compact />
+        </div>
+        <div className="mx-auto max-w-screen-2xl px-4 sm:px-6 lg:px-8">
+          <div className="flex h-[4.5rem] items-center justify-between gap-6 md:h-20">
+            <Link href="/" className="flex min-w-0 shrink-0 items-center gap-3">
+              <div className="relative h-14 w-14 shrink-0 md:h-16 md:w-16">
                 {siteConfig?.publicLogoUrl || siteConfig?.logoUrl ? (
                   <img
                     src={siteConfig.publicLogoUrl || siteConfig.logoUrl}
@@ -134,7 +137,7 @@ const Header = () => {
                     alt={BRAND_NAME}
                     fill
                     className="object-contain"
-                    sizes="48px"
+                    sizes="64px"
                     priority
                   />
                 )}
@@ -154,7 +157,7 @@ const Header = () => {
               </p>
             </Link>
 
-            <nav className="hidden lg:flex items-center gap-4 xl:gap-5">
+            <nav className="hidden flex-1 items-center justify-center gap-4 lg:flex xl:gap-6">
               {navItems.map((item) => {
                 if (item.name === dict.nav.about) {
                   return (
@@ -331,7 +334,7 @@ const Header = () => {
               })}
             </nav>
 
-            <div className="hidden lg:flex items-center gap-3 text-white">
+            <div className="ml-auto hidden shrink-0 items-center gap-3 text-white lg:flex">
               {session ? (
                 <div className="flex items-center gap-5">
                   <div className="relative">
@@ -421,7 +424,6 @@ const Header = () => {
                     )}
                   </AnimatePresence>
                   </div>
-                  <HeaderLanguageMenu tone="dark" />
                 </div>
               ) : (
                 <div className="flex items-center gap-3">
@@ -437,13 +439,11 @@ const Header = () => {
                   >
                     {joinLabel}
                   </Link>
-                  <HeaderLanguageMenu tone="dark" />
                 </div>
               )}
             </div>
 
-            <div className="flex shrink-0 items-center gap-1 lg:hidden">
-              <HeaderLanguageMenu tone="dark" />
+            <div className="mt-4 flex shrink-0 items-center lg:hidden">
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className="lg:hidden p-2 rounded-lg text-white hover:bg-white/10 transition-colors"
@@ -463,7 +463,7 @@ const Header = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="lg:hidden fixed inset-x-0 top-16 bottom-0 z-40 bg-black/40 md:top-[4.5rem]"
+              className="lg:hidden fixed inset-x-0 top-[4.5rem] bottom-0 z-40 bg-black/40 md:top-20"
               onClick={() => setIsMenuOpen(false)}
             />
           )}
@@ -475,7 +475,7 @@ const Header = () => {
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
-              className="lg:hidden fixed top-16 md:top-[4.5rem] left-0 right-0 z-50 bg-white border-t border-gray-200 max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain shadow-lg"
+              className="lg:hidden fixed top-[4.5rem] md:top-20 left-0 right-0 z-50 bg-white border-t border-gray-200 max-h-[calc(100dvh-4.5rem)] overflow-y-auto overscroll-contain shadow-lg"
             >
               <div className="container-custom py-4">
                 <nav className="space-y-1">
