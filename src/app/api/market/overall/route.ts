@@ -4,6 +4,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import connectDB from '@/lib/mongodb'
 import Product from '@/models/Product'
 import { errorResponse, successResponse } from '@/lib/api-utils'
+import { publicListingFilter } from '@/lib/pig-listings'
+import { priceValueStages } from '@/lib/market-price'
 
 export async function GET(req: NextRequest) {
   try {
@@ -17,8 +19,7 @@ export async function GET(req: NextRequest) {
 
     const matchStage: any = {
       $and: [
-        { $or: [ { isActive: true }, { isActive: { $exists: false } } ] },
-        { $or: [ { availability: 'available' }, { availability: { $exists: false } } ] },
+        publicListingFilter(),
       ]
     }
     if (region) matchStage.$and.push({ location: { $regex: new RegExp(region, 'i') } })
@@ -26,21 +27,8 @@ export async function GET(req: NextRequest) {
 
     const pipeline: any[] = [
       { $match: matchStage },
-      { $addFields: {
-        pricePerKg: {
-          $ifNull: [
-            '$pricePerKg',
-            {
-              $cond: [
-                { $and: [ { $gt: ['$price', 0] }, { $gt: ['$weight', 0] } ] },
-                { $divide: ['$price', '$weight'] },
-                null
-              ]
-            }
-          ]
-        },
-        value: { $cond: [ { $eq: [unit, 'kg'] }, '$pricePerKg', '$price' ] }
-      }},
+      ...priceValueStages(unit),
+      { $match: { value: { $gt: 0 } } },
       { $group: { _id: null, count: { $sum: 1 }, avg: { $avg: '$value' } } }
     ]
 

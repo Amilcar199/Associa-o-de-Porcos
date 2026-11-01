@@ -5,6 +5,8 @@ import connectDB from '@/lib/mongodb'
 import Product from '@/models/Product'
 import MarketQuote from '@/models/MarketQuote'
 import { errorResponse, successResponse } from '@/lib/api-utils'
+import { publicListingFilter } from '@/lib/pig-listings'
+import { priceValueStages } from '@/lib/market-price'
 
 type Unit = 'kg' | 'head'
 
@@ -29,8 +31,7 @@ export async function GET(req: NextRequest) {
 
     const matchStage: any = {
       $and: [
-        { $or: [ { isActive: true }, { isActive: { $exists: false } } ] },
-        { $or: [ { availability: 'available' }, { availability: { $exists: false } } ] },
+        publicListingFilter(),
         { $or: [ { updatedAt: { $gte: start, $lt: end } }, { createdAt: { $gte: start, $lt: end } } ] },
       ]
     }
@@ -39,22 +40,8 @@ export async function GET(req: NextRequest) {
 
     const pipeline: any[] = [
       { $match: matchStage },
-      { $addFields: {
-        pricePerKg: {
-          $ifNull: [
-            '$pricePerKg',
-            {
-              $cond: [
-                { $and: [ { $gt: ['$price', 0] }, { $gt: ['$weight', 0] } ] },
-                { $divide: ['$price', '$weight'] },
-                null
-              ]
-            }
-          ]
-        },
-        value: { $cond: [ { $eq: [unit, 'kg'] }, '$pricePerKg', '$price' ] },
-        weightForWeighting: { $cond: [ { $and: [ { $eq: [unit, 'kg'] }, { $gt: ['$weight', 0] } ] }, '$weight', 1 ] }
-      }},
+      ...priceValueStages(unit),
+      { $match: { value: { $gt: 0 } } },
     ]
 
     if (breed) pipeline.push({ $match: { breed } })

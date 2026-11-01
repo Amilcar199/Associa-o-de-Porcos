@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import connectDB from '@/lib/mongodb'
 import Product from '@/models/Product'
 import { errorResponse, successResponse } from '@/lib/api-utils'
+import { publicListingFilter } from '@/lib/pig-listings'
 
 export async function GET(req: NextRequest) {
   try {
@@ -14,8 +15,12 @@ export async function GET(req: NextRequest) {
       .select({ updatedAt: 1 })
       .lean()
 
-    const regions = await (Product as any).distinct('location', { $or: [ { isActive: true }, { isActive: { $exists: false } } ] })
-    const breeds = await (Product as any).distinct('breed', { $or: [ { isActive: true }, { isActive: { $exists: false } } ] })
+    const regions = await (Product as any).distinct('location', publicListingFilter())
+    const breeds = await (Product as any).distinct('breed', publicListingFilter())
+    const [vivo, carcass] = await Promise.all([
+      Product.countDocuments({ $and: [publicListingFilter(), { saleForm: 'vivo' }] }),
+      Product.countDocuments({ $and: [publicListingFilter(), { saleForm: 'carcaça' }] }),
+    ])
 
     const methodologyPT = 'A média, o mínimo e o máximo saem dos anúncios públicos de suínos disponíveis, na forma de venda escolhida. Cada anúncio conta uma vez. Carcaça usa AOA/kg e vivo usa AOA/cabeça. A referência oficial é uma cotação aprovada pela associação e não substitui a média dos anúncios.'
     const methodologyEN = 'Indicators use simple or weighted averages (when enabled): AOA/kg for "carcass" and AOA/head for "live". Outliers may be cleaned using a band (±X%) around the official quote by region/form, when available.'
@@ -24,6 +29,7 @@ export async function GET(req: NextRequest) {
       lastUpdated: lastDoc?.updatedAt || null,
       regions: (regions as string[]).filter(Boolean).map(r => String(r).trim()).filter(Boolean).sort(),
       breeds: (breeds as string[]).filter(Boolean).map(b => String(b).trim()).filter(Boolean).sort(),
+      counts: { vivo, carcass },
       methodology: {
         pt: methodologyPT,
         en: methodologyEN

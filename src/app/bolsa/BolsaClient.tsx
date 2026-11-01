@@ -39,6 +39,8 @@ export default function BolsaClient() {
   const isEn = String(locale).startsWith('en')
   const { data: session } = useSession()
   const [saleForm, setSaleForm] = React.useState<SaleForm>('carcaça')
+  const [formReady, setFormReady] = React.useState(false)
+  const [listingCounts, setListingCounts] = React.useState({ vivo: 0, carcass: 0 })
   const [region, setRegion] = React.useState('')
   const [breed, setBreed] = React.useState('')
   const [periodDays, setPeriodDays] = React.useState(30)
@@ -73,10 +75,15 @@ export default function BolsaClient() {
     fetch('/api/market/meta', { cache: 'no-store' }).then(response => response.json()).then(result => {
       setRegionsList(result?.data?.regions || [])
       setBreedsList(result?.data?.breeds || [])
-    }).catch(() => undefined)
+      const vivo = Number(result?.data?.counts?.vivo || 0)
+      const carcass = Number(result?.data?.counts?.carcass || 0)
+      setListingCounts({ vivo, carcass })
+      if (vivo > carcass) setSaleForm('vivo')
+    }).catch(() => undefined).finally(() => setFormReady(true))
   }, [])
 
   React.useEffect(() => {
+    if (!formReady) return
     let cancelled = false
     async function load() {
       setLoading(true); setError('')
@@ -94,7 +101,7 @@ export default function BolsaClient() {
     }
     load()
     return () => { cancelled = true }
-  }, [query, isEn])
+  }, [query, isEn, formReady])
 
   const points = data.history.filter(point => point.avg != null)
   const sortedRegions = [...data.regions].sort((a, b) => {
@@ -122,7 +129,7 @@ export default function BolsaClient() {
         <label className="text-xs font-medium text-gray-500">{isEn ? 'Period' : 'Período'}<select value={periodDays} onChange={event => setPeriodDays(Number(event.target.value))} className="mt-1 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5"><option value={7}>{isEn ? '7 days' : '7 dias'}</option><option value={30}>{isEn ? '30 days' : '30 dias'}</option><option value={180}>{isEn ? '6 months' : '6 meses'}</option><option value={365}>{isEn ? '1 year' : '1 ano'}</option></select></label>
         {session ? <label className="text-xs font-medium text-gray-500">{isEn ? 'Breed' : 'Raça'}<select value={breed} onChange={event => setBreed(event.target.value)} className="mt-1 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5"><option value="">{isEn ? 'All' : 'Todas'}</option>{breedsList.map(item => <option key={item}>{item}</option>)}</select></label> : <div />}
       </div>
-      <p className="mt-4 text-sm leading-relaxed text-gray-600">{isEn ? 'The average, minimum and maximum come from public pig listings for this sale form. Each listing counts once. The official reference, when it exists, is a quote approved by the association and does not replace that average.' : 'A média, o mínimo e o máximo saem dos anúncios públicos de suínos nesta forma de venda. Cada anúncio conta uma vez. A referência oficial, quando existe, é uma cotação aprovada pela associação e não substitui essa média.'} {data.summary?.effectiveDate ? `${isEn ? 'Latest price day' : 'Dia do preço'}: ${data.summary.effectiveDate.slice(0, 10)}.` : ''}</p>
+      <p className="mt-4 text-sm leading-relaxed text-gray-600">{isEn ? 'The average, minimum and maximum come from public pig listings for this sale form. Each listing counts once. The official reference, when it exists, is a quote approved by the association and does not replace that average.' : 'A média, o mínimo e o máximo saem dos anúncios públicos de suínos nesta forma de venda. Cada anúncio conta uma vez. A referência oficial, quando existe, é uma cotação aprovada pela associação e não substitui essa média.'} {data.summary?.effectiveDate ? `${isEn ? 'Latest price day' : 'Dia do preço'}: ${data.summary.effectiveDate.slice(0, 10)}.` : ''} {(saleForm === 'carcaça' ? listingCounts.vivo : listingCounts.carcass) > 0 && (data.summary?.current.count ?? 0) === 0 ? (isEn ? ` There are listings in the other sale form.` : ` Há anúncios na outra forma de venda.`) : ''}</p>
     </div>
 
     <div className="mt-6 grid gap-4 md:grid-cols-3">

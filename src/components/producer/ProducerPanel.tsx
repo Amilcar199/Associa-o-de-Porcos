@@ -9,7 +9,7 @@ import { FARM_PHOTO_LIMIT } from '@/lib/farm-owner'
 import { ANGOLA_PROVINCE_NAMES } from '@/components/sections/PigMap/angola-provinces'
 import { MUNICIPALITIES_BY_PROVINCE } from '@/components/sections/PigMap/province-municipalities'
 import PigOffers from '@/components/producer/PigOffers'
-import PaymentBox from '@/components/producer/PaymentBox'
+import SubscriptionPanel from '@/components/producer/SubscriptionPanel'
 import { useLanguage } from '@/components/providers/LanguageProvider'
 
 type SectionId = 'inicio' | 'perfil' | 'fazenda' | 'animais' | 'anuncios' | 'procura' | 'pedidos' | 'contactos' | 'cotacoes' | 'conteudos' | 'plano' | 'notificacoes'
@@ -73,6 +73,10 @@ export default function ProducerPanel() {
     })
     setLoading(false)
   }, [isEn, router])
+
+  useEffect(() => {
+    if (window.location.hash === '#plano') setSection('plano')
+  }, [])
 
   useEffect(() => {
     if (status === 'loading') return
@@ -440,11 +444,11 @@ export default function ProducerPanel() {
               {profile?.planExpiresAt ? ` · ${t('até', 'until')} ${new Date(profile.planExpiresAt).toLocaleDateString(isEn ? 'en' : 'pt-AO')}` : ''}
             </p>
           </article>
-          <article className="rounded-2xl border border-primary-100 bg-primary-50 p-6">
-            <h2 className="font-heading text-xl font-semibold">Plano Pro</h2>
-            <p className="mt-2 text-sm text-gray-700">{t('Permite pagar o destaque de cada anúncio aprovado. Este pagamento é simulado até o MULTICAIXA estar ligado.', 'Lets you pay to highlight each approved listing. This payment is simulated until MULTICAIXA is connected.')}</p>
+          <article className="rounded-2xl border border-primary-100 bg-primary-50 p-6 lg:col-span-2">
+            <h2 className="font-heading text-xl font-semibold">{t('Subscrição', 'Subscription')}</h2>
+            <p className="mt-2 text-sm text-gray-700">{t('Compare os períodos, veja o que cada plano inclui e pague por Express, IBAN ou PayPay. Depois do pagamento, envie o comprovativo.', 'Compare the periods, see what each plan includes and pay by Express, IBAN or PayPay. After payment, send the receipt.')}</p>
             <div className="mt-4">
-              <PaymentBox purpose="pro" showHistory isEn={isEn} onPaid={() => window.location.reload()} />
+              <SubscriptionPanel isEn={isEn} onChanged={() => window.location.reload()} />
             </div>
           </article>
           <article className="rounded-2xl border border-gray-100 bg-white p-6 lg:col-span-2">

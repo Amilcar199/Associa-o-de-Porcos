@@ -42,7 +42,7 @@ export default function AdminPaymentsPage() {
     <div className="space-y-6">
       <div className="border-b border-gray-200 pb-4">
         <h1 className="text-2xl font-bold text-gray-900">Pagamentos</h1>
-        <p className="mt-1 text-gray-600">Histórico do Plano Pro e dos destaques. O gateway actual é simulado; o MULTICAIXA substitui só a cobrança.</p>
+        <p className="mt-1 text-gray-600">Histórico dos destaques. As subscrições mensais, os comprovativos e o Express ficam em Subscrições.</p>
       </div>
       {error && <p className="text-sm text-red-600">{error}</p>}
       {rows.length === 0 && !error && <p className="text-sm text-gray-500">Ainda não há pagamentos.</p>}

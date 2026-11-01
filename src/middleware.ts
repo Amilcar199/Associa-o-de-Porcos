@@ -32,6 +32,7 @@ function isPathOrChild(pathname: string, path: string) {
 
 function isPublicApi(pathname: string) {
   if (isPathOrChild(pathname, '/api/auth')) return true
+  if (pathname === '/api/payments/express/webhook') return true
   return PUBLIC_API_PREFIXES.some((prefix) => isPathOrChild(pathname, prefix))
 }
 

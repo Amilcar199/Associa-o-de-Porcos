@@ -5,6 +5,8 @@ import connectDB from '@/lib/mongodb'
 import Product from '@/models/Product'
 import MarketQuote from '@/models/MarketQuote'
 import { errorResponse, successResponse } from '@/lib/api-utils'
+import { publicListingFilter } from '@/lib/pig-listings'
+import { priceValueStages } from '@/lib/market-price'
 
 type Unit = 'kg' | 'head'
 
@@ -27,8 +29,7 @@ function range(start: Date, end: Date) {
 async function computeAverage(unit: Unit, start: Date, end: Date, region?: string, breed?: string, saleForm?: 'carcaça' | 'vivo') {
   const matchStage: any = {
     $and: [
-      { $or: [ { isActive: true }, { isActive: { $exists: false } } ] },
-      { $or: [ { availability: 'available' }, { availability: { $exists: false } } ] },
+      publicListingFilter(),
       { $or: [ { updatedAt: range(start, end) }, { createdAt: range(start, end) } ] },
     ]
   }
@@ -38,32 +39,16 @@ async function computeAverage(unit: Unit, start: Date, end: Date, region?: strin
   }
   if (saleForm) matchStage.$and.push({ saleForm })
 
-  const addFields: any = {
-    pricePerKg: {
-      $ifNull: [
-        '$pricePerKg',
-        {
-          $cond: [
-            { $and: [ { $gt: ['$price', 0] }, { $gt: ['$weight', 0] } ] },
-            { $divide: ['$price', '$weight'] },
-            null
-          ]
-        }
-      ]
-    },
-    value: unit === 'kg' ? '$pricePerKg' : '$price'
-  }
-
   const pipeline: any[] = [
     { $match: matchStage },
-    { $addFields: addFields },
+    ...priceValueStages(unit),
   ]
 
   if (breed) {
     pipeline.push({ $match: { breed } })
   }
 
-  pipeline.push({ $match: { value: { $ne: null } } })
+  pipeline.push({ $match: { value: { $gt: 0 } } })
   pipeline.push({
     $group: {
       _id: null,

@@ -4,6 +4,7 @@ import Hero from '@/components/sections/Hero'
 import BolsaPreview from '@/components/sections/BolsaPreview'
 import OfferRail from '@/components/sections/home/OfferRail'
 import LatestNews from '@/components/sections/LatestNews'
+import LatestProducts from '@/components/sections/LatestProducts'
 import CallToAction from '@/components/sections/CallToAction'
 import PartnersSection from '@/components/sections/PartnersSection'
 
@@ -36,6 +37,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <LatestProducts />
 
       {/* Latest News */}
       <LatestNews />

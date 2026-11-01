@@ -5,6 +5,8 @@ import connectDB from '@/lib/mongodb'
 import Product from '@/models/Product'
 import MarketQuote from '@/models/MarketQuote'
 import { errorResponse, successResponse } from '@/lib/api-utils'
+import { publicListingFilter } from '@/lib/pig-listings'
+import { priceValueStages } from '@/lib/market-price'
 
 type Unit = 'kg' | 'head'
 
@@ -18,35 +20,28 @@ export async function GET(req: NextRequest) {
     const region = searchParams.get('region') || undefined
     const breed = searchParams.get('breed') || undefined
     const limit = Math.min(parseInt(searchParams.get('limit') || '100'), 500)
+    const startParam = searchParams.get('start')
+    const endParam = searchParams.get('end')
     const cleanOutliers = String(searchParams.get('cleanOutliers') || 'false') === 'true'
     const bandPct = Math.min(Math.max(parseFloat(searchParams.get('bandPct') || '0.1'), 0.01), 0.5)
 
     const matchStage: any = {
       $and: [
-        { $or: [ { isActive: true }, { isActive: { $exists: false } } ] },
-        { $or: [ { availability: 'available' }, { availability: { $exists: false } } ] },
+        publicListingFilter(),
       ]
+    }
+    if (startParam && endParam) {
+      const start = new Date(startParam)
+      const end = new Date(endParam)
+      matchStage.$and.push({ $or: [{ updatedAt: { $gte: start, $lt: end } }, { createdAt: { $gte: start, $lt: end } }] })
     }
     if (region) matchStage.$and.push({ location: { $regex: new RegExp(region, 'i') } })
     if (saleFormParam) matchStage.$and.push({ saleForm: saleFormParam })
 
     const pipeline: any[] = [
       { $match: matchStage },
-      { $addFields: {
-        pricePerKg: {
-          $ifNull: [
-            '$pricePerKg',
-            {
-              $cond: [
-                { $and: [ { $gt: ['$price', 0] }, { $gt: ['$weight', 0] } ] },
-                { $divide: ['$price', '$weight'] },
-                null
-              ]
-            }
-          ]
-        },
-        value: { $cond: [ { $eq: [unit, 'kg'] }, '$pricePerKg', '$price' ] }
-      }},
+      ...priceValueStages(unit),
+      { $match: { value: { $gt: 0 } } },
     ]
 
     if (breed) pipeline.push({ $match: { breed } })

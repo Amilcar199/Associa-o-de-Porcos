@@ -5,6 +5,7 @@ import User from '@/models/User'
 import { extendFrom, isPendingOpen, type PaymentOutcome } from '@/lib/payments'
 import { recordAudit } from '@/lib/record-audit'
 import { notifyUsers } from '@/lib/notify-users'
+import { runSubscriptionLifecycle } from '@/lib/subscription-service'
 
 export async function expireDuePayments() {
   const now = new Date()
@@ -18,6 +19,11 @@ export async function expireDuePayments() {
     { highlighted: true, highlightExpiresAt: { $ne: null, $lte: now } },
     { $set: { highlighted: false } },
   )
+  try {
+    await runSubscriptionLifecycle()
+  } catch (error) {
+    console.error('Falha ao actualizar subscrições:', error)
+  }
 }
 
 export async function settlePayment(paymentId: string, outcome: PaymentOutcome) {

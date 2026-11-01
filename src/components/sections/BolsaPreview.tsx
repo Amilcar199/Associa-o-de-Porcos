@@ -22,6 +22,7 @@ export default function BolsaPreview({ compact = false }: { compact?: boolean })
   const { locale } = useLanguage()
   const isEn = String(locale).startsWith('en')
   const [saleForm, setSaleForm] = useState('carcaça' as 'carcaça' | 'vivo')
+  const [formReady, setFormReady] = useState(false)
   const unit: Unit = saleForm === 'vivo' ? 'head' : 'kg'
   const [loading, setLoading] = useState({ summary: false, overall: false })
   const [error, setError] = useState({ summary: '', overall: '' })
@@ -35,7 +36,18 @@ export default function BolsaPreview({ compact = false }: { compact?: boolean })
     return p
   }, [unit, saleForm])
 
-  useEffect(() => { (async () => {
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/market/meta', { cache: 'no-store' }).then(response => response.json()).then(result => {
+      if (cancelled) return
+      const vivo = Number(result?.data?.counts?.vivo || 0)
+      const carcass = Number(result?.data?.counts?.carcass || 0)
+      if (vivo > carcass) setSaleForm('vivo')
+    }).catch(() => undefined).finally(() => { if (!cancelled) setFormReady(true) })
+    return () => { cancelled = true }
+  }, [])
+
+  useEffect(() => { if (!formReady) return; (async () => {
     setLoading(l => ({ ...l, summary: true })); setError(e => ({ ...e, summary: '' }))
     try {
       const s: SummaryRes = await (await fetch(`/api/market/summary?${params.toString()}`, { cache: 'no-store' })).json()
@@ -51,7 +63,7 @@ export default function BolsaPreview({ compact = false }: { compact?: boolean })
     } catch {
       setError(e => ({ ...e, overall: isEn ? 'Failed to load' : 'Falha ao carregar' }))
     } finally { setLoading(l => ({ ...l, overall: false })) }
-  })() }, [params, isEn])
+  })() }, [params, isEn, formReady])
 
   const monthly = summary?.variation?.monthly ?? null
   const rising = monthly != null && monthly >= 0

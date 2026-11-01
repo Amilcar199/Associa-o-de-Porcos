@@ -11,6 +11,11 @@ import MarketQuote from '@/models/MarketQuote'
 import QuoteRequest from '@/models/QuoteRequest'
 import QuoteResponse from '@/models/QuoteResponse'
 import SiteConfig from '@/models/SiteConfig'
+import SubscriptionPlan from '@/models/SubscriptionPlan'
+import Subscription from '@/models/Subscription'
+import SubscriptionTransaction from '@/models/SubscriptionTransaction'
+import SubscriptionRefund from '@/models/SubscriptionRefund'
+import PaymentSettings from '@/models/PaymentSettings'
 import { errorResponse, validateSession } from '@/lib/api-utils'
 import { rateLimitOrNull } from '@/lib/rate-limit'
 import { backupUser } from '@/lib/audit'
@@ -25,7 +30,7 @@ export async function GET(req: NextRequest) {
     if ('error' in auth) return errorResponse(auth.error || 'Não autorizado', auth.status)
 
     await connectDB()
-    const [users, products, farms, news, memberContent, marketQuotes, quoteRequests, quoteResponses, siteConfig] = await Promise.all([
+    const [users, products, farms, news, memberContent, marketQuotes, quoteRequests, quoteResponses, siteConfig, subscriptionPlans, subscriptions, subscriptionTransactions, subscriptionRefunds, paymentSettings] = await Promise.all([
       User.find().select('name email role plan planExpiresAt verificationStatus isActive phone company location createdAt updatedAt').lean(),
       Product.find().lean(),
       Farm.find().lean(),
@@ -35,6 +40,11 @@ export async function GET(req: NextRequest) {
       QuoteRequest.find().lean(),
       QuoteResponse.find().lean(),
       SiteConfig.find().lean(),
+      SubscriptionPlan.find().lean(),
+      Subscription.find().lean(),
+      SubscriptionTransaction.find().lean(),
+      SubscriptionRefund.find().lean(),
+      PaymentSettings.find().lean(),
     ])
 
     const payload = {
@@ -49,6 +59,8 @@ export async function GET(req: NextRequest) {
         marketQuotes: marketQuotes.length,
         quoteRequests: quoteRequests.length,
         quoteResponses: quoteResponses.length,
+        subscriptions: subscriptions.length,
+        subscriptionTransactions: subscriptionTransactions.length,
       },
       users: users.map((user) => backupUser(user as Record<string, unknown>)),
       products,
@@ -59,6 +71,11 @@ export async function GET(req: NextRequest) {
       quoteRequests,
       quoteResponses,
       siteConfig,
+      subscriptionPlans,
+      subscriptions,
+      subscriptionTransactions,
+      subscriptionRefunds,
+      paymentSettings,
     }
 
     const actorId = (auth.user as { id?: string }).id
