@@ -36,14 +36,14 @@ function byHierarchy(members: CouncilMember[]) {
 function Portrait({ member, lead = false }: { member: CouncilMember; lead?: boolean }) {
   return (
     <article className={`group relative overflow-hidden rounded-3xl bg-primary-950 shadow-lg ${lead ? 'ring-2 ring-primary-300' : 'ring-1 ring-white/10'}`}>
-      <div className={`relative ${lead ? 'aspect-[4/5]' : 'aspect-[3/4]'}`}>
+      <div className="relative aspect-[4/5]">
         {member.avatar ? (
           <Image
             src={member.avatar}
             alt={member.name}
             fill
             className="object-cover transition duration-700 group-hover:scale-105"
-            sizes={lead ? '(max-width:768px) 100vw, 420px' : '(max-width:768px) 100vw, 280px'}
+            sizes={lead ? '220px' : '160px'}
           />
         ) : (
           <div className="flex h-full items-center justify-center bg-gradient-to-br from-primary-800 to-primary-950 text-5xl font-semibold text-white">
@@ -51,12 +51,12 @@ function Portrait({ member, lead = false }: { member: CouncilMember; lead?: bool
           </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/20 to-transparent" />
-        <div className="absolute inset-x-0 bottom-0 p-5">
-          <p className={`font-semibold uppercase tracking-[0.18em] text-primary-200 ${lead ? 'text-xs' : 'text-[11px]'}`}>{member.role}</p>
-          <h3 className={`mt-1 font-heading font-semibold text-white ${lead ? 'text-2xl' : 'text-lg'}`}>{member.name}</h3>
+        <div className="absolute inset-x-0 bottom-0 p-3 sm:p-4">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-primary-200 sm:text-[11px]">{member.role}</p>
+          <h3 className={`mt-1 font-heading font-semibold text-white ${lead ? 'text-base sm:text-xl' : 'text-sm sm:text-base'}`}>{member.name}</h3>
           {member.company && <p className="mt-1 text-sm text-white/70">{member.company}</p>}
           {member.description && (
-            <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-white/80">{member.description}</p>
+            <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-white/80 sm:line-clamp-3 sm:text-sm">{member.description}</p>
           )}
         </div>
       </div>
@@ -106,12 +106,12 @@ export default function CouncilBoard({
 
         <div>
           {lead && (
-            <div className="mx-auto max-w-sm">
+            <div className="mx-auto w-40 sm:w-48 md:w-56">
               <Portrait member={lead} lead />
             </div>
           )}
           {rest.length > 0 && (
-            <div className={`mx-auto mt-8 grid max-w-3xl gap-5 ${rest.length > 1 ? 'sm:grid-cols-2' : 'max-w-xs'}`}>
+            <div className={`mx-auto mt-5 grid justify-center gap-3 sm:mt-8 sm:gap-5 ${rest.length > 1 ? 'grid-cols-2 max-w-md' : 'max-w-[10rem]'}`}>
               {rest.map((member) => (
                 <Portrait key={member._id} member={member} />
               ))}
