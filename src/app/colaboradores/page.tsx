@@ -3,7 +3,6 @@ export const dynamic = 'force-dynamic'
 import type { Metadata } from 'next'
 import { cookies } from 'next/headers'
 import CollaboratorsClient from './CollaboratorsClient'
-import PageHeader from '@/components/ui/PageHeader'
 
 export function generateMetadata(): Metadata {
   const locale = cookies().get('locale')?.value || 'pt-AO'
@@ -30,19 +29,5 @@ async function getCollaborators() {
 
 export default async function ColaboradoresPage() {
   const collaborators = await getCollaborators()
-  const locale = cookies().get('locale')?.value || 'pt-AO'
-  const isEn = String(locale).startsWith('en')
-
-  return (
-    <>
-      <PageHeader
-        eyebrow={isEn ? 'Association' : 'Associação'}
-        title={isEn ? 'Administrative Council' : 'Conselho Administrativo'}
-        description={isEn ? 'The people who lead the association and represent its members.' : 'Quem dirige a associação e representa os associados.'}
-      />
-      <section className="container-custom py-10 md:py-12">
-        <CollaboratorsClient initial={collaborators} />
-      </section>
-    </>
-  )
+  return <CollaboratorsClient initial={collaborators} />
 }
